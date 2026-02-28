@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none">
+  <defs>
+    <linearGradient id="aura-g1" x1="0" y1="0" x2="36" y2="36">
+      <stop stop-color="#06d6a0"/><stop offset="1" stop-color="#0891b2"/>
+    </linearGradient>
+    <linearGradient id="aura-g2" x1="36" y1="0" x2="0" y2="36">
+      <stop stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="aura-glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      @media (prefers-reduced-motion: reduce) {
+        .aura-orbit { animation: none !important; }
+        .aura-core { animation: none !important; }
+      }
+    </style>
+  </defs>
+  <circle cx="18" cy="18" r="16" stroke="url(#aura-g1)" stroke-width="1.5" opacity="0.3"/>
+  <ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#aura-g1)" stroke-width="1.2" opacity="0.5">
+    <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="12s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#aura-g2)" stroke-width="1.2" opacity="0.5">
+    <animateTransform attributeName="transform" type="rotate" from="120 18 18" to="480 18 18" dur="16s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#aura-g1)" stroke-width="1" opacity="0.3">
+    <animateTransform attributeName="transform" type="rotate" from="240 18 18" to="600 18 18" dur="20s" repeatCount="indefinite"/>
+  </ellipse>
+  <circle class="aura-core" cx="18" cy="18" r="5" fill="url(#aura-g1)" filter="url(#aura-glow)">
+    <animate attributeName="r" values="3.5;6;3.5" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="18" cy="18" r="2" fill="#050811" opacity="0.4"/>
+</svg>

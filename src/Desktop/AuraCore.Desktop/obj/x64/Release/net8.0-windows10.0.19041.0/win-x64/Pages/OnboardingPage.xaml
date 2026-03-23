@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AuraCore.Desktop.Pages.OnboardingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                    Width="600" Spacing="32">
+
+            <!-- Step indicator -->
+            <StackPanel x:ConnectionId='2' x:Name="StepDots" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" />
+
+            <!-- Step content area -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="12" Padding="40" MinHeight="320"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel VerticalAlignment="Center" Spacing="20" HorizontalAlignment="Center">
+                    <FontIcon x:ConnectionId='7' x:Name="StepIcon" Glyph="&#xE95E;" FontSize="56"
+                              Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
+                    <TextBlock x:ConnectionId='8' x:Name="StepTitle" Text="" Style="{StaticResource TitleTextBlockStyle}"
+                               HorizontalAlignment="Center" TextAlignment="Center" />
+                    <TextBlock x:ConnectionId='9' x:Name="StepDescription" Text="" FontSize="14" Opacity="0.7"
+                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                               HorizontalAlignment="Center" />
+                    <TextBlock x:ConnectionId='10' x:Name="StepDetail" Text="" FontSize="12" Opacity="0.4"
+                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- Navigation buttons -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:ConnectionId='4' x:Name="BackBtn" Grid.Column="0" Content="Back"                      
+                        Padding="24,10" HorizontalAlignment="Left" Visibility="Collapsed" />
+
+                <TextBlock x:ConnectionId='5' x:Name="StepCounter" Grid.Column="1" Text="1 / 6"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                           Opacity="0.4" FontSize="13" />
+
+                <Button x:ConnectionId='6' x:Name="NextBtn" Grid.Column="2" Content="Next"                      
+                        Style="{StaticResource AccentButtonStyle}" Padding="24,10"
+                        HorizontalAlignment="Right" />
+            </Grid>
+
+            <!-- Skip -->
+            <HyperlinkButton x:ConnectionId='3' x:Name="SkipBtn" Content="Skip tutorial"                      
+                             HorizontalAlignment="Center" />
+
+        </StackPanel>
+    </Grid>
+</Page>
+

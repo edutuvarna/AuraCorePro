@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="AuraCore.Desktop.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Aura Core Pro">
+
+    <Grid>
+        <Grid.KeyboardAccelerators>
+            <!-- Navigation shortcuts: Ctrl+1 through Ctrl+9 -->
+            <KeyboardAccelerator x:ConnectionId='2' Key="Number1" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='3' Key="Number2" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='4' Key="Number3" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='5' Key="Number4" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='6' Key="Number5" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='7' Key="Number6" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='8' Key="Number7" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='9' Key="Number8" Modifiers="Control"                            />
+            <KeyboardAccelerator x:ConnectionId='10' Key="Number9" Modifiers="Control"                            />
+            <!-- Ctrl+G = Gaming Mode toggle -->
+            <KeyboardAccelerator x:ConnectionId='11' Key="G" Modifiers="Control"                            />
+            <!-- F5 = Refresh current page -->
+            <KeyboardAccelerator x:ConnectionId='12' Key="F5"                            />
+        </Grid.KeyboardAccelerators>
+        <NavigationView x:ConnectionId='13'
+            x:Name="NavView"
+            IsBackButtonVisible="Collapsed"
+            PaneDisplayMode="Left"
+            IsSettingsVisible="True"
+                                                       >
+
+            <NavigationView.PaneFooter>
+                <StackPanel Padding="12,8" Spacing="4">
+                    <Button x:ConnectionId='14' x:Name="NotificationBell" Background="Transparent" BorderThickness="0"
+                            Padding="4" HorizontalAlignment="Left"                               >
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xEA8F;" FontSize="16" />
+                            <Border x:ConnectionId='18' x:Name="NotifBadge" Visibility="Collapsed"
+                                    Background="#C62828" CornerRadius="8" Padding="5,1"
+                                    VerticalAlignment="Center">
+                                <TextBlock x:ConnectionId='19' x:Name="NotifBadgeText" Text="0" FontSize="10"
+                                           Foreground="White" FontWeight="SemiBold" />
+                            </Border>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock x:ConnectionId='15' x:Name="UserInfoText" Text="" FontSize="11" Opacity="0.6" TextTrimming="CharacterEllipsis" MaxWidth="180" />
+                    <Border x:ConnectionId='16' x:Name="TierBadge" CornerRadius="4" Padding="8,2" HorizontalAlignment="Left">
+                        <TextBlock x:ConnectionId='17' x:Name="TierBadgeText" Text="FREE" FontSize="10" Foreground="White" FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+            </NavigationView.PaneFooter>
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Dashboard" Tag="dashboard">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE80F;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="System Health" Tag="system-health">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE95E;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="AI Recommendations" Tag="recommendations">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE99A;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator />
+                <NavigationViewItemHeader Content="Optimization" />
+
+                <NavigationViewItem Content="Junk Cleaner" Tag="junk-cleaner">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="RAM Optimizer" Tag="ram-optimizer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7F7;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Storage" Tag="storage-compression">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEDA2;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Registry" Tag="registry-optimizer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7FC;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Bloatware" Tag="bloatware-removal">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEA99;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Network" Tag="network-optimizer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE968;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Gaming Mode" Tag="gaming-mode">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7FC;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator />
+                <NavigationViewItemHeader Content="Customization" />
+
+                <NavigationViewItem Content="Context Menu" Tag="context-menu">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE712;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Taskbar" Tag="taskbar-tweaks">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE700;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Explorer" Tag="explorer-tweaks">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEC50;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator />
+                <NavigationViewItemHeader Content="Tools" />
+
+                <NavigationViewItem Content="App Installer" Tag="app-installer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE71E;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Space Analyzer" Tag="space-analyzer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE9F9;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Disk Health" Tag="disk-health">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xECA7;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Startup Optimizer" Tag="startup-optimizer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7B5;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Auto-Schedule" Tag="scheduler">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE823;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem x:ConnectionId='20' x:Name="AdminNavItem" Content="Admin Panel" Tag="admin" Visibility="Collapsed">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7EF;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <Frame x:ConnectionId='21' x:Name="ContentFrame" />
+        </NavigationView>
+    </Grid>
+</Window>
+

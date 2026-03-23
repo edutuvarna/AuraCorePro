@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AuraCore.Desktop": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

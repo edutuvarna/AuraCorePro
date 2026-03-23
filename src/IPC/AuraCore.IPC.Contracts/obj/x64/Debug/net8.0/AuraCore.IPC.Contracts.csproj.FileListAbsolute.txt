@@ -1,0 +1,15 @@
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\bin\x64\Debug\net8.0\AuraCore.IPC.Contracts.deps.json
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\bin\x64\Debug\net8.0\AuraCore.IPC.Contracts.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\bin\x64\Debug\net8.0\AuraCore.IPC.Contracts.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\bin\x64\Debug\net8.0\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\bin\x64\Debug\net8.0\AuraCore.SharedKernel.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.csproj.AssemblyReference.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.AssemblyInfo.cs
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.825A2F9D.Up2Date
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\refint\AuraCore.IPC.Contracts.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\AuraCore.IPC.Contracts.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\IPC\AuraCore.IPC.Contracts\obj\x64\Debug\net8.0\ref\AuraCore.IPC.Contracts.dll

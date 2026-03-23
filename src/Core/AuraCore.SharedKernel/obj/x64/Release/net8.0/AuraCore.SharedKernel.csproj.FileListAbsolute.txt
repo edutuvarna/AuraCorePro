@@ -1,0 +1,12 @@
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\bin\x64\Release\net8.0\AuraCore.SharedKernel.deps.json
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\bin\x64\Release\net8.0\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\bin\x64\Release\net8.0\AuraCore.SharedKernel.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.AssemblyInfo.cs
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\refint\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\ref\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Release\net8.0\AuraCore.SharedKernel.sourcelink.json

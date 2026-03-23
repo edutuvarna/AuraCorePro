@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="../AuraCore.PrivilegedService.IPC/AuraCore.PrivilegedService.IPC.csproj" />
+    <ProjectReference Include="../AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj" />
+    <ProjectReference Include="../../IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj" />
+  </ItemGroup>
+</Project>

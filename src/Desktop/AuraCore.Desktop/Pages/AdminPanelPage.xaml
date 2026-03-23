@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="AuraCore.Desktop.Pages.AdminPanelPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="20" MaxWidth="1000">
+
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PageTitle" Text="Admin Panel" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="PageSubtitle" Text="Server management, users, subscriptions, and payments"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Server Config + Health -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Server Configuration" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="ServerUrlBox" PlaceholderText="https://api.auracorepro.com" Width="400" />
+                        <Button Content="Save" Click="SaveServerUrl_Click" Padding="16,8" />
+                        <Button x:Name="HealthCheckBtn" Content="Health Check" Click="HealthCheck_Click" Padding="16,8" />
+                        <ProgressRing x:Name="HealthProgress" IsActive="False" Visibility="Collapsed" Width="20" Height="20" />
+                    </StackPanel>
+                    <StackPanel x:Name="HealthPanel" Orientation="Horizontal" Spacing="16" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border x:Name="ApiDot" Width="10" Height="10" CornerRadius="5" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ApiHealthText" Text="" FontSize="12" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock x:Name="HealthLatencyText" Text="" FontSize="11" Opacity="0.5" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock x:Name="ServerStatus" Text="" FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Stats -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Statistics" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <Button Content="Refresh" Click="RefreshStats_Click" Padding="12,4" FontSize="12" />
+                        <ProgressRing x:Name="StatsProgress" IsActive="False" Visibility="Collapsed" Width="20" Height="20" />
+                    </StackPanel>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Total Users" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatUsers" Text="--" FontSize="20" FontWeight="SemiBold" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Pro" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatPro" Text="--" FontSize="20" FontWeight="SemiBold" Foreground="#1565C0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="2">
+                            <TextBlock Text="Enterprise" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatEnterprise" Text="--" FontSize="20" FontWeight="SemiBold" Foreground="#6A1B9A" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Spacing="2">
+                            <TextBlock Text="Revenue" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatRevenue" Text="--" FontSize="20" FontWeight="SemiBold" Foreground="#2E7D32" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="4" Spacing="2">
+                            <TextBlock Text="Pending Crypto" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatPending" Text="--" FontSize="20" FontWeight="SemiBold" Foreground="#E65100" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="5" Spacing="2">
+                            <TextBlock Text="Conversion" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="StatConversion" Text="--" FontSize="20" FontWeight="SemiBold" Foreground="#00838F" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Recent Payments -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="Recent Payments" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <Button Content="Refresh" Click="RefreshPayments_Click" Padding="10,3" FontSize="11" />
+                        <ProgressRing x:Name="PaymentsProgress" IsActive="False" Visibility="Collapsed" Width="18" Height="18" />
+                    </StackPanel>
+                    <StackPanel x:Name="PaymentsList" Spacing="4" />
+                    <TextBlock x:Name="PaymentsStatus" Text="" FontSize="11" Opacity="0.5" />
+                </StackPanel>
+            </Border>
+
+            <!-- User Management -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="User Management" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="UserSearchBox" PlaceholderText="Search by email..." Width="300" KeyDown="UserSearch_KeyDown" />
+                        <Button Content="Search" Click="UserSearch_Click" Padding="12,8" />
+                        <Button Content="Show All" Click="ShowAllUsers_Click" Padding="12,8" />
+                        <ProgressRing x:Name="UserProgress" IsActive="False" Visibility="Collapsed" Width="20" Height="20" />
+                    </StackPanel>
+                    <StackPanel x:Name="UserList" Spacing="4" />
+                    <TextBlock x:Name="UserCountText" Text="" FontSize="12" Opacity="0.5" />
+                </StackPanel>
+            </Border>
+
+            <!-- Grant Subscription -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Grant Subscription" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="GrantEmailBox" PlaceholderText="User email" Width="220" />
+                        <ComboBox x:Name="GrantTierBox" Width="130" SelectedIndex="0">
+                            <ComboBoxItem Content="Pro" Tag="pro" />
+                            <ComboBoxItem Content="Enterprise" Tag="enterprise" />
+                        </ComboBox>
+                        <ComboBox x:Name="GrantDaysBox" Width="130" SelectedIndex="1">
+                            <ComboBoxItem Content="7 days" Tag="7" />
+                            <ComboBoxItem Content="30 days" Tag="30" />
+                            <ComboBoxItem Content="90 days" Tag="90" />
+                            <ComboBoxItem Content="365 days" Tag="365" />
+                            <ComboBoxItem Content="Lifetime" Tag="36500" />
+                        </ComboBox>
+                        <Button Content="Grant" Click="GrantSub_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="GrantStatus" Text="" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Revoke Subscription -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Revoke Subscription" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock Text="Downgrade a user back to Free tier immediately." FontSize="12" Opacity="0.6" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="RevokeEmailBox" PlaceholderText="User email" Width="300" />
+                        <Button Content="Revoke" Click="RevokeSub_Click" Padding="16,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="RevokeStatus" Text="" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Password Reset -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Reset User Password" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="ResetEmailBox" PlaceholderText="User email" Width="250" />
+                        <PasswordBox x:Name="ResetPasswordBox" PlaceholderText="New password" Width="200" />
+                        <Button Content="Reset Password" Click="ResetPassword_Click" Padding="16,8" />
+                    </StackPanel>
+                    <TextBlock x:Name="ResetStatus" Text="" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,11 @@
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\bin\Debug\net8.0\AuraCore.Domain.deps.json
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\bin\Debug\net8.0\AuraCore.Domain.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\bin\Debug\net8.0\AuraCore.Domain.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.AssemblyInfo.cs
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\refint\AuraCore.Domain.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\AuraCore.Domain.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Domain\obj\Debug\net8.0\ref\AuraCore.Domain.dll

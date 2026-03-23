@@ -1,0 +1,15 @@
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\bin\Debug\net8.0\AuraCore.API.Application.deps.json
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\bin\Debug\net8.0\AuraCore.API.Application.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\bin\Debug\net8.0\AuraCore.API.Application.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\bin\Debug\net8.0\AuraCore.API.Domain.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\bin\Debug\net8.0\AuraCore.API.Domain.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.csproj.AssemblyReference.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.AssemblyInfoInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.AssemblyInfo.cs
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.B3618DFF.Up2Date
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\refint\AuraCore.API.Application.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\AuraCore.API.Application.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Backend\AuraCore.API.Application\obj\Debug\net8.0\ref\AuraCore.API.Application.dll

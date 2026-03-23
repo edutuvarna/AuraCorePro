@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AuraCore.Desktop.Pages.SystemHealthPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="20" MaxWidth="900">
+
+            <StackPanel Spacing="4">
+                <TextBlock x:ConnectionId='36' x:Name="PageTitle" Text="System Health Analyzer" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:ConnectionId='37' x:Name="PageSubtitle" Text="Complete system diagnostic scan" 
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:ConnectionId='32' x:Name="ScanBtn" Content="Run Full Scan"                      
+                        Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
+                <Button x:ConnectionId='33' x:Name="ExportPdfBtn" Content="Export PDF Report"                           
+                        Padding="24,10" IsEnabled="False" />
+                <ProgressRing x:ConnectionId='34' x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
+                <TextBlock x:ConnectionId='35' x:Name="StatusText" Text="Ready" VerticalAlignment="Center" 
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- OS Section -->
+            <Border x:ConnectionId='2' x:Name="OsSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Operating System" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='27' x:Name="OsName" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='28' x:Name="OsVersion" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='29' x:Name="OsArch" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='30' x:Name="OsMachine" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='31' x:Name="OsUptime" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- CPU Section -->
+            <Border x:ConnectionId='3' x:Name="CpuSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Processor" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='23' x:Name="CpuName" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='24' x:Name="CpuCores" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ProgressBar x:ConnectionId='25' x:Name="CpuBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
+                    <TextBlock x:ConnectionId='26' x:Name="CpuUsage" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Memory Section -->
+            <Border x:ConnectionId='4' x:Name="MemSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Memory" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='19' x:Name="MemTotal" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='20' x:Name="MemAvail" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ProgressBar x:ConnectionId='21' x:Name="MemBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
+                    <TextBlock x:ConnectionId='22' x:Name="MemUsage" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Drives Section -->
+            <Border x:ConnectionId='5' x:Name="DiskSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Storage Drives" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel x:ConnectionId='18' x:Name="DriveList" Spacing="12" />
+                </StackPanel>
+            </Border>
+
+            <!-- Processes Section -->
+            <Border x:ConnectionId='6' x:Name="ProcSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Process Summary" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='16' x:Name="ProcCount" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:ConnectionId='17' x:Name="ProcTopRam" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- GPU Section -->
+            <Border x:ConnectionId='7' x:Name="GpuSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Graphics (GPU)" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel x:ConnectionId='15' x:Name="GpuList" Spacing="10" />
+                </StackPanel>
+            </Border>
+
+            <!-- Battery Section -->
+            <Border x:ConnectionId='8' x:Name="BatterySection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Battery" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='12' x:Name="BatteryCharge" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ProgressBar x:ConnectionId='13' x:Name="BatteryBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
+                    <TextBlock x:ConnectionId='14' x:Name="BatteryStatus" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Startup Programs -->
+            <Border x:ConnectionId='9' x:Name="StartupSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel Spacing="8">
+                    <TextBlock x:ConnectionId='10' x:Name="StartupHeader" Text="Startup Programs" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel x:ConnectionId='11' x:Name="StartupList" Spacing="4" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

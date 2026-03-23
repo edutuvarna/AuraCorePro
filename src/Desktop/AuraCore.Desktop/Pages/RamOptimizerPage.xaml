@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="AuraCore.Desktop.Pages.RamOptimizerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="20" MaxWidth="900">
+
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PageTitle" Text="RAM Optimizer" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="PageSubtitle" Text="Analyze memory usage and reclaim wasted RAM"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Action Bar -->
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="ScanBtn" Content="Analyze Memory" Click="ScanBtn_Click"
+                        Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
+                <Button x:Name="OptimizeBtn" Content="Optimize RAM" Click="OptimizeBtn_Click"
+                        Padding="24,10" IsEnabled="False" />
+                <ToggleSwitch x:Name="TrendToggle" Header="Track Trends" OnContent="ON" OffContent="OFF"
+                              Toggled="TrendToggle_Toggled" VerticalAlignment="Center" />
+                <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
+                <TextBlock x:Name="StatusText" Text="Click Analyze to scan memory usage"
+                           VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Leak Detection Alert -->
+            <Border x:Name="LeakAlertCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="16" BorderBrush="#E65100" BorderThickness="1.5">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE7BA;" FontSize="18" Foreground="#E65100" />
+                        <TextBlock Text="Possible Memory Leaks Detected" FontWeight="SemiBold" FontSize="14" Foreground="#E65100" />
+                    </StackPanel>
+                    <TextBlock x:Name="LeakDetailText" Text="" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                    <StackPanel x:Name="LeakList" Spacing="4" />
+                </StackPanel>
+            </Border>
+
+            <!-- Memory Overview (hidden until scan) -->
+            <Border x:Name="MemoryOverview" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Total RAM" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock x:Name="TotalRamText" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="In Use" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock x:Name="UsedRamText" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#E65100" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="2">
+                            <TextBlock Text="Available" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock x:Name="AvailRamText" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#2E7D32" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" Spacing="2">
+                            <TextBlock Text="Reclaimable" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock x:Name="ReclaimText" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#1565C0" />
+                        </StackPanel>
+                    </Grid>
+                    <ProgressBar x:Name="MemBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
+                    <TextBlock x:Name="MemPctText" Text="" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Process List -->
+            <StackPanel x:Name="ProcessList" Spacing="4" />
+
+            <!-- Optimization Result -->
+            <Border x:Name="ResultCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="ResultTitle" Text="" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="#2E7D32" />
+                    <TextBlock x:Name="ResultDetail" Text="" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

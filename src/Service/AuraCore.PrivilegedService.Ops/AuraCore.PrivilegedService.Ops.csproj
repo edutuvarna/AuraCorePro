@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj" />
+    <ProjectReference Include="../../Core/AuraCore.SharedKernel/AuraCore.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="AuraCore.Desktop.Pages.SchedulerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="20" MaxWidth="960">
+
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PageTitle" Text="Auto-Scheduling" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="PageSubtitle" Text="Set modules to run automatically in the background when your PC is idle"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Master Toggle -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Background Scheduler" FontWeight="SemiBold" FontSize="16" />
+                        <TextBlock x:Name="SchedulerStatus" Text="Inactive — no tasks scheduled"
+                                   FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <ToggleSwitch x:Name="MasterToggle" Grid.Column="1" OnContent="ON" OffContent="OFF"
+                                  Toggled="MasterToggle_Toggled" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Schedule List -->
+            <StackPanel x:Name="ScheduleList" Spacing="8" />
+
+            <!-- Add Custom Schedule -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Add Schedule" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ComboBox x:Name="AddModuleBox" PlaceholderText="Module" Width="200" />
+                        <ComboBox x:Name="AddIntervalBox" PlaceholderText="Interval" Width="180">
+                            <ComboBoxItem Content="Every 30 minutes" Tag="Every30Min" />
+                            <ComboBoxItem Content="Every hour" Tag="Hourly" />
+                            <ComboBoxItem Content="Every 6 hours" Tag="Every6Hours" />
+                            <ComboBoxItem Content="Daily" Tag="Daily" IsSelected="True" />
+                            <ComboBoxItem Content="Weekly" Tag="Weekly" />
+                        </ComboBox>
+                        <CheckBox x:Name="AddIdleCheck" Content="Only when idle" IsChecked="True" VerticalAlignment="Center" />
+                        <Button Content="Add" Click="AddSchedule_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Activity Log -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Activity Log" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <StackPanel x:Name="LogList" Spacing="2" />
+                    <TextBlock x:Name="NoLogText" Text="No activity yet — enable a schedule to begin" FontSize="12" Opacity="0.4" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

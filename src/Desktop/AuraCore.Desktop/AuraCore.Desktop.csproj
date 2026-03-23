@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <Platforms>x64;x86;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-x86;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.0" />
+    <PackageReference Include="QuestPDF" Version="2024.12.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Core/AuraCore.Domain/AuraCore.Domain.csproj" />
+    <ProjectReference Include="../../Core/AuraCore.Application/AuraCore.Application.csproj" />
+    <ProjectReference Include="../../Core/AuraCore.SharedKernel/AuraCore.SharedKernel.csproj" />
+    <ProjectReference Include="../AuraCore.Desktop.ViewModels/AuraCore.Desktop.ViewModels.csproj" />
+    <ProjectReference Include="../AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
+    <ProjectReference Include="../../Guards/AuraCore.Guard.Licensing/AuraCore.Guard.Licensing.csproj" />
+    <ProjectReference Include="../../Guards/AuraCore.Guard.FeatureFlags/AuraCore.Guard.FeatureFlags.csproj" />
+    <ProjectReference Include="../../Guards/AuraCore.Guard.Security/AuraCore.Guard.Security.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.Optimization/AuraCore.Engine.Optimization.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.Safety/AuraCore.Engine.Safety.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.Plugin/AuraCore.Engine.Plugin.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.Scheduler/AuraCore.Engine.Scheduler.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.AIRecommender/AuraCore.Engine.AIRecommender.csproj" />
+    <ProjectReference Include="../../Engines/AuraCore.Engine.SystemMonitor/AuraCore.Engine.SystemMonitor.csproj" />
+    <ProjectReference Include="../../Simulation/AuraCore.Simulation/AuraCore.Simulation.csproj" />
+    <ProjectReference Include="../../Platform/AuraCore.Platform.Configuration/AuraCore.Platform.Configuration.csproj" />
+    <ProjectReference Include="../../Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj" />
+    <ProjectReference Include="../../Platform/AuraCore.Platform.Telemetry/AuraCore.Platform.Telemetry.csproj" />
+    <ProjectReference Include="../../Platform/AuraCore.Platform.Diagnostics/AuraCore.Platform.Diagnostics.csproj" />
+    <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.Windows/AuraCore.Infrastructure.Windows.csproj" />
+    <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.Http/AuraCore.Infrastructure.Http.csproj" />
+    <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.Storage/AuraCore.Infrastructure.Storage.csproj" />
+    <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.Logging/AuraCore.Infrastructure.Logging.csproj" />
+    <ProjectReference Include="../../IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.SystemHealth/AuraCore.Module.SystemHealth.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.JunkCleaner/AuraCore.Module.JunkCleaner.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.BloatwareRemoval/AuraCore.Module.BloatwareRemoval.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.RegistryOptimizer/AuraCore.Module.RegistryOptimizer.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.RamOptimizer/AuraCore.Module.RamOptimizer.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.StorageCompression/AuraCore.Module.StorageCompression.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.AppInstaller/AuraCore.Module.AppInstaller.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.GamingMode/AuraCore.Module.GamingMode.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.NetworkOptimizer/AuraCore.Module.NetworkOptimizer.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.ContextMenu/AuraCore.Module.ContextMenu.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.TaskbarTweaks/AuraCore.Module.TaskbarTweaks.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.ExplorerTweaks/AuraCore.Module.ExplorerTweaks.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,13 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "zhH2hroSm8E=",
+  "dgSpecHash": "+mUHXtd/f4I=",
   "success": true,
   "projectFilePath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Http\\AuraCore.Infrastructure.Http.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.25\\microsoft.netcore.app.runtime.win-x64.8.0.25.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.25\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.25.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.25\\microsoft.aspnetcore.app.runtime.win-x64.8.0.25.nupkg.sha512"
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512"
   ],
   "logs": []
 }

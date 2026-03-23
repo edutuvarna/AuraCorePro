@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Module.TaskbarTweaks")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+224e7cb031b4650acd020e18644ca85b099c5445")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec37e0f25572748372207526d26bc06d3d677232")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Module.TaskbarTweaks")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Module.TaskbarTweaks")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

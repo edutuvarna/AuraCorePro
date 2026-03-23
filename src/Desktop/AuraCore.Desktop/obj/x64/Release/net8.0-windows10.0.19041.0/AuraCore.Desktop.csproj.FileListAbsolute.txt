@@ -306,3 +306,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Desktop\AuraCore.Desktop\obj\
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Desktop\AuraCore.Desktop\obj\x64\Release\net8.0-windows10.0.19041.0\qualifiers.txt
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Desktop\AuraCore.Desktop\obj\x64\Release\net8.0-windows10.0.19041.0\qualifiers.txt.intermediate
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Desktop\AuraCore.Desktop\obj\x64\Release\net8.0-windows10.0.19041.0\MultipleQualifiersPerDimensionFound.txt
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Desktop\AuraCore.Desktop\obj\x64\Release\net8.0-windows10.0.19041.0\AuraCore.Desktop.sourcelink.json

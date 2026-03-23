@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "AF0DKhAEWkA=",
+  "dgSpecHash": "dDTcc+Dvshw=",
   "success": true,
   "projectFilePath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Modules\\AuraCore.Module.RegistryOptimizer\\AuraCore.Module.RegistryOptimizer.csproj",
   "expectedPackageFiles": [
@@ -8,10 +8,7 @@
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\system.security.accesscontrol\\5.0.0\\system.security.accesscontrol.5.0.0.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.25\\microsoft.netcore.app.runtime.win-x64.8.0.25.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.25\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.25.nupkg.sha512",
-    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.25\\microsoft.aspnetcore.app.runtime.win-x64.8.0.25.nupkg.sha512"
+    "C:\\Users\\Admin\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

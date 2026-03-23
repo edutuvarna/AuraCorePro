@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Module.RamOptimizer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b1bdc9619341cd682364af7a33eb9d3e3769ac2a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+224e7cb031b4650acd020e18644ca85b099c5445")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Module.RamOptimizer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Module.RamOptimizer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

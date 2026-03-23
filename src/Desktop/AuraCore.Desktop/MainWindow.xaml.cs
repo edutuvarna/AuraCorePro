@@ -33,6 +33,10 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         // Initialize background scheduler
         App.InitScheduler(DispatcherQueue);
 
+        // Start auto-update checker
+        UpdateChecker.Instance.UpdateFound += OnUpdateFound;
+        UpdateChecker.Instance.Start();
+
         // Subscribe to notifications
         NotificationService.Instance.UnreadCountChanged += (count) =>
         {
@@ -283,6 +287,64 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         catch { }
     }
 
+    // ── AUTO UPDATE ─────────────────────────────────────────
+
+    private void OnUpdateFound(UpdateInfo info)
+    {
+        DispatcherQueue?.TryEnqueue(async () =>
+        {
+            if (info.IsMandatory)
+            {
+                // Mandatory update — block the app
+                var dialog = new ContentDialog
+                {
+                    Title = $"Mandatory Update v{info.Version}",
+                    Content = $"A mandatory update is available. You must update to continue using AuraCore Pro.\n\n{info.ReleaseNotes}",
+                    PrimaryButtonText = "Download Update",
+                    CloseButtonText = "",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = Content.XamlRoot
+                };
+
+                // Keep showing until user clicks download
+                while (true)
+                {
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        await Windows.System.Launcher.LaunchUriAsync(new Uri(info.DownloadUrl));
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // Optional update — show notification
+                NotificationService.Instance.Post(
+                    $"Update v{info.Version} Available",
+                    $"{info.ReleaseNotes}\nGo to Settings to download.",
+                    NotificationType.Info
+                );
+
+                // Also show a dialog
+                var dialog = new ContentDialog
+                {
+                    Title = $"Update Available — v{info.Version}",
+                    Content = $"A new version of AuraCore Pro is available!\n\n{info.ReleaseNotes}",
+                    PrimaryButtonText = "Download Now",
+                    CloseButtonText = "Later",
+                    DefaultButton = ContentDialogButton.Primary,
+                    XamlRoot = Content.XamlRoot
+                };
+
+                if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                {
+                    await Windows.System.Launcher.LaunchUriAsync(new Uri(info.DownloadUrl));
+                }
+            }
+        });
+    }
+
     // ── NOTIFICATION BELL ───────────────────────────────────
     private void NotificationBell_Click(object sender, RoutedEventArgs e)
     {
@@ -453,3 +515,4 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         _ => ""
     };
 }
+

@@ -140,16 +140,14 @@ public sealed partial class LoginWindow : Microsoft.UI.Xaml.Window
 
     private void LoginTab_Click(object sender, RoutedEventArgs e)
     {
-        LoginForm.Visibility = Visibility.Visible;
-        RegisterForm.Visibility = Visibility.Collapsed;
+        ShowForm("login");
         LoginTab.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["AccentButtonStyle"];
         RegisterTab.Style = null;
     }
 
     private void RegisterTab_Click(object sender, RoutedEventArgs e)
     {
-        LoginForm.Visibility = Visibility.Collapsed;
-        RegisterForm.Visibility = Visibility.Visible;
+        ShowForm("register");
         RegisterTab.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["AccentButtonStyle"];
         LoginTab.Style = null;
     }
@@ -240,6 +238,107 @@ public sealed partial class LoginWindow : Microsoft.UI.Xaml.Window
         OpenMainWindow();
     }
 
+    // ── FORGOT PASSWORD ─────────────────────────────────────
+
+    private void ShowForm(string form)
+    {
+        LoginForm.Visibility = form == "login" ? Visibility.Visible : Visibility.Collapsed;
+        RegisterForm.Visibility = form == "register" ? Visibility.Visible : Visibility.Collapsed;
+        ForgotForm.Visibility = form == "forgot" ? Visibility.Visible : Visibility.Collapsed;
+        ResetForm.Visibility = form == "reset" ? Visibility.Visible : Visibility.Collapsed;
+        StatusText.Text = "";
+    }
+
+    private void ForgotLink_Click(object sender, RoutedEventArgs e)
+    {
+        ForgotEmail.Text = LoginEmail.Text.Trim();
+        ShowForm("forgot");
+    }
+
+    private void BackToLogin_Click(object sender, RoutedEventArgs e)
+    {
+        ShowForm("login");
+    }
+
+    private async void ForgotBtn_Click(object sender, RoutedEventArgs e)
+    {
+        var email = ForgotEmail.Text.Trim();
+        if (string.IsNullOrEmpty(email))
+        { StatusText.Text = S._("login.invalidEmail"); return; }
+
+        SetLoading(true);
+        ForgotBtn.IsEnabled = false;
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/api/auth/password/forgot", new { email });
+            var json = await response.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(json);
+
+            if (response.IsSuccessStatusCode)
+            {
+                StatusText.Text = S.Current == S.Lang.EN
+                    ? "Reset code sent! Check your email."
+                    : "Sıfırlama kodu gönderildi! E-postanızı kontrol edin.";
+                ResetEmail.Text = email;
+                await Task.Delay(1500);
+                ShowForm("reset");
+            }
+            else
+            {
+                var error = doc.RootElement.TryGetProperty("error", out var errProp) ? errProp.GetString() : "Failed";
+                StatusText.Text = error;
+            }
+        }
+        catch (HttpRequestException) { StatusText.Text = S._("login.cannotConnect"); }
+        catch (TaskCanceledException) { StatusText.Text = S._("login.timeout"); }
+        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        finally { SetLoading(false); ForgotBtn.IsEnabled = true; }
+    }
+
+    private async void ResetBtn_Click(object sender, RoutedEventArgs e)
+    {
+        var email = ResetEmail.Text.Trim();
+        var code = ResetCode.Text.Trim();
+        var pass = ResetNewPass.Password;
+        var confirm = ResetConfirmPass.Password;
+
+        if (string.IsNullOrEmpty(code) || code.Length != 6)
+        { StatusText.Text = S.Current == S.Lang.EN ? "Enter the 6-digit code" : "6 haneli kodu girin"; return; }
+        if (string.IsNullOrEmpty(pass) || pass.Length < 8)
+        { StatusText.Text = S._("login.passwordTooShort"); return; }
+        if (pass != confirm)
+        { StatusText.Text = S._("login.passwordMismatch"); return; }
+
+        SetLoading(true);
+        ResetBtn.IsEnabled = false;
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/api/auth/password/reset",
+                new { email, code, newPassword = pass });
+            var json = await response.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(json);
+
+            if (response.IsSuccessStatusCode)
+            {
+                StatusText.Text = S.Current == S.Lang.EN
+                    ? "Password reset! You can now sign in."
+                    : "Şifre sıfırlandı! Artık giriş yapabilirsiniz.";
+                LoginEmail.Text = email;
+                await Task.Delay(2000);
+                ShowForm("login");
+            }
+            else
+            {
+                var error = doc.RootElement.TryGetProperty("error", out var errProp) ? errProp.GetString() : "Failed";
+                StatusText.Text = error;
+            }
+        }
+        catch (HttpRequestException) { StatusText.Text = S._("login.cannotConnect"); }
+        catch (TaskCanceledException) { StatusText.Text = S._("login.timeout"); }
+        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        finally { SetLoading(false); ResetBtn.IsEnabled = true; }
+    }
+
     private static void SyncSessionState()
     {
         SessionState.AccessToken = AccessToken;
@@ -263,6 +362,7 @@ public sealed partial class LoginWindow : Microsoft.UI.Xaml.Window
         Progress.IsActive = loading;
         Progress.Visibility = loading ? Visibility.Visible : Visibility.Collapsed;
         LoginBtn.IsEnabled = !loading; RegisterBtn.IsEnabled = !loading;
+        ForgotBtn.IsEnabled = !loading; ResetBtn.IsEnabled = !loading;
         if (loading) StatusText.Text = "";
     }
 

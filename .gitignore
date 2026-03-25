@@ -1,0 +1,84 @@
+# =============================================
+# AuraCore Pro - .gitignore
+# =============================================
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+publish/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# NuGet
+packages/
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# Windows App SDK / WinUI3
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.appxupload
+*.msix
+*.msixbundle
+*.msixupload
+Generated Files/
+
+# WebView2 cache
+**/EBWebView/
+**/*.exe.WebView2/
+
+# Project-specific build artifacts
+*.pri
+*.xbf
+*.g.cs
+*.g.i.cs
+*.g.cs.backup
+
+# Backup files
+*.bak
+*.bak2
+*.orig
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Logs
+*.log
+*.log.*
+
+# Secrets (never commit)
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+# Inno Setup output
+Output/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node modules (admin panel)
+node_modules/
+
+# Temp files
+*.tmp
+*.temp
+~$*

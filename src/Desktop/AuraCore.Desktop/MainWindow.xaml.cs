@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using AuraCore.Application;
 using AuraCore.Desktop.Pages;
+using AuraCore.Module.DiskCleanup;
 using AuraCore.Desktop.Services;
 using AuraCore.Domain.Enums;
 using Microsoft.UI.Windowing;
@@ -28,7 +29,19 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         ApplyTierLocking();
 
         // Initialize theme
-        ThemeService.Initialize(Content as FrameworkElement ?? (FrameworkElement)Content);
+        // Initialize theme on root Grid (not just Content)
+        if (Content is FrameworkElement rootEl)
+        {
+            ThemeService.Initialize(rootEl);
+            // Also explicitly set on NavView for sidebar
+            var et = ThemeService.CurrentTheme switch
+            {
+                ThemeService.AppTheme.Light => ElementTheme.Light,
+                ThemeService.AppTheme.Dark => ElementTheme.Dark,
+                _ => ElementTheme.Default
+            };
+            NavView.RequestedTheme = et;
+        }
 
         // Initialize background scheduler
         App.InitScheduler(DispatcherQueue);
@@ -139,6 +152,9 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             ["disk-health"] = "nav.diskHealth",
             ["startup-optimizer"] = "nav.startupOptimizer",
             ["scheduler"] = "nav.scheduler",
+            ["disk-cleanup"] = "nav.diskCleanup",
+            ["defender-manager"] = "nav.defender",
+            ["iso-builder"] = "nav.isoBuilder",
             ["admin"] = "nav.admin",
         };
 
@@ -150,19 +166,17 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             }
             else if (item is NavigationViewItemHeader header)
             {
-                var headerText = header.Content?.ToString() ?? "";
-                if (headerText is "Optimization" or "Optimizasyon")
+                var ht = header.Content?.ToString() ?? "";
+                if (ht.Contains("Optimization") || ht.Contains("Optimizasyon"))
                     header.Content = Services.S._("nav.optimization");
-                else if (headerText is "Customization" or "Kişiselleştirme")
+                else if (ht.Contains("Customization") || ht.Contains("Ki"))
                     header.Content = Services.S._("nav.customization");
-                else if (headerText is "Tools" or "Araçlar")
+                else if (ht.Contains("Advanced") || ht.Contains("Gelismis"))
+                    header.Content = Services.S._("nav.advancedTools");
+                else if (ht.Contains("Tools") || ht.Contains("Ara"))
                     header.Content = Services.S._("nav.tools");
             }
         }
-
-        // Localize built-in Settings nav item
-        if (NavView.SettingsItem is NavigationViewItem settingsItem)
-            settingsItem.Content = Services.S._("nav.settings");
     }
 
     private void UpdateTierBadge()
@@ -180,7 +194,6 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         TierBadge.Background = new SolidColorBrush(badgeColor);
         if (isAdmin) AdminNavItem.Visibility = Visibility.Visible;
     }
-
     private void ApplyTierLocking()
     {
         var userTier = GetCurrentTier();
@@ -196,7 +209,6 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             { item.IsEnabled = true; item.Content = originalContent; item.ClearValue(NavigationViewItem.ForegroundProperty); }
         }
     }
-
     /// <summary>Called after successful payment to refresh tier badge and unlock features</summary>
     public void RefreshAfterPayment()
     {
@@ -260,6 +272,9 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             "disk-health" => typeof(DiskHealthPage),
             "startup-optimizer" => typeof(StartupOptimizerPage),
             "scheduler" => typeof(SchedulerPage),
+            "iso-builder" => typeof(IsoBuilderPage),
+            "disk-cleanup" => typeof(DiskCleanupPage),
+            "defender-manager" => typeof(DefenderPage),
             "admin" => typeof(AdminPanelPage),
             _ => typeof(DashboardPage)
         };
@@ -295,54 +310,291 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
         {
             if (info.IsMandatory)
             {
-                // Mandatory update — block the app
-                var dialog = new ContentDialog
+                await ShowMandatoryUpdateDialog(info);
+            }
+            else
+            {
+                await ShowOptionalUpdateDialog(info);
+            }
+        });
+    }
+
+    private async Task ShowMandatoryUpdateDialog(UpdateInfo info)
+    {
+        var panel = new StackPanel { Spacing = 12, Width = 400 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = "A mandatory update is required to continue using AuraCore Pro.",
+            TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+            Opacity = 0.7
+        });
+
+        if (!string.IsNullOrEmpty(info.ReleaseNotes))
+        {
+            panel.Children.Add(new TextBlock
+            {
+                Text = "What's new:",
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                FontSize = 13
+            });
+            panel.Children.Add(new TextBlock
+            {
+                Text = info.ReleaseNotes,
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                Opacity = 0.6,
+                FontSize = 12
+            });
+        }
+
+        var progressBar = new ProgressBar
+        {
+            IsIndeterminate = false,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 0,
+            Visibility = Visibility.Collapsed,
+            Margin = new Thickness(0, 4, 0, 0)
+        };
+        panel.Children.Add(progressBar);
+
+        var statusText = new TextBlock
+        {
+            Text = "",
+            FontSize = 12,
+            Opacity = 0.5,
+            Visibility = Visibility.Collapsed
+        };
+        panel.Children.Add(statusText);
+
+        var dialog = new ContentDialog
+        {
+            Title = $"Mandatory Update - v{info.Version}",
+            Content = panel,
+            PrimaryButtonText = "Download & Install",
+            CloseButtonText = "",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot
+        };
+
+        while (true)
+        {
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                // Download in-app
+                dialog.IsPrimaryButtonEnabled = false;
+                progressBar.Visibility = Visibility.Visible;
+                statusText.Visibility = Visibility.Visible;
+                statusText.Text = "Downloading update...";
+
+                UpdateChecker.Instance.DownloadProgressChanged += (pct) =>
                 {
-                    Title = $"Mandatory Update v{info.Version}",
-                    Content = $"A mandatory update is available. You must update to continue using AuraCore Pro.\n\n{info.ReleaseNotes}",
-                    PrimaryButtonText = "Download Update",
-                    CloseButtonText = "",
+                    DispatcherQueue?.TryEnqueue(() =>
+                    {
+                        progressBar.Value = pct;
+                        statusText.Text = $"Downloading... {pct:F0}%";
+                    });
+                };
+
+                var filePath = await UpdateChecker.Instance.DownloadUpdateAsync();
+                if (filePath != null)
+                {
+                    statusText.Text = "Download complete! Launching installer...";
+                    await Task.Delay(1000);
+                    if (UpdateChecker.Instance.LaunchInstaller())
+                    {
+                        // Exit app so installer can replace files
+                        App.MainWindow = null;
+                        _reallyClose = true;
+                        this.Close();
+                        System.Environment.Exit(0);
+                    }
+                    else
+                    {
+                        statusText.Text = "Could not launch installer. Opening download folder...";
+                        var folder = System.IO.Path.GetDirectoryName(filePath);
+                        if (folder != null)
+                            await Windows.System.Launcher.LaunchFolderPathAsync(folder);
+                    }
+                    break;
+                }
+                else
+                {
+                    statusText.Text = "Download failed. Opening browser instead...";
+                    dialog.IsPrimaryButtonEnabled = true;
+                    progressBar.Visibility = Visibility.Collapsed;
+                    await Task.Delay(1500);
+                    await Windows.System.Launcher.LaunchUriAsync(new Uri(info.DownloadUrl));
+                    break;
+                }
+            }
+        }
+    }
+
+    private async Task ShowOptionalUpdateDialog(UpdateInfo info)
+    {
+        // Notification
+        NotificationService.Instance.Post(
+            $"Update v{info.Version} Available",
+            string.IsNullOrEmpty(info.ReleaseNotes) ? "A new version is available." : info.ReleaseNotes,
+            NotificationType.Info
+        );
+
+        var panel = new StackPanel { Spacing = 12, Width = 400 };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = $"You are running v{UpdateChecker.CurrentVersion}. Version {info.Version} is available!",
+            TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+            Opacity = 0.7
+        });
+
+        if (!string.IsNullOrEmpty(info.ReleaseNotes))
+        {
+            panel.Children.Add(new TextBlock
+            {
+                Text = "What's new:",
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                FontSize = 13
+            });
+            panel.Children.Add(new TextBlock
+            {
+                Text = info.ReleaseNotes,
+                TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                Opacity = 0.6,
+                FontSize = 12
+            });
+        }
+
+        var progressBar = new ProgressBar
+        {
+            IsIndeterminate = false,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 0,
+            Visibility = Visibility.Collapsed,
+            Margin = new Thickness(0, 4, 0, 0)
+        };
+        panel.Children.Add(progressBar);
+
+        var statusText = new TextBlock
+        {
+            Text = "",
+            FontSize = 12,
+            Opacity = 0.5,
+            Visibility = Visibility.Collapsed
+        };
+        panel.Children.Add(statusText);
+
+        var dialog = new ContentDialog
+        {
+            Title = $"Update Available - v{info.Version}",
+            Content = panel,
+            PrimaryButtonText = "Download & Install",
+            SecondaryButtonText = "Skip This Version",
+            CloseButtonText = "Later",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            // Download in-app
+            dialog.IsPrimaryButtonEnabled = false;
+            dialog.IsSecondaryButtonEnabled = false;
+            progressBar.Visibility = Visibility.Visible;
+            statusText.Visibility = Visibility.Visible;
+            statusText.Text = "Downloading update...";
+
+            // Show a new dialog for progress since the old one closed
+            var progressPanel = new StackPanel { Spacing = 8, Width = 380 };
+            var dlProgressBar = new ProgressBar
+            {
+                IsIndeterminate = false, Minimum = 0, Maximum = 100, Value = 0
+            };
+            var dlStatusText = new TextBlock
+            {
+                Text = "Downloading update...",
+                FontSize = 12, Opacity = 0.6
+            };
+            progressPanel.Children.Add(dlStatusText);
+            progressPanel.Children.Add(dlProgressBar);
+
+            var progressDialog = new ContentDialog
+            {
+                Title = $"Downloading v{info.Version}",
+                Content = progressPanel,
+                CloseButtonText = "",
+                XamlRoot = Content.XamlRoot
+            };
+
+            UpdateChecker.Instance.DownloadProgressChanged += (pct) =>
+            {
+                DispatcherQueue?.TryEnqueue(() =>
+                {
+                    dlProgressBar.Value = pct;
+                    dlStatusText.Text = $"Downloading... {pct:F0}%";
+                });
+            };
+
+            // Show progress dialog and download concurrently
+            var downloadTask = UpdateChecker.Instance.DownloadUpdateAsync();
+            _ = progressDialog.ShowAsync();
+
+            var filePath = await downloadTask;
+
+            // Close progress dialog
+            progressDialog.Hide();
+
+            if (filePath != null)
+            {
+                var installDialog = new ContentDialog
+                {
+                    Title = "Download Complete",
+                    Content = "The update has been downloaded. Would you like to install it now? The app will close to complete the installation.",
+                    PrimaryButtonText = "Install Now",
+                    CloseButtonText = "Install Later",
                     DefaultButton = ContentDialogButton.Primary,
                     XamlRoot = Content.XamlRoot
                 };
 
-                // Keep showing until user clicks download
-                while (true)
+                if (await installDialog.ShowAsync() == ContentDialogResult.Primary)
                 {
-                    var result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Primary)
+                    if (UpdateChecker.Instance.LaunchInstaller())
                     {
-                        await Windows.System.Launcher.LaunchUriAsync(new Uri(info.DownloadUrl));
-                        break;
+                        App.MainWindow = null;
+                        _reallyClose = true;
+                        this.Close();
+                        System.Environment.Exit(0);
                     }
                 }
             }
             else
             {
-                // Optional update — show notification
-                NotificationService.Instance.Post(
-                    $"Update v{info.Version} Available",
-                    $"{info.ReleaseNotes}\nGo to Settings to download.",
-                    NotificationType.Info
-                );
-
-                // Also show a dialog
-                var dialog = new ContentDialog
+                // Fallback to browser
+                var failDialog = new ContentDialog
                 {
-                    Title = $"Update Available — v{info.Version}",
-                    Content = $"A new version of AuraCore Pro is available!\n\n{info.ReleaseNotes}",
-                    PrimaryButtonText = "Download Now",
-                    CloseButtonText = "Later",
-                    DefaultButton = ContentDialogButton.Primary,
+                    Title = "Download Failed",
+                    Content = "The in-app download failed. Would you like to download from the browser instead?",
+                    PrimaryButtonText = "Open Browser",
+                    CloseButtonText = "Cancel",
                     XamlRoot = Content.XamlRoot
                 };
 
-                if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+                if (await failDialog.ShowAsync() == ContentDialogResult.Primary)
                 {
                     await Windows.System.Launcher.LaunchUriAsync(new Uri(info.DownloadUrl));
                 }
             }
-        });
+        }
+        else if (result == ContentDialogResult.Secondary)
+        {
+            // Skip this version
+            UpdateChecker.Instance.SkipVersion(info.Version);
+        }
+        // else: Later - do nothing, will check again in 5 min
     }
 
     // ── NOTIFICATION BELL ───────────────────────────────────

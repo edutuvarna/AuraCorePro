@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="AuraCore.Desktop.Pages.DefenderPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="20" MaxWidth="960">
+
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PageTitle" Text="Windows Defender Manager" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock Text="Monitor and control Windows Security features"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <InfoBar x:Name="AdminWarning" Title="Admin privileges recommended"
+                     Message="Some features require running as administrator to modify settings."
+                     Severity="Warning" IsOpen="False" IsClosable="True" />
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="RefreshBtn" Content="Refresh Status" Click="RefreshBtn_Click"
+                        Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
+                <Button x:Name="QuickScanBtn" Content="Quick Scan" Click="QuickScanBtn_Click" Padding="24,10" />
+                <Button x:Name="FullScanBtn" Content="Full Scan" Click="FullScanBtn_Click" Padding="24,10" />
+                <Button x:Name="UpdateDefsBtn" Content="Update Definitions" Click="UpdateDefsBtn_Click" Padding="24,10" />
+                <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
+                <TextBlock x:Name="StatusText" Text="Click Refresh to check Defender status"
+                           VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Protection Level Banner -->
+            <Border x:Name="ProtectionBanner" Visibility="Collapsed"
+                    CornerRadius="8" Padding="20" BorderThickness="1">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="ShieldIcon" Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" FontSize="32" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="ProtectionLevelText" FontWeight="SemiBold" FontSize="16" />
+                        <TextBlock x:Name="ProtectionDetailText" FontSize="12" Opacity="0.7" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2" HorizontalAlignment="Right">
+                        <TextBlock x:Name="SignatureText" FontSize="11" Opacity="0.5" />
+                        <TextBlock x:Name="EngineText" FontSize="11" Opacity="0.5" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Protection Toggles -->
+            <Border x:Name="ProtectionCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Protection Features" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,8" />
+                    <StackPanel x:Name="ToggleList" Spacing="8" />
+                </StackPanel>
+            </Border>
+
+            <!-- Firewall Status -->
+            <Border x:Name="FirewallCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Firewall Status" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,8" />
+                    <StackPanel x:Name="FirewallList" Spacing="8" />
+                </StackPanel>
+            </Border>
+
+            <!-- Threat History -->
+            <Border x:Name="ThreatCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="ThreatTitle" Text="Threat History" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,8" />
+                    <StackPanel x:Name="ThreatList" Spacing="6" />
+                </StackPanel>
+            </Border>
+
+            <!-- Exclusions -->
+            <Border x:Name="ExclusionCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Exclusions" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,8" />
+                    <StackPanel x:Name="ExclusionList" Spacing="6" />
+                    <TextBlock x:Name="NoExclusionsText" Text="No exclusions configured" FontSize="12" Opacity="0.4" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

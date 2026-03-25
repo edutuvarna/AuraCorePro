@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Feature
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.FeatureFlags\obj\x64\Debug\net8.0\refint\AuraCore.Guard.FeatureFlags.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.FeatureFlags\obj\x64\Debug\net8.0\AuraCore.Guard.FeatureFlags.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.FeatureFlags\obj\x64\Debug\net8.0\ref\AuraCore.Guard.FeatureFlags.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.FeatureFlags\obj\x64\Debug\net8.0\AuraCore.Guard.FeatureFlags.sourcelink.json

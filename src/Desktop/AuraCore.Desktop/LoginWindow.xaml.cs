@@ -175,18 +175,43 @@ public sealed partial class LoginWindow : Microsoft.UI.Xaml.Window
         await AuthenticateAsync("register", email, password);
     }
 
-    private async Task AuthenticateAsync(string action, string email, string password)
+    private async Task AuthenticateAsync(string action, string email, string password, string? totpCode = null)
     {
         SetLoading(true);
         try
         {
             var endpoint = action == "login" ? "api/auth/login" : "api/auth/register";
-            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/{endpoint}", new { email, password });
+
+            // Build request body - include TOTP code if provided
+            object body = totpCode != null
+                ? new { email, password, totpCode }
+                : new { email, password };
+
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/{endpoint}", body);
             var json = await response.Content.ReadAsStringAsync();
             var doc = JsonDocument.Parse(json);
 
             if (response.IsSuccessStatusCode)
             {
+                // Check if 2FA is required
+                if (doc.RootElement.TryGetProperty("requires2fa", out var r2fa) && r2fa.GetBoolean())
+                {
+                    SetLoading(false);
+                    var code = await Show2faDialogAsync();
+                    if (!string.IsNullOrEmpty(code))
+                    {
+                        // Retry login with TOTP code
+                        await AuthenticateAsync("login", email, password, code);
+                    }
+                    else
+                    {
+                        StatusText.Text = S.Current == S.Lang.EN
+                            ? "2FA code required to sign in"
+                            : "Giris icin 2FA kodu gerekli";
+                    }
+                    return;
+                }
+
                 AccessToken = doc.RootElement.GetProperty("accessToken").GetString();
                 RefreshToken = doc.RootElement.GetProperty("refreshToken").GetString();
                 var user = doc.RootElement.GetProperty("user");
@@ -211,6 +236,46 @@ public sealed partial class LoginWindow : Microsoft.UI.Xaml.Window
         catch (TaskCanceledException) { StatusText.Text = S._("login.timeout"); }
         catch (Exception ex) { StatusText.Text = $"{S._("common.error")}: {ex.Message}"; }
         finally { SetLoading(false); }
+    }
+
+    private async Task<string?> Show2faDialogAsync()
+    {
+        var input = new TextBox
+        {
+            PlaceholderText = "000000",
+            MaxLength = 6,
+            TextAlignment = Microsoft.UI.Xaml.TextAlignment.Center,
+            FontSize = 24,
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
+        };
+
+        var panel = new StackPanel { Spacing = 12 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = S.Current == S.Lang.EN
+                ? "Enter the 6-digit code from your authenticator app"
+                : "Dogrulama uygulamanizdan 6 haneli kodu girin",
+            TextWrapping = TextWrapping.Wrap,
+            Opacity = 0.7,
+            FontSize = 13
+        });
+        panel.Children.Add(input);
+
+        var dialog = new ContentDialog
+        {
+            Title = S.Current == S.Lang.EN ? "Two-Factor Authentication" : "Iki Adimli Dogrulama",
+            Content = panel,
+            PrimaryButtonText = S.Current == S.Lang.EN ? "Verify" : "Dogrula",
+            CloseButtonText = S.Current == S.Lang.EN ? "Cancel" : "Iptal",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary && input.Text.Length == 6)
+            return input.Text.Trim();
+
+        return null;
     }
 
     private async Task FetchUserTierAsync()

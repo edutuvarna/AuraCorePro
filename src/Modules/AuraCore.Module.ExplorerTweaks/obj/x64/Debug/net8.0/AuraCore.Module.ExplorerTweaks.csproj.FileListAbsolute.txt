@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.Explo
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.ExplorerTweaks\obj\x64\Debug\net8.0\refint\AuraCore.Module.ExplorerTweaks.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.ExplorerTweaks\obj\x64\Debug\net8.0\AuraCore.Module.ExplorerTweaks.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.ExplorerTweaks\obj\x64\Debug\net8.0\ref\AuraCore.Module.ExplorerTweaks.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.ExplorerTweaks\obj\x64\Debug\net8.0\AuraCore.Module.ExplorerTweaks.sourcelink.json

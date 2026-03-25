@@ -29,6 +29,8 @@
           "AuraCore.Module.AppInstaller": "1.0.0",
           "AuraCore.Module.BloatwareRemoval": "1.0.0",
           "AuraCore.Module.ContextMenu": "1.0.0",
+          "AuraCore.Module.DefenderManager": "1.0.0",
+          "AuraCore.Module.DiskCleanup": "1.0.0",
           "AuraCore.Module.ExplorerTweaks": "1.0.0",
           "AuraCore.Module.GamingMode": "1.0.0",
           "AuraCore.Module.JunkCleaner": "1.0.0",
@@ -604,6 +606,32 @@
           }
         }
       },
+      "AuraCore.Module.DefenderManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.DefenderManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.DiskCleanup/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.DiskCleanup.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "AuraCore.Module.ExplorerTweaks/1.0.0": {
         "dependencies": {
           "AuraCore.Application": "1.0.0",
@@ -974,6 +1002,16 @@
       "sha512": ""
     },
     "AuraCore.Module.ContextMenu/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.DefenderManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.DiskCleanup/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

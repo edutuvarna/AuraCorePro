@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.AppIn
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.AppInstaller\obj\x64\Debug\net8.0\refint\AuraCore.Module.AppInstaller.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.AppInstaller\obj\x64\Debug\net8.0\AuraCore.Module.AppInstaller.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.AppInstaller\obj\x64\Debug\net8.0\ref\AuraCore.Module.AppInstaller.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.AppInstaller\obj\x64\Debug\net8.0\AuraCore.Module.AppInstaller.sourcelink.json

@@ -15,3 +15,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Application\obj
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Application\obj\x64\Debug\net8.0\refint\AuraCore.Application.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Application\obj\x64\Debug\net8.0\AuraCore.Application.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Application\obj\x64\Debug\net8.0\ref\AuraCore.Application.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.Application\obj\x64\Debug\net8.0\AuraCore.Application.sourcelink.json

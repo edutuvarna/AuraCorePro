@@ -66,7 +66,18 @@ public sealed partial class SettingsPage : Page
             _ => ThemeService.AppTheme.System
         };
         if (App.MainWindow?.Content is FrameworkElement root)
+        {
             ThemeService.SetTheme(root, theme);
+            // WinUI3: NavigationView pane ignores parent theme
+            // Must set RequestedTheme on root Grid - this propagates to NavigationView
+            var et = theme switch
+            {
+                ThemeService.AppTheme.Light => ElementTheme.Light,
+                ThemeService.AppTheme.Dark => ElementTheme.Dark,
+                _ => ElementTheme.Default
+            };
+            root.RequestedTheme = et;
+        }
     }
 
     private void LanguageSelector_Changed(object sender, SelectionChangedEventArgs e)

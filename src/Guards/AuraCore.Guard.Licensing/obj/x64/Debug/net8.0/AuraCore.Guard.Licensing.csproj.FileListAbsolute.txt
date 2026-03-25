@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Licensi
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Licensing\obj\x64\Debug\net8.0\refint\AuraCore.Guard.Licensing.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Licensing\obj\x64\Debug\net8.0\AuraCore.Guard.Licensing.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Licensing\obj\x64\Debug\net8.0\ref\AuraCore.Guard.Licensing.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Guards\AuraCore.Guard.Licensing\obj\x64\Debug\net8.0\AuraCore.Guard.Licensing.sourcelink.json

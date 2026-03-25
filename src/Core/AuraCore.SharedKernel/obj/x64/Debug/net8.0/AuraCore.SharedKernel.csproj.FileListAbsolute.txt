@@ -9,3 +9,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\ob
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Debug\net8.0\refint\AuraCore.SharedKernel.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Debug\net8.0\AuraCore.SharedKernel.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Debug\net8.0\ref\AuraCore.SharedKernel.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Core\AuraCore.SharedKernel\obj\x64\Debug\net8.0\AuraCore.SharedKernel.sourcelink.json

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b1bdc9619341cd682364af7a33eb9d3e3769ac2a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad6c1e2f9d954c01d7578f2b2f036f696514bda6")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

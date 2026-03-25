@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infra
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Windows\obj\x64\Debug\net8.0\refint\AuraCore.Infrastructure.Windows.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Windows\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Windows.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Windows\obj\x64\Debug\net8.0\ref\AuraCore.Infrastructure.Windows.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Windows\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Windows.sourcelink.json

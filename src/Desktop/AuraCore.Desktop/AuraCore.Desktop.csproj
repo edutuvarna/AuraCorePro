@@ -55,5 +55,7 @@
     <ProjectReference Include="../../Modules/AuraCore.Module.ContextMenu/AuraCore.Module.ContextMenu.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.TaskbarTweaks/AuraCore.Module.TaskbarTweaks.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.ExplorerTweaks/AuraCore.Module.ExplorerTweaks.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.DiskCleanup/AuraCore.Module.DiskCleanup.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.DefenderManager/AuraCore.Module.DefenderManager.csproj" />
   </ItemGroup>
 </Project>

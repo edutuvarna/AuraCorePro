@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.Regis
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RegistryOptimizer\obj\x64\Debug\net8.0\refint\AuraCore.Module.RegistryOptimizer.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RegistryOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.RegistryOptimizer.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RegistryOptimizer\obj\x64\Debug\net8.0\ref\AuraCore.Module.RegistryOptimizer.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RegistryOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.RegistryOptimizer.sourcelink.json

@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.Gamin
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.GamingMode\obj\x64\Debug\net8.0\refint\AuraCore.Module.GamingMode.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.GamingMode\obj\x64\Debug\net8.0\AuraCore.Module.GamingMode.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.GamingMode\obj\x64\Debug\net8.0\ref\AuraCore.Module.GamingMode.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.GamingMode\obj\x64\Debug\net8.0\AuraCore.Module.GamingMode.sourcelink.json

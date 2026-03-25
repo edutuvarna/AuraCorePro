@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Engine.Safety")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec37e0f25572748372207526d26bc06d3d677232")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad6c1e2f9d954c01d7578f2b2f036f696514bda6")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Engine.Safety")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Engine.Safety")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

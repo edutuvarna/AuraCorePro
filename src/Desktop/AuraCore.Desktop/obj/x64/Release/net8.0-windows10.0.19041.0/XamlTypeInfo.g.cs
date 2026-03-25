@@ -226,7 +226,7 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
         
         private void InitTypeTables()
         {
-            _typeNameTable = new string[74];
+            _typeNameTable = new string[78];
             _typeNameTable[0] = "Microsoft.UI.Xaml.Controls.XamlControlsResources";
             _typeNameTable[1] = "Microsoft.UI.Xaml.ResourceDictionary";
             _typeNameTable[2] = "Object";
@@ -274,35 +274,39 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
             _typeNameTable[44] = "Microsoft.UI.Xaml.Controls.Primitives.RangeBase";
             _typeNameTable[45] = "Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings";
             _typeNameTable[46] = "AuraCore.Desktop.Pages.DashboardPage";
-            _typeNameTable[47] = "AuraCore.Desktop.Pages.DiskHealthPage";
-            _typeNameTable[48] = "AuraCore.Desktop.Pages.ExplorerPage";
-            _typeNameTable[49] = "AuraCore.Desktop.Pages.GamingModePage";
-            _typeNameTable[50] = "AuraCore.Desktop.Pages.JunkCleanerPage";
-            _typeNameTable[51] = "AuraCore.Desktop.Pages.NetworkPage";
-            _typeNameTable[52] = "AuraCore.Desktop.Pages.OnboardingPage";
-            _typeNameTable[53] = "Microsoft.UI.Xaml.Controls.WebView2";
-            _typeNameTable[54] = "Microsoft.UI.Xaml.FrameworkElement";
-            _typeNameTable[55] = "Microsoft.Web.WebView2.Core.CoreWebView2";
-            _typeNameTable[56] = "Windows.UI.Color";
-            _typeNameTable[57] = "System.Uri";
-            _typeNameTable[58] = "AuraCore.Desktop.Pages.PaymentPage";
-            _typeNameTable[59] = "AuraCore.Desktop.Pages.RamOptimizerPage";
-            _typeNameTable[60] = "AuraCore.Desktop.Pages.RecommendationsPage";
-            _typeNameTable[61] = "AuraCore.Desktop.Pages.RegistryPage";
-            _typeNameTable[62] = "AuraCore.Desktop.Pages.SchedulerPage";
-            _typeNameTable[63] = "Microsoft.UI.Xaml.Controls.RadioButtons";
-            _typeNameTable[64] = "Int32";
-            _typeNameTable[65] = "AuraCore.Desktop.Pages.SettingsPage";
-            _typeNameTable[66] = "AuraCore.Desktop.Pages.SpaceAnalyzerPage";
-            _typeNameTable[67] = "AuraCore.Desktop.Pages.StartupOptimizerPage";
-            _typeNameTable[68] = "AuraCore.Desktop.Pages.StoragePage";
-            _typeNameTable[69] = "AuraCore.Desktop.Pages.SystemHealthPage";
-            _typeNameTable[70] = "AuraCore.Desktop.Pages.TaskbarPage";
-            _typeNameTable[71] = "AuraCore.Desktop.Pages.UpgradePage";
-            _typeNameTable[72] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
-            _typeNameTable[73] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
+            _typeNameTable[47] = "Microsoft.UI.Xaml.Controls.InfoBar";
+            _typeNameTable[48] = "Microsoft.UI.Xaml.Controls.InfoBarSeverity";
+            _typeNameTable[49] = "Microsoft.UI.Xaml.Controls.Primitives.ButtonBase";
+            _typeNameTable[50] = "System.Windows.Input.ICommand";
+            _typeNameTable[51] = "Microsoft.UI.Xaml.Controls.IconSource";
+            _typeNameTable[52] = "Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings";
+            _typeNameTable[53] = "AuraCore.Desktop.Pages.DefenderPage";
+            _typeNameTable[54] = "AuraCore.Desktop.Pages.DiskCleanupPage";
+            _typeNameTable[55] = "AuraCore.Desktop.Pages.DiskHealthPage";
+            _typeNameTable[56] = "AuraCore.Desktop.Pages.ExplorerPage";
+            _typeNameTable[57] = "AuraCore.Desktop.Pages.GamingModePage";
+            _typeNameTable[58] = "AuraCore.Desktop.Pages.IsoBuilderPage";
+            _typeNameTable[59] = "AuraCore.Desktop.Pages.JunkCleanerPage";
+            _typeNameTable[60] = "AuraCore.Desktop.Pages.NetworkPage";
+            _typeNameTable[61] = "AuraCore.Desktop.Pages.OnboardingPage";
+            _typeNameTable[62] = "AuraCore.Desktop.Pages.PaymentPage";
+            _typeNameTable[63] = "AuraCore.Desktop.Pages.RamOptimizerPage";
+            _typeNameTable[64] = "AuraCore.Desktop.Pages.RecommendationsPage";
+            _typeNameTable[65] = "AuraCore.Desktop.Pages.RegistryPage";
+            _typeNameTable[66] = "AuraCore.Desktop.Pages.SchedulerPage";
+            _typeNameTable[67] = "Microsoft.UI.Xaml.Controls.RadioButtons";
+            _typeNameTable[68] = "Int32";
+            _typeNameTable[69] = "AuraCore.Desktop.Pages.SettingsPage";
+            _typeNameTable[70] = "AuraCore.Desktop.Pages.SpaceAnalyzerPage";
+            _typeNameTable[71] = "AuraCore.Desktop.Pages.StartupOptimizerPage";
+            _typeNameTable[72] = "AuraCore.Desktop.Pages.StoragePage";
+            _typeNameTable[73] = "AuraCore.Desktop.Pages.SystemHealthPage";
+            _typeNameTable[74] = "AuraCore.Desktop.Pages.TaskbarPage";
+            _typeNameTable[75] = "AuraCore.Desktop.Pages.UpgradePage";
+            _typeNameTable[76] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
+            _typeNameTable[77] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
 
-            _typeTable = new global::System.Type[74];
+            _typeTable = new global::System.Type[78];
             _typeTable[0] = typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources);
             _typeTable[1] = typeof(global::Microsoft.UI.Xaml.ResourceDictionary);
             _typeTable[2] = typeof(global::System.Object);
@@ -350,33 +354,37 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
             _typeTable[44] = typeof(global::Microsoft.UI.Xaml.Controls.Primitives.RangeBase);
             _typeTable[45] = typeof(global::Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings);
             _typeTable[46] = typeof(global::AuraCore.Desktop.Pages.DashboardPage);
-            _typeTable[47] = typeof(global::AuraCore.Desktop.Pages.DiskHealthPage);
-            _typeTable[48] = typeof(global::AuraCore.Desktop.Pages.ExplorerPage);
-            _typeTable[49] = typeof(global::AuraCore.Desktop.Pages.GamingModePage);
-            _typeTable[50] = typeof(global::AuraCore.Desktop.Pages.JunkCleanerPage);
-            _typeTable[51] = typeof(global::AuraCore.Desktop.Pages.NetworkPage);
-            _typeTable[52] = typeof(global::AuraCore.Desktop.Pages.OnboardingPage);
-            _typeTable[53] = typeof(global::Microsoft.UI.Xaml.Controls.WebView2);
-            _typeTable[54] = typeof(global::Microsoft.UI.Xaml.FrameworkElement);
-            _typeTable[55] = typeof(global::Microsoft.Web.WebView2.Core.CoreWebView2);
-            _typeTable[56] = typeof(global::Windows.UI.Color);
-            _typeTable[57] = typeof(global::System.Uri);
-            _typeTable[58] = typeof(global::AuraCore.Desktop.Pages.PaymentPage);
-            _typeTable[59] = typeof(global::AuraCore.Desktop.Pages.RamOptimizerPage);
-            _typeTable[60] = typeof(global::AuraCore.Desktop.Pages.RecommendationsPage);
-            _typeTable[61] = typeof(global::AuraCore.Desktop.Pages.RegistryPage);
-            _typeTable[62] = typeof(global::AuraCore.Desktop.Pages.SchedulerPage);
-            _typeTable[63] = typeof(global::Microsoft.UI.Xaml.Controls.RadioButtons);
-            _typeTable[64] = typeof(global::System.Int32);
-            _typeTable[65] = typeof(global::AuraCore.Desktop.Pages.SettingsPage);
-            _typeTable[66] = typeof(global::AuraCore.Desktop.Pages.SpaceAnalyzerPage);
-            _typeTable[67] = typeof(global::AuraCore.Desktop.Pages.StartupOptimizerPage);
-            _typeTable[68] = typeof(global::AuraCore.Desktop.Pages.StoragePage);
-            _typeTable[69] = typeof(global::AuraCore.Desktop.Pages.SystemHealthPage);
-            _typeTable[70] = typeof(global::AuraCore.Desktop.Pages.TaskbarPage);
-            _typeTable[71] = typeof(global::AuraCore.Desktop.Pages.UpgradePage);
-            _typeTable[72] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
-            _typeTable[73] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
+            _typeTable[47] = typeof(global::Microsoft.UI.Xaml.Controls.InfoBar);
+            _typeTable[48] = typeof(global::Microsoft.UI.Xaml.Controls.InfoBarSeverity);
+            _typeTable[49] = typeof(global::Microsoft.UI.Xaml.Controls.Primitives.ButtonBase);
+            _typeTable[50] = typeof(global::System.Windows.Input.ICommand);
+            _typeTable[51] = typeof(global::Microsoft.UI.Xaml.Controls.IconSource);
+            _typeTable[52] = typeof(global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings);
+            _typeTable[53] = typeof(global::AuraCore.Desktop.Pages.DefenderPage);
+            _typeTable[54] = typeof(global::AuraCore.Desktop.Pages.DiskCleanupPage);
+            _typeTable[55] = typeof(global::AuraCore.Desktop.Pages.DiskHealthPage);
+            _typeTable[56] = typeof(global::AuraCore.Desktop.Pages.ExplorerPage);
+            _typeTable[57] = typeof(global::AuraCore.Desktop.Pages.GamingModePage);
+            _typeTable[58] = typeof(global::AuraCore.Desktop.Pages.IsoBuilderPage);
+            _typeTable[59] = typeof(global::AuraCore.Desktop.Pages.JunkCleanerPage);
+            _typeTable[60] = typeof(global::AuraCore.Desktop.Pages.NetworkPage);
+            _typeTable[61] = typeof(global::AuraCore.Desktop.Pages.OnboardingPage);
+            _typeTable[62] = typeof(global::AuraCore.Desktop.Pages.PaymentPage);
+            _typeTable[63] = typeof(global::AuraCore.Desktop.Pages.RamOptimizerPage);
+            _typeTable[64] = typeof(global::AuraCore.Desktop.Pages.RecommendationsPage);
+            _typeTable[65] = typeof(global::AuraCore.Desktop.Pages.RegistryPage);
+            _typeTable[66] = typeof(global::AuraCore.Desktop.Pages.SchedulerPage);
+            _typeTable[67] = typeof(global::Microsoft.UI.Xaml.Controls.RadioButtons);
+            _typeTable[68] = typeof(global::System.Int32);
+            _typeTable[69] = typeof(global::AuraCore.Desktop.Pages.SettingsPage);
+            _typeTable[70] = typeof(global::AuraCore.Desktop.Pages.SpaceAnalyzerPage);
+            _typeTable[71] = typeof(global::AuraCore.Desktop.Pages.StartupOptimizerPage);
+            _typeTable[72] = typeof(global::AuraCore.Desktop.Pages.StoragePage);
+            _typeTable[73] = typeof(global::AuraCore.Desktop.Pages.SystemHealthPage);
+            _typeTable[74] = typeof(global::AuraCore.Desktop.Pages.TaskbarPage);
+            _typeTable[75] = typeof(global::AuraCore.Desktop.Pages.UpgradePage);
+            _typeTable[76] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
+            _typeTable[77] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -427,27 +435,31 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
         private object Activate_42_ContextMenuPage() { return new global::AuraCore.Desktop.Pages.ContextMenuPage(); }
         private object Activate_43_ProgressBar() { return new global::Microsoft.UI.Xaml.Controls.ProgressBar(); }
         private object Activate_46_DashboardPage() { return new global::AuraCore.Desktop.Pages.DashboardPage(); }
-        private object Activate_47_DiskHealthPage() { return new global::AuraCore.Desktop.Pages.DiskHealthPage(); }
-        private object Activate_48_ExplorerPage() { return new global::AuraCore.Desktop.Pages.ExplorerPage(); }
-        private object Activate_49_GamingModePage() { return new global::AuraCore.Desktop.Pages.GamingModePage(); }
-        private object Activate_50_JunkCleanerPage() { return new global::AuraCore.Desktop.Pages.JunkCleanerPage(); }
-        private object Activate_51_NetworkPage() { return new global::AuraCore.Desktop.Pages.NetworkPage(); }
-        private object Activate_52_OnboardingPage() { return new global::AuraCore.Desktop.Pages.OnboardingPage(); }
-        private object Activate_53_WebView2() { return new global::Microsoft.UI.Xaml.Controls.WebView2(); }
-        private object Activate_58_PaymentPage() { return new global::AuraCore.Desktop.Pages.PaymentPage(); }
-        private object Activate_59_RamOptimizerPage() { return new global::AuraCore.Desktop.Pages.RamOptimizerPage(); }
-        private object Activate_60_RecommendationsPage() { return new global::AuraCore.Desktop.Pages.RecommendationsPage(); }
-        private object Activate_61_RegistryPage() { return new global::AuraCore.Desktop.Pages.RegistryPage(); }
-        private object Activate_62_SchedulerPage() { return new global::AuraCore.Desktop.Pages.SchedulerPage(); }
-        private object Activate_63_RadioButtons() { return new global::Microsoft.UI.Xaml.Controls.RadioButtons(); }
-        private object Activate_65_SettingsPage() { return new global::AuraCore.Desktop.Pages.SettingsPage(); }
-        private object Activate_66_SpaceAnalyzerPage() { return new global::AuraCore.Desktop.Pages.SpaceAnalyzerPage(); }
-        private object Activate_67_StartupOptimizerPage() { return new global::AuraCore.Desktop.Pages.StartupOptimizerPage(); }
-        private object Activate_68_StoragePage() { return new global::AuraCore.Desktop.Pages.StoragePage(); }
-        private object Activate_69_SystemHealthPage() { return new global::AuraCore.Desktop.Pages.SystemHealthPage(); }
-        private object Activate_70_TaskbarPage() { return new global::AuraCore.Desktop.Pages.TaskbarPage(); }
-        private object Activate_71_UpgradePage() { return new global::AuraCore.Desktop.Pages.UpgradePage(); }
-        private object Activate_72_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
+        private object Activate_47_InfoBar() { return new global::Microsoft.UI.Xaml.Controls.InfoBar(); }
+        private object Activate_52_InfoBarTemplateSettings() { return new global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings(); }
+        private object Activate_53_DefenderPage() { return new global::AuraCore.Desktop.Pages.DefenderPage(); }
+        private object Activate_54_DiskCleanupPage() { return new global::AuraCore.Desktop.Pages.DiskCleanupPage(); }
+        private object Activate_55_DiskHealthPage() { return new global::AuraCore.Desktop.Pages.DiskHealthPage(); }
+        private object Activate_56_ExplorerPage() { return new global::AuraCore.Desktop.Pages.ExplorerPage(); }
+        private object Activate_57_GamingModePage() { return new global::AuraCore.Desktop.Pages.GamingModePage(); }
+        private object Activate_58_IsoBuilderPage() { return new global::AuraCore.Desktop.Pages.IsoBuilderPage(); }
+        private object Activate_59_JunkCleanerPage() { return new global::AuraCore.Desktop.Pages.JunkCleanerPage(); }
+        private object Activate_60_NetworkPage() { return new global::AuraCore.Desktop.Pages.NetworkPage(); }
+        private object Activate_61_OnboardingPage() { return new global::AuraCore.Desktop.Pages.OnboardingPage(); }
+        private object Activate_62_PaymentPage() { return new global::AuraCore.Desktop.Pages.PaymentPage(); }
+        private object Activate_63_RamOptimizerPage() { return new global::AuraCore.Desktop.Pages.RamOptimizerPage(); }
+        private object Activate_64_RecommendationsPage() { return new global::AuraCore.Desktop.Pages.RecommendationsPage(); }
+        private object Activate_65_RegistryPage() { return new global::AuraCore.Desktop.Pages.RegistryPage(); }
+        private object Activate_66_SchedulerPage() { return new global::AuraCore.Desktop.Pages.SchedulerPage(); }
+        private object Activate_67_RadioButtons() { return new global::Microsoft.UI.Xaml.Controls.RadioButtons(); }
+        private object Activate_69_SettingsPage() { return new global::AuraCore.Desktop.Pages.SettingsPage(); }
+        private object Activate_70_SpaceAnalyzerPage() { return new global::AuraCore.Desktop.Pages.SpaceAnalyzerPage(); }
+        private object Activate_71_StartupOptimizerPage() { return new global::AuraCore.Desktop.Pages.StartupOptimizerPage(); }
+        private object Activate_72_StoragePage() { return new global::AuraCore.Desktop.Pages.StoragePage(); }
+        private object Activate_73_SystemHealthPage() { return new global::AuraCore.Desktop.Pages.SystemHealthPage(); }
+        private object Activate_74_TaskbarPage() { return new global::AuraCore.Desktop.Pages.TaskbarPage(); }
+        private object Activate_75_UpgradePage() { return new global::AuraCore.Desktop.Pages.UpgradePage(); }
+        private object Activate_76_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
         private void StaticInitializer_0_XamlControlsResources() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources).TypeHandle);
         private void StaticInitializer_4_ProgressRing() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressRing).TypeHandle);
         private void StaticInitializer_7_ProgressRingTemplateSettings() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressRingTemplateSettings).TypeHandle);
@@ -476,31 +488,34 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
         private void StaticInitializer_43_ProgressBar() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressBar).TypeHandle);
         private void StaticInitializer_45_ProgressBarTemplateSettings() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings).TypeHandle);
         private void StaticInitializer_46_DashboardPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.DashboardPage).TypeHandle);
-        private void StaticInitializer_47_DiskHealthPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.DiskHealthPage).TypeHandle);
-        private void StaticInitializer_48_ExplorerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.ExplorerPage).TypeHandle);
-        private void StaticInitializer_49_GamingModePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.GamingModePage).TypeHandle);
-        private void StaticInitializer_50_JunkCleanerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.JunkCleanerPage).TypeHandle);
-        private void StaticInitializer_51_NetworkPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.NetworkPage).TypeHandle);
-        private void StaticInitializer_52_OnboardingPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.OnboardingPage).TypeHandle);
-        private void StaticInitializer_53_WebView2() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.WebView2).TypeHandle);
-        private void StaticInitializer_55_CoreWebView2() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.Web.WebView2.Core.CoreWebView2).TypeHandle);
-        private void StaticInitializer_56_Color() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Windows.UI.Color).TypeHandle);
-        private void StaticInitializer_57_Uri() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Uri).TypeHandle);
-        private void StaticInitializer_58_PaymentPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.PaymentPage).TypeHandle);
-        private void StaticInitializer_59_RamOptimizerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RamOptimizerPage).TypeHandle);
-        private void StaticInitializer_60_RecommendationsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RecommendationsPage).TypeHandle);
-        private void StaticInitializer_61_RegistryPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RegistryPage).TypeHandle);
-        private void StaticInitializer_62_SchedulerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SchedulerPage).TypeHandle);
-        private void StaticInitializer_63_RadioButtons() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.RadioButtons).TypeHandle);
-        private void StaticInitializer_65_SettingsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SettingsPage).TypeHandle);
-        private void StaticInitializer_66_SpaceAnalyzerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SpaceAnalyzerPage).TypeHandle);
-        private void StaticInitializer_67_StartupOptimizerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.StartupOptimizerPage).TypeHandle);
-        private void StaticInitializer_68_StoragePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.StoragePage).TypeHandle);
-        private void StaticInitializer_69_SystemHealthPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SystemHealthPage).TypeHandle);
-        private void StaticInitializer_70_TaskbarPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.TaskbarPage).TypeHandle);
-        private void StaticInitializer_71_UpgradePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.UpgradePage).TypeHandle);
-        private void StaticInitializer_72_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
-        private void StaticInitializer_73_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
+        private void StaticInitializer_47_InfoBar() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.InfoBar).TypeHandle);
+        private void StaticInitializer_48_InfoBarSeverity() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.InfoBarSeverity).TypeHandle);
+        private void StaticInitializer_50_ICommand() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Windows.Input.ICommand).TypeHandle);
+        private void StaticInitializer_52_InfoBarTemplateSettings() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings).TypeHandle);
+        private void StaticInitializer_53_DefenderPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.DefenderPage).TypeHandle);
+        private void StaticInitializer_54_DiskCleanupPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.DiskCleanupPage).TypeHandle);
+        private void StaticInitializer_55_DiskHealthPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.DiskHealthPage).TypeHandle);
+        private void StaticInitializer_56_ExplorerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.ExplorerPage).TypeHandle);
+        private void StaticInitializer_57_GamingModePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.GamingModePage).TypeHandle);
+        private void StaticInitializer_58_IsoBuilderPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.IsoBuilderPage).TypeHandle);
+        private void StaticInitializer_59_JunkCleanerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.JunkCleanerPage).TypeHandle);
+        private void StaticInitializer_60_NetworkPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.NetworkPage).TypeHandle);
+        private void StaticInitializer_61_OnboardingPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.OnboardingPage).TypeHandle);
+        private void StaticInitializer_62_PaymentPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.PaymentPage).TypeHandle);
+        private void StaticInitializer_63_RamOptimizerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RamOptimizerPage).TypeHandle);
+        private void StaticInitializer_64_RecommendationsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RecommendationsPage).TypeHandle);
+        private void StaticInitializer_65_RegistryPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.RegistryPage).TypeHandle);
+        private void StaticInitializer_66_SchedulerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SchedulerPage).TypeHandle);
+        private void StaticInitializer_67_RadioButtons() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.RadioButtons).TypeHandle);
+        private void StaticInitializer_69_SettingsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SettingsPage).TypeHandle);
+        private void StaticInitializer_70_SpaceAnalyzerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SpaceAnalyzerPage).TypeHandle);
+        private void StaticInitializer_71_StartupOptimizerPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.StartupOptimizerPage).TypeHandle);
+        private void StaticInitializer_72_StoragePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.StoragePage).TypeHandle);
+        private void StaticInitializer_73_SystemHealthPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.SystemHealthPage).TypeHandle);
+        private void StaticInitializer_74_TaskbarPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.TaskbarPage).TypeHandle);
+        private void StaticInitializer_75_UpgradePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::AuraCore.Desktop.Pages.UpgradePage).TypeHandle);
+        private void StaticInitializer_76_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
+        private void StaticInitializer_77_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
         private void MapAdd_0_XamlControlsResources(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.Object, global::System.Object>)instance;
@@ -514,7 +529,7 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
             var newItem = (global::System.Object)item;
             collection.Add(newItem);
         }
-        private void VectorAdd_73_IList(object instance, object item)
+        private void VectorAdd_77_IList(object instance, object item)
         {
             var collection = (global::System.Collections.Generic.ICollection<global::Microsoft.UI.Xaml.Controls.TreeViewNode>)instance;
             var newItem = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)item;
@@ -879,135 +894,176 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 47:   //  AuraCore.Desktop.Pages.DiskHealthPage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_47_DiskHealthPage;
-                userType.StaticInitializer = StaticInitializer_47_DiskHealthPage;
-                userType.SetIsLocalType();
+            case 47:   //  Microsoft.UI.Xaml.Controls.InfoBar
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Control"));
+                userType.Activator = Activate_47_InfoBar;
+                userType.StaticInitializer = StaticInitializer_47_InfoBar;
+                userType.SetContentPropertyName("Microsoft.UI.Xaml.Controls.InfoBar.Content");
+                userType.AddMemberName("Content");
+                userType.AddMemberName("Title");
+                userType.AddMemberName("Message");
+                userType.AddMemberName("Severity");
+                userType.AddMemberName("IsOpen");
+                userType.AddMemberName("IsClosable");
+                userType.AddMemberName("ActionButton");
+                userType.AddMemberName("CloseButtonCommand");
+                userType.AddMemberName("CloseButtonCommandParameter");
+                userType.AddMemberName("CloseButtonStyle");
+                userType.AddMemberName("ContentTemplate");
+                userType.AddMemberName("IconSource");
+                userType.AddMemberName("IsIconVisible");
+                userType.AddMemberName("TemplateSettings");
                 xamlType = userType;
                 break;
 
-            case 48:   //  AuraCore.Desktop.Pages.ExplorerPage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_48_ExplorerPage;
-                userType.StaticInitializer = StaticInitializer_48_ExplorerPage;
-                userType.SetIsLocalType();
+            case 48:   //  Microsoft.UI.Xaml.Controls.InfoBarSeverity
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Enum"));
+                userType.StaticInitializer = StaticInitializer_48_InfoBarSeverity;
+                userType.AddEnumValue("Informational", global::Microsoft.UI.Xaml.Controls.InfoBarSeverity.Informational);
+                userType.AddEnumValue("Success", global::Microsoft.UI.Xaml.Controls.InfoBarSeverity.Success);
+                userType.AddEnumValue("Warning", global::Microsoft.UI.Xaml.Controls.InfoBarSeverity.Warning);
+                userType.AddEnumValue("Error", global::Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error);
                 xamlType = userType;
                 break;
 
-            case 49:   //  AuraCore.Desktop.Pages.GamingModePage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_49_GamingModePage;
-                userType.StaticInitializer = StaticInitializer_49_GamingModePage;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 50:   //  AuraCore.Desktop.Pages.JunkCleanerPage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_50_JunkCleanerPage;
-                userType.StaticInitializer = StaticInitializer_50_JunkCleanerPage;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 51:   //  AuraCore.Desktop.Pages.NetworkPage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_51_NetworkPage;
-                userType.StaticInitializer = StaticInitializer_51_NetworkPage;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 52:   //  AuraCore.Desktop.Pages.OnboardingPage
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_52_OnboardingPage;
-                userType.StaticInitializer = StaticInitializer_52_OnboardingPage;
-                userType.SetIsLocalType();
-                xamlType = userType;
-                break;
-
-            case 53:   //  Microsoft.UI.Xaml.Controls.WebView2
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.FrameworkElement"));
-                userType.Activator = Activate_53_WebView2;
-                userType.StaticInitializer = StaticInitializer_53_WebView2;
-                userType.AddMemberName("CanGoBack");
-                userType.AddMemberName("CanGoForward");
-                userType.AddMemberName("CoreWebView2");
-                userType.AddMemberName("DefaultBackgroundColor");
-                userType.AddMemberName("Source");
-                xamlType = userType;
-                break;
-
-            case 54:   //  Microsoft.UI.Xaml.FrameworkElement
+            case 49:   //  Microsoft.UI.Xaml.Controls.Primitives.ButtonBase
                 xamlType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 55:   //  Microsoft.Web.WebView2.Core.CoreWebView2
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.StaticInitializer = StaticInitializer_55_CoreWebView2;
+            case 50:   //  System.Windows.Input.ICommand
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, null);
+                userType.StaticInitializer = StaticInitializer_50_ICommand;
                 userType.SetIsReturnTypeStub();
                 xamlType = userType;
                 break;
 
-            case 56:   //  Windows.UI.Color
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.ValueType"));
-                userType.StaticInitializer = StaticInitializer_56_Color;
+            case 51:   //  Microsoft.UI.Xaml.Controls.IconSource
+                xamlType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlSystemBaseType(typeName, type);
+                break;
+
+            case 52:   //  Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.DependencyObject"));
+                userType.StaticInitializer = StaticInitializer_52_InfoBarTemplateSettings;
                 userType.SetIsReturnTypeStub();
                 xamlType = userType;
                 break;
 
-            case 57:   //  System.Uri
-                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
-                userType.StaticInitializer = StaticInitializer_57_Uri;
-                userType.SetIsReturnTypeStub();
-                xamlType = userType;
-                break;
-
-            case 58:   //  AuraCore.Desktop.Pages.PaymentPage
+            case 53:   //  AuraCore.Desktop.Pages.DefenderPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_58_PaymentPage;
-                userType.StaticInitializer = StaticInitializer_58_PaymentPage;
+                userType.Activator = Activate_53_DefenderPage;
+                userType.StaticInitializer = StaticInitializer_53_DefenderPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 59:   //  AuraCore.Desktop.Pages.RamOptimizerPage
+            case 54:   //  AuraCore.Desktop.Pages.DiskCleanupPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_59_RamOptimizerPage;
-                userType.StaticInitializer = StaticInitializer_59_RamOptimizerPage;
+                userType.Activator = Activate_54_DiskCleanupPage;
+                userType.StaticInitializer = StaticInitializer_54_DiskCleanupPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 60:   //  AuraCore.Desktop.Pages.RecommendationsPage
+            case 55:   //  AuraCore.Desktop.Pages.DiskHealthPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_60_RecommendationsPage;
-                userType.StaticInitializer = StaticInitializer_60_RecommendationsPage;
+                userType.Activator = Activate_55_DiskHealthPage;
+                userType.StaticInitializer = StaticInitializer_55_DiskHealthPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 61:   //  AuraCore.Desktop.Pages.RegistryPage
+            case 56:   //  AuraCore.Desktop.Pages.ExplorerPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_61_RegistryPage;
-                userType.StaticInitializer = StaticInitializer_61_RegistryPage;
+                userType.Activator = Activate_56_ExplorerPage;
+                userType.StaticInitializer = StaticInitializer_56_ExplorerPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 62:   //  AuraCore.Desktop.Pages.SchedulerPage
+            case 57:   //  AuraCore.Desktop.Pages.GamingModePage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_62_SchedulerPage;
-                userType.StaticInitializer = StaticInitializer_62_SchedulerPage;
+                userType.Activator = Activate_57_GamingModePage;
+                userType.StaticInitializer = StaticInitializer_57_GamingModePage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 63:   //  Microsoft.UI.Xaml.Controls.RadioButtons
+            case 58:   //  AuraCore.Desktop.Pages.IsoBuilderPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_58_IsoBuilderPage;
+                userType.StaticInitializer = StaticInitializer_58_IsoBuilderPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 59:   //  AuraCore.Desktop.Pages.JunkCleanerPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_59_JunkCleanerPage;
+                userType.StaticInitializer = StaticInitializer_59_JunkCleanerPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 60:   //  AuraCore.Desktop.Pages.NetworkPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_60_NetworkPage;
+                userType.StaticInitializer = StaticInitializer_60_NetworkPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 61:   //  AuraCore.Desktop.Pages.OnboardingPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_61_OnboardingPage;
+                userType.StaticInitializer = StaticInitializer_61_OnboardingPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 62:   //  AuraCore.Desktop.Pages.PaymentPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_62_PaymentPage;
+                userType.StaticInitializer = StaticInitializer_62_PaymentPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 63:   //  AuraCore.Desktop.Pages.RamOptimizerPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_63_RamOptimizerPage;
+                userType.StaticInitializer = StaticInitializer_63_RamOptimizerPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 64:   //  AuraCore.Desktop.Pages.RecommendationsPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_64_RecommendationsPage;
+                userType.StaticInitializer = StaticInitializer_64_RecommendationsPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 65:   //  AuraCore.Desktop.Pages.RegistryPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_65_RegistryPage;
+                userType.StaticInitializer = StaticInitializer_65_RegistryPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 66:   //  AuraCore.Desktop.Pages.SchedulerPage
+                userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
+                userType.Activator = Activate_66_SchedulerPage;
+                userType.StaticInitializer = StaticInitializer_66_SchedulerPage;
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 67:   //  Microsoft.UI.Xaml.Controls.RadioButtons
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Control"));
-                userType.Activator = Activate_63_RadioButtons;
-                userType.StaticInitializer = StaticInitializer_63_RadioButtons;
+                userType.Activator = Activate_67_RadioButtons;
+                userType.StaticInitializer = StaticInitializer_67_RadioButtons;
                 userType.SetContentPropertyName("Microsoft.UI.Xaml.Controls.RadioButtons.Items");
                 userType.AddMemberName("Items");
                 userType.AddMemberName("Header");
@@ -1020,70 +1076,70 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 64:   //  Int32
+            case 68:   //  Int32
                 xamlType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 65:   //  AuraCore.Desktop.Pages.SettingsPage
+            case 69:   //  AuraCore.Desktop.Pages.SettingsPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_65_SettingsPage;
-                userType.StaticInitializer = StaticInitializer_65_SettingsPage;
+                userType.Activator = Activate_69_SettingsPage;
+                userType.StaticInitializer = StaticInitializer_69_SettingsPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 66:   //  AuraCore.Desktop.Pages.SpaceAnalyzerPage
+            case 70:   //  AuraCore.Desktop.Pages.SpaceAnalyzerPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_66_SpaceAnalyzerPage;
-                userType.StaticInitializer = StaticInitializer_66_SpaceAnalyzerPage;
+                userType.Activator = Activate_70_SpaceAnalyzerPage;
+                userType.StaticInitializer = StaticInitializer_70_SpaceAnalyzerPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 67:   //  AuraCore.Desktop.Pages.StartupOptimizerPage
+            case 71:   //  AuraCore.Desktop.Pages.StartupOptimizerPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_67_StartupOptimizerPage;
-                userType.StaticInitializer = StaticInitializer_67_StartupOptimizerPage;
+                userType.Activator = Activate_71_StartupOptimizerPage;
+                userType.StaticInitializer = StaticInitializer_71_StartupOptimizerPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 68:   //  AuraCore.Desktop.Pages.StoragePage
+            case 72:   //  AuraCore.Desktop.Pages.StoragePage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_68_StoragePage;
-                userType.StaticInitializer = StaticInitializer_68_StoragePage;
+                userType.Activator = Activate_72_StoragePage;
+                userType.StaticInitializer = StaticInitializer_72_StoragePage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 69:   //  AuraCore.Desktop.Pages.SystemHealthPage
+            case 73:   //  AuraCore.Desktop.Pages.SystemHealthPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_69_SystemHealthPage;
-                userType.StaticInitializer = StaticInitializer_69_SystemHealthPage;
+                userType.Activator = Activate_73_SystemHealthPage;
+                userType.StaticInitializer = StaticInitializer_73_SystemHealthPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 70:   //  AuraCore.Desktop.Pages.TaskbarPage
+            case 74:   //  AuraCore.Desktop.Pages.TaskbarPage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_70_TaskbarPage;
-                userType.StaticInitializer = StaticInitializer_70_TaskbarPage;
+                userType.Activator = Activate_74_TaskbarPage;
+                userType.StaticInitializer = StaticInitializer_74_TaskbarPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 71:   //  AuraCore.Desktop.Pages.UpgradePage
+            case 75:   //  AuraCore.Desktop.Pages.UpgradePage
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_71_UpgradePage;
-                userType.StaticInitializer = StaticInitializer_71_UpgradePage;
+                userType.Activator = Activate_75_UpgradePage;
+                userType.StaticInitializer = StaticInitializer_75_UpgradePage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 72:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
+            case 76:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.DependencyObject"));
-                userType.Activator = Activate_72_TreeViewNode;
-                userType.StaticInitializer = StaticInitializer_72_TreeViewNode;
+                userType.Activator = Activate_76_TreeViewNode;
+                userType.StaticInitializer = StaticInitializer_76_TreeViewNode;
                 userType.AddMemberName("Children");
                 userType.AddMemberName("Content");
                 userType.AddMemberName("Depth");
@@ -1095,10 +1151,10 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 73:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
+            case 77:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
                 userType = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType(this, typeName, type, null);
-                userType.StaticInitializer = StaticInitializer_73_IList;
-                userType.CollectionAdd = VectorAdd_73_IList;
+                userType.StaticInitializer = StaticInitializer_77_IList;
+                userType.CollectionAdd = VectorAdd_77_IList;
                 userType.SetIsReturnTypeStub();
                 xamlType = userType;
                 break;
@@ -1696,172 +1752,262 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
             var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
             return that.TemplateSettings;
         }
-        private object get_58_WebView2_CanGoBack(object instance)
+        private object get_58_InfoBar_Content(object instance)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            return that.CanGoBack;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.Content;
         }
-        private void set_58_WebView2_CanGoBack(object instance, object Value)
+        private void set_58_InfoBar_Content(object instance, object Value)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            that.CanGoBack = (global::System.Boolean)Value;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.Content = (global::System.Object)Value;
         }
-        private object get_59_WebView2_CanGoForward(object instance)
+        private object get_59_InfoBar_Title(object instance)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            return that.CanGoForward;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.Title;
         }
-        private void set_59_WebView2_CanGoForward(object instance, object Value)
+        private void set_59_InfoBar_Title(object instance, object Value)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            that.CanGoForward = (global::System.Boolean)Value;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.Title = (global::System.String)Value;
         }
-        private object get_60_WebView2_CoreWebView2(object instance)
+        private object get_60_InfoBar_Message(object instance)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            return that.CoreWebView2;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.Message;
         }
-        private object get_61_WebView2_DefaultBackgroundColor(object instance)
+        private void set_60_InfoBar_Message(object instance, object Value)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            return that.DefaultBackgroundColor;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.Message = (global::System.String)Value;
         }
-        private void set_61_WebView2_DefaultBackgroundColor(object instance, object Value)
+        private object get_61_InfoBar_Severity(object instance)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            that.DefaultBackgroundColor = (global::Windows.UI.Color)Value;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.Severity;
         }
-        private object get_62_WebView2_Source(object instance)
+        private void set_61_InfoBar_Severity(object instance, object Value)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            return that.Source;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.Severity = (global::Microsoft.UI.Xaml.Controls.InfoBarSeverity)Value;
         }
-        private void set_62_WebView2_Source(object instance, object Value)
+        private object get_62_InfoBar_IsOpen(object instance)
         {
-            var that = (global::Microsoft.UI.Xaml.Controls.WebView2)instance;
-            that.Source = (global::System.Uri)Value;
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.IsOpen;
         }
-        private object get_63_RadioButtons_Items(object instance)
+        private void set_62_InfoBar_IsOpen(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.IsOpen = (global::System.Boolean)Value;
+        }
+        private object get_63_InfoBar_IsClosable(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.IsClosable;
+        }
+        private void set_63_InfoBar_IsClosable(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.IsClosable = (global::System.Boolean)Value;
+        }
+        private object get_64_InfoBar_ActionButton(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.ActionButton;
+        }
+        private void set_64_InfoBar_ActionButton(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.ActionButton = (global::Microsoft.UI.Xaml.Controls.Primitives.ButtonBase)Value;
+        }
+        private object get_65_InfoBar_CloseButtonCommand(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.CloseButtonCommand;
+        }
+        private void set_65_InfoBar_CloseButtonCommand(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.CloseButtonCommand = (global::System.Windows.Input.ICommand)Value;
+        }
+        private object get_66_InfoBar_CloseButtonCommandParameter(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.CloseButtonCommandParameter;
+        }
+        private void set_66_InfoBar_CloseButtonCommandParameter(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.CloseButtonCommandParameter = (global::System.Object)Value;
+        }
+        private object get_67_InfoBar_CloseButtonStyle(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.CloseButtonStyle;
+        }
+        private void set_67_InfoBar_CloseButtonStyle(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.CloseButtonStyle = (global::Microsoft.UI.Xaml.Style)Value;
+        }
+        private object get_68_InfoBar_ContentTemplate(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.ContentTemplate;
+        }
+        private void set_68_InfoBar_ContentTemplate(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.ContentTemplate = (global::Microsoft.UI.Xaml.DataTemplate)Value;
+        }
+        private object get_69_InfoBar_IconSource(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.IconSource;
+        }
+        private void set_69_InfoBar_IconSource(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.IconSource = (global::Microsoft.UI.Xaml.Controls.IconSource)Value;
+        }
+        private object get_70_InfoBar_IsIconVisible(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.IsIconVisible;
+        }
+        private void set_70_InfoBar_IsIconVisible(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            that.IsIconVisible = (global::System.Boolean)Value;
+        }
+        private object get_71_InfoBar_TemplateSettings(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
+            return that.TemplateSettings;
+        }
+        private object get_72_RadioButtons_Items(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.Items;
         }
-        private object get_64_RadioButtons_Header(object instance)
+        private object get_73_RadioButtons_Header(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.Header;
         }
-        private void set_64_RadioButtons_Header(object instance, object Value)
+        private void set_73_RadioButtons_Header(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.Header = (global::System.Object)Value;
         }
-        private object get_65_RadioButtons_HeaderTemplate(object instance)
+        private object get_74_RadioButtons_HeaderTemplate(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.HeaderTemplate;
         }
-        private void set_65_RadioButtons_HeaderTemplate(object instance, object Value)
+        private void set_74_RadioButtons_HeaderTemplate(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.HeaderTemplate = (global::Microsoft.UI.Xaml.DataTemplate)Value;
         }
-        private object get_66_RadioButtons_ItemTemplate(object instance)
+        private object get_75_RadioButtons_ItemTemplate(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.ItemTemplate;
         }
-        private void set_66_RadioButtons_ItemTemplate(object instance, object Value)
+        private void set_75_RadioButtons_ItemTemplate(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.ItemTemplate = (global::System.Object)Value;
         }
-        private object get_67_RadioButtons_ItemsSource(object instance)
+        private object get_76_RadioButtons_ItemsSource(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.ItemsSource;
         }
-        private void set_67_RadioButtons_ItemsSource(object instance, object Value)
+        private void set_76_RadioButtons_ItemsSource(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.ItemsSource = (global::System.Object)Value;
         }
-        private object get_68_RadioButtons_MaxColumns(object instance)
+        private object get_77_RadioButtons_MaxColumns(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.MaxColumns;
         }
-        private void set_68_RadioButtons_MaxColumns(object instance, object Value)
+        private void set_77_RadioButtons_MaxColumns(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.MaxColumns = (global::System.Int32)Value;
         }
-        private object get_69_RadioButtons_SelectedIndex(object instance)
+        private object get_78_RadioButtons_SelectedIndex(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.SelectedIndex;
         }
-        private void set_69_RadioButtons_SelectedIndex(object instance, object Value)
+        private void set_78_RadioButtons_SelectedIndex(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.SelectedIndex = (global::System.Int32)Value;
         }
-        private object get_70_RadioButtons_SelectedItem(object instance)
+        private object get_79_RadioButtons_SelectedItem(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             return that.SelectedItem;
         }
-        private void set_70_RadioButtons_SelectedItem(object instance, object Value)
+        private void set_79_RadioButtons_SelectedItem(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.RadioButtons)instance;
             that.SelectedItem = (global::System.Object)Value;
         }
-        private object get_71_TreeViewNode_Children(object instance)
+        private object get_80_TreeViewNode_Children(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Children;
         }
-        private object get_72_TreeViewNode_Content(object instance)
+        private object get_81_TreeViewNode_Content(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Content;
         }
-        private void set_72_TreeViewNode_Content(object instance, object Value)
+        private void set_81_TreeViewNode_Content(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.Content = (global::System.Object)Value;
         }
-        private object get_73_TreeViewNode_Depth(object instance)
+        private object get_82_TreeViewNode_Depth(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Depth;
         }
-        private object get_74_TreeViewNode_HasChildren(object instance)
+        private object get_83_TreeViewNode_HasChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasChildren;
         }
-        private object get_75_TreeViewNode_HasUnrealizedChildren(object instance)
+        private object get_84_TreeViewNode_HasUnrealizedChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasUnrealizedChildren;
         }
-        private void set_75_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
+        private void set_84_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.HasUnrealizedChildren = (global::System.Boolean)Value;
         }
-        private object get_76_TreeViewNode_IsExpanded(object instance)
+        private object get_85_TreeViewNode_IsExpanded(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.IsExpanded;
         }
-        private void set_76_TreeViewNode_IsExpanded(object instance, object Value)
+        private void set_85_TreeViewNode_IsExpanded(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.IsExpanded = (global::System.Boolean)Value;
         }
-        private object get_77_TreeViewNode_Parent(object instance)
+        private object get_86_TreeViewNode_Parent(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Parent;
@@ -2278,140 +2424,204 @@ namespace AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo
                 xamlMember.Getter = get_57_ProgressBar_TemplateSettings;
                 xamlMember.SetIsReadOnly();
                 break;
-            case "Microsoft.UI.Xaml.Controls.WebView2.CanGoBack":
-                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.WebView2");
-                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CanGoBack", "Boolean");
+            case "Microsoft.UI.Xaml.Controls.InfoBar.Content":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Content", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_58_WebView2_CanGoBack;
-                xamlMember.Setter = set_58_WebView2_CanGoBack;
+                xamlMember.Getter = get_58_InfoBar_Content;
+                xamlMember.Setter = set_58_InfoBar_Content;
                 break;
-            case "Microsoft.UI.Xaml.Controls.WebView2.CanGoForward":
-                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.WebView2");
-                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CanGoForward", "Boolean");
+            case "Microsoft.UI.Xaml.Controls.InfoBar.Title":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Title", "String");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_59_WebView2_CanGoForward;
-                xamlMember.Setter = set_59_WebView2_CanGoForward;
+                xamlMember.Getter = get_59_InfoBar_Title;
+                xamlMember.Setter = set_59_InfoBar_Title;
                 break;
-            case "Microsoft.UI.Xaml.Controls.WebView2.CoreWebView2":
-                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.WebView2");
-                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CoreWebView2", "Microsoft.Web.WebView2.Core.CoreWebView2");
-                xamlMember.Getter = get_60_WebView2_CoreWebView2;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.Message":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Message", "String");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_60_InfoBar_Message;
+                xamlMember.Setter = set_60_InfoBar_Message;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.Severity":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Severity", "Microsoft.UI.Xaml.Controls.InfoBarSeverity");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_61_InfoBar_Severity;
+                xamlMember.Setter = set_61_InfoBar_Severity;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.IsOpen":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "IsOpen", "Boolean");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_62_InfoBar_IsOpen;
+                xamlMember.Setter = set_62_InfoBar_IsOpen;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.IsClosable":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "IsClosable", "Boolean");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_63_InfoBar_IsClosable;
+                xamlMember.Setter = set_63_InfoBar_IsClosable;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.ActionButton":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "ActionButton", "Microsoft.UI.Xaml.Controls.Primitives.ButtonBase");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_64_InfoBar_ActionButton;
+                xamlMember.Setter = set_64_InfoBar_ActionButton;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.CloseButtonCommand":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CloseButtonCommand", "System.Windows.Input.ICommand");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_65_InfoBar_CloseButtonCommand;
+                xamlMember.Setter = set_65_InfoBar_CloseButtonCommand;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.CloseButtonCommandParameter":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CloseButtonCommandParameter", "Object");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_66_InfoBar_CloseButtonCommandParameter;
+                xamlMember.Setter = set_66_InfoBar_CloseButtonCommandParameter;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.CloseButtonStyle":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "CloseButtonStyle", "Microsoft.UI.Xaml.Style");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_67_InfoBar_CloseButtonStyle;
+                xamlMember.Setter = set_67_InfoBar_CloseButtonStyle;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.ContentTemplate":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "ContentTemplate", "Microsoft.UI.Xaml.DataTemplate");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_68_InfoBar_ContentTemplate;
+                xamlMember.Setter = set_68_InfoBar_ContentTemplate;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.IconSource":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "IconSource", "Microsoft.UI.Xaml.Controls.IconSource");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_69_InfoBar_IconSource;
+                xamlMember.Setter = set_69_InfoBar_IconSource;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.IsIconVisible":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "IsIconVisible", "Boolean");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_70_InfoBar_IsIconVisible;
+                xamlMember.Setter = set_70_InfoBar_IsIconVisible;
+                break;
+            case "Microsoft.UI.Xaml.Controls.InfoBar.TemplateSettings":
+                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.InfoBar");
+                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "TemplateSettings", "Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_71_InfoBar_TemplateSettings;
                 xamlMember.SetIsReadOnly();
-                break;
-            case "Microsoft.UI.Xaml.Controls.WebView2.DefaultBackgroundColor":
-                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.WebView2");
-                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "DefaultBackgroundColor", "Windows.UI.Color");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_61_WebView2_DefaultBackgroundColor;
-                xamlMember.Setter = set_61_WebView2_DefaultBackgroundColor;
-                break;
-            case "Microsoft.UI.Xaml.Controls.WebView2.Source":
-                userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.WebView2");
-                xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Source", "System.Uri");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_62_WebView2_Source;
-                xamlMember.Setter = set_62_WebView2_Source;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.Items":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Items", "System.Collections.Generic.IList`1<Object>");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_63_RadioButtons_Items;
+                xamlMember.Getter = get_72_RadioButtons_Items;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.Header":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Header", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_64_RadioButtons_Header;
-                xamlMember.Setter = set_64_RadioButtons_Header;
+                xamlMember.Getter = get_73_RadioButtons_Header;
+                xamlMember.Setter = set_73_RadioButtons_Header;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.HeaderTemplate":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "HeaderTemplate", "Microsoft.UI.Xaml.DataTemplate");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_65_RadioButtons_HeaderTemplate;
-                xamlMember.Setter = set_65_RadioButtons_HeaderTemplate;
+                xamlMember.Getter = get_74_RadioButtons_HeaderTemplate;
+                xamlMember.Setter = set_74_RadioButtons_HeaderTemplate;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.ItemTemplate":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "ItemTemplate", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_66_RadioButtons_ItemTemplate;
-                xamlMember.Setter = set_66_RadioButtons_ItemTemplate;
+                xamlMember.Getter = get_75_RadioButtons_ItemTemplate;
+                xamlMember.Setter = set_75_RadioButtons_ItemTemplate;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.ItemsSource":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "ItemsSource", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_67_RadioButtons_ItemsSource;
-                xamlMember.Setter = set_67_RadioButtons_ItemsSource;
+                xamlMember.Getter = get_76_RadioButtons_ItemsSource;
+                xamlMember.Setter = set_76_RadioButtons_ItemsSource;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.MaxColumns":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "MaxColumns", "Int32");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_68_RadioButtons_MaxColumns;
-                xamlMember.Setter = set_68_RadioButtons_MaxColumns;
+                xamlMember.Getter = get_77_RadioButtons_MaxColumns;
+                xamlMember.Setter = set_77_RadioButtons_MaxColumns;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.SelectedIndex":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "SelectedIndex", "Int32");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_69_RadioButtons_SelectedIndex;
-                xamlMember.Setter = set_69_RadioButtons_SelectedIndex;
+                xamlMember.Getter = get_78_RadioButtons_SelectedIndex;
+                xamlMember.Setter = set_78_RadioButtons_SelectedIndex;
                 break;
             case "Microsoft.UI.Xaml.Controls.RadioButtons.SelectedItem":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.RadioButtons");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "SelectedItem", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_70_RadioButtons_SelectedItem;
-                xamlMember.Setter = set_70_RadioButtons_SelectedItem;
+                xamlMember.Getter = get_79_RadioButtons_SelectedItem;
+                xamlMember.Setter = set_79_RadioButtons_SelectedItem;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Children":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Children", "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>");
-                xamlMember.Getter = get_71_TreeViewNode_Children;
+                xamlMember.Getter = get_80_TreeViewNode_Children;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Content":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Content", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_72_TreeViewNode_Content;
-                xamlMember.Setter = set_72_TreeViewNode_Content;
+                xamlMember.Getter = get_81_TreeViewNode_Content;
+                xamlMember.Setter = set_81_TreeViewNode_Content;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Depth":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Depth", "Int32");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_73_TreeViewNode_Depth;
+                xamlMember.Getter = get_82_TreeViewNode_Depth;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasChildren":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "HasChildren", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_74_TreeViewNode_HasChildren;
+                xamlMember.Getter = get_83_TreeViewNode_HasChildren;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasUnrealizedChildren":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "HasUnrealizedChildren", "Boolean");
-                xamlMember.Getter = get_75_TreeViewNode_HasUnrealizedChildren;
-                xamlMember.Setter = set_75_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Getter = get_84_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Setter = set_84_TreeViewNode_HasUnrealizedChildren;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.IsExpanded":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "IsExpanded", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_76_TreeViewNode_IsExpanded;
-                xamlMember.Setter = set_76_TreeViewNode_IsExpanded;
+                xamlMember.Getter = get_85_TreeViewNode_IsExpanded;
+                xamlMember.Setter = set_85_TreeViewNode_IsExpanded;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Parent":
                 userType = (global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::AuraCore.Desktop.AuraCore_Desktop_XamlTypeInfo.XamlMember(this, "Parent", "Microsoft.UI.Xaml.Controls.TreeViewNode");
-                xamlMember.Getter = get_77_TreeViewNode_Parent;
+                xamlMember.Getter = get_86_TreeViewNode_Parent;
                 xamlMember.SetIsReadOnly();
                 break;
             }

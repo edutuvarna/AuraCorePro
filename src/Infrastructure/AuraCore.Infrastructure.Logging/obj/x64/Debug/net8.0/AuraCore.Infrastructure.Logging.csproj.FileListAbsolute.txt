@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infra
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Logging\obj\x64\Debug\net8.0\refint\AuraCore.Infrastructure.Logging.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Logging\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Logging.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Logging\obj\x64\Debug\net8.0\ref\AuraCore.Infrastructure.Logging.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Logging\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Logging.sourcelink.json

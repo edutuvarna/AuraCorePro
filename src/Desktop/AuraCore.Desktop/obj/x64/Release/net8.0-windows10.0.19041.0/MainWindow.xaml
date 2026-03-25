@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Aura Core Pro">
 
-    <Grid>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.KeyboardAccelerators>
             <!-- Navigation shortcuts: Ctrl+1 through Ctrl+9 -->
             <KeyboardAccelerator x:ConnectionId='2' Key="Number1" Modifiers="Control"                            />
@@ -111,11 +111,24 @@
                 <NavigationViewItem Content="Disk Health" Tag="disk-health">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xECA7;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Disk Cleanup Pro" Tag="disk-cleanup">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Defender Manager" Tag="defender-manager">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE83D;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Startup Optimizer" Tag="startup-optimizer">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE7B5;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem Content="Auto-Schedule" Tag="scheduler">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE823;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemSeparator />
+                <NavigationViewItemHeader Content="Advanced Tools" />
+
+                <NavigationViewItem Content="ISO Builder" Tag="iso-builder">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE958;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItem x:ConnectionId='20' x:Name="AdminNavItem" Content="Admin Panel" Tag="admin" Visibility="Collapsed">

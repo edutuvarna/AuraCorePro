@@ -43,13 +43,35 @@ public static class ThemeService
         // Apply to root content element
         root.RequestedTheme = elementTheme;
 
-        // Also apply to any child frames to ensure full propagation
-        if (root is Microsoft.UI.Xaml.Controls.Panel panel)
+        // Apply to all child elements recursively for full propagation
+        ApplyToChildren(root, elementTheme);
+    }
+
+    private static void ApplyToChildren(FrameworkElement parent, ElementTheme theme)
+    {
+        if (parent is Microsoft.UI.Xaml.Controls.Panel panel)
         {
             foreach (var child in panel.Children)
             {
                 if (child is FrameworkElement fe)
-                    fe.RequestedTheme = elementTheme;
+                {
+                    fe.RequestedTheme = theme;
+                    ApplyToChildren(fe, theme);
+                }
+            }
+        }
+        else if (parent is Microsoft.UI.Xaml.Controls.ContentControl cc && cc.Content is FrameworkElement cfe)
+        {
+            cfe.RequestedTheme = theme;
+            ApplyToChildren(cfe, theme);
+        }
+        else if (parent is Microsoft.UI.Xaml.Controls.NavigationView nav)
+        {
+            nav.RequestedTheme = theme;
+            if (nav.Content is FrameworkElement navContent)
+            {
+                navContent.RequestedTheme = theme;
+                ApplyToChildren(navContent, theme);
             }
         }
     }

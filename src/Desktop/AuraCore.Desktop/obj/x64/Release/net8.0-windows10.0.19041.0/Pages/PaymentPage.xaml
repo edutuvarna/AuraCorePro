@@ -2,7 +2,6 @@
 <Page x:ConnectionId='1' x:Class="AuraCore.Desktop.Pages.PaymentPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
                         >
 
     <Grid>
@@ -22,64 +21,92 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-
-                <Button x:ConnectionId='10' Grid.Column="0" Content="← Back"                   
-                        Style="{StaticResource DefaultButtonStyle}" Padding="12,6" />
-
-                <TextBlock x:ConnectionId='11' Grid.Column="1" x:Name="HeaderText" Text="Complete Your Purchase"
+                <Button x:ConnectionId='15' Grid.Column="0" Content="&#x2190; Back"                    Padding="12,6" />
+                <TextBlock x:ConnectionId='16' Grid.Column="1" x:Name="HeaderText" Text="Complete Your Purchase"
                            Style="{StaticResource SubtitleTextBlockStyle}"
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
-
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <FontIcon Glyph="&#xE72E;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                    <TextBlock Text="Secure Payment" FontSize="12"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="Secure Payment" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- WebView2 -->
-        <WebView2 x:ConnectionId='2' Grid.Row="1" x:Name="PaymentWebView"
-                                                                        
-                                                                           />
-
-        <!-- Loading Overlay -->
-        <Grid x:ConnectionId='3' Grid.Row="1" x:Name="LoadingOverlay" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+        <!-- Loading Screen -->
+        <Grid x:ConnectionId='2' Grid.Row="1" x:Name="LoadingScreen" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
                 <ProgressRing IsActive="True" Width="48" Height="48" />
-                <TextBlock x:ConnectionId='9' x:Name="LoadingText" Text="Loading payment page..."
+                <TextBlock x:ConnectionId='14' x:Name="LoadingText" Text="Creating checkout session..."
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
         </Grid>
 
-        <!-- Success Overlay -->
-        <Grid x:ConnectionId='4' Grid.Row="1" x:Name="SuccessOverlay" Visibility="Collapsed"
+        <!-- Waiting Screen (shown after browser opens) -->
+        <Grid x:ConnectionId='3' Grid.Row="1" x:Name="WaitingScreen" Visibility="Collapsed"
+              Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" MaxWidth="420">
+                <FontIcon Glyph="&#xE8A7;" FontSize="56" Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                          HorizontalAlignment="Center" />
+                <TextBlock Text="Checkout opened in your browser"
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           HorizontalAlignment="Center" TextAlignment="Center" />
+                <TextBlock Text="Complete your payment in the browser window that just opened. This page will update automatically when your payment is confirmed."
+                           Style="{StaticResource BodyTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                <ProgressRing IsActive="True" Width="32" Height="32" HorizontalAlignment="Center" />
+                <TextBlock x:ConnectionId='11' x:Name="PollStatusText" Text="Waiting for payment..."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                           HorizontalAlignment="Center" />
+                <StackPanel Spacing="8" Margin="0,16,0,0">
+                    <Button x:ConnectionId='12' Content="Reopen checkout in browser"                     
+                            HorizontalAlignment="Center" Padding="16,8" />
+                    <Button x:ConnectionId='13' Content="Cancel"                   
+                            HorizontalAlignment="Center" Padding="16,8"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- Success Screen -->
+        <Grid x:ConnectionId='4' Grid.Row="1" x:Name="SuccessScreen" Visibility="Collapsed"
               Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" MaxWidth="400">
                 <FontIcon Glyph="&#xE73E;" FontSize="64" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                <TextBlock Text="Payment Successful!" Style="{StaticResource TitleTextBlockStyle}"
-                           HorizontalAlignment="Center" />
-                <TextBlock x:ConnectionId='6' x:Name="SuccessMessage" Text="Your subscription has been activated."
+                <TextBlock Text="Payment Successful!" Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:ConnectionId='8' x:Name="SuccessMessage" Text="Your subscription has been activated."
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center" TextAlignment="Center" />
-                <TextBlock x:ConnectionId='7' x:Name="TierUpdateText" Text="Updating your account..."
+                <TextBlock x:ConnectionId='9' x:Name="TierUpdateText" Text="Updating your account..."
                            Style="{StaticResource CaptionTextBlockStyle}"
-                           Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                           HorizontalAlignment="Center" />
-                <Button x:ConnectionId='8' Content="Continue" Style="{StaticResource AccentButtonStyle}"
+                           Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
+                <Button x:ConnectionId='10' Content="Continue" Style="{StaticResource AccentButtonStyle}"
                         HorizontalAlignment="Center" Padding="32,10"                        Margin="0,8,0,0" />
             </StackPanel>
         </Grid>
 
-        <!-- Status Bar -->
+        <!-- Error Screen -->
+        <Grid x:ConnectionId='5' Grid.Row="1" x:Name="ErrorScreen" Visibility="Collapsed"
+              Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" MaxWidth="400">
+                <FontIcon Glyph="&#xE783;" FontSize="48" Foreground="#ef4444" />
+                <TextBlock Text="Something went wrong" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:ConnectionId='6' x:Name="ErrorText" Style="{StaticResource BodyTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                <Button x:ConnectionId='7' Content="Try Again" Style="{StaticResource AccentButtonStyle}"
+                        HorizontalAlignment="Center" Padding="24,10"                        />
+            </StackPanel>
+        </Grid>
+
+        <!-- Bottom Bar -->
         <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,1,0,0"
-                Padding="16,8">
-            <TextBlock x:ConnectionId='5' x:Name="StatusText" Text="Powered by Stripe — your payment details are never stored on our servers"
-                       FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                       HorizontalAlignment="Center" />
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,1,0,0" Padding="16,8">
+            <TextBlock Text="Powered by Stripe — your payment details are never stored on our servers"
+                       FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
         </Border>
     </Grid>
 </Page>

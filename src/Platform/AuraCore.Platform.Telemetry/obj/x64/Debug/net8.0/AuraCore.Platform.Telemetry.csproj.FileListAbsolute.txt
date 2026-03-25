@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Te
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Telemetry\obj\x64\Debug\net8.0\refint\AuraCore.Platform.Telemetry.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Telemetry\obj\x64\Debug\net8.0\AuraCore.Platform.Telemetry.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Telemetry\obj\x64\Debug\net8.0\ref\AuraCore.Platform.Telemetry.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Telemetry\obj\x64\Debug\net8.0\AuraCore.Platform.Telemetry.sourcelink.json

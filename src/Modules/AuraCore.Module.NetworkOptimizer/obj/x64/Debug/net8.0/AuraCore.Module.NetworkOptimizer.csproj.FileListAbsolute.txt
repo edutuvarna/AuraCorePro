@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.Netwo
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.NetworkOptimizer\obj\x64\Debug\net8.0\refint\AuraCore.Module.NetworkOptimizer.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.NetworkOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.NetworkOptimizer.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.NetworkOptimizer\obj\x64\Debug\net8.0\ref\AuraCore.Module.NetworkOptimizer.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.NetworkOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.NetworkOptimizer.sourcelink.json

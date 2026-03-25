@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Platform.Telemetry")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad6c1e2f9d954c01d7578f2b2f036f696514bda6")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Platform.Telemetry")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Platform.Telemetry")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

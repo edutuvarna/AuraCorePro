@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RamOp
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RamOptimizer\obj\x64\Debug\net8.0\refint\AuraCore.Module.RamOptimizer.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RamOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.RamOptimizer.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RamOptimizer\obj\x64\Debug\net8.0\ref\AuraCore.Module.RamOptimizer.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.RamOptimizer\obj\x64\Debug\net8.0\AuraCore.Module.RamOptimizer.sourcelink.json

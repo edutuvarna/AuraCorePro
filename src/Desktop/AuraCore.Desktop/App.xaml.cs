@@ -40,6 +40,8 @@ public partial class App : Microsoft.UI.Xaml.Application
         AuraCore.Module.ContextMenu.ContextMenuRegistration.AddContextMenuModule(sc);
         AuraCore.Module.TaskbarTweaks.TaskbarTweaksRegistration.AddTaskbarTweaksModule(sc);
         AuraCore.Module.ExplorerTweaks.ExplorerTweaksRegistration.AddExplorerTweaksModule(sc);
+        AuraCore.Module.DiskCleanup.DiskCleanupRegistration.AddDiskCleanupModule(sc);
+        AuraCore.Module.DefenderManager.DefenderManagerRegistration.AddDefenderManagerModule(sc);
 
         // Guards
         AuraCore.Guard.Licensing.LicensingRegistration.AddLicensingGuard(sc);

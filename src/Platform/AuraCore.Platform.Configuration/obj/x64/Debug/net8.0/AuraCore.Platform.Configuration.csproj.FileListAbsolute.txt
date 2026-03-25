@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Co
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Configuration\obj\x64\Debug\net8.0\refint\AuraCore.Platform.Configuration.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Configuration\obj\x64\Debug\net8.0\AuraCore.Platform.Configuration.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Configuration\obj\x64\Debug\net8.0\ref\AuraCore.Platform.Configuration.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Platform\AuraCore.Platform.Configuration\obj\x64\Debug\net8.0\AuraCore.Platform.Configuration.sourcelink.json

@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infra
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Storage\obj\x64\Debug\net8.0\refint\AuraCore.Infrastructure.Storage.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Storage\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Storage.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Storage\obj\x64\Debug\net8.0\ref\AuraCore.Infrastructure.Storage.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Infrastructure\AuraCore.Infrastructure.Storage\obj\x64\Debug\net8.0\AuraCore.Infrastructure.Storage.sourcelink.json

@@ -6,9 +6,12 @@ Pages\AppInstallerPage.xbf
 Pages\BloatwarePage.xbf
 Pages\ContextMenuPage.xbf
 Pages\DashboardPage.xbf
+Pages\DefenderPage.xbf
+Pages\DiskCleanupPage.xbf
 Pages\DiskHealthPage.xbf
 Pages\ExplorerPage.xbf
 Pages\GamingModePage.xbf
+Pages\IsoBuilderPage.xbf
 Pages\JunkCleanerPage.xbf
 Pages\NetworkPage.xbf
 Pages\OnboardingPage.xbf

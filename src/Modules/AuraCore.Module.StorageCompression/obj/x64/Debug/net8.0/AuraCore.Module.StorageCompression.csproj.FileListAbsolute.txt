@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.Stora
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.StorageCompression\obj\x64\Debug\net8.0\refint\AuraCore.Module.StorageCompression.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.StorageCompression\obj\x64\Debug\net8.0\AuraCore.Module.StorageCompression.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.StorageCompression\obj\x64\Debug\net8.0\ref\AuraCore.Module.StorageCompression.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Modules\AuraCore.Module.StorageCompression\obj\x64\Debug\net8.0\AuraCore.Module.StorageCompression.sourcelink.json

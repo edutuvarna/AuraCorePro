@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Engines\AuraCore.Engine.Safet
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Engines\AuraCore.Engine.Safety\obj\x64\Debug\net8.0\refint\AuraCore.Engine.Safety.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Engines\AuraCore.Engine.Safety\obj\x64\Debug\net8.0\AuraCore.Engine.Safety.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Engines\AuraCore.Engine.Safety\obj\x64\Debug\net8.0\ref\AuraCore.Engine.Safety.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Engines\AuraCore.Engine.Safety\obj\x64\Debug\net8.0\AuraCore.Engine.Safety.sourcelink.json

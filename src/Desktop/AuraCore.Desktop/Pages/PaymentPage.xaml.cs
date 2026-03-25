@@ -5,7 +5,6 @@ using System.Text.Json;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.Web.WebView2.Core;
 
 namespace AuraCore.Desktop.Pages;
 
@@ -14,7 +13,9 @@ public sealed partial class PaymentPage : Page
     private string _tier = "pro";
     private string _plan = "monthly";
     private int _deviceCount = 1;
-    private static readonly HttpClient Http = new();
+    private string? _checkoutUrl;
+    private bool _polling;
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(10) };
 
     public PaymentPage()
     {
@@ -32,27 +33,44 @@ public sealed partial class PaymentPage : Page
         }
     }
 
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        _polling = false; // Stop polling when leaving page
+    }
+
     private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        await StartCheckout();
+    }
+
+    private async Task StartCheckout()
+    {
+        ShowScreen("loading");
+        LoadingText.Text = "Creating checkout session...";
+
         try
         {
-            LoadingText.Text = "Creating checkout session...";
-            await PaymentWebView.EnsureCoreWebView2Async();
+            _checkoutUrl = await GetCheckoutUrlAsync();
 
-            // Get Stripe Checkout URL from API
-            var url = await GetCheckoutUrlAsync();
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(_checkoutUrl))
             {
-                LoadingText.Text = "Failed to create checkout session. Please try again.";
+                ShowError("Failed to create checkout session. Please check your connection and try again.");
                 return;
             }
 
-            LoadingText.Text = "Loading Stripe checkout...";
-            PaymentWebView.Source = new Uri(url);
+            // Open Stripe checkout in default browser
+            LoadingText.Text = "Opening browser...";
+            await Windows.System.Launcher.LaunchUriAsync(new Uri(_checkoutUrl));
+
+            // Show waiting screen and start polling for payment completion
+            ShowScreen("waiting");
+            _polling = true;
+            _ = PollForPaymentAsync();
         }
         catch (Exception ex)
         {
-            LoadingText.Text = $"Error: {ex.Message}";
+            ShowError($"Error: {ex.Message}");
         }
     }
 
@@ -62,12 +80,13 @@ public sealed partial class PaymentPage : Page
         {
             var apiUrl = LoginWindow.ApiBaseUrl;
             var token = LoginWindow.AccessToken;
+            var email = LoginWindow.UserEmail;
 
             HttpRequestMessage request;
 
-            // If user is logged in, use authenticated endpoint
             if (!string.IsNullOrEmpty(token))
             {
+                // Authenticated checkout — uses user's email automatically
                 request = new HttpRequestMessage(HttpMethod.Post, $"{apiUrl}/api/payment/stripe/create-session")
                 {
                     Content = JsonContent.Create(new { tier = _tier, plan = _plan, deviceCount = _deviceCount })
@@ -76,10 +95,10 @@ public sealed partial class PaymentPage : Page
             }
             else
             {
-                // Use public checkout endpoint
+                // Public checkout — pass email if available
                 request = new HttpRequestMessage(HttpMethod.Post, $"{apiUrl}/api/payment/checkout")
                 {
-                    Content = JsonContent.Create(new { tier = _tier, plan = _plan, deviceCount = _deviceCount })
+                    Content = JsonContent.Create(new { tier = _tier, plan = _plan, deviceCount = _deviceCount, email })
                 };
             }
 
@@ -89,10 +108,7 @@ public sealed partial class PaymentPage : Page
             var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
 
-            if (doc.RootElement.TryGetProperty("url", out var urlProp))
-                return urlProp.GetString();
-
-            return null;
+            return doc.RootElement.TryGetProperty("url", out var urlProp) ? urlProp.GetString() : null;
         }
         catch
         {
@@ -100,89 +116,117 @@ public sealed partial class PaymentPage : Page
         }
     }
 
-    private void PaymentWebView_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
+    /// <summary>
+    /// Polls the license API every 5 seconds to detect when payment completes.
+    /// When Stripe webhook fires, the user's tier changes from "free" to "pro/enterprise".
+    /// </summary>
+    private async Task PollForPaymentAsync()
     {
-        var uri = args.Uri;
+        var attempts = 0;
+        var maxAttempts = 120; // 10 minutes max (120 * 5 seconds)
 
-        // Check if redirected to success URL
-        if (uri.Contains("payment=success"))
+        while (_polling && attempts < maxAttempts)
         {
-            args.Cancel = true;
-            _ = HandlePaymentSuccessAsync();
-        }
-        // Check if redirected to cancel URL
-        else if (uri.Contains("payment=cancelled"))
-        {
-            args.Cancel = true;
-            GoBack();
-        }
-    }
+            attempts++;
+            await Task.Delay(5000); // Check every 5 seconds
 
-    private void PaymentWebView_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
-    {
-        // Hide loading overlay once Stripe page loads
-        LoadingOverlay.Visibility = Visibility.Collapsed;
-    }
+            if (!_polling) return;
 
-    private async Task HandlePaymentSuccessAsync()
-    {
-        // Show success overlay
-        PaymentWebView.Visibility = Visibility.Collapsed;
-        LoadingOverlay.Visibility = Visibility.Collapsed;
-        SuccessOverlay.Visibility = Visibility.Visible;
-
-        var tierName = _tier == "enterprise" ? "Enterprise" : "Pro";
-        SuccessMessage.Text = $"Your {tierName} subscription is now active.\nAll premium features have been unlocked!";
-        TierUpdateText.Text = "Refreshing your account...";
-
-        // Refresh tier from API
-        try
-        {
-            await RefreshTierAsync();
-            TierUpdateText.Text = $"Account updated — you are now {tierName}!";
-        }
-        catch
-        {
-            TierUpdateText.Text = "Account will update on next login.";
-        }
-    }
-
-    private async Task RefreshTierAsync()
-    {
-        try
-        {
-            var apiUrl = LoginWindow.ApiBaseUrl;
-            var token = LoginWindow.AccessToken;
-
-            if (string.IsNullOrEmpty(token)) return;
-
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{apiUrl}/api/license/validate?key=self&device=self");
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await Http.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return;
-
-            var json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-
-            if (doc.RootElement.TryGetProperty("tier", out var tierProp))
+            try
             {
-                var newTier = tierProp.GetString() ?? "free";
-                LoginWindow.UserTier = newTier;
-                SessionState.UserTier = newTier;
+                DispatcherQueue?.TryEnqueue(() =>
+                {
+                    PollStatusText.Text = $"Waiting for payment... ({attempts * 5}s)";
+                });
+
+                var apiUrl = LoginWindow.ApiBaseUrl;
+                var token = LoginWindow.AccessToken;
+
+                if (string.IsNullOrEmpty(token)) continue;
+
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{apiUrl}/api/license/validate?key=self&device=self");
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await Http.SendAsync(request);
+                if (!response.IsSuccessStatusCode) continue;
+
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty("tier", out var tierProp))
+                {
+                    var currentTier = tierProp.GetString() ?? "free";
+
+                    // Payment detected! Tier changed from free
+                    if (currentTier != "free")
+                    {
+                        _polling = false;
+                        LoginWindow.UserTier = currentTier;
+                        SessionState.UserTier = currentTier;
+
+                        DispatcherQueue?.TryEnqueue(() => HandlePaymentSuccess(currentTier));
+                        return;
+                    }
+                }
             }
+            catch { /* Continue polling */ }
         }
-        catch { /* Will update on next login */ }
+
+        // Timeout — stop polling
+        if (_polling)
+        {
+            _polling = false;
+            DispatcherQueue?.TryEnqueue(() =>
+            {
+                PollStatusText.Text = "Payment not detected yet. If you completed payment, it may take a minute to process. Try reopening the app.";
+            });
+        }
+    }
+
+    private void HandlePaymentSuccess(string tier)
+    {
+        var tierName = tier == "enterprise" ? "Enterprise" : "Pro";
+
+        ShowScreen("success");
+        SuccessMessage.Text = $"Your {tierName} subscription is now active.\nAll premium features have been unlocked!";
+        TierUpdateText.Text = $"Account updated — you are now {tierName}!";
+    }
+
+    private void ShowScreen(string screen)
+    {
+        LoadingScreen.Visibility = screen == "loading" ? Visibility.Visible : Visibility.Collapsed;
+        WaitingScreen.Visibility = screen == "waiting" ? Visibility.Visible : Visibility.Collapsed;
+        SuccessScreen.Visibility = screen == "success" ? Visibility.Visible : Visibility.Collapsed;
+        ErrorScreen.Visibility = screen == "error" ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void ShowError(string message)
+    {
+        ErrorText.Text = message;
+        ShowScreen("error");
+    }
+
+    private async void Reopen_Click(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(_checkoutUrl))
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri(_checkoutUrl));
+        }
+    }
+
+    private async void TryAgain_Click(object sender, RoutedEventArgs e)
+    {
+        await StartCheckout();
     }
 
     private void Back_Click(object sender, RoutedEventArgs e)
     {
+        _polling = false;
         GoBack();
     }
 
     private void Continue_Click(object sender, RoutedEventArgs e)
     {
-        // Navigate back to dashboard — MainWindow will refresh tier badge and feature locking
         if (Frame.CanGoBack)
             Frame.GoBack();
         else

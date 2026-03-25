@@ -1,0 +1,848 @@
+using System.Text.Json;
+
+namespace AuraCore.Desktop.Services;
+
+/// <summary>
+/// Centralized localization service. Shortcut: S.Get("key") or S._("key")
+/// Supports English and Turkish. Persists user choice.
+/// </summary>
+public static class S
+{
+    public enum Lang { EN, TR }
+
+    public static Lang Current { get; private set; } = Lang.EN;
+
+    private static readonly string ConfigPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "AuraCorePro", "language.json");
+
+    /// <summary>Get localized string by key. Falls back to key itself if not found.</summary>
+    public static string Get(string key)
+    {
+        var dict = Current == Lang.TR ? TR : EN;
+        return dict.TryGetValue(key, out var val) ? val : (EN.TryGetValue(key, out var en) ? en : key);
+    }
+
+    /// <summary>Shortcut alias for Get</summary>
+    public static string _(string key) => Get(key);
+
+    public static void SetLanguage(Lang lang)
+    {
+        Current = lang;
+        Save();
+        LanguageChanged?.Invoke();
+    }
+
+    /// <summary>Fires when language changes. Subscribe to refresh UI.</summary>
+    public static event Action? LanguageChanged;
+
+    public static void Load()
+    {
+        try
+        {
+            if (!File.Exists(ConfigPath)) return;
+            var json = File.ReadAllText(ConfigPath);
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("Lang", out var prop))
+                if (Enum.TryParse<Lang>(prop.GetString(), out var l)) Current = l;
+        }
+        catch { }
+    }
+
+    private static void Save()
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)!);
+            File.WriteAllText(ConfigPath, JsonSerializer.Serialize(new { Lang = Current.ToString() }));
+        }
+        catch { }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  ENGLISH STRINGS
+    // ═══════════════════════════════════════════════════════════
+    private static readonly Dictionary<string, string> EN = new()
+    {
+        // ── Login Window ──
+        ["login.title"] = "Aura Core Pro",
+        ["login.subtitle"] = "AI Powered Windows Intelligence",
+        ["login.signIn"] = "Sign In",
+        ["login.createAccount"] = "Create Account",
+        ["login.email"] = "Email",
+        ["login.password"] = "Password",
+        ["login.confirmPassword"] = "Confirm Password",
+        ["login.emailPlaceholder"] = "your@email.com",
+        ["login.passwordPlaceholder"] = "Enter your password",
+        ["login.minChars"] = "Minimum 8 characters",
+        ["login.repeatPassword"] = "Repeat your password",
+        ["login.offline"] = "Continue offline (Free tier)",
+        ["login.signingIn"] = "Signing in...",
+        ["login.registering"] = "Creating account...",
+        ["login.invalidEmail"] = "Please enter a valid email address.",
+        ["login.passwordTooShort"] = "Password must be at least 8 characters.",
+        ["login.passwordMismatch"] = "Passwords do not match.",
+        ["login.cannotConnect"] = "Cannot connect to server.",
+        ["login.timeout"] = "Connection timed out.",
+
+        // ── Main Window / Navigation ──
+        ["nav.dashboard"] = "Dashboard",
+        ["nav.systemHealth"] = "System Health",
+        ["nav.recommendations"] = "AI Recommendations",
+        ["nav.junkCleaner"] = "Junk Cleaner",
+        ["nav.ramOptimizer"] = "RAM Optimizer",
+        ["nav.storage"] = "Storage",
+        ["nav.registry"] = "Registry",
+        ["nav.bloatware"] = "Bloatware",
+        ["nav.network"] = "Network",
+        ["nav.gamingMode"] = "Gaming Mode",
+        ["nav.contextMenu"] = "Context Menu",
+        ["nav.taskbar"] = "Taskbar",
+        ["nav.explorer"] = "Explorer",
+        ["nav.appInstaller"] = "App Installer",
+        ["nav.spaceAnalyzer"] = "Space Analyzer",
+        ["nav.diskHealth"] = "Disk Health",
+        ["nav.scheduler"] = "Auto-Schedule",
+        ["nav.admin"] = "Admin Panel",
+        ["nav.settings"] = "Settings",
+        ["nav.optimization"] = "Optimization",
+        ["nav.customization"] = "Customization",
+        ["nav.tools"] = "Tools",
+        ["nav.notifications"] = "Notifications",
+        ["nav.clearAll"] = "Clear All",
+        ["nav.noNotifications"] = "No notifications yet",
+
+        // ── Dashboard ──
+        ["dash.title"] = "Dashboard",
+        ["dash.subtitle"] = "Real-time system monitoring and quick actions",
+        ["dash.welcome"] = "Welcome back, {0}",
+        ["dash.cpu"] = "CPU",
+        ["dash.ram"] = "RAM",
+        ["dash.disk"] = "Disk (C:)",
+        ["dash.health"] = "Health",
+        ["dash.systemInfo"] = "System Information",
+        ["dash.quickActions"] = "Quick Actions",
+        ["dash.scanJunk"] = "Scan Junk",
+        ["dash.optimizeRam"] = "Optimize RAM",
+        ["dash.healthScan"] = "Health Scan",
+        ["dash.live"] = "Live — updating every 3 seconds",
+        ["dash.excellent"] = "Excellent",
+        ["dash.good"] = "Good",
+        ["dash.fair"] = "Fair",
+        ["dash.poor"] = "Poor",
+        ["dash.scanningJunk"] = "Scanning junk files...",
+        ["dash.optimizingRam"] = "Optimizing RAM...",
+        ["dash.runningHealth"] = "Running health scan...",
+
+        // ── System Health ──
+        ["health.title"] = "System Health Analyzer",
+        ["health.subtitle"] = "Complete system diagnostic scan",
+        ["health.runScan"] = "Run Full Scan",
+        ["health.exportPdf"] = "Export PDF Report",
+        ["health.ready"] = "Ready",
+        ["health.scanning"] = "Scanning...",
+        ["health.scanningCpu"] = "Scanning CPU...",
+        ["health.scanningMemory"] = "Scanning memory...",
+        ["health.scanningDrives"] = "Scanning drives...",
+        ["health.scanningProcesses"] = "Scanning processes...",
+        ["health.scanningGpu"] = "Scanning GPU...",
+        ["health.checkingBattery"] = "Checking battery...",
+        ["health.scanningStartup"] = "Scanning startup programs...",
+        ["health.scanComplete"] = "Scan complete — {0} sections analyzed",
+        ["health.os"] = "Operating System",
+        ["health.processor"] = "Processor",
+        ["health.memory"] = "Memory",
+        ["health.drives"] = "Storage Drives",
+        ["health.processSummary"] = "Process Summary",
+        ["health.gpu"] = "Graphics (GPU)",
+        ["health.battery"] = "Battery",
+        ["health.startup"] = "Startup Programs",
+        ["health.startupCount"] = "Startup Programs ({0})",
+        ["health.generatingPdf"] = "Generating PDF report...",
+        ["health.pdfExported"] = "PDF report exported to {0}",
+
+        // ── Junk Cleaner ──
+        ["junk.title"] = "Junk Cleaner",
+        ["junk.subtitle"] = "Find and remove temporary files, caches, and other junk",
+        ["junk.scan"] = "Scan for Junk",
+        ["junk.clean"] = "Clean Selected ({0})",
+        ["junk.totalSize"] = "Total size",
+        ["junk.files"] = "Files",
+        ["junk.categories"] = "Categories",
+        ["junk.selectAll"] = "Select All",
+        ["junk.deselectAll"] = "Deselect All",
+
+        // ── RAM Optimizer ──
+        ["ram.title"] = "RAM Optimizer",
+        ["ram.subtitle"] = "Analyze memory usage and reclaim wasted RAM",
+        ["ram.analyze"] = "Analyze Memory",
+        ["ram.optimize"] = "Optimize RAM",
+        ["ram.totalRam"] = "Total RAM",
+        ["ram.inUse"] = "In Use",
+        ["ram.available"] = "Available",
+        ["ram.reclaimable"] = "Reclaimable",
+
+        // ── Storage Compression ──
+        ["storage.title"] = "Storage Compression",
+        ["storage.subtitle"] = "Transparently compress folders to free disk space — apps see no difference",
+        ["storage.analyze"] = "Analyze Storage",
+        ["storage.compress"] = "Compress Selected ({0})",
+        ["storage.foldersFound"] = "Folders found",
+        ["storage.totalSize"] = "Total size",
+        ["storage.estimatedSavings"] = "Estimated savings",
+        ["storage.compactOs"] = "CompactOS",
+        ["storage.driveType"] = "Drive Type",
+        ["storage.compactOsTitle"] = "CompactOS — System-Wide Compression",
+        ["storage.compactOsDesc"] = "Compresses the entire Windows installation. Saves 2-4 GB on the system drive. Fully transparent — no performance impact on modern hardware (SSD + decent CPU). Reversible.",
+        ["storage.decompress"] = "Decompress",
+        ["storage.compressed"] = "COMPRESSED",
+
+        // ── Registry Optimizer ──
+        ["reg.title"] = "Registry Optimizer",
+        ["reg.subtitle"] = "Scan and clean invalid, orphaned, and obsolete registry entries",
+        ["reg.scan"] = "Scan Registry",
+        ["reg.fixAllSafe"] = "Fix All Safe",
+        ["reg.fixSelected"] = "Fix Selected ({0})",
+        ["reg.restoreBackup"] = "Restore Backup",
+        ["reg.totalIssues"] = "Total issues",
+        ["reg.safeToFix"] = "Safe to fix",
+        ["reg.needsCaution"] = "Needs caution",
+        ["reg.backupHistory"] = "Backup History",
+        ["reg.backupNote"] = "A full backup of your user registry is created automatically before any changes. All fixes target only safe, well-known locations.",
+        ["reg.backupHistoryNote"] = "Registry backups are created automatically before each fix operation.",
+
+        // ── Bloatware Removal ──
+        ["bloat.title"] = "Bloatware Removal",
+        ["bloat.subtitle"] = "Detect and remove pre-installed Windows apps you don't need",
+        ["bloat.scan"] = "Scan Apps",
+        ["bloat.remove"] = "Remove Selected ({0})",
+        ["bloat.totalApps"] = "Total apps",
+        ["bloat.removable"] = "Removable",
+        ["bloat.safeToRemove"] = "Safe to remove",
+        ["bloat.systemRequired"] = "System required",
+        ["bloat.all"] = "All",
+        ["bloat.safe"] = "Safe",
+        ["bloat.caution"] = "Caution",
+        ["bloat.oem"] = "OEM",
+        ["bloat.freshCleanup"] = "Fresh Windows Cleanup",
+        ["bloat.selectAllSafe"] = "Select All Safe",
+        ["bloat.deselectAll"] = "Deselect All",
+
+        // ── Network Optimizer ──
+        ["net.title"] = "Network Optimizer",
+        ["net.subtitle"] = "Diagnose network performance and optimize DNS settings",
+        ["net.diagnose"] = "Diagnose Network",
+        ["net.findBestDns"] = "Find Best DNS",
+        ["net.speedTest"] = "Speed Test",
+        ["net.speedTestResults"] = "Speed Test Results",
+        ["net.downloadSpeed"] = "Download Speed",
+        ["net.latency"] = "Latency",
+        ["net.downloaded"] = "Downloaded",
+        ["net.server"] = "Server",
+        ["net.currentDns"] = "Current DNS",
+        ["net.provider"] = "Provider",
+        ["net.primary"] = "Primary",
+        ["net.secondary"] = "Secondary",
+        ["net.response"] = "Response",
+        ["net.connectionTest"] = "Connection Test",
+        ["net.dnsBenchmark"] = "DNS Benchmark Results",
+        ["net.switchDns"] = "Switch DNS Provider",
+        ["net.customDns"] = "Custom DNS",
+        ["net.customDnsDesc"] = "Enter your own DNS server addresses (IPv4 format)",
+        ["net.primaryDns"] = "Primary DNS",
+        ["net.secondaryDns"] = "Secondary DNS",
+        ["net.applyCustomDns"] = "Apply Custom DNS",
+        ["net.quickActions"] = "Quick Actions",
+        ["net.fixCommon"] = "Fix Common Issues",
+        ["net.flushDns"] = "Flush DNS",
+        ["net.resetAdapter"] = "Reset Adapter",
+        ["net.resetWinsock"] = "Reset Winsock",
+        ["net.adapters"] = "Network Adapters",
+
+        // ── Gaming Mode ──
+        ["game.title"] = "Gaming Mode",
+        ["game.subtitle"] = "One-click optimization for maximum gaming performance",
+        ["game.off"] = "Gaming Mode is OFF",
+        ["game.on"] = "Gaming Mode is ON",
+        ["game.onAuto"] = "Gaming Mode is ON (Auto)",
+        ["game.analyze"] = "Analyze System",
+        ["game.activate"] = "Activate Gaming Mode",
+        ["game.deactivate"] = "Deactivate",
+        ["game.autoDetect"] = "Auto-Detect Game Launch",
+        ["game.autoDetectDesc"] = "Automatically activate Gaming Mode when a game starts, and deactivate when it closes. Monitors 60+ known games every 5 seconds.",
+        ["game.addCustom"] = "Add custom game process name (e.g. myGame)",
+        ["game.add"] = "Add",
+        ["game.remove"] = "Remove",
+        ["game.optimizations"] = "Optimizations",
+        ["game.bgApps"] = "Background Apps to Suspend ({0})",
+        ["game.clickAnalyze"] = "Click Analyze to see what can be optimized",
+        ["game.monitoringActive"] = "Monitoring active — waiting for game launch...",
+        ["game.gameDetected"] = "Game detected: {0} — Gaming Mode activated automatically",
+        ["game.gameExited"] = "Game exited — Gaming Mode deactivated",
+        ["game.disabled"] = "Disabled",
+
+        // ── App Installer ──
+        ["apps.title"] = "App Installer",
+        ["apps.subtitle"] = "Install, update, search, and manage applications with WinGet",
+        ["apps.bundles"] = "App Bundles",
+        ["apps.search"] = "Search Apps",
+        ["apps.installed"] = "Installed Apps",
+        ["apps.updates"] = "Updates",
+        ["apps.searchBtn"] = "Search",
+        ["apps.installSelected"] = "Install Selected ({0})",
+        ["apps.refresh"] = "Refresh",
+        ["apps.uninstallSelected"] = "Uninstall Selected ({0})",
+        ["apps.exportList"] = "Export List",
+        ["apps.importInstall"] = "Import & Install",
+        ["apps.filterPlaceholder"] = "Filter installed apps...",
+        ["apps.searchPlaceholder"] = "Search for apps (e.g. Chrome, VS Code, Python)...",
+        ["apps.checkUpdates"] = "Check for Updates",
+        ["apps.updateAll"] = "Update All",
+        ["apps.updateSelected"] = "Update Selected ({0})",
+
+        // ── Context Menu ──
+        ["ctx.title"] = "Context Menu Customizer",
+        ["ctx.subtitle"] = "Clean up and customize your right-click context menu",
+        ["ctx.scan"] = "Scan Context Menu",
+        ["ctx.apply"] = "Apply Changes ({0})",
+        ["ctx.classicMenu"] = "Classic Context Menu (Windows 10 style)",
+        ["ctx.classicMenuDesc"] = "Bypass the Windows 11 simplified menu — show all options directly without 'Show more options'",
+
+        // ── Taskbar ──
+        ["taskbar.title"] = "Taskbar Tweaks",
+        ["taskbar.subtitle"] = "Customize the Windows 11 taskbar layout and behavior",
+        ["taskbar.scan"] = "Scan Settings",
+        ["taskbar.apply"] = "Apply Changes ({0})",
+
+        // ── Explorer ──
+        ["explorer.title"] = "Explorer Tweaks",
+        ["explorer.subtitle"] = "Customize File Explorer behavior, privacy, and appearance",
+
+        // Space Analyzer
+        ["space.title"] = "Space Analyzer",
+        ["space.subtitle"] = "Visualize disk usage — find what's eating your storage",
+        ["space.scan"] = "Analyze Drive",
+
+        // Disk Health
+        ["disk.title"] = "Disk Health Monitor",
+        ["disk.subtitle"] = "Monitor drive health, temperature, and SMART diagnostics",
+        ["disk.scan"] = "Scan Drives",
+
+        // Startup Optimizer
+        ["startup.title"] = "Startup Optimizer",
+        ["startup.subtitle"] = "Control which programs launch at startup — speed up your boot time",
+        ["nav.startupOptimizer"] = "Startup Optimizer",
+        ["explorer.scan"] = "Scan Settings",
+        ["explorer.recommended"] = "Recommended Preset",
+        ["explorer.apply"] = "Apply Changes ({0})",
+
+        // ── Scheduler ──
+        ["sched.title"] = "Auto-Scheduling",
+        ["sched.subtitle"] = "Set modules to run automatically in the background when your PC is idle",
+        ["sched.bgScheduler"] = "Background Scheduler",
+        ["sched.addSchedule"] = "Add Schedule",
+        ["sched.activityLog"] = "Activity Log",
+        ["sched.module"] = "Module",
+        ["sched.interval"] = "Interval",
+        ["sched.every30min"] = "Every 30 minutes",
+        ["sched.hourly"] = "Every hour",
+        ["sched.every6hours"] = "Every 6 hours",
+        ["sched.daily"] = "Daily",
+        ["sched.weekly"] = "Weekly",
+        ["sched.onlyIdle"] = "Only when idle",
+        ["sched.add"] = "Add",
+
+        // ── Recommendations ──
+        ["rec.title"] = "AI Recommendations",
+        ["rec.subtitle"] = "Smart analysis of your system — prioritized suggestions to improve performance, security, and health",
+        ["rec.analyze"] = "Analyze My System",
+        ["rec.critical"] = "Critical",
+        ["rec.high"] = "High",
+        ["rec.medium"] = "Medium",
+        ["rec.tips"] = "Tips",
+        ["rec.allGood"] = "Your system looks great!",
+        ["rec.noIssues"] = "No critical issues found. Keep up the good work!",
+
+        // ── Settings ──
+        ["settings.title"] = "Settings",
+        ["settings.account"] = "Account",
+        ["settings.email"] = "Email",
+        ["settings.subscription"] = "Subscription",
+        ["settings.role"] = "Role",
+        ["settings.logOut"] = "Log Out",
+        ["settings.appearance"] = "Appearance",
+        ["settings.chooseTheme"] = "Choose your preferred theme",
+        ["settings.systemDefault"] = "System default",
+        ["settings.light"] = "Light",
+        ["settings.dark"] = "Dark",
+        ["settings.language"] = "Language",
+        ["settings.chooseLang"] = "Choose your preferred language",
+        ["settings.about"] = "About Aura Core Pro",
+        ["settings.version"] = "Version 1.0.0",
+        ["settings.tagline"] = "AI Powered Windows Intelligence",
+        ["settings.description"] = "Aura Core Pro is a comprehensive Windows optimization suite featuring 12 modules for system health analysis, cleanup, performance tuning, and customization.",
+        ["settings.logOutTitle"] = "Log out?",
+        ["settings.logOutMsg"] = "You will need to sign in again to use online features.",
+        ["settings.loggedOut"] = "Logged out",
+        ["settings.restartMsg"] = "Please restart Aura Core Pro to sign in with a different account.",
+        ["settings.langRestart"] = "Language changed. Pages will update as you navigate.",
+
+        // ── Upgrade ──
+        ["upgrade.title"] = "Upgrade to Unlock",
+        ["upgrade.subtitle"] = "This feature requires a Pro or Enterprise subscription",
+        ["upgrade.currentPlan"] = "Current Plan",
+
+        // ── Admin ──
+        ["admin.title"] = "Admin Panel",
+        ["admin.subtitle"] = "Server management, users, subscriptions, and payments",
+        ["admin.serverConfig"] = "Server Configuration",
+        ["admin.save"] = "Save",
+        ["admin.stats"] = "Statistics",
+        ["admin.totalUsers"] = "Total Users",
+        ["admin.pro"] = "Pro",
+        ["admin.revenue"] = "Revenue",
+        ["admin.pendingCrypto"] = "Pending Crypto",
+        ["admin.userMgmt"] = "User Management",
+        ["admin.search"] = "Search",
+        ["admin.showAll"] = "Show All",
+        ["admin.grantSub"] = "Grant Subscription",
+        ["admin.grant"] = "Grant",
+        ["admin.resetPassword"] = "Reset User Password",
+        ["admin.reset"] = "Reset Password",
+        ["admin.refresh"] = "Refresh",
+
+        // ── Common ──
+        ["common.ok"] = "OK",
+        ["common.cancel"] = "Cancel",
+        ["common.apply"] = "Apply",
+        ["common.close"] = "Close",
+        ["common.error"] = "Error",
+        ["common.success"] = "Success",
+        ["common.install"] = "Install",
+        ["common.uninstall"] = "Uninstall",
+        ["common.update"] = "Update",
+        ["common.installed"] = "INSTALLED",
+        ["common.on"] = "ON",
+        ["common.off"] = "OFF",
+        ["common.fix"] = "Fix",
+
+        // ── PDF Report ──
+        ["pdf.title"] = "AURA CORE PRO",
+        ["pdf.reportTitle"] = "System Health Report",
+        ["pdf.generated"] = "Generated",
+        ["pdf.machine"] = "Machine",
+        ["pdf.os"] = "Operating System",
+        ["pdf.version"] = "Version",
+        ["pdf.architecture"] = "Architecture",
+        ["pdf.uptime"] = "Uptime",
+        ["pdf.cpu"] = "CPU",
+        ["pdf.cores"] = "Cores",
+        ["pdf.load"] = "Load",
+        ["pdf.total"] = "Total",
+        ["pdf.availableMem"] = "Available",
+        ["pdf.usage"] = "Usage",
+        ["pdf.drives"] = "Storage Drives",
+        ["pdf.freeOf"] = "{0} GB free of {1} GB ({2}% used)",
+        ["pdf.processes"] = "Process Summary",
+        ["pdf.running"] = "Running",
+        ["pdf.topMemory"] = "Top Memory",
+        ["pdf.graphics"] = "Graphics (GPU)",
+        ["pdf.battery"] = "Battery",
+        ["pdf.status"] = "Status",
+        ["pdf.startupPrograms"] = "Startup Programs ({0})",
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    //  TURKISH STRINGS
+    // ═══════════════════════════════════════════════════════════
+    private static readonly Dictionary<string, string> TR = new()
+    {
+        // ── Giriş Ekranı ──
+        ["login.title"] = "Aura Core Pro",
+        ["login.subtitle"] = "Yapay Zekâ Destekli Windows Optimizasyonu",
+        ["login.signIn"] = "Giriş Yap",
+        ["login.createAccount"] = "Hesap Oluştur",
+        ["login.email"] = "E-posta",
+        ["login.password"] = "Şifre",
+        ["login.confirmPassword"] = "Şifre Tekrarı",
+        ["login.emailPlaceholder"] = "ornek@email.com",
+        ["login.passwordPlaceholder"] = "Şifrenizi girin",
+        ["login.minChars"] = "En az 8 karakter",
+        ["login.repeatPassword"] = "Şifrenizi tekrar girin",
+        ["login.offline"] = "Çevrimdışı devam et (Ücretsiz)",
+        ["login.signingIn"] = "Giriş yapılıyor...",
+        ["login.registering"] = "Hesap oluşturuluyor...",
+        ["login.invalidEmail"] = "Lütfen geçerli bir e-posta adresi girin.",
+        ["login.passwordTooShort"] = "Şifre en az 8 karakter olmalıdır.",
+        ["login.passwordMismatch"] = "Şifreler eşleşmiyor.",
+        ["login.cannotConnect"] = "Sunucuya bağlanılamıyor.",
+        ["login.timeout"] = "Bağlantı zaman aşımına uğradı.",
+
+        // ── Ana Pencere / Navigasyon ──
+        ["nav.dashboard"] = "Kontrol Paneli",
+        ["nav.systemHealth"] = "Sistem Sağlığı",
+        ["nav.recommendations"] = "Yapay Zekâ Önerileri",
+        ["nav.junkCleaner"] = "Gereksiz Dosya Temizleyici",
+        ["nav.ramOptimizer"] = "RAM Optimizasyonu",
+        ["nav.storage"] = "Depolama",
+        ["nav.registry"] = "Kayıt Defteri",
+        ["nav.bloatware"] = "Gereksiz Uygulamalar",
+        ["nav.network"] = "Ağ",
+        ["nav.gamingMode"] = "Oyun Modu",
+        ["nav.contextMenu"] = "Sağ Tık Menüsü",
+        ["nav.taskbar"] = "Görev Çubuğu",
+        ["nav.explorer"] = "Dosya Gezgini",
+        ["nav.appInstaller"] = "Uygulama Yükleyici",
+        ["nav.spaceAnalyzer"] = "Alan Analizi",
+        ["nav.diskHealth"] = "Disk Sağlığı",
+        ["nav.scheduler"] = "Otomatik Zamanlama",
+        ["nav.admin"] = "Yönetici Paneli",
+        ["nav.settings"] = "Ayarlar",
+        ["nav.optimization"] = "Optimizasyon",
+        ["nav.customization"] = "Kişiselleştirme",
+        ["nav.tools"] = "Araçlar",
+        ["nav.notifications"] = "Bildirimler",
+        ["nav.clearAll"] = "Tümünü Temizle",
+        ["nav.noNotifications"] = "Henüz bildirim yok",
+
+        // ── Kontrol Paneli ──
+        ["dash.title"] = "Kontrol Paneli",
+        ["dash.subtitle"] = "Gerçek zamanlı sistem izleme ve hızlı işlemler",
+        ["dash.welcome"] = "Tekrar hoş geldiniz, {0}",
+        ["dash.cpu"] = "İşlemci",
+        ["dash.ram"] = "Bellek",
+        ["dash.disk"] = "Disk (C:)",
+        ["dash.health"] = "Sağlık",
+        ["dash.systemInfo"] = "Sistem Bilgileri",
+        ["dash.quickActions"] = "Hızlı İşlemler",
+        ["dash.scanJunk"] = "Gereksiz Dosya Tara",
+        ["dash.optimizeRam"] = "RAM Optimize Et",
+        ["dash.healthScan"] = "Sağlık Taraması",
+        ["dash.live"] = "Canlı — her 3 saniyede güncelleniyor",
+        ["dash.excellent"] = "Mükemmel",
+        ["dash.good"] = "İyi",
+        ["dash.fair"] = "Orta",
+        ["dash.poor"] = "Kötü",
+        ["dash.scanningJunk"] = "Gereksiz dosyalar taranıyor...",
+        ["dash.optimizingRam"] = "RAM optimize ediliyor...",
+        ["dash.runningHealth"] = "Sağlık taraması çalıştırılıyor...",
+
+        // ── Sistem Sağlığı ──
+        ["health.title"] = "Sistem Sağlığı Analizi",
+        ["health.subtitle"] = "Kapsamlı sistem tanılama taraması",
+        ["health.runScan"] = "Tam Tarama Başlat",
+        ["health.exportPdf"] = "PDF Rapor Oluştur",
+        ["health.ready"] = "Hazır",
+        ["health.scanning"] = "Taranıyor...",
+        ["health.scanningCpu"] = "İşlemci taranıyor...",
+        ["health.scanningMemory"] = "Bellek taranıyor...",
+        ["health.scanningDrives"] = "Diskler taranıyor...",
+        ["health.scanningProcesses"] = "İşlemler taranıyor...",
+        ["health.scanningGpu"] = "Ekran kartı taranıyor...",
+        ["health.checkingBattery"] = "Pil kontrol ediliyor...",
+        ["health.scanningStartup"] = "Başlangıç programları taranıyor...",
+        ["health.scanComplete"] = "Tarama tamamlandı — {0} bölüm analiz edildi",
+        ["health.os"] = "İşletim Sistemi",
+        ["health.processor"] = "İşlemci",
+        ["health.memory"] = "Bellek",
+        ["health.drives"] = "Depolama Sürücüleri",
+        ["health.processSummary"] = "İşlem Özeti",
+        ["health.gpu"] = "Ekran Kartı (GPU)",
+        ["health.battery"] = "Pil",
+        ["health.startup"] = "Başlangıç Programları",
+        ["health.startupCount"] = "Başlangıç Programları ({0})",
+        ["health.generatingPdf"] = "PDF raporu oluşturuluyor...",
+        ["health.pdfExported"] = "PDF rapor şuraya kaydedildi: {0}",
+
+        // ── Gereksiz Dosya Temizleyici ──
+        ["junk.title"] = "Gereksiz Dosya Temizleyici",
+        ["junk.subtitle"] = "Geçici dosyaları, önbellekleri ve diğer gereksiz dosyaları bulun ve temizleyin",
+        ["junk.scan"] = "Gereksiz Dosya Tara",
+        ["junk.clean"] = "Seçilenleri Temizle ({0})",
+        ["junk.totalSize"] = "Toplam boyut",
+        ["junk.files"] = "Dosya",
+        ["junk.categories"] = "Kategori",
+        ["junk.selectAll"] = "Tümünü Seç",
+        ["junk.deselectAll"] = "Tüm Seçimi Kaldır",
+
+        // ── RAM Optimizasyonu ──
+        ["ram.title"] = "RAM Optimizasyonu",
+        ["ram.subtitle"] = "Bellek kullanımını analiz edin ve boşa harcanan belleği geri kazanın",
+        ["ram.analyze"] = "Belleği Analiz Et",
+        ["ram.optimize"] = "RAM Optimize Et",
+        ["ram.totalRam"] = "Toplam RAM",
+        ["ram.inUse"] = "Kullanılan",
+        ["ram.available"] = "Kullanılabilir",
+        ["ram.reclaimable"] = "Geri Kazanılabilir",
+
+        // ── Depolama Sıkıştırma ──
+        ["storage.title"] = "Depolama Sıkıştırma",
+        ["storage.subtitle"] = "Disk alanı kazanmak için klasörleri şeffaf olarak sıkıştırın — uygulamalar farkı görmez",
+        ["storage.analyze"] = "Depolamayı Analiz Et",
+        ["storage.compress"] = "Seçilenleri Sıkıştır ({0})",
+        ["storage.foldersFound"] = "Bulunan klasör",
+        ["storage.totalSize"] = "Toplam boyut",
+        ["storage.estimatedSavings"] = "Tahmini tasarruf",
+        ["storage.compactOs"] = "CompactOS",
+        ["storage.driveType"] = "Sürücü Türü",
+        ["storage.compactOsTitle"] = "CompactOS — Sistem Geneli Sıkıştırma",
+        ["storage.compactOsDesc"] = "Tüm Windows kurulumunu sıkıştırır. Sistem sürücüsünde 2-4 GB tasarruf sağlar. Tamamen şeffaf — modern donanımda performans etkisi yok (SSD + iyi CPU). Geri alınabilir.",
+        ["storage.decompress"] = "Sıkıştırmayı Aç",
+        ["storage.compressed"] = "SIKIŞTIRILMIŞ",
+
+        // ── Kayıt Defteri Optimizasyonu ──
+        ["reg.title"] = "Kayıt Defteri Optimizasyonu",
+        ["reg.subtitle"] = "Geçersiz, yetim ve eski kayıt defteri girdilerini tarayın ve temizleyin",
+        ["reg.scan"] = "Kayıt Defterini Tara",
+        ["reg.fixAllSafe"] = "Güvenli Olanları Düzelt",
+        ["reg.fixSelected"] = "Seçilenleri Düzelt ({0})",
+        ["reg.restoreBackup"] = "Yedeği Geri Yükle",
+        ["reg.totalIssues"] = "Toplam sorun",
+        ["reg.safeToFix"] = "Güvenle düzeltilebilir",
+        ["reg.needsCaution"] = "Dikkat gerektirir",
+        ["reg.backupHistory"] = "Yedekleme Geçmişi",
+        ["reg.backupNote"] = "Herhangi bir değişiklik yapılmadan önce kullanıcı kayıt defterinizin tam yedeği otomatik olarak oluşturulur. Tüm düzeltmeler yalnızca güvenli, bilinen konumları hedefler.",
+        ["reg.backupHistoryNote"] = "Her düzeltme işleminden önce kayıt defteri yedekleri otomatik olarak oluşturulur.",
+
+        // ── Gereksiz Uygulama Kaldırma ──
+        ["bloat.title"] = "Gereksiz Uygulama Kaldırma",
+        ["bloat.subtitle"] = "İhtiyacınız olmayan önceden yüklenmiş Windows uygulamalarını tespit edin ve kaldırın",
+        ["bloat.scan"] = "Uygulamaları Tara",
+        ["bloat.remove"] = "Seçilenleri Kaldır ({0})",
+        ["bloat.totalApps"] = "Toplam uygulama",
+        ["bloat.removable"] = "Kaldırılabilir",
+        ["bloat.safeToRemove"] = "Güvenle kaldırılabilir",
+        ["bloat.systemRequired"] = "Sistem gereksinimi",
+        ["bloat.all"] = "Tümü",
+        ["bloat.safe"] = "Güvenli",
+        ["bloat.caution"] = "Dikkatli",
+        ["bloat.oem"] = "OEM",
+        ["bloat.freshCleanup"] = "Temiz Windows Kurulumu",
+        ["bloat.selectAllSafe"] = "Güvenli Olanları Seç",
+        ["bloat.deselectAll"] = "Tüm Seçimi Kaldır",
+
+        // ── Ağ Optimizasyonu ──
+        ["net.title"] = "Ağ Optimizasyonu",
+        ["net.subtitle"] = "Ağ performansını teşhis edin ve DNS ayarlarını optimize edin",
+        ["net.diagnose"] = "Ağı Teşhis Et",
+        ["net.findBestDns"] = "En İyi DNS'i Bul",
+        ["net.speedTest"] = "Hız Testi",
+        ["net.speedTestResults"] = "Hız Testi Sonuçları",
+        ["net.downloadSpeed"] = "İndirme Hızı",
+        ["net.latency"] = "Gecikme",
+        ["net.downloaded"] = "İndirilen",
+        ["net.server"] = "Sunucu",
+        ["net.currentDns"] = "Mevcut DNS",
+        ["net.provider"] = "Sağlayıcı",
+        ["net.primary"] = "Birincil",
+        ["net.secondary"] = "İkincil",
+        ["net.response"] = "Yanıt",
+        ["net.connectionTest"] = "Bağlantı Testi",
+        ["net.dnsBenchmark"] = "DNS Kıyaslama Sonuçları",
+        ["net.switchDns"] = "DNS Sağlayıcısını Değiştir",
+        ["net.customDns"] = "Özel DNS",
+        ["net.customDnsDesc"] = "Kendi DNS sunucu adreslerinizi girin (IPv4 formatı)",
+        ["net.primaryDns"] = "Birincil DNS",
+        ["net.secondaryDns"] = "İkincil DNS",
+        ["net.applyCustomDns"] = "Özel DNS Uygula",
+        ["net.quickActions"] = "Hızlı İşlemler",
+        ["net.fixCommon"] = "Yaygın Sorunları Düzelt",
+        ["net.flushDns"] = "DNS Önbelleğini Temizle",
+        ["net.resetAdapter"] = "Adaptörü Sıfırla",
+        ["net.resetWinsock"] = "Winsock Sıfırla",
+        ["net.adapters"] = "Ağ Adaptörleri",
+
+        // ── Oyun Modu ──
+        ["game.title"] = "Oyun Modu",
+        ["game.subtitle"] = "Maksimum oyun performansı için tek tıkla optimizasyon",
+        ["game.off"] = "Oyun Modu KAPALI",
+        ["game.on"] = "Oyun Modu AÇIK",
+        ["game.onAuto"] = "Oyun Modu AÇIK (Otomatik)",
+        ["game.analyze"] = "Sistemi Analiz Et",
+        ["game.activate"] = "Oyun Modunu Etkinleştir",
+        ["game.deactivate"] = "Devre Dışı Bırak",
+        ["game.autoDetect"] = "Otomatik Oyun Algılama",
+        ["game.autoDetectDesc"] = "Bir oyun başlatıldığında Oyun Modunu otomatik olarak etkinleştirir, oyun kapandığında devre dışı bırakır. 60'tan fazla bilinen oyunu her 5 saniyede kontrol eder.",
+        ["game.addCustom"] = "Özel oyun işlem adı ekleyin (ör. oyunAdı)",
+        ["game.add"] = "Ekle",
+        ["game.remove"] = "Kaldır",
+        ["game.optimizations"] = "Optimizasyonlar",
+        ["game.bgApps"] = "Askıya Alınacak Arka Plan Uygulamaları ({0})",
+        ["game.clickAnalyze"] = "Nelerin optimize edilebileceğini görmek için Analiz Et'e tıklayın",
+        ["game.monitoringActive"] = "İzleme aktif — oyun başlatılması bekleniyor...",
+        ["game.gameDetected"] = "Oyun algılandı: {0} — Oyun Modu otomatik etkinleştirildi",
+        ["game.gameExited"] = "Oyun kapandı — Oyun Modu devre dışı bırakıldı",
+        ["game.disabled"] = "Devre dışı",
+
+        // ── Uygulama Yükleyici ──
+        ["apps.title"] = "Uygulama Yükleyici",
+        ["apps.subtitle"] = "WinGet ile uygulamaları yükleyin, güncelleyin, arayın ve yönetin",
+        ["apps.bundles"] = "Uygulama Paketleri",
+        ["apps.search"] = "Uygulama Ara",
+        ["apps.installed"] = "Yüklü Uygulamalar",
+        ["apps.updates"] = "Güncellemeler",
+        ["apps.searchBtn"] = "Ara",
+        ["apps.installSelected"] = "Seçilenleri Yükle ({0})",
+        ["apps.refresh"] = "Yenile",
+        ["apps.uninstallSelected"] = "Seçilenleri Kaldır ({0})",
+        ["apps.exportList"] = "Listeyi Dışa Aktar",
+        ["apps.importInstall"] = "İçe Aktar ve Yükle",
+        ["apps.filterPlaceholder"] = "Yüklü uygulamaları filtrele...",
+        ["apps.searchPlaceholder"] = "Uygulama ara (ör. Chrome, VS Code, Python)...",
+        ["apps.checkUpdates"] = "Güncellemeleri Kontrol Et",
+        ["apps.updateAll"] = "Tümünü Güncelle",
+        ["apps.updateSelected"] = "Seçilenleri Güncelle ({0})",
+
+        // ── Sağ Tık Menüsü ──
+        ["ctx.title"] = "Sağ Tık Menüsü Özelleştirme",
+        ["ctx.subtitle"] = "Sağ tık bağlam menünüzü temizleyin ve özelleştirin",
+        ["ctx.scan"] = "Bağlam Menüsünü Tara",
+        ["ctx.apply"] = "Değişiklikleri Uygula ({0})",
+        ["ctx.classicMenu"] = "Klasik Bağlam Menüsü (Windows 10 tarzı)",
+        ["ctx.classicMenuDesc"] = "Windows 11 basitleştirilmiş menüsünü atlayın — 'Daha fazla seçenek göster' olmadan tüm seçenekleri doğrudan gösterin",
+
+        // ── Görev Çubuğu ──
+        ["taskbar.title"] = "Görev Çubuğu Ayarları",
+        ["taskbar.subtitle"] = "Windows 11 görev çubuğu düzenini ve davranışını özelleştirin",
+        ["taskbar.scan"] = "Ayarları Tara",
+        ["taskbar.apply"] = "Değişiklikleri Uygula ({0})",
+
+        // ── Dosya Gezgini ──
+        ["explorer.title"] = "Dosya Gezgini Ayarları",
+        ["explorer.subtitle"] = "Dosya Gezgini davranışını, gizliliğini ve görünümünü özelleştirin",
+        ["explorer.scan"] = "Ayarları Tara",
+
+        // ── Alan Analizi ──
+        ["space.title"] = "Alan Analizi",
+        ["space.subtitle"] = "Disk kullanımını görselleştir — depolamanızı neyin tükettiğini bulun",
+        ["space.scan"] = "Sürücüyü Analiz Et",
+
+        // ── Disk Sağlığı ──
+        ["disk.title"] = "Disk Sağlığı İzleyicisi",
+        ["disk.subtitle"] = "Sürücü sağlığını, sıcaklığı ve SMART tanılamalarını izleyin",
+        ["disk.scan"] = "Sürücüleri Tara",
+
+        // Başlangıç Yöneticisi
+        ["startup.title"] = "Başlangıç Yöneticisi",
+        ["startup.subtitle"] = "Başlangıçta hangi programların çalışacağını kontrol edin — önyükleme sürenizi hızlandırın",
+        ["nav.startupOptimizer"] = "Başlangıç Yöneticisi",
+
+        ["explorer.recommended"] = "Önerilen Ön Ayar",
+        ["explorer.apply"] = "Değişiklikleri Uygula ({0})",
+
+        // ── Zamanlayıcı ──
+        ["sched.title"] = "Otomatik Zamanlama",
+        ["sched.subtitle"] = "Bilgisayarınız boştayken modülleri arka planda otomatik çalıştırın",
+        ["sched.bgScheduler"] = "Arka Plan Zamanlayıcısı",
+        ["sched.addSchedule"] = "Zamanlama Ekle",
+        ["sched.activityLog"] = "Etkinlik Günlüğü",
+        ["sched.module"] = "Modül",
+        ["sched.interval"] = "Aralık",
+        ["sched.every30min"] = "Her 30 dakikada",
+        ["sched.hourly"] = "Her saat",
+        ["sched.every6hours"] = "Her 6 saatte",
+        ["sched.daily"] = "Günlük",
+        ["sched.weekly"] = "Haftalık",
+        ["sched.onlyIdle"] = "Yalnızca boştayken",
+        ["sched.add"] = "Ekle",
+
+        // ── Öneriler ──
+        ["rec.title"] = "Yapay Zekâ Önerileri",
+        ["rec.subtitle"] = "Sisteminizin akıllı analizi — performans, güvenlik ve sağlığı iyileştirmek için önceliklendirilmiş öneriler",
+        ["rec.analyze"] = "Sistemimi Analiz Et",
+        ["rec.critical"] = "Kritik",
+        ["rec.high"] = "Yüksek",
+        ["rec.medium"] = "Orta",
+        ["rec.tips"] = "İpuçları",
+        ["rec.allGood"] = "Sisteminiz harika görünüyor!",
+        ["rec.noIssues"] = "Kritik bir sorun bulunamadı. Böyle devam edin!",
+
+        // ── Ayarlar ──
+        ["settings.title"] = "Ayarlar",
+        ["settings.account"] = "Hesap",
+        ["settings.email"] = "E-posta",
+        ["settings.subscription"] = "Abonelik",
+        ["settings.role"] = "Rol",
+        ["settings.logOut"] = "Çıkış Yap",
+        ["settings.appearance"] = "Görünüm",
+        ["settings.chooseTheme"] = "Tercih ettiğiniz temayı seçin",
+        ["settings.systemDefault"] = "Sistem varsayılanı",
+        ["settings.light"] = "Açık",
+        ["settings.dark"] = "Koyu",
+        ["settings.language"] = "Dil",
+        ["settings.chooseLang"] = "Tercih ettiğiniz dili seçin",
+        ["settings.about"] = "Aura Core Pro Hakkında",
+        ["settings.version"] = "Sürüm 1.0.0",
+        ["settings.tagline"] = "Yapay Zekâ Destekli Windows Optimizasyonu",
+        ["settings.description"] = "Aura Core Pro, sistem sağlığı analizi, temizlik, performans ayarı ve kişiselleştirme için 12 modül içeren kapsamlı bir Windows optimizasyon paketidir.",
+        ["settings.logOutTitle"] = "Çıkış yapılsın mı?",
+        ["settings.logOutMsg"] = "Çevrimiçi özellikleri kullanmak için tekrar giriş yapmanız gerekecektir.",
+        ["settings.loggedOut"] = "Çıkış yapıldı",
+        ["settings.restartMsg"] = "Farklı bir hesapla giriş yapmak için lütfen Aura Core Pro'yu yeniden başlatın.",
+        ["settings.langRestart"] = "Dil değiştirildi. Sayfalar arasında gezindikçe güncellenecektir.",
+
+        // ── Yükseltme ──
+        ["upgrade.title"] = "Kilidini Açmak İçin Yükseltin",
+        ["upgrade.subtitle"] = "Bu özellik Pro veya Enterprise aboneliği gerektirir",
+        ["upgrade.currentPlan"] = "Mevcut Plan",
+
+        // ── Yönetici ──
+        ["admin.title"] = "Yönetici Paneli",
+        ["admin.subtitle"] = "Sunucu yönetimi, kullanıcılar, abonelikler ve ödemeler",
+        ["admin.serverConfig"] = "Sunucu Yapılandırması",
+        ["admin.save"] = "Kaydet",
+        ["admin.stats"] = "İstatistikler",
+        ["admin.totalUsers"] = "Toplam Kullanıcı",
+        ["admin.pro"] = "Pro",
+        ["admin.revenue"] = "Gelir",
+        ["admin.pendingCrypto"] = "Bekleyen Kripto",
+        ["admin.userMgmt"] = "Kullanıcı Yönetimi",
+        ["admin.search"] = "Ara",
+        ["admin.showAll"] = "Tümünü Göster",
+        ["admin.grantSub"] = "Abonelik Ver",
+        ["admin.grant"] = "Ver",
+        ["admin.resetPassword"] = "Kullanıcı Şifresi Sıfırla",
+        ["admin.reset"] = "Şifreyi Sıfırla",
+        ["admin.refresh"] = "Yenile",
+
+        // ── Ortak ──
+        ["common.ok"] = "Tamam",
+        ["common.cancel"] = "İptal",
+        ["common.apply"] = "Uygula",
+        ["common.close"] = "Kapat",
+        ["common.error"] = "Hata",
+        ["common.success"] = "Başarılı",
+        ["common.install"] = "Yükle",
+        ["common.uninstall"] = "Kaldır",
+        ["common.update"] = "Güncelle",
+        ["common.installed"] = "YÜKLÜ",
+        ["common.on"] = "AÇIK",
+        ["common.off"] = "KAPALI",
+        ["common.fix"] = "Düzelt",
+
+        // ── PDF Raporu ──
+        ["pdf.title"] = "AURA CORE PRO",
+        ["pdf.reportTitle"] = "Sistem Sağlığı Raporu",
+        ["pdf.generated"] = "Oluşturulma",
+        ["pdf.machine"] = "Bilgisayar",
+        ["pdf.os"] = "İşletim Sistemi",
+        ["pdf.version"] = "Sürüm",
+        ["pdf.architecture"] = "Mimari",
+        ["pdf.uptime"] = "Çalışma Süresi",
+        ["pdf.cpu"] = "İşlemci",
+        ["pdf.cores"] = "Çekirdek",
+        ["pdf.load"] = "Yük",
+        ["pdf.total"] = "Toplam",
+        ["pdf.availableMem"] = "Kullanılabilir",
+        ["pdf.usage"] = "Kullanım",
+        ["pdf.drives"] = "Depolama Sürücüleri",
+        ["pdf.freeOf"] = "{0} GB boş / {1} GB toplam (%{2} kullanılıyor)",
+        ["pdf.processes"] = "İşlem Özeti",
+        ["pdf.running"] = "Çalışan",
+        ["pdf.topMemory"] = "En Çok Bellek",
+        ["pdf.graphics"] = "Ekran Kartı (GPU)",
+        ["pdf.battery"] = "Pil",
+        ["pdf.status"] = "Durum",
+        ["pdf.startupPrograms"] = "Başlangıç Programları ({0})",
+    };
+}

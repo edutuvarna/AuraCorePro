@@ -17,3 +17,4 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Simulation\AuraCore.Simulatio
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Simulation\AuraCore.Simulation\obj\x64\Debug\net8.0\refint\AuraCore.Simulation.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Simulation\AuraCore.Simulation\obj\x64\Debug\net8.0\AuraCore.Simulation.pdb
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Simulation\AuraCore.Simulation\obj\x64\Debug\net8.0\ref\AuraCore.Simulation.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\src\Simulation\AuraCore.Simulation\obj\x64\Debug\net8.0\AuraCore.Simulation.sourcelink.json

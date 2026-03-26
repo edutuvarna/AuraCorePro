@@ -12,7 +12,7 @@ public static class TierFeatures
 {
     public static readonly Dictionary<string, SubscriptionTier> ModuleRequirements = new()
     {
-        // Free tier — expanded
+        // Free tier
         ["system-health"] = SubscriptionTier.Free,
         ["junk-cleaner"] = SubscriptionTier.Free,
         ["explorer-tweaks"] = SubscriptionTier.Free,
@@ -21,12 +21,16 @@ public static class TierFeatures
         ["network-optimizer"] = SubscriptionTier.Free,
         ["gaming-mode"] = SubscriptionTier.Free,
         ["app-installer"] = SubscriptionTier.Free,
+        ["defender-manager"] = SubscriptionTier.Free,
 
         // Pro tier
         ["storage-compression"] = SubscriptionTier.Pro,
         ["registry-optimizer"] = SubscriptionTier.Pro,
         ["bloatware-removal"] = SubscriptionTier.Pro,
         ["context-menu"] = SubscriptionTier.Pro,
+        ["disk-cleanup"] = SubscriptionTier.Pro,
+        ["privacy-cleaner"] = SubscriptionTier.Pro,
+        ["iso-builder"] = SubscriptionTier.Pro,
     };
 
     public static readonly Dictionary<SubscriptionTier, decimal> MonthlyPrices = new()
@@ -45,7 +49,7 @@ public static class TierFeatures
 
     public static bool IsModuleAllowed(string moduleId, SubscriptionTier userTier)
     {
-        if (userTier == SubscriptionTier.Admin) return true; // Admin gets everything
+        if (userTier == SubscriptionTier.Admin) return true;
         if (!ModuleRequirements.TryGetValue(moduleId, out var required)) return true;
         return userTier >= required;
     }

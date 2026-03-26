@@ -125,7 +125,7 @@ public sealed class UpdateChecker
 
             var available = root.TryGetProperty("updateAvailable", out var avProp) && avProp.GetBoolean();
             LastCheckTime = DateTimeOffset.Now;
-            _retryCount = 0; // Reset retry on success
+            _retryCount = 0;
 
             if (!available)
             {
@@ -139,14 +139,12 @@ public sealed class UpdateChecker
             var releaseNotes = root.TryGetProperty("releaseNotes", out var rProp) ? rProp.GetString() ?? "" : "";
             var mandatory = root.TryGetProperty("isMandatory", out var mProp) && mProp.GetBoolean();
 
-            // Skip if user chose to skip this version (unless mandatory)
             if (!mandatory && version == _skippedVersion && !forceNotify)
             {
                 CheckCompleted?.Invoke();
                 return;
             }
 
-            // Don't re-notify for same version (unless manual check)
             if (version == LatestVersion && UpdateAvailable && !forceNotify)
             {
                 CheckCompleted?.Invoke();
@@ -206,7 +204,6 @@ public sealed class UpdateChecker
             Directory.CreateDirectory(tempDir);
             var filePath = Path.Combine(tempDir, fileName);
 
-            // Delete old file if exists
             if (File.Exists(filePath)) File.Delete(filePath);
 
             using var contentStream = await response.Content.ReadAsStreamAsync();
@@ -245,20 +242,26 @@ public sealed class UpdateChecker
         }
     }
 
-    /// <summary>Launch the downloaded installer and exit the app</summary>
-    public bool LaunchInstaller()
+    /// <summary>
+    /// Launch the downloaded installer in SILENT mode for seamless auto-update.
+    /// The installer will: close the running app (CloseApplications=yes),
+    /// clean old files, install new files, then relaunch.
+    /// </summary>
+    public bool LaunchInstaller(bool silent = true)
     {
         if (string.IsNullOrEmpty(DownloadedFilePath) || !File.Exists(DownloadedFilePath))
             return false;
 
         try
         {
-            Process.Start(new ProcessStartInfo
+            var args = silent ? "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS" : "";
+            var proc = Process.Start(new ProcessStartInfo
             {
                 FileName = DownloadedFilePath,
+                Arguments = args,
                 UseShellExecute = true
             });
-            return true;
+            return proc != null;
         }
         catch
         {
@@ -271,7 +274,6 @@ public sealed class UpdateChecker
         _retryCount++;
         if (_retryCount <= MaxRetries)
         {
-            // Exponential backoff: 30s, 60s, 120s
             var delay = TimeSpan.FromSeconds(30 * Math.Pow(2, _retryCount - 1));
             _ = Task.Delay(delay).ContinueWith(_ => CheckForUpdateAsync());
         }

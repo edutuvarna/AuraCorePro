@@ -402,11 +402,13 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
                 var filePath = await UpdateChecker.Instance.DownloadUpdateAsync();
                 if (filePath != null)
                 {
-                    statusText.Text = "Download complete! Launching installer...";
-                    await Task.Delay(1000);
-                    if (UpdateChecker.Instance.LaunchInstaller())
+                    statusText.Text = "Download complete! Installing update...";
+                    await Task.Delay(500);
+                    if (UpdateChecker.Instance.LaunchInstaller(silent: true))
                     {
-                        // Exit app so installer can replace files
+                        statusText.Text = "Installer launched. App will restart automatically...";
+                        await Task.Delay(3000);
+                        // Graceful exit - installer has CloseApplications=yes as safety net
                         App.MainWindow = null;
                         _reallyClose = true;
                         this.Close();
@@ -556,7 +558,7 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
                 var installDialog = new ContentDialog
                 {
                     Title = "Download Complete",
-                    Content = "The update has been downloaded. Would you like to install it now? The app will close to complete the installation.",
+                    Content = "The update has been downloaded. Click Install Now to update silently. The app will close and restart automatically.",
                     PrimaryButtonText = "Install Now",
                     CloseButtonText = "Install Later",
                     DefaultButton = ContentDialogButton.Primary,
@@ -565,8 +567,11 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
 
                 if (await installDialog.ShowAsync() == ContentDialogResult.Primary)
                 {
-                    if (UpdateChecker.Instance.LaunchInstaller())
+                    if (UpdateChecker.Instance.LaunchInstaller(silent: true))
                     {
+                        // Wait for installer to start, then exit gracefully
+                        // Installer has CloseApplications=yes as safety net
+                        await Task.Delay(3000);
                         App.MainWindow = null;
                         _reallyClose = true;
                         this.Close();

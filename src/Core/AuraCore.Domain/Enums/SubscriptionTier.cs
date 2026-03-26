@@ -31,6 +31,7 @@ public static class TierFeatures
         ["disk-cleanup"] = SubscriptionTier.Pro,
         ["privacy-cleaner"] = SubscriptionTier.Pro,
         ["iso-builder"] = SubscriptionTier.Pro,
+        ["driver-updater"] = SubscriptionTier.Pro,
     };
 
     public static readonly Dictionary<SubscriptionTier, decimal> MonthlyPrices = new()

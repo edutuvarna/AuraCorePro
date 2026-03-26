@@ -58,5 +58,6 @@
     <ProjectReference Include="../../Modules/AuraCore.Module.DiskCleanup/AuraCore.Module.DiskCleanup.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.DefenderManager/AuraCore.Module.DefenderManager.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.PrivacyCleaner/AuraCore.Module.PrivacyCleaner.csproj" />
+    <ProjectReference Include="../../Modules/AuraCore.Module.DriverUpdater/AuraCore.Module.DriverUpdater.csproj" />
   </ItemGroup>
 </Project>

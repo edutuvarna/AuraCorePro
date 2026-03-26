@@ -114,6 +114,9 @@
                 <NavigationViewItem Content="Disk Cleanup Pro" Tag="disk-cleanup">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Driver Updater" Tag="driver-updater">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE964;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Privacy Cleaner" Tag="privacy-cleaner">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE72E;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>

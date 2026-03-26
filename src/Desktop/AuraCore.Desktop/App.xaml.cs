@@ -43,6 +43,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         AuraCore.Module.DiskCleanup.DiskCleanupRegistration.AddDiskCleanupModule(sc);
         AuraCore.Module.DefenderManager.DefenderManagerRegistration.AddDefenderManagerModule(sc);
         AuraCore.Module.PrivacyCleaner.PrivacyCleanerRegistration.AddPrivacyCleanerModule(sc);
+        AuraCore.Module.DriverUpdater.DriverUpdaterRegistration.AddDriverUpdaterModule(sc);
 
         // Guards
         AuraCore.Guard.Licensing.LicensingRegistration.AddLicensingGuard(sc);

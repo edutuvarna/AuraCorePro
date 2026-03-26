@@ -277,6 +277,7 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             "defender-manager" => typeof(DefenderPage),
             "privacy-cleaner" => typeof(PrivacyCleanerPage),
             "driver-updater" => typeof(DriverUpdaterPage),
+            "battery-optimizer" => typeof(BatteryOptimizerPage),
             "admin" => typeof(AdminPanelPage),
             _ => typeof(DashboardPage)
         };

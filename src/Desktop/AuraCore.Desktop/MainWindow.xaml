@@ -114,6 +114,9 @@
                 <NavigationViewItem Content="Disk Cleanup Pro" Tag="disk-cleanup">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Battery Optimizer" Tag="battery-optimizer">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEA94;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Driver Updater" Tag="driver-updater">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE964;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>

@@ -32,6 +32,7 @@ public static class TierFeatures
         ["privacy-cleaner"] = SubscriptionTier.Pro,
         ["iso-builder"] = SubscriptionTier.Pro,
         ["driver-updater"] = SubscriptionTier.Pro,
+        ["battery-optimizer"] = SubscriptionTier.Free,
     };
 
     public static readonly Dictionary<SubscriptionTier, decimal> MonthlyPrices = new()

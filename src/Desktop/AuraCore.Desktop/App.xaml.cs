@@ -44,6 +44,7 @@ public partial class App : Microsoft.UI.Xaml.Application
         AuraCore.Module.DefenderManager.DefenderManagerRegistration.AddDefenderManagerModule(sc);
         AuraCore.Module.PrivacyCleaner.PrivacyCleanerRegistration.AddPrivacyCleanerModule(sc);
         AuraCore.Module.DriverUpdater.DriverUpdaterRegistration.AddDriverUpdaterModule(sc);
+        AuraCore.Module.BatteryOptimizer.BatteryOptimizerRegistration.AddBatteryOptimizerModule(sc);
 
         // Guards
         AuraCore.Guard.Licensing.LicensingRegistration.AddLicensingGuard(sc);

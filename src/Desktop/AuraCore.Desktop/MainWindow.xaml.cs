@@ -275,6 +275,7 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             "iso-builder" => typeof(IsoBuilderPage),
             "disk-cleanup" => typeof(DiskCleanupPage),
             "defender-manager" => typeof(DefenderPage),
+            "privacy-cleaner" => typeof(PrivacyCleanerPage),
             "admin" => typeof(AdminPanelPage),
             _ => typeof(DashboardPage)
         };

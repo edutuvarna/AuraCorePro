@@ -114,6 +114,9 @@
                 <NavigationViewItem Content="Disk Cleanup Pro" Tag="disk-cleanup">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE74D;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Privacy Cleaner" Tag="privacy-cleaner">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE72E;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Defender Manager" Tag="defender-manager">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE83D;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>

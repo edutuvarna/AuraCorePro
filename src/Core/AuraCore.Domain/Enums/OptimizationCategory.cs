@@ -11,5 +11,6 @@ public enum OptimizationCategory
     ApplicationManagement,
     GamingPerformance,
     NetworkOptimization,
-    ShellCustomization
+    ShellCustomization,
+    Privacy
 }

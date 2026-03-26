@@ -3,13 +3,14 @@ using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.DiskCleanup.Models;
+using System.Security.Cryptography;
 
 namespace AuraCore.Module.DiskCleanup;
 
 /// <summary>
 /// Disk Cleanup Pro - Deep system cleanup beyond what Windows built-in tool covers.
 /// Scans: WinUpdate cache, Delivery Optimization, Error Reports, Crash Dumps,
-/// Shader Cache, Font Cache, Installer Cache, Old Windows, and more.
+/// Shader Cache, Font Cache, Installer Cache, Old Windows, Empty Folders, Duplicates, and more.
 /// </summary>
 public sealed class DiskCleanupModule : IOptimizationModule
 {
@@ -46,7 +47,6 @@ public sealed class DiskCleanupModule : IOptimizationModule
                     "Peer-to-peer update delivery cache files",
                     deliveryOpt, risk: "Safe", admin: true));
             }
-            // Also check user-level DO cache
             var doUser = Path.Combine(winDir, @"SoftwareDistribution\DeliveryOptimization");
             if (Directory.Exists(doUser))
             {
@@ -90,7 +90,6 @@ public sealed class DiskCleanupModule : IOptimizationModule
             var miniDump = Path.Combine(winDir, "Minidump");
             if (Directory.Exists(miniDump))
                 dumps.AddRange(ScanDir("temp", "", miniDump, risk: "Medium").Files);
-            // MEMORY.DMP in Windows root
             var fullDump = Path.Combine(winDir, "MEMORY.DMP");
             if (File.Exists(fullDump))
             {
@@ -121,7 +120,6 @@ public sealed class DiskCleanupModule : IOptimizationModule
                     "Compiled shader cache - will be rebuilt automatically",
                     shaderCache, risk: "Safe"));
             }
-            // AMD/NVIDIA shader caches
             var amdCache = Path.Combine(localApp, @"AMD\DxCache");
             if (Directory.Exists(amdCache))
             {
@@ -153,7 +151,7 @@ public sealed class DiskCleanupModule : IOptimizationModule
                     patchCache, risk: "Medium", admin: true));
             }
 
-            // 8. Windows Temp (System level - different from user temp)
+            // 8. Windows Temp (System level)
             var winTemp = Path.Combine(winDir, "Temp");
             if (Directory.Exists(winTemp))
             {
@@ -201,6 +199,20 @@ public sealed class DiskCleanupModule : IOptimizationModule
                     extensions: new[] { ".etl" }));
             }
 
+            // ═══════════════════════════════════════════════════════════
+            // 13. Empty Folder Scanner (NEW)
+            // ═══════════════════════════════════════════════════════════
+            var emptyFolders = ScanEmptyFolders(ct);
+            if (emptyFolders.FileCount > 0)
+                categories.Add(emptyFolders);
+
+            // ═══════════════════════════════════════════════════════════
+            // 14. Duplicate File Finder (NEW)
+            // ═══════════════════════════════════════════════════════════
+            var duplicates = ScanDuplicateFiles(ct);
+            if (duplicates.FileCount > 0)
+                categories.Add(duplicates);
+
         }, ct);
 
         categories.RemoveAll(c => c.FileCount == 0);
@@ -221,7 +233,6 @@ public sealed class DiskCleanupModule : IOptimizationModule
         int total = LastReport.TotalFiles;
         int processed = 0;
 
-        // Get selected categories from plan tags, or clean all
         var selectedCategories = plan.SelectedItemIds?.Count > 0
             ? new HashSet<string>(plan.SelectedItemIds)
             : new HashSet<string>(LastReport.Categories.Select(c => c.Name));
@@ -231,6 +242,32 @@ public sealed class DiskCleanupModule : IOptimizationModule
             foreach (var category in LastReport.Categories)
             {
                 if (!selectedCategories.Contains(category.Name)) continue;
+
+                // Special handling for empty folders - delete deepest first
+                if (category.Name == "Empty Folders")
+                {
+                    var sorted = category.Files
+                        .OrderByDescending(f => f.FullPath.Length)
+                        .ToList();
+                    foreach (var folder in sorted)
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        try
+                        {
+                            if (Directory.Exists(folder.FullPath) && !Directory.EnumerateFileSystemEntries(folder.FullPath).Any())
+                            {
+                                Directory.Delete(folder.FullPath);
+                                deleted++;
+                            }
+                        }
+                        catch { }
+                        processed++;
+                        progress?.Report(new TaskProgress(Id,
+                            total > 0 ? (double)processed / total * 100 : 100,
+                            $"Removing empty folders: {processed}/{total}"));
+                    }
+                    continue;
+                }
 
                 foreach (var file in category.Files)
                 {
@@ -245,7 +282,6 @@ public sealed class DiskCleanupModule : IOptimizationModule
                         }
                         else if (Directory.Exists(file.FullPath))
                         {
-                            // For entries representing folders (like Windows.old)
                             var dirSize = file.SizeBytes;
                             Directory.Delete(file.FullPath, true);
                             freedBytes += dirSize;
@@ -270,6 +306,232 @@ public sealed class DiskCleanupModule : IOptimizationModule
 
     public Task RollbackAsync(string operationId, CancellationToken ct = default)
         => Task.CompletedTask;
+
+    // ═══════════════════════════════════════════════════════════
+    // Empty Folder Scanner
+    // ═══════════════════════════════════════════════════════════
+    private static CleanupCategory ScanEmptyFolders(CancellationToken ct)
+    {
+        var emptyDirs = new List<CleanupItem>();
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        // Scan common user directories for empty folders
+        var scanRoots = new[]
+        {
+            Path.Combine(userProfile, "Downloads"),
+            Path.Combine(userProfile, "Documents"),
+            Path.Combine(userProfile, "Desktop"),
+            Path.Combine(userProfile, "Pictures"),
+            Path.Combine(userProfile, "Videos"),
+            Path.Combine(userProfile, "Music"),
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        };
+
+        // Protected dirs that should never be removed even if empty
+        var protectedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".git", ".vs", ".vscode", "node_modules", "__pycache__",
+            "bin", "obj", "Debug", "Release", ".nuget", ".npm",
+            "AppData", "Local", "Roaming", "LocalLow",
+            "Microsoft", "Packages", "WindowsApps",
+            "Desktop", "Documents", "Downloads", "Pictures", "Videos", "Music"
+        };
+
+        foreach (var root in scanRoots)
+        {
+            if (!Directory.Exists(root)) continue;
+            ct.ThrowIfCancellationRequested();
+
+            try
+            {
+                foreach (var dir in Directory.EnumerateDirectories(root, "*", new EnumerationOptions
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = FileAttributes.System | FileAttributes.Hidden
+                }))
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        var dirName = Path.GetFileName(dir);
+                        if (protectedNames.Contains(dirName)) continue;
+
+                        // Check if truly empty (no files, no subdirs)
+                        if (!Directory.EnumerateFileSystemEntries(dir).Any())
+                        {
+                            var info = new DirectoryInfo(dir);
+                            emptyDirs.Add(new CleanupItem(
+                                dir, 0, "Empty Folders", info.LastWriteTimeUtc));
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        return new CleanupCategory
+        {
+            Name = "Empty Folders",
+            Description = $"Empty directories in user folders - {emptyDirs.Count} found across Downloads, Documents, Desktop, etc.",
+            RiskLevel = "Safe",
+            RequiresAdmin = false,
+            Files = emptyDirs
+        };
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Duplicate File Finder
+    // ═══════════════════════════════════════════════════════════
+    private static CleanupCategory ScanDuplicateFiles(CancellationToken ct)
+    {
+        var duplicateFiles = new List<CleanupItem>();
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        var scanRoots = new[]
+        {
+            Path.Combine(userProfile, "Downloads"),
+            Path.Combine(userProfile, "Documents"),
+            Path.Combine(userProfile, "Desktop"),
+            Path.Combine(userProfile, "Pictures"),
+            Path.Combine(userProfile, "Videos"),
+        };
+
+        // Phase 1: Group files by size (fast pre-filter)
+        var sizeGroups = new Dictionary<long, List<string>>();
+        long minSize = 100 * 1024;     // Ignore files < 100 KB
+        long maxSize = 500L * 1024 * 1024; // Ignore files > 500 MB (too slow to hash)
+        int maxFilesPerRoot = 10000;    // Safety limit per directory
+
+        foreach (var root in scanRoots)
+        {
+            if (!Directory.Exists(root)) continue;
+            ct.ThrowIfCancellationRequested();
+            int count = 0;
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(root, "*.*", new EnumerationOptions
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = FileAttributes.System | FileAttributes.Hidden
+                }))
+                {
+                    ct.ThrowIfCancellationRequested();
+                    if (++count > maxFilesPerRoot) break;
+
+                    try
+                    {
+                        var info = new FileInfo(file);
+                        if (info.Length < minSize || info.Length > maxSize) continue;
+
+                        if (!sizeGroups.TryGetValue(info.Length, out var list))
+                        {
+                            list = new List<string>();
+                            sizeGroups[info.Length] = list;
+                        }
+                        list.Add(file);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        // Phase 2: Hash files that share the same size
+        var hashGroups = new Dictionary<string, List<(string path, long size, DateTimeOffset modified)>>();
+
+        foreach (var group in sizeGroups.Where(g => g.Value.Count > 1))
+        {
+            foreach (var filePath in group.Value)
+            {
+                ct.ThrowIfCancellationRequested();
+                try
+                {
+                    var hash = ComputePartialHash(filePath);
+                    if (hash is null) continue;
+
+                    if (!hashGroups.TryGetValue(hash, out var list))
+                    {
+                        list = new List<(string, long, DateTimeOffset)>();
+                        hashGroups[hash] = list;
+                    }
+                    var fi = new FileInfo(filePath);
+                    list.Add((filePath, fi.Length, fi.LastWriteTimeUtc));
+                }
+                catch { }
+            }
+        }
+
+        // Phase 3: For each group of duplicates, keep the oldest, mark others for removal
+        foreach (var group in hashGroups.Where(g => g.Value.Count > 1))
+        {
+            // Keep the file that was modified earliest (original)
+            var sorted = group.Value.OrderBy(f => f.modified).ToList();
+            // Skip first (keep it), add rest as duplicates
+            for (int i = 1; i < sorted.Count; i++)
+            {
+                duplicateFiles.Add(new CleanupItem(
+                    sorted[i].path,
+                    sorted[i].size,
+                    "Duplicate Files",
+                    sorted[i].modified));
+            }
+        }
+
+        var totalWaste = duplicateFiles.Sum(f => f.SizeBytes);
+        var wasteDisplay = totalWaste switch
+        {
+            < 1024 * 1024 => $"{totalWaste / 1024.0:F0} KB",
+            < 1024L * 1024 * 1024 => $"{totalWaste / (1024.0 * 1024):F1} MB",
+            _ => $"{totalWaste / (1024.0 * 1024 * 1024):F2} GB"
+        };
+
+        return new CleanupCategory
+        {
+            Name = "Duplicate Files",
+            Description = $"Duplicate files in user folders - {duplicateFiles.Count} copies found ({wasteDisplay} wasted)",
+            RiskLevel = "Low",
+            RequiresAdmin = false,
+            Files = duplicateFiles
+        };
+    }
+
+    /// <summary>
+    /// Computes a partial hash (first 8KB + last 8KB) for fast duplicate detection.
+    /// Full hash only for files smaller than 16KB.
+    /// </summary>
+    private static string? ComputePartialHash(string path)
+    {
+        try
+        {
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var hasher = SHA256.Create();
+            var bufferSize = 8192;
+
+            if (stream.Length <= bufferSize * 2)
+            {
+                // Small file - hash entire content
+                var hash = hasher.ComputeHash(stream);
+                return $"{stream.Length}:{Convert.ToHexString(hash)}";
+            }
+
+            // Large file - hash first 8KB + last 8KB
+            var buffer = new byte[bufferSize * 2];
+            stream.Read(buffer, 0, bufferSize);
+            stream.Seek(-bufferSize, SeekOrigin.End);
+            stream.Read(buffer, bufferSize, bufferSize);
+
+            var partialHash = hasher.ComputeHash(buffer);
+            return $"{stream.Length}:{Convert.ToHexString(partialHash)}";
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
     private static CleanupCategory ScanDir(string name, string description, string path,
         string risk = "Safe", bool admin = false, string[]? extensions = null)

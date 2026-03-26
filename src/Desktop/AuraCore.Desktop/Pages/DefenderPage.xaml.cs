@@ -30,6 +30,10 @@ public sealed partial class DefenderPage : Page
 
         if (!IsAdmin) AdminWarning.IsOpen = true;
 
+        // CPU slider label
+        CpuLimitSlider.ValueChanged += (s, e) =>
+            CpuLimitText.Text = $"{(int)CpuLimitSlider.Value}%";
+
         // Auto-refresh on load
         _ = RefreshStatusAsync();
 
@@ -79,16 +83,11 @@ public sealed partial class DefenderPage : Page
                 SignatureText.Foreground = new SolidColorBrush(Red);
             ProtectionBanner.Visibility = Visibility.Visible;
 
-            // Toggles
             BuildToggles(status);
-
-            // Firewall
             BuildFirewall(status);
-
-            // Threats
+            BuildSchedule(_module.LastSchedule);
+            BuildQuarantine(_module.LastQuarantine);
             BuildThreats(_module.LastThreats);
-
-            // Exclusions
             BuildExclusions(_module.LastExclusions);
 
             StatusText.Text = $"Defender status loaded - {level} protection";
@@ -101,6 +100,266 @@ public sealed partial class DefenderPage : Page
         }
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // Scheduled Scan (NEW)
+    // ═══════════════════════════════════════════════════════════
+    private void BuildSchedule(ScheduledScanInfo? schedule)
+    {
+        if (schedule is null)
+        {
+            ScheduleCard.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        ScheduleSummaryText.Text = schedule.Summary;
+
+        // Set day combo
+        for (int i = 0; i < ScheduleDayCombo.Items.Count; i++)
+        {
+            if (ScheduleDayCombo.Items[i] is ComboBoxItem item &&
+                item.Tag?.ToString() == schedule.ScheduleDay.ToString())
+            {
+                ScheduleDayCombo.SelectedIndex = i;
+                break;
+            }
+        }
+
+        // Set time
+        ScheduleTimePicker.SelectedTime = schedule.ScheduleTimeSpan;
+
+        // Set scan type
+        ScheduleTypeCombo.SelectedIndex = schedule.ScanType == "Full Scan" ? 1 : 0;
+
+        // CPU limit
+        CpuLimitSlider.Value = schedule.CpuLoadLimit;
+        CpuLimitText.Text = $"{schedule.CpuLoadLimit}%";
+
+        // Idle only
+        IdleOnlyCheck.IsChecked = schedule.ScanOnlyIfIdle;
+
+        // Enable controls only for admin
+        ScheduleDayCombo.IsEnabled = IsAdmin;
+        ScheduleTimePicker.IsEnabled = IsAdmin;
+        ScheduleTypeCombo.IsEnabled = IsAdmin;
+        CpuLimitSlider.IsEnabled = IsAdmin;
+        IdleOnlyCheck.IsEnabled = IsAdmin;
+        SaveScheduleBtn.IsEnabled = IsAdmin;
+
+        ScheduleCard.Visibility = Visibility.Visible;
+    }
+
+    private async void SaveScheduleBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (_module is null) return;
+
+        var dayItem = ScheduleDayCombo.SelectedItem as ComboBoxItem;
+        var day = int.Parse(dayItem?.Tag?.ToString() ?? "8");
+        var time = ScheduleTimePicker.SelectedTime ?? TimeSpan.FromHours(2);
+        var typeItem = ScheduleTypeCombo.SelectedItem as ComboBoxItem;
+        var scanType = int.Parse(typeItem?.Tag?.ToString() ?? "1");
+        var cpuLimit = (int)CpuLimitSlider.Value;
+        var idleOnly = IdleOnlyCheck.IsChecked == true;
+
+        SaveScheduleBtn.IsEnabled = false;
+        StatusText.Text = "Saving schedule...";
+
+        try
+        {
+            var ok1 = await _module.SetScheduledScanAsync(day, time.Hours, time.Minutes, scanType);
+            var ok2 = await _module.SetCpuLimitAsync(cpuLimit);
+            var ok3 = await _module.SetScanOnlyIfIdleAsync(idleOnly);
+
+            if (ok1 && ok2 && ok3)
+            {
+                StatusText.Text = "Schedule saved successfully!";
+                // Refresh to show updated summary
+                var schedule = await _module.GetScheduledScanAsync();
+                ScheduleSummaryText.Text = schedule.Summary;
+            }
+            else
+            {
+                StatusText.Text = "Some settings failed to save - admin required";
+            }
+        }
+        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        finally
+        {
+            SaveScheduleBtn.IsEnabled = IsAdmin;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Quarantine (NEW)
+    // ═══════════════════════════════════════════════════════════
+    private void BuildQuarantine(List<QuarantineItem> items)
+    {
+        QuarantineList.Children.Clear();
+        var quarantined = items.Where(q => q.Status == "Quarantined" || q.IsActive).ToList();
+
+        QuarantineTitle.Text = quarantined.Count > 0
+            ? $"Quarantine ({quarantined.Count})"
+            : "Quarantine";
+
+        if (quarantined.Count == 0)
+        {
+            QuarantineList.Children.Add(new TextBlock
+            {
+                Text = "No items in quarantine",
+                FontSize = 12, Opacity = 0.5,
+                Foreground = new SolidColorBrush(Green)
+            });
+        }
+        else
+        {
+            foreach (var q in quarantined)
+            {
+                var sevColor = q.Severity switch
+                {
+                    "Severe" or "High" => Red,
+                    "Medium" => Amber,
+                    _ => Blue
+                };
+
+                var card = new Border
+                {
+                    Background = new SolidColorBrush(
+                        Windows.UI.Color.FromArgb(8, sevColor.R, sevColor.G, sevColor.B)),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(12, 10, 12, 10),
+                    BorderBrush = new SolidColorBrush(
+                        Windows.UI.Color.FromArgb(30, sevColor.R, sevColor.G, sevColor.B)),
+                    BorderThickness = new Thickness(0.5)
+                };
+
+                var grid = new Grid { ColumnSpacing = 12 };
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var info = new StackPanel { Spacing = 2 };
+                info.Children.Add(new TextBlock
+                {
+                    Text = q.ThreatName,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    FontSize = 13
+                });
+                info.Children.Add(new TextBlock
+                {
+                    Text = q.ResourceSummary,
+                    FontSize = 10, Opacity = 0.4,
+                    FontFamily = new FontFamily("Consolas"),
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                });
+
+                var dateAndBadge = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                dateAndBadge.Children.Add(new TextBlock
+                {
+                    Text = q.DetectedAt != DateTimeOffset.MinValue
+                        ? q.DetectedAt.ToLocalTime().ToString("g") : "",
+                    FontSize = 10, Opacity = 0.35
+                });
+
+                var sevBadge = new Border
+                {
+                    Background = new SolidColorBrush(
+                        Windows.UI.Color.FromArgb(30, sevColor.R, sevColor.G, sevColor.B)),
+                    CornerRadius = new CornerRadius(3),
+                    Padding = new Thickness(6, 1, 6, 1),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                sevBadge.Child = new TextBlock
+                {
+                    Text = q.Severity.ToUpper(), FontSize = 9,
+                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                    Foreground = new SolidColorBrush(sevColor)
+                };
+                dateAndBadge.Children.Add(sevBadge);
+
+                if (q.DidExecute)
+                {
+                    var execBadge = new Border
+                    {
+                        Background = new SolidColorBrush(Windows.UI.Color.FromArgb(30, Red.R, Red.G, Red.B)),
+                        CornerRadius = new CornerRadius(3),
+                        Padding = new Thickness(6, 1, 6, 1)
+                    };
+                    execBadge.Child = new TextBlock
+                    {
+                        Text = "EXECUTED", FontSize = 9,
+                        FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                        Foreground = new SolidColorBrush(Red)
+                    };
+                    dateAndBadge.Children.Add(execBadge);
+                }
+
+                info.Children.Add(dateAndBadge);
+                grid.Children.Add(info);
+
+                // Action buttons
+                if (IsAdmin)
+                {
+                    var removeBtn = new Button
+                    {
+                        Content = "Remove",
+                        FontSize = 11,
+                        Padding = new Thickness(10, 4, 10, 4),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    var capturedId = q.ThreatId;
+                    removeBtn.Click += async (s, ev) =>
+                    {
+                        if (_module is null) return;
+                        removeBtn.IsEnabled = false;
+                        var ok = await _module.RemoveQuarantinedThreatAsync(capturedId);
+                        StatusText.Text = ok ? "Threat removed from quarantine" : "Failed to remove - check permissions";
+                        if (ok) await RefreshStatusAsync();
+                        else removeBtn.IsEnabled = true;
+                    };
+                    Grid.SetColumn(removeBtn, 1);
+                    grid.Children.Add(removeBtn);
+
+                    var restoreBtn = new Button
+                    {
+                        Content = "Restore",
+                        FontSize = 11,
+                        Padding = new Thickness(10, 4, 10, 4),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    var capturedId2 = q.ThreatId;
+                    restoreBtn.Click += async (s, ev) =>
+                    {
+                        if (_module is null) return;
+                        var dialog = new ContentDialog
+                        {
+                            Title = "Restore quarantined item?",
+                            Content = "This will add the file path to exclusions. Only restore if you are sure the file is safe.",
+                            PrimaryButtonText = "Restore",
+                            CloseButtonText = "Cancel",
+                            XamlRoot = this.XamlRoot,
+                            DefaultButton = ContentDialogButton.Close
+                        };
+                        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+                        restoreBtn.IsEnabled = false;
+                        var ok = await _module.RestoreQuarantinedThreatAsync(capturedId2);
+                        StatusText.Text = ok ? "Item restored (added to exclusions)" : "Failed to restore";
+                        if (ok) await RefreshStatusAsync();
+                        else restoreBtn.IsEnabled = true;
+                    };
+                    Grid.SetColumn(restoreBtn, 2);
+                    grid.Children.Add(restoreBtn);
+                }
+
+                card.Child = grid;
+                QuarantineList.Children.Add(card);
+            }
+        }
+
+        QuarantineCard.Visibility = Visibility.Visible;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Existing UI builders (unchanged)
+    // ═══════════════════════════════════════════════════════════
     private void BuildToggles(DefenderStatus status)
     {
         ToggleList.Children.Clear();
@@ -126,10 +385,8 @@ public sealed partial class DefenderPage : Page
 
             var toggle = new ToggleSwitch
             {
-                IsOn = enabled,
-                IsEnabled = IsAdmin,
-                OnContent = "ON",
-                OffContent = "OFF",
+                IsOn = enabled, IsEnabled = IsAdmin,
+                OnContent = "ON", OffContent = "OFF",
                 VerticalAlignment = VerticalAlignment.Center
             };
             var capturedKey = key;
@@ -137,23 +394,13 @@ public sealed partial class DefenderPage : Page
             {
                 if (_module is null) return;
                 var success = await _module.SetProtectionAsync(capturedKey, toggle.IsOn);
-                if (!success)
-                {
-                    // Revert
-                    toggle.IsOn = !toggle.IsOn;
-                    StatusText.Text = "Failed - admin required";
-                }
-                else
-                {
-                    StatusText.Text = $"{name}: {(toggle.IsOn ? "Enabled" : "Disabled")}";
-                }
+                if (!success) { toggle.IsOn = !toggle.IsOn; StatusText.Text = "Failed - admin required"; }
+                else StatusText.Text = $"{name}: {(toggle.IsOn ? "Enabled" : "Disabled")}";
             };
             grid_SetColumn(toggle, 1);
             row.Children.Add(toggle);
-
             ToggleList.Children.Add(row);
 
-            // Separator
             ToggleList.Children.Add(new Border
             {
                 Height = 1,
@@ -162,10 +409,8 @@ public sealed partial class DefenderPage : Page
             });
         }
 
-        // Network + Tamper (read-only, can't be changed via Set-MpPreference)
         AddReadOnlyRow("Network Protection", status.NetworkProtection, "Blocks malicious network connections");
         AddReadOnlyRow("Tamper Protection", status.TamperProtection, "Prevents unauthorized changes to security settings");
-
         ProtectionCard.Visibility = Visibility.Visible;
     }
 
@@ -196,19 +441,13 @@ public sealed partial class DefenderPage : Page
         };
         grid_SetColumn(badge, 1);
         row.Children.Add(badge);
-
         ToggleList.Children.Add(row);
     }
 
     private void BuildFirewall(DefenderStatus status)
     {
         FirewallList.Children.Clear();
-        var profiles = new[]
-        {
-            ("Domain", status.FirewallDomain),
-            ("Private", status.FirewallPrivate),
-            ("Public", status.FirewallPublic),
-        };
+        var profiles = new[] { ("Domain", status.FirewallDomain), ("Private", status.FirewallPrivate), ("Public", status.FirewallPublic) };
 
         foreach (var (name, enabled) in profiles)
         {
@@ -218,10 +457,8 @@ public sealed partial class DefenderPage : Page
 
             row.Children.Add(new TextBlock
             {
-                Text = $"{name} Profile",
-                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                FontSize = 13,
-                VerticalAlignment = VerticalAlignment.Center
+                Text = $"{name} Profile", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                FontSize = 13, VerticalAlignment = VerticalAlignment.Center
             });
 
             var badge = new Border
@@ -233,13 +470,12 @@ public sealed partial class DefenderPage : Page
             };
             badge.Child = new TextBlock
             {
-                Text = enabled ? "ENABLED" : "DISABLED",
-                FontSize = 11, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Text = enabled ? "ENABLED" : "DISABLED", FontSize = 11,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = new SolidColorBrush(enabled ? Green : Red)
             };
             Grid.SetColumn(badge, 1);
             row.Children.Add(badge);
-
             FirewallList.Children.Add(row);
         }
         FirewallCard.Visibility = Visibility.Visible;
@@ -262,13 +498,7 @@ public sealed partial class DefenderPage : Page
         {
             foreach (var t in threats.Take(10))
             {
-                var sevColor = t.Severity switch
-                {
-                    "Severe" or "High" => Red,
-                    "Medium" => Amber,
-                    _ => Blue
-                };
-
+                var sevColor = t.Severity switch { "Severe" or "High" => Red, "Medium" => Amber, _ => Blue };
                 var card = new Border
                 {
                     Background = new SolidColorBrush(Windows.UI.Color.FromArgb(8, sevColor.R, sevColor.G, sevColor.B)),
@@ -276,28 +506,15 @@ public sealed partial class DefenderPage : Page
                     BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(30, sevColor.R, sevColor.G, sevColor.B)),
                     BorderThickness = new Thickness(0.5)
                 };
-
                 var grid = new Grid { ColumnSpacing = 12 };
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
                 var info = new StackPanel { Spacing = 2 };
-                info.Children.Add(new TextBlock
-                {
-                    Text = t.ThreatName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13
-                });
+                info.Children.Add(new TextBlock { Text = t.ThreatName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 });
                 if (!string.IsNullOrEmpty(t.Path))
-                    info.Children.Add(new TextBlock
-                    {
-                        Text = t.Path, FontSize = 10, Opacity = 0.4,
-                        FontFamily = new FontFamily("Consolas"),
-                        TextTrimming = TextTrimming.CharacterEllipsis
-                    });
-                info.Children.Add(new TextBlock
-                {
-                    Text = t.DetectedAt != DateTimeOffset.MinValue ? t.DetectedAt.ToLocalTime().ToString("g") : "",
-                    FontSize = 10, Opacity = 0.35
-                });
+                    info.Children.Add(new TextBlock { Text = t.Path, FontSize = 10, Opacity = 0.4, FontFamily = new FontFamily("Consolas"), TextTrimming = TextTrimming.CharacterEllipsis });
+                info.Children.Add(new TextBlock { Text = t.DetectedAt != DateTimeOffset.MinValue ? t.DetectedAt.ToLocalTime().ToString("g") : "", FontSize = 10, Opacity = 0.35 });
                 grid.Children.Add(info);
 
                 var badges = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
@@ -306,12 +523,7 @@ public sealed partial class DefenderPage : Page
                     Background = new SolidColorBrush(Windows.UI.Color.FromArgb(30, sevColor.R, sevColor.G, sevColor.B)),
                     CornerRadius = new CornerRadius(3), Padding = new Thickness(6, 2, 6, 2)
                 };
-                sevBadge.Child = new TextBlock
-                {
-                    Text = t.Severity.ToUpper(), FontSize = 9,
-                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                    Foreground = new SolidColorBrush(sevColor)
-                };
+                sevBadge.Child = new TextBlock { Text = t.Severity.ToUpper(), FontSize = 9, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = new SolidColorBrush(sevColor) };
                 badges.Children.Add(sevBadge);
 
                 var statusColor = t.Status == "Active" ? Red : Green;
@@ -320,16 +532,10 @@ public sealed partial class DefenderPage : Page
                     Background = new SolidColorBrush(Windows.UI.Color.FromArgb(30, statusColor.R, statusColor.G, statusColor.B)),
                     CornerRadius = new CornerRadius(3), Padding = new Thickness(6, 2, 6, 2)
                 };
-                statusBadge.Child = new TextBlock
-                {
-                    Text = t.Status.ToUpper(), FontSize = 9,
-                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                    Foreground = new SolidColorBrush(statusColor)
-                };
+                statusBadge.Child = new TextBlock { Text = t.Status.ToUpper(), FontSize = 9, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = new SolidColorBrush(statusColor) };
                 badges.Children.Add(statusBadge);
                 Grid.SetColumn(badges, 1);
                 grid.Children.Add(badges);
-
                 card.Child = grid;
                 ThreatList.Children.Add(card);
             }
@@ -340,10 +546,7 @@ public sealed partial class DefenderPage : Page
     private void BuildExclusions(List<ExclusionInfo> exclusions)
     {
         ExclusionList.Children.Clear();
-        if (exclusions.Count == 0)
-        {
-            NoExclusionsText.Visibility = Visibility.Visible;
-        }
+        if (exclusions.Count == 0) { NoExclusionsText.Visibility = Visibility.Visible; }
         else
         {
             NoExclusionsText.Visibility = Visibility.Collapsed;
@@ -360,33 +563,17 @@ public sealed partial class DefenderPage : Page
                     CornerRadius = new CornerRadius(3), Padding = new Thickness(6, 2, 6, 2),
                     VerticalAlignment = VerticalAlignment.Center
                 };
-                typeBadge.Child = new TextBlock
-                {
-                    Text = ex.Type.ToUpper(), FontSize = 9,
-                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                    Foreground = new SolidColorBrush(Blue)
-                };
+                typeBadge.Child = new TextBlock { Text = ex.Type.ToUpper(), FontSize = 9, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = new SolidColorBrush(Blue) };
                 row.Children.Add(typeBadge);
 
-                var valText = new TextBlock
-                {
-                    Text = ex.Value, FontSize = 12,
-                    FontFamily = new FontFamily("Consolas"),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    TextTrimming = TextTrimming.CharacterEllipsis
-                };
+                var valText = new TextBlock { Text = ex.Value, FontSize = 12, FontFamily = new FontFamily("Consolas"), VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis };
                 Grid.SetColumn(valText, 1);
                 row.Children.Add(valText);
 
                 if (IsAdmin)
                 {
-                    var removeBtn = new Button
-                    {
-                        Content = "Remove", FontSize = 11,
-                        Padding = new Thickness(8, 3, 8, 3)
-                    };
-                    var capturedType = ex.Type;
-                    var capturedValue = ex.Value;
+                    var removeBtn = new Button { Content = "Remove", FontSize = 11, Padding = new Thickness(8, 3, 8, 3) };
+                    var capturedType = ex.Type; var capturedValue = ex.Value;
                     removeBtn.Click += async (s, ev) =>
                     {
                         if (_module is null) return;
@@ -397,7 +584,6 @@ public sealed partial class DefenderPage : Page
                     Grid.SetColumn(removeBtn, 2);
                     row.Children.Add(removeBtn);
                 }
-
                 ExclusionList.Children.Add(row);
             }
         }
@@ -423,8 +609,7 @@ public sealed partial class DefenderPage : Page
         {
             Title = "Start Full Scan?",
             Content = "A full system scan can take 30+ minutes. It will run in the background.",
-            PrimaryButtonText = "Start",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = "Start", CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot
         };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;

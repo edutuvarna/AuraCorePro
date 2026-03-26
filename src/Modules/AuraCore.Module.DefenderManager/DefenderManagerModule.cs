@@ -10,6 +10,7 @@ namespace AuraCore.Module.DefenderManager;
 /// <summary>
 /// Windows Defender Manager - Monitor and control Windows Security features.
 /// Uses PowerShell cmdlets (Get-MpComputerStatus, Get-MpThreat, etc.)
+/// Includes: Scheduled Scan management, Quarantine management.
 /// </summary>
 public sealed class DefenderManagerModule : IOptimizationModule
 {
@@ -21,6 +22,8 @@ public sealed class DefenderManagerModule : IOptimizationModule
     public DefenderStatus? LastStatus { get; private set; }
     public List<ThreatInfo> LastThreats { get; private set; } = new();
     public List<ExclusionInfo> LastExclusions { get; private set; } = new();
+    public ScheduledScanInfo? LastSchedule { get; private set; }
+    public List<QuarantineItem> LastQuarantine { get; private set; } = new();
 
     /// <summary>Scan = Gather Defender status</summary>
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
@@ -28,6 +31,8 @@ public sealed class DefenderManagerModule : IOptimizationModule
         LastStatus = await GetDefenderStatusAsync(ct);
         LastThreats = await GetThreatHistoryAsync(ct);
         LastExclusions = await GetExclusionsAsync(ct);
+        LastSchedule = await GetScheduledScanAsync(ct);
+        LastQuarantine = await GetQuarantineAsync(ct);
 
         var issues = 0;
         if (LastStatus != null)
@@ -74,7 +79,6 @@ public sealed class DefenderManagerModule : IOptimizationModule
 
     public async Task<bool> SetProtectionAsync(string feature, bool enabled, CancellationToken ct = default)
     {
-        var value = enabled ? "$true" : "$false";
         var cmd = feature switch
         {
             "RealTime" => $"Set-MpPreference -DisableRealtimeMonitoring {(enabled ? "$false" : "$true")}",
@@ -113,7 +117,232 @@ public sealed class DefenderManagerModule : IOptimizationModule
         return await RunPowerShellAsync(cmd, ct);
     }
 
-    // ── Internal helpers ──
+    // ═══════════════════════════════════════════════════════════
+    // Scheduled Scan Management (NEW)
+    // ═══════════════════════════════════════════════════════════
+
+    /// <summary>Get current scheduled scan settings</summary>
+    public async Task<ScheduledScanInfo> GetScheduledScanAsync(CancellationToken ct = default)
+    {
+        var info = new ScheduledScanInfo();
+        try
+        {
+            var output = await RunPowerShellOutputAsync(
+                "Get-MpPreference | Select-Object ScanScheduleDay,ScanScheduleTime," +
+                "ScanScheduleQuickScanTime,RemediationScheduleDay,RemediationScheduleTime," +
+                "ScanParameters,CheckForSignaturesBeforeRunningScan," +
+                "ScanOnlyIfIdleEnabled,ScanAvgCPULoadFactor | ConvertTo-Json", ct);
+
+            if (string.IsNullOrWhiteSpace(output)) return info;
+
+            var doc = System.Text.Json.JsonDocument.Parse(output);
+            var root = doc.RootElement;
+
+            // ScanScheduleDay: 0=Daily, 1=Sun, 2=Mon, ..., 7=Sat, 8=Never
+            info.ScheduleDay = GetInt(root, "ScanScheduleDay");
+            info.ScheduleDayName = info.ScheduleDay switch
+            {
+                0 => "Daily",
+                1 => "Sunday",
+                2 => "Monday",
+                3 => "Tuesday",
+                4 => "Wednesday",
+                5 => "Thursday",
+                6 => "Friday",
+                7 => "Saturday",
+                8 => "Never",
+                _ => "Unknown"
+            };
+
+            // ScanScheduleTime is a DateTime with the time component
+            if (root.TryGetProperty("ScanScheduleTime", out var timeProp))
+            {
+                if (timeProp.ValueKind == System.Text.Json.JsonValueKind.String &&
+                    DateTime.TryParse(timeProp.GetString(), out var dt))
+                {
+                    info.ScheduleTime = dt.ToString("HH:mm");
+                    info.ScheduleTimeSpan = dt.TimeOfDay;
+                }
+                else if (timeProp.ValueKind == System.Text.Json.JsonValueKind.Number)
+                {
+                    // Sometimes returned as ticks
+                    var ticks = timeProp.GetInt64();
+                    var ts = TimeSpan.FromTicks(ticks);
+                    info.ScheduleTime = $"{ts.Hours:D2}:{ts.Minutes:D2}";
+                    info.ScheduleTimeSpan = ts;
+                }
+            }
+
+            // Quick scan time
+            if (root.TryGetProperty("ScanScheduleQuickScanTime", out var qstProp))
+            {
+                if (qstProp.ValueKind == System.Text.Json.JsonValueKind.String &&
+                    DateTime.TryParse(qstProp.GetString(), out var qdt))
+                {
+                    info.QuickScanTime = qdt.ToString("HH:mm");
+                }
+                else if (qstProp.ValueKind == System.Text.Json.JsonValueKind.Number)
+                {
+                    var ticks = qstProp.GetInt64();
+                    var ts = TimeSpan.FromTicks(ticks);
+                    info.QuickScanTime = $"{ts.Hours:D2}:{ts.Minutes:D2}";
+                }
+            }
+
+            // ScanParameters: 1=QuickScan, 2=FullScan
+            info.ScanType = GetInt(root, "ScanParameters") switch
+            {
+                1 => "Quick Scan",
+                2 => "Full Scan",
+                _ => "Quick Scan"
+            };
+
+            info.CheckSignaturesBeforeScan = GetBool(root, "CheckForSignaturesBeforeRunningScan");
+            info.ScanOnlyIfIdle = GetBool(root, "ScanOnlyIfIdleEnabled");
+            info.CpuLoadLimit = GetInt(root, "ScanAvgCPULoadFactor");
+            if (info.CpuLoadLimit == 0) info.CpuLoadLimit = 50;
+        }
+        catch (Exception ex)
+        {
+            info.Error = ex.Message;
+        }
+
+        LastSchedule = info;
+        return info;
+    }
+
+    /// <summary>Set scheduled scan day and time</summary>
+    public async Task<bool> SetScheduledScanAsync(int day, int hour, int minute, int scanType = 1, CancellationToken ct = default)
+    {
+        // day: 0=Daily, 1=Sun..7=Sat, 8=Never
+        // scanType: 1=Quick, 2=Full
+        var timeStr = $"{hour:D2}:{minute:D2}:00";
+        var cmd = $"Set-MpPreference -ScanScheduleDay {day} -ScanScheduleTime {timeStr} -ScanParameters {scanType}";
+        return await RunPowerShellAsync(cmd, ct);
+    }
+
+    /// <summary>Set CPU load limit for scans (1-100%)</summary>
+    public async Task<bool> SetCpuLimitAsync(int percent, CancellationToken ct = default)
+    {
+        percent = Math.Clamp(percent, 5, 100);
+        return await RunPowerShellAsync($"Set-MpPreference -ScanAvgCPULoadFactor {percent}", ct);
+    }
+
+    /// <summary>Enable/disable scan only when idle</summary>
+    public async Task<bool> SetScanOnlyIfIdleAsync(bool enabled, CancellationToken ct = default)
+        => await RunPowerShellAsync($"Set-MpPreference -ScanOnlyIfIdleEnabled {(enabled ? "$true" : "$false")}", ct);
+
+    // ═══════════════════════════════════════════════════════════
+    // Quarantine Management (NEW)
+    // ═══════════════════════════════════════════════════════════
+
+    /// <summary>Get quarantined/detected threat items</summary>
+    public async Task<List<QuarantineItem>> GetQuarantineAsync(CancellationToken ct = default)
+    {
+        var items = new List<QuarantineItem>();
+        try
+        {
+            // Get threat detection details with resources
+            var output = await RunPowerShellOutputAsync(
+                "Get-MpThreat | Select-Object ThreatID,ThreatName,SeverityID,IsActive," +
+                "InitialDetectionTime,CleaningAction,Resources,DidThreatExecute | ConvertTo-Json", ct);
+
+            if (string.IsNullOrWhiteSpace(output) || output.Trim() == "null")
+            {
+                LastQuarantine = items;
+                return items;
+            }
+
+            var doc = System.Text.Json.JsonDocument.Parse(output);
+            var elements = doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array
+                ? doc.RootElement.EnumerateArray().ToList()
+                : new List<System.Text.Json.JsonElement> { doc.RootElement };
+
+            foreach (var el in elements)
+            {
+                var threatId = GetLong(el, "ThreatID");
+                var name = GetString(el, "ThreatName");
+                var severity = GetInt(el, "SeverityID") switch
+                {
+                    1 => "Low", 2 => "Medium", 4 => "High", 5 => "Severe", _ => "Unknown"
+                };
+                var isActive = GetBool(el, "IsActive");
+                var didExecute = GetBool(el, "DidThreatExecute");
+                var cleanAction = GetInt(el, "CleaningAction") switch
+                {
+                    1 => "Clean", 2 => "Quarantine", 3 => "Remove",
+                    6 => "Allow", 8 => "UserDefined", 9 => "NoAction",
+                    10 => "Block", _ => "Unknown"
+                };
+
+                var resources = new List<string>();
+                if (el.TryGetProperty("Resources", out var resProp) &&
+                    resProp.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    foreach (var r in resProp.EnumerateArray())
+                    {
+                        var val = r.GetString();
+                        if (!string.IsNullOrWhiteSpace(val))
+                            resources.Add(val);
+                    }
+                }
+
+                var detected = DateTimeOffset.MinValue;
+                if (el.TryGetProperty("InitialDetectionTime", out var dtProp) &&
+                    dtProp.ValueKind == System.Text.Json.JsonValueKind.String &&
+                    DateTimeOffset.TryParse(dtProp.GetString(), out var parsedDt))
+                    detected = parsedDt;
+
+                items.Add(new QuarantineItem
+                {
+                    ThreatId = threatId,
+                    ThreatName = name,
+                    Severity = severity,
+                    IsActive = isActive,
+                    DidExecute = didExecute,
+                    Action = cleanAction,
+                    Resources = resources,
+                    DetectedAt = detected,
+                    Status = isActive ? "Active" : (cleanAction == "Quarantine" ? "Quarantined" : "Resolved")
+                });
+            }
+        }
+        catch { }
+
+        LastQuarantine = items;
+        return items;
+    }
+
+    /// <summary>Remove a threat from quarantine (permanently delete)</summary>
+    public async Task<bool> RemoveQuarantinedThreatAsync(long threatId, CancellationToken ct = default)
+        => await RunPowerShellAsync($"Remove-MpThreat -ThreatID {threatId}", ct);
+
+    /// <summary>Restore a quarantined item (allow it)</summary>
+    public async Task<bool> RestoreQuarantinedThreatAsync(long threatId, CancellationToken ct = default)
+    {
+        // Add the threat's resources to exclusion, then remove the threat record
+        var quarantined = LastQuarantine.FirstOrDefault(q => q.ThreatId == threatId);
+        if (quarantined == null) return false;
+
+        // Add each resource path as exclusion
+        foreach (var resource in quarantined.Resources)
+        {
+            var cleanPath = resource;
+            // Strip prefixes like "file:_C:\" 
+            if (cleanPath.Contains("file:"))
+            {
+                var idx = cleanPath.IndexOf("file:");
+                cleanPath = cleanPath.Substring(idx + 5).TrimStart('_').Replace("_", "\\");
+            }
+            if (!string.IsNullOrWhiteSpace(cleanPath) && (cleanPath.Contains("\\") || cleanPath.Contains("/")))
+            {
+                await RunPowerShellAsync($"Add-MpPreference -ExclusionPath '{cleanPath}'", ct);
+            }
+        }
+        return true;
+    }
+
+    // ── Internal helpers (unchanged) ──
 
     private static async Task<DefenderStatus> GetDefenderStatusAsync(CancellationToken ct)
     {
@@ -208,7 +437,6 @@ public sealed class DefenderManagerModule : IOptimizationModule
                 ? doc.RootElement.EnumerateArray().ToList()
                 : new List<System.Text.Json.JsonElement> { doc.RootElement };
 
-            // Get threat names
             var nameOutput = await RunPowerShellOutputAsync(
                 "Get-MpThreat | Select-Object -First 20 ThreatID,ThreatName,SeverityID,IsActive | ConvertTo-Json", ct);
 

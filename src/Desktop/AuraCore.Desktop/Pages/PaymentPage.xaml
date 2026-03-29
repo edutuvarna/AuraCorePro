@@ -45,7 +45,7 @@
         <!-- Waiting Screen (shown after browser opens) -->
         <Grid Grid.Row="1" x:Name="WaitingScreen" Visibility="Collapsed"
               Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" MaxWidth="420">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" MaxWidth="420">
                 <FontIcon Glyph="&#xE8A7;" FontSize="56" Foreground="{ThemeResource AccentFillColorDefaultBrush}"
                           HorizontalAlignment="Center" />
                 <TextBlock Text="Checkout opened in your browser"

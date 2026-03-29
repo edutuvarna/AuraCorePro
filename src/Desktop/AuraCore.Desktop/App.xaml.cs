@@ -21,6 +21,8 @@ public partial class App : Microsoft.UI.Xaml.Application
     public App()
     {
         InitializeComponent();
+        // Hook crash reporting before anything else
+        CrashReportService.Initialize(this);
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)

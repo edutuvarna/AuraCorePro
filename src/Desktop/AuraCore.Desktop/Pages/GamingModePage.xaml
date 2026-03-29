@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
             <StackPanel Spacing="4">
                 <TextBlock x:Name="PageTitle" Text="Gaming Mode" Style="{StaticResource TitleTextBlockStyle}" />
@@ -17,7 +17,7 @@
             <Border x:Name="ToggleCard"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     CornerRadius="12" Padding="28" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <Grid ColumnSpacing="20">
+                <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -45,7 +45,7 @@
 
             <!-- Auto-Detect Card -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="12">
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
@@ -77,7 +77,7 @@
 
             <!-- Game Profiles -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="12">
                     <TextBlock Text="Game Profiles" FontWeight="SemiBold" FontSize="14" />
                     <TextBlock Text="Create custom optimization profiles for specific games. Each profile controls which optimizations are applied when that game is detected."
@@ -117,7 +117,7 @@
             <!-- Result -->
             <Border x:Name="ResultCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <TextBlock x:Name="ResultText" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
             </Border>
 

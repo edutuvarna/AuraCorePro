@@ -790,11 +790,12 @@ public sealed partial class IsoBuilderPage : Page
             sb.AppendLine($"Drivers: {_drivers.Count(d => d.Selected)}");
             sb.AppendLine($"Winget apps: {_wingetApps.Count(a => a.Selected) + _customWingetIds.Count}");
             sb.AppendLine($"WiFi: {(EnableWifiCheck?.IsChecked == true ? WifiSsidBox?.Text ?? "Not set" : "Disabled")}");
-            sb.AppendLine($"Output: {(OutputUsbWrite?.IsChecked == true ? "USB Write" : "Files Only")}");
+            sb.AppendLine($"Output: {(OutputUsbWrite?.IsChecked == true ? "USB Write" : OutputStandaloneIso?.IsChecked == true ? "Standalone ISO" : "Files Only")}");
             SummaryText.Text = sb.ToString();
 
             var min = 1;
             if (OutputUsbWrite?.IsChecked == true) min += 8;
+            if (OutputStandaloneIso?.IsChecked == true) min += 5;
             if (_drivers.Count(d => d.Selected) > 0) min += 3;
             EstimatedTimeText.Text = $"Estimated: ~{min} min";
         }
@@ -959,6 +960,30 @@ public sealed partial class IsoBuilderPage : Page
                 }
                 await RunBuildSteps(config, folderPath, null);
             }
+            else if (OutputStandaloneIso?.IsChecked == true)
+            {
+                string? folderPath = null;
+                var buildHwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+
+                if (IsAdmin())
+                    folderPath = ShowWin32FolderDialog("Select output folder for ISO", buildHwnd);
+                else
+                {
+                    var picker = new FolderPicker { SuggestedStartLocation = PickerLocationId.Desktop };
+                    picker.FileTypeFilter.Add("*");
+                    WinRT.Interop.InitializeWithWindow.Initialize(picker, buildHwnd);
+                    var folder = await picker.PickSingleFolderAsync();
+                    folderPath = folder?.Path;
+                }
+
+                if (string.IsNullOrEmpty(folderPath))
+                {
+                    TerminalOverlay.Visibility = Visibility.Collapsed;
+                    WizardGrid.Visibility = Visibility.Visible;
+                    return;
+                }
+                await RunStandaloneIsoBuild(config, folderPath);
+            }
             else if (OutputUsbWrite?.IsChecked == true)
             {
                 if (UsbDriveCombo.SelectedItem is not ComboBoxItem sel)
@@ -1085,11 +1110,23 @@ public sealed partial class IsoBuilderPage : Page
 
             if (config.IncludeDrivers && config.Drivers.Count > 0)
             {
-                Prog($"[{step + 1}] Exporting drivers...");
+                Prog($"[{step + 1}] Exporting {config.Drivers.Count} selected driver(s)...");
                 var drvDir = Path.Combine(target, "AuraCoreDrivers");
                 Directory.CreateDirectory(drvDir);
-                await RunPowershell($"Export-WindowsDriver -Online -Destination '{drvDir}'|Out-Null");
-                DispatcherQueue.TryEnqueue(() => LogTerminal("  Drivers exported"));
+                var exported = 0;
+                foreach (var drv in config.Drivers)
+                {
+                    if (!string.IsNullOrEmpty(drv.DriverFile))
+                    {
+                        try
+                        {
+                            await RunPowershell($"pnputil /export-driver \"{drv.DriverFile}\" \"{drvDir}\"");
+                            exported++;
+                        }
+                        catch { }
+                    }
+                }
+                DispatcherQueue.TryEnqueue(() => LogTerminal($"  {exported} drivers exported"));
             }
 
             if (usb != null)
@@ -1113,6 +1150,335 @@ public sealed partial class IsoBuilderPage : Page
                 TerminalStepText.Text = "BUILD SUCCESSFUL";
                 TerminalTimeText.Text = $"Completed in {totalElapsed:F1}s";
             });
+        });
+    }
+
+    // ══════════════════════════════════════════════
+    // STANDALONE ISO BUILD
+    // ══════════════════════════════════════════════
+
+    private static string? FindOscdimg()
+    {
+        // Check common Windows ADK paths
+        string[] candidates = [
+            @"C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe",
+            @"C:\Program Files\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe",
+            @"C:\Program Files (x86)\Windows Kits\11\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg\oscdimg.exe",
+        ];
+        foreach (var p in candidates)
+            if (File.Exists(p)) return p;
+        // Check PATH
+        try
+        {
+            var proc = Process.Start(new ProcessStartInfo("where", "oscdimg.exe")
+            { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true });
+            var result = proc?.StandardOutput.ReadToEnd()?.Trim();
+            proc?.WaitForExit(3000);
+            if (!string.IsNullOrEmpty(result) && File.Exists(result.Split('\n')[0].Trim()))
+                return result.Split('\n')[0].Trim();
+        }
+        catch { }
+        return null;
+    }
+
+    private async Task RunStandaloneIsoBuild(IsoBuilderConfig config, string outputFolder)
+    {
+        var isWin11 = _isoPath != null && Path.GetFileName(_isoPath).ToLower().Contains("win11");
+        var isoFileName = $"AuraCore_{(isWin11 ? "Win11" : "Win10")}_{DateTime.Now:yyyyMMdd_HHmm}.iso";
+        var isoOutputPath = Path.Combine(outputFolder, isoFileName);
+        var tempDir = Path.Combine(Path.GetTempPath(), "AuraCoreISO_" + Guid.NewGuid().ToString("N")[..8]);
+
+        var total = 7;
+        if (config.ExePaths.Count > 0) total++;
+        if (config.IncludeDrivers && config.Drivers.Count > 0) total++;
+        var step = 0;
+
+        void Prog(string msg)
+        {
+            step++;
+            var pct = (int)((step / (double)total) * 100);
+            var elapsed = (DateTime.Now - _buildStartTime).TotalSeconds;
+            var remain = step > 0 ? (elapsed / step) * (total - step) : 0;
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                TerminalProgress.Value = pct;
+                TerminalStepText.Text = $"Step {step}/{total}";
+                TerminalTimeText.Text = $"Elapsed: {elapsed:F0}s | Remaining: ~{remain:F0}s";
+                LogTerminal(msg);
+            });
+        }
+
+        await Task.Run(async () =>
+        {
+            try
+            {
+                // Step 1: Find oscdimg
+                Prog($"[1] Checking oscdimg.exe...");
+                var oscdimg = FindOscdimg();
+                if (oscdimg == null)
+                {
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        LogTerminal("  oscdimg.exe not found, installing silently...");
+                        LogTerminal("  Downloading Windows ADK Deployment Tools...");
+                    });
+
+                    // Download ADK installer
+                    var adkInstaller = Path.Combine(Path.GetTempPath(), "adksetup.exe");
+                    try
+                    {
+                        using var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(5) };
+                        var adkUrl = "https://go.microsoft.com/fwlink/?linkid=2271337"; // ADK for Win11 24H2
+                        var bytes = await http.GetByteArrayAsync(adkUrl);
+                        await File.WriteAllBytesAsync(adkInstaller, bytes);
+                        DispatcherQueue.TryEnqueue(() => LogTerminal($"  Downloaded ({bytes.Length / (1024 * 1024)} MB)"));
+                    }
+                    catch (Exception dlEx)
+                    {
+                        DispatcherQueue.TryEnqueue(() =>
+                        {
+                            LogTerminal($"  Download failed: {dlEx.Message}");
+                            LogTerminal("  Falling back to extracted folder output...");
+                        });
+                    }
+
+                    // Silent install Deployment Tools only
+                    if (File.Exists(adkInstaller))
+                    {
+                        DispatcherQueue.TryEnqueue(() => LogTerminal("  Installing ADK Deployment Tools (silent, ~2 min)..."));
+                        var psi = new ProcessStartInfo(adkInstaller,
+                            "/quiet /norestart /features OptionId.DeploymentTools /ceip off")
+                        {
+                            UseShellExecute = true,
+                            Verb = IsAdmin() ? "" : "runas",
+                            CreateNoWindow = true
+                        };
+                        try
+                        {
+                            using var proc = Process.Start(psi);
+                            proc?.WaitForExit(300_000); // 5 min timeout
+                            if (proc?.ExitCode == 0)
+                            {
+                                DispatcherQueue.TryEnqueue(() => LogTerminal("  ADK installed successfully!"));
+                            }
+                            else
+                            {
+                                DispatcherQueue.TryEnqueue(() => LogTerminal($"  ADK install exit code: {proc?.ExitCode}"));
+                            }
+                        }
+                        catch (Exception instEx)
+                        {
+                            DispatcherQueue.TryEnqueue(() => LogTerminal($"  Install error: {instEx.Message}"));
+                        }
+                        try { File.Delete(adkInstaller); } catch { }
+
+                        // Re-check
+                        oscdimg = FindOscdimg();
+                        if (oscdimg != null)
+                            DispatcherQueue.TryEnqueue(() => LogTerminal($"  oscdimg ready: {oscdimg}"));
+                        else
+                            DispatcherQueue.TryEnqueue(() => LogTerminal("  oscdimg still not found, falling back to folder output..."));
+                    }
+                }
+                else
+                {
+                    DispatcherQueue.TryEnqueue(() => LogTerminal($"  Found: {oscdimg}"));
+                }
+
+                // Step 2: Mount source ISO
+                Prog($"[{step + 1}] Mounting source ISO...");
+                var mountScript =
+                    $"try{{Dismount-DiskImage -ImagePath '{_isoPath}' -EA SilentlyContinue}}catch{{}};" +
+                    $"Start-Sleep 1;" +
+                    $"(Mount-DiskImage -ImagePath '{_isoPath}' -PassThru|Get-Volume).DriveLetter";
+                var mountLetter = (await RunPowershell(mountScript)).Trim();
+                if (string.IsNullOrEmpty(mountLetter) || mountLetter.Length > 2)
+                {
+                    DispatcherQueue.TryEnqueue(() => LogTerminal($"  ERROR: Could not mount ISO. Output: {mountLetter}"));
+                    return;
+                }
+                DispatcherQueue.TryEnqueue(() => LogTerminal($"  Mounted at {mountLetter}:\\"));
+
+                // Step 3: Copy ISO contents to temp
+                Prog($"[{step + 1}] Copying ISO contents to temp (this may take a few minutes)...");
+                Directory.CreateDirectory(tempDir);
+                await RunPowershell($"Copy-Item -Path '{mountLetter}:\\*' -Destination '{tempDir}' -Recurse -Force");
+                // Remove read-only attributes (ISO files are read-only)
+                await RunPowershell($"Get-ChildItem '{tempDir}' -Recurse | ForEach-Object {{ $_.Attributes = 'Normal' }}");
+                DispatcherQueue.TryEnqueue(() => LogTerminal($"  Files copied to temp"));
+
+                // Step 4: Generate autounattend.xml
+                Prog($"[{step + 1}] Generating autounattend.xml...");
+                var xml = IsoBuilderService.GenerateUnattendXml(config);
+                await File.WriteAllTextAsync(Path.Combine(tempDir, "autounattend.xml"), xml, Encoding.UTF8);
+                DispatcherQueue.TryEnqueue(() => LogTerminal($"  autounattend.xml ({xml.Length:N0} bytes)"));
+
+                // Step 5: Generate PostInstall scripts
+                Prog($"[{step + 1}] Generating PostInstall scripts...");
+                var script = IsoBuilderService.GeneratePostInstallScript(config);
+                await File.WriteAllTextAsync(Path.Combine(tempDir, "PostInstall.ps1"), script, Encoding.UTF8);
+                await File.WriteAllTextAsync(Path.Combine(tempDir, "RunPostInstall.bat"),
+                    "@echo off\r\necho AuraCore Pro Post-Install\r\n" +
+                    "powershell.exe -ExecutionPolicy Bypass -File \"%~dp0PostInstall.ps1\"\r\npause",
+                    Encoding.UTF8);
+                DispatcherQueue.TryEnqueue(() => LogTerminal($"  PostInstall.ps1 + bat"));
+
+                // Step 6: Bundle EXEs
+                if (config.ExePaths.Count > 0)
+                {
+                    Prog($"[{step + 1}] Bundling {config.ExePaths.Count} installer(s)...");
+                    var exeDir = Path.Combine(tempDir, "AuraCoreInstallers");
+                    Directory.CreateDirectory(exeDir);
+                    foreach (var p in config.ExePaths)
+                    {
+                        if (File.Exists(p))
+                        {
+                            File.Copy(p, Path.Combine(exeDir, Path.GetFileName(p)), true);
+                            var fn = Path.GetFileName(p);
+                            DispatcherQueue.TryEnqueue(() => LogTerminal($"  + {fn}"));
+                        }
+                    }
+                }
+
+                // Step 7: Export drivers
+                if (config.IncludeDrivers && config.Drivers.Count > 0)
+                {
+                    Prog($"[{step + 1}] Exporting {config.Drivers.Count} selected driver(s)...");
+                    var drvDir = Path.Combine(tempDir, "AuraCoreDrivers");
+                    Directory.CreateDirectory(drvDir);
+                    var exported = 0;
+                    foreach (var drv in config.Drivers)
+                    {
+                        if (!string.IsNullOrEmpty(drv.DriverFile))
+                        {
+                            try
+                            {
+                                await RunPowershell($"pnputil /export-driver \"{drv.DriverFile}\" \"{drvDir}\"");
+                                exported++;
+                                var dn = drv.DeviceName ?? drv.DriverFile;
+                                DispatcherQueue.TryEnqueue(() => LogTerminal($"  + {dn}"));
+                            }
+                            catch { }
+                        }
+                    }
+                    DispatcherQueue.TryEnqueue(() => LogTerminal($"  {exported} drivers exported"));
+                }
+
+                // Step 8: Unmount source ISO
+                Prog($"[{step + 1}] Unmounting source ISO...");
+                try { await RunPowershell($"Dismount-DiskImage -ImagePath '{_isoPath}'"); } catch { }
+                DispatcherQueue.TryEnqueue(() => LogTerminal("  Unmounted"));
+
+                // Step 9: Create bootable ISO with oscdimg
+                if (oscdimg != null)
+                {
+                    Prog($"[{step + 1}] Creating bootable ISO ({isoFileName})...");
+                    // UEFI boot: etfsboot.com (BIOS) + efisys_noprompt.bin (UEFI)
+                    var bootDir = Path.Combine(tempDir, "boot");
+                    var efiBootDir = Path.Combine(tempDir, "efi", "microsoft", "boot");
+                    var etfsBoot = Path.Combine(bootDir, "etfsboot.com");
+                    var efiBoot = Path.Combine(efiBootDir, "efisys_noprompt.bin");
+                    // Fallback to efisys.bin if noprompt version doesn't exist
+                    if (!File.Exists(efiBoot))
+                        efiBoot = Path.Combine(efiBootDir, "efisys.bin");
+
+                    string oscdimgArgs;
+                    if (File.Exists(etfsBoot) && File.Exists(efiBoot))
+                    {
+                        // Dual boot: BIOS + UEFI
+                        oscdimgArgs = $"-m -o -u2 -udfver102 " +
+                            $"-bootdata:2#p0,e,b\"{etfsBoot}\"#pEF,e,b\"{efiBoot}\" " +
+                            $"\"{tempDir}\" \"{isoOutputPath}\"";
+                    }
+                    else if (File.Exists(efiBoot))
+                    {
+                        // UEFI only
+                        oscdimgArgs = $"-m -o -u2 -udfver102 " +
+                            $"-bootdata:1#pEF,e,b\"{efiBoot}\" " +
+                            $"\"{tempDir}\" \"{isoOutputPath}\"";
+                    }
+                    else
+                    {
+                        // No boot files found - create data ISO
+                        oscdimgArgs = $"-m -o -u2 -udfver102 \"{tempDir}\" \"{isoOutputPath}\"";
+                        DispatcherQueue.TryEnqueue(() => LogTerminal("  WARNING: Boot files not found in ISO. Creating non-bootable ISO."));
+                    }
+
+                    var psi = new ProcessStartInfo(oscdimg, oscdimgArgs)
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var proc = Process.Start(psi);
+                    var stdout = proc?.StandardOutput.ReadToEndAsync();
+                    var stderr = proc?.StandardError.ReadToEndAsync();
+                    proc?.WaitForExit(300_000); // 5 min timeout
+
+                    var errOut = stderr?.Result?.Trim() ?? "";
+                    if (proc?.ExitCode == 0 && File.Exists(isoOutputPath))
+                    {
+                        var isoSize = new FileInfo(isoOutputPath).Length / (1024.0 * 1024.0);
+                        DispatcherQueue.TryEnqueue(() =>
+                        {
+                            LogTerminal($"  ISO created: {isoSize:F0} MB");
+                            LogTerminal($"  Path: {isoOutputPath}");
+                        });
+                    }
+                    else
+                    {
+                        DispatcherQueue.TryEnqueue(() =>
+                        {
+                            LogTerminal($"  ERROR: oscdimg failed (exit {proc?.ExitCode})");
+                            if (!string.IsNullOrEmpty(errOut)) LogTerminal($"  {errOut[..Math.Min(errOut.Length, 200)]}");
+                            LogTerminal($"  Extracted files available at: {tempDir}");
+                        });
+                        return; // Don't delete temp on failure
+                    }
+                }
+                else
+                {
+                    // No oscdimg - just copy extracted+modified folder to output
+                    Prog($"[{step + 1}] Copying modified files to output...");
+                    var outDir = Path.Combine(outputFolder, $"AuraCore_{(isWin11 ? "Win11" : "Win10")}_{DateTime.Now:yyyyMMdd_HHmm}");
+                    Directory.CreateDirectory(outDir);
+                    await RunPowershell($"Copy-Item -Path '{tempDir}\\*' -Destination '{outDir}' -Recurse -Force");
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        LogTerminal($"  Modified files saved to: {outDir}");
+                        LogTerminal($"  To create ISO, install Windows ADK and run:");
+                        LogTerminal($"  oscdimg -m -o -u2 -udfver102 \"{outDir}\" \"{isoOutputPath}\"");
+                    });
+                }
+
+                // Cleanup temp
+                try { Directory.Delete(tempDir, true); } catch { }
+
+                var totalElapsed = (DateTime.Now - _buildStartTime).TotalSeconds;
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    LogTerminal($"\n=== BUILD COMPLETE ===");
+                    LogTerminal($"  Time: {totalElapsed:F1}s");
+                    LogTerminal($"  Output: {(oscdimg != null ? isoOutputPath : outputFolder)}");
+                    LogTerminal($"  Use with Ventoy or mount directly");
+                    LogTerminal($"\n  Powered by AuraCore Pro");
+                    TerminalProgress.Value = 100;
+                    TerminalStepText.Text = "BUILD SUCCESSFUL";
+                    TerminalTimeText.Text = $"Completed in {totalElapsed:F1}s";
+                });
+            }
+            catch (Exception ex)
+            {
+                // Cleanup on error
+                try { await RunPowershell($"Dismount-DiskImage -ImagePath '{_isoPath}' -EA SilentlyContinue"); } catch { }
+                try { if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true); } catch { }
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    LogTerminal($"\n[FATAL] {ex.Message}");
+                    TerminalStepText.Text = "BUILD FAILED";
+                });
+            }
         });
     }
 
@@ -1342,6 +1708,7 @@ public sealed partial class IsoBuilderPage : Page
             if (FindName("S12Desc") is TextBlock s12d) s12d.Text = S._("iso.s12.desc");
             if (FindName("OutputFormatLabel") is TextBlock ofl) ofl.Text = S._("iso.s12.outputFormat");
             OutputUnattendOnly.Content = S._("iso.s12.filesOnly");
+            OutputStandaloneIso.Content = S._("iso.s12.standaloneIso");
             OutputUsbWrite.Content = S._("iso.s12.usbWrite");
             if (FindName("BuildSummaryLabel") is TextBlock bsl) bsl.Text = S._("iso.s12.buildSummary");
             DisclaimerCheck.Content = S._("iso.s12.acceptRisks");
@@ -1758,7 +2125,7 @@ public sealed class DriverItem
     public string DriverFile { get; set; } = "";
     public string Version { get; set; } = "";
     public string DeviceName { get; set; } = "";
-    public bool Selected { get; set; } = true;
+    public bool Selected { get; set; } = false; // Default off — user selects what they need
 }
 
 public sealed class DriverJsonItem

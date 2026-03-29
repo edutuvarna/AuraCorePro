@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
             <StackPanel Spacing="4">
                 <TextBlock x:Name="PageTitle" Text="Context Menu Customizer" Style="{StaticResource TitleTextBlockStyle}" />
@@ -26,7 +26,7 @@
             <!-- Classic Menu Toggle -->
             <Border x:Name="ClassicMenuCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -53,7 +53,7 @@
             <!-- Result -->
             <Border x:Name="ResultCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="4">
                     <TextBlock x:Name="ResultTitle" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="#2E7D32" />
                     <TextBlock x:Name="ResultDetail" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />

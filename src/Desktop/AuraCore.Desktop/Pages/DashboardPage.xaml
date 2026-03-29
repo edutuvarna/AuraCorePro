@@ -4,131 +4,198 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer Padding="32">
         <StackPanel Spacing="24" MaxWidth="900">
+            <StackPanel.ChildrenTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition FromVerticalOffset="40" IsStaggeringEnabled="True" />
+                </TransitionCollection>
+            </StackPanel.ChildrenTransitions>
 
-            <StackPanel Spacing="4">
-                <TextBlock x:Name="PageTitle" Text="Dashboard" Style="{StaticResource TitleTextBlockStyle}" />
-                <TextBlock x:Name="WelcomeText" Text="AI Powered Windows Intelligence"
-                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
+            <!-- Header with greeting -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="PageTitle" Text="Dashboard" FontSize="28" FontWeight="Bold" />
+                    <TextBlock x:Name="WelcomeText" Text="AI Powered Windows Intelligence"
+                               FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+                <Border Grid.Column="1" Background="#1A10B981" CornerRadius="20" Padding="12,6" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Ellipse Width="8" Height="8" Fill="#10B981" />
+                        <TextBlock x:Name="LiveIndicator" Text="LIVE" FontSize="11" FontWeight="SemiBold" Foreground="#10B981" />
+                    </StackPanel>
+                </Border>
+            </Grid>
 
-            <!-- Live Stats -->
+            <!-- Live Stats - Accent Stripe Cards -->
             <Grid ColumnSpacing="12" RowSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <!-- CPU Card -->
                 <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE950;" FontSize="14" Foreground="#3B82F6" />
-                            <TextBlock Text="CPU" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        CornerRadius="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Grid>
+                        <Border Background="#3B82F6" Width="4" CornerRadius="12,0,0,12" HorizontalAlignment="Left" />
+                        <StackPanel Padding="20,16,16,16" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#1A3B82F6" CornerRadius="8" Padding="6">
+                                    <FontIcon Glyph="&#xE950;" FontSize="13" Foreground="#3B82F6" />
+                                </Border>
+                                <TextBlock Text="CPU" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="CpuText" Text="--%" FontSize="26" FontWeight="Bold" />
+                            <ProgressBar x:Name="CpuBar" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#3B82F6" />
+                            <TextBlock x:Name="CpuDetail" Text="" FontSize="11" Opacity="0.4" />
                         </StackPanel>
-                        <TextBlock x:Name="CpuText" Text="--%" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <ProgressBar x:Name="CpuBar" Minimum="0" Maximum="100" Height="6" CornerRadius="3" Foreground="#3B82F6" />
-                        <TextBlock x:Name="CpuDetail" Text="" FontSize="11" Opacity="0.5" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
+                <!-- RAM Card -->
                 <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE964;" FontSize="14" Foreground="#8B5CF6" />
-                            <TextBlock Text="RAM" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        CornerRadius="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Grid>
+                        <Border Background="#8B5CF6" Width="4" CornerRadius="12,0,0,12" HorizontalAlignment="Left" />
+                        <StackPanel Padding="20,16,16,16" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#1A8B5CF6" CornerRadius="8" Padding="6">
+                                    <FontIcon Glyph="&#xE964;" FontSize="13" Foreground="#8B5CF6" />
+                                </Border>
+                                <TextBlock Text="RAM" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="RamText" Text="--%" FontSize="26" FontWeight="Bold" />
+                            <ProgressBar x:Name="RamBar" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#8B5CF6" />
+                            <TextBlock x:Name="RamDetail" Text="" FontSize="11" Opacity="0.4" />
                         </StackPanel>
-                        <TextBlock x:Name="RamText" Text="--%" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <ProgressBar x:Name="RamBar" Minimum="0" Maximum="100" Height="6" CornerRadius="3" Foreground="#8B5CF6" />
-                        <TextBlock x:Name="RamDetail" Text="" FontSize="11" Opacity="0.5" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
+                <!-- Disk Card -->
                 <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xEDA2;" FontSize="14" Foreground="#F59E0B" />
-                            <TextBlock Text="Disk (C:)" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        CornerRadius="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Grid>
+                        <Border Background="#F59E0B" Width="4" CornerRadius="12,0,0,12" HorizontalAlignment="Left" />
+                        <StackPanel Padding="20,16,16,16" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#1AF59E0B" CornerRadius="8" Padding="6">
+                                    <FontIcon Glyph="&#xEDA2;" FontSize="13" Foreground="#F59E0B" />
+                                </Border>
+                                <TextBlock Text="Disk (C:)" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="DiskText" Text="--%" FontSize="26" FontWeight="Bold" />
+                            <ProgressBar x:Name="DiskBar" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#F59E0B" />
+                            <TextBlock x:Name="DiskDetail" Text="" FontSize="11" Opacity="0.4" />
                         </StackPanel>
-                        <TextBlock x:Name="DiskText" Text="--%" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <ProgressBar x:Name="DiskBar" Minimum="0" Maximum="100" Height="6" CornerRadius="3" Foreground="#F59E0B" />
-                        <TextBlock x:Name="DiskDetail" Text="" FontSize="11" Opacity="0.5" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
 
+                <!-- GPU Card -->
                 <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                    <StackPanel Spacing="6">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE95E;" FontSize="14" Foreground="#10B981" />
-                            <TextBlock Text="Health" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        CornerRadius="12" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    <Grid>
+                        <Border Background="#EC4899" Width="4" CornerRadius="12,0,0,12" HorizontalAlignment="Left" />
+                        <StackPanel Padding="20,16,16,16" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Background="#1AEC4899" CornerRadius="8" Padding="6">
+                                    <FontIcon Glyph="&#xE7F4;" FontSize="13" Foreground="#EC4899" />
+                                </Border>
+                                <TextBlock Text="GPU" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock x:Name="GpuText" Text="--" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                            
+                            <TextBlock x:Name="GpuDetail" Text="" FontSize="11" Opacity="0.4" TextTrimming="CharacterEllipsis" />
                         </StackPanel>
-                        <TextBlock x:Name="HealthText" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <ProgressBar x:Name="HealthBar" Minimum="0" Maximum="100" Height="6" CornerRadius="3" Foreground="#10B981" />
-                        <TextBlock x:Name="HealthDetail" Text="" FontSize="11" Opacity="0.5" />
-                    </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
 
-            <!-- System Info -->
+            <!-- System Info - Two Column Grid -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="System Information" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="OsText" FontSize="13" Opacity="0.7" />
-                    <TextBlock x:Name="CpuNameText" FontSize="13" Opacity="0.7" />
-                    <TextBlock x:Name="RamTotalText" FontSize="13" Opacity="0.7" />
-                    <TextBlock x:Name="UptimeText" FontSize="13" Opacity="0.7" />
+                    CornerRadius="12" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="14">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Background="#1A06B6D4" CornerRadius="8" Padding="6">
+                            <FontIcon Glyph="&#xE7F7;" FontSize="13" Foreground="#06B6D4" />
+                        </Border>
+                        <TextBlock Text="System Information" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <Grid ColumnSpacing="24" RowSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Operating System" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                            <TextBlock x:Name="OsText" FontSize="13" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Processor" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                            <TextBlock x:Name="CpuNameText" FontSize="13" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Memory" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                            <TextBlock x:Name="RamTotalText" FontSize="13" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Uptime" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                            <TextBlock x:Name="UptimeText" FontSize="13" />
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Border>
 
             <!-- AI Tip -->
             <Border x:Name="AiTipCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="12" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <Grid ColumnSpacing="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <FontIcon x:Name="AiTipIcon" Grid.Column="0" Glyph="&#xE99A;" FontSize="24" VerticalAlignment="Center" />
+                    <Border Grid.Column="0" Background="#1AE99A2E" CornerRadius="12" Padding="10" VerticalAlignment="Center">
+                        <FontIcon x:Name="AiTipIcon" Glyph="&#xE99A;" FontSize="20" Foreground="#E99A2E" />
+                    </Border>
                     <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
                         <TextBlock x:Name="AiTipTitle" Text="" FontWeight="SemiBold" FontSize="14" />
-                        <TextBlock x:Name="AiTipDesc" Text="" FontSize="12" Opacity="0.7" TextWrapping="Wrap" />
+                        <TextBlock x:Name="AiTipDesc" Text="" FontSize="12" Opacity="0.6" TextWrapping="Wrap" />
                     </StackPanel>
                     <Button x:Name="AiTipAction" Grid.Column="2" Content="Fix" Padding="16,8"
-                            VerticalAlignment="Center" Click="AiTipAction_Click" Visibility="Collapsed" />
+                            VerticalAlignment="Center" Click="AiTipAction_Click" Visibility="Collapsed"
+                            Style="{StaticResource AccentButtonStyle}" CornerRadius="8" />
                 </Grid>
             </Border>
 
             <!-- Quick Actions -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <StackPanel Spacing="12">
+                    CornerRadius="12" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="14">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE945;" FontSize="16" Foreground="#06B6D4" />
-                        <TextBlock Text="Quick Actions" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <Border Background="#1A06B6D4" CornerRadius="8" Padding="6">
+                            <FontIcon Glyph="&#xE945;" FontSize="13" Foreground="#06B6D4" />
+                        </Border>
+                        <TextBlock Text="Quick Actions" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Click="QuickJunk_Click" Padding="16,10" CornerRadius="8">
+                        <Button x:Name="QuickCleanupBtn" Click="QuickCleanup_Click" Padding="16,10" CornerRadius="8">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE74D;" FontSize="14" />
-                                <TextBlock Text="Scan Junk" />
+                                <TextBlock x:Name="QuickCleanupText" Text="Deep Cleanup" />
                             </StackPanel>
                         </Button>
                         <Button Click="QuickRam_Click" Padding="16,10" CornerRadius="8">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE964;" FontSize="14" />
                                 <TextBlock Text="Optimize RAM" />
-                            </StackPanel>
-                        </Button>
-                        <Button Click="QuickHealth_Click" Padding="16,10" CornerRadius="8"
-                                Style="{StaticResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE95E;" FontSize="14" />
-                                <TextBlock Text="Health Scan" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -140,33 +207,37 @@
             <!-- Disk Full Prediction -->
             <Border x:Name="DiskPredictionCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="12" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="12">
-                    <FontIcon Glyph="&#xEDA2;" FontSize="20" Foreground="#F59E0B" />
-                    <StackPanel Spacing="2">
+                    <Border Background="#1AF59E0B" CornerRadius="10" Padding="8">
+                        <FontIcon Glyph="&#xEDA2;" FontSize="18" Foreground="#F59E0B" />
+                    </Border>
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
                         <TextBlock Text="Disk Space Prediction" FontWeight="SemiBold" FontSize="13" />
-                        <TextBlock x:Name="DiskPredictionText" Text="" FontSize="12" Opacity="0.7" />
+                        <TextBlock x:Name="DiskPredictionText" Text="" FontSize="12" Opacity="0.6" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Recent Activity Log -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <StackPanel Spacing="10">
+                    CornerRadius="12" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel Spacing="12">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE9D5;" FontSize="16" Foreground="#8B5CF6" />
-                        <TextBlock Text="Recent Activity" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <Border Background="#1A8B5CF6" CornerRadius="8" Padding="6">
+                            <FontIcon Glyph="&#xE9D5;" FontSize="13" Foreground="#8B5CF6" />
+                        </Border>
+                        <TextBlock Text="Recent Activity" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel x:Name="ActivityLogPanel" Spacing="4">
-                        <TextBlock Text="No recent activity" FontSize="12" Opacity="0.4" />
+                        <TextBlock Text="No recent activity" FontSize="12" Opacity="0.3" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Live indicator -->
-            <TextBlock x:Name="LiveText" Text="Live — updating every 3 seconds"
-                       FontSize="11" Opacity="0.3" HorizontalAlignment="Center" />
+            <TextBlock x:Name="LiveText" Text="Live - updating every 3 seconds"
+                       FontSize="11" Opacity="0.2" HorizontalAlignment="Center" />
 
         </StackPanel>
     </ScrollViewer>

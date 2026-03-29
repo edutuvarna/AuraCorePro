@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
             <StackPanel Spacing="4">
                 <TextBlock x:Name="PageTitle" Text="Storage Compression" Style="{StaticResource TitleTextBlockStyle}" />
@@ -26,7 +26,7 @@
             <!-- Summary -->
             <Border x:Name="SummaryCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <Grid ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
@@ -59,7 +59,7 @@
             <!-- HDD Warning -->
             <Border x:Name="HddWarning" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="16" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <FontIcon Glyph="&#xE7BA;" FontSize="18" Foreground="#E65100" />
                     <TextBlock x:Name="HddWarningText" FontSize="12" Foreground="#E65100" TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -69,7 +69,7 @@
             <!-- CompactOS Toggle -->
             <Border x:Name="CompactOsCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
@@ -90,7 +90,7 @@
             <!-- Result -->
             <Border x:Name="ResultCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="4">
                     <TextBlock x:Name="ResultTitle" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="#2E7D32" />
                     <TextBlock x:Name="ResultDetail" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

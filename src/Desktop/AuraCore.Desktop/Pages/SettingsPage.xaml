@@ -5,7 +5,12 @@
     <ScrollViewer Padding="32">
         <StackPanel Spacing="20" MaxWidth="700">
 
-            <TextBlock x:Name="PageTitle" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+            <StackPanel Spacing="2">
+                <TextBlock x:Name="PageTitle" Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="PageSubtitle" Text="Preferences and account management"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
 
             <!-- Account -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"

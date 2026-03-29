@@ -3,61 +3,85 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
-            <StackPanel Spacing="4">
+            <!-- HEADER -->
+            <StackPanel Spacing="2">
                 <TextBlock x:Name="PageTitle" Text="AI Recommendations" Style="{StaticResource TitleTextBlockStyle}" />
-                <TextBlock x:Name="PageSubtitle" Text="Smart analysis of your system — prioritized suggestions to improve performance, security, and health"
-                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock x:Name="PageSubtitle" Text="Smart analysis of your system - prioritized suggestions to improve performance, security, and health"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
+            <!-- ACTION BAR -->
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <Button x:Name="AnalyzeBtn" Content="Analyze My System" Click="AnalyzeBtn_Click"
                         Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
                 <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
                 <TextBlock x:Name="StatusText" Text="Click Analyze to get personalized recommendations"
-                           VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
-            <!-- Summary -->
+            <!-- SUMMARY CARDS -->
             <Border x:Name="SummaryCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <Grid ColumnSpacing="24">
+                    CornerRadius="10" Padding="20"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Spacing="2">
-                        <TextBlock Text="Critical" FontSize="11" Foreground="#C62828" />
-                        <TextBlock x:Name="CriticalCount" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#C62828" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="2">
-                        <TextBlock Text="High" FontSize="11" Foreground="#E65100" />
-                        <TextBlock x:Name="HighCount" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#E65100" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Spacing="2">
-                        <TextBlock Text="Medium" FontSize="11" Foreground="#1565C0" />
-                        <TextBlock x:Name="MediumCount" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#1565C0" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="3" Spacing="2">
-                        <TextBlock Text="Tips" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock x:Name="LowCount" Style="{StaticResource SubtitleTextBlockStyle}" />
-                    </StackPanel>
+
+                    <Border Grid.Column="0" Background="#14C62828" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="LblCritical" Text="Critical" FontSize="11" Foreground="#FFC62828"/>
+                            <TextBlock x:Name="CriticalCount" FontSize="20" FontWeight="SemiBold" Foreground="#FFC62828"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#14E65100" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="LblHigh" Text="High" FontSize="11" Foreground="#FFE65100"/>
+                            <TextBlock x:Name="HighCount" FontSize="20" FontWeight="SemiBold" Foreground="#FFE65100"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#141565C0" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="LblMedium" Text="Medium" FontSize="11" Foreground="#FF1565C0"/>
+                            <TextBlock x:Name="MediumCount" FontSize="20" FontWeight="SemiBold" Foreground="#FF1565C0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="LblTips" Text="Tips" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock x:Name="LowCount" FontSize="20" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
-            <!-- Recommendation List -->
+            <!-- RECOMMENDATION LIST -->
             <StackPanel x:Name="RecList" Spacing="8" />
 
-            <!-- All Good -->
+            <!-- ALL GOOD -->
             <Border x:Name="AllGoodCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="24" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="24"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="8" HorizontalAlignment="Center">
-                    <FontIcon Glyph="&#xE73E;" FontSize="36" Foreground="#2E7D32" HorizontalAlignment="Center" />
-                    <TextBlock Text="Your system looks great!" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" />
-                    <TextBlock Text="No critical issues found. Keep up the good work!" FontSize="13" Opacity="0.6" HorizontalAlignment="Center" />
+                    <FontIcon Glyph="&#xE73E;" FontSize="36" Foreground="#FF2E7D32" HorizontalAlignment="Center" />
+                    <TextBlock x:Name="AllGoodTitle" Text="Your system looks great!"
+                               FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" />
+                    <TextBlock x:Name="AllGoodDesc" Text="No critical issues found. Keep up the good work!"
+                               FontSize="13" Opacity="0.6" HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>
 

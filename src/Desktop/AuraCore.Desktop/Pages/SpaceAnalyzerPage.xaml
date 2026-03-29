@@ -5,62 +5,86 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
-            <StackPanel Spacing="4">
+            <!-- HEADER -->
+            <StackPanel Spacing="2">
                 <TextBlock x:Name="PageTitle" Text="Space Analyzer" Style="{StaticResource TitleTextBlockStyle}" />
-                <TextBlock x:Name="PageSubtitle" Text="Visualize disk usage — find what's eating your storage"
-                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock x:Name="PageSubtitle" Text="Visualize disk usage - find what is eating your storage"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
+            <!-- ACTION BAR -->
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <ComboBox x:Name="DriveSelector" PlaceholderText="Select drive" Width="160" />
                 <Button x:Name="ScanBtn" Content="Analyze Drive" Click="ScanBtn_Click"
                         Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
                 <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
                 <TextBlock x:Name="StatusText" Text="Select a drive and click Analyze"
-                           VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
-            <!-- Drive summary -->
+            <!-- SUMMARY CARDS -->
             <Border x:Name="SummaryCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                <Grid ColumnSpacing="24">
+                    CornerRadius="10" Padding="20"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Spacing="2">
-                        <TextBlock Text="Total Size" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock x:Name="TotalSizeText" Style="{StaticResource SubtitleTextBlockStyle}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="2">
-                        <TextBlock Text="Used" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock x:Name="UsedSizeText" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#E65100" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Spacing="2">
-                        <TextBlock Text="Free" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock x:Name="FreeSizeText" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="#2E7D32" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="3" Spacing="2">
-                        <TextBlock Text="Folders Scanned" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock x:Name="FolderCountText" Style="{StaticResource SubtitleTextBlockStyle}" />
-                    </StackPanel>
+
+                    <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Total Size" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock x:Name="TotalSizeText" FontSize="20" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#14E65100" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Used" FontSize="11" Foreground="#FFE65100"/>
+                            <TextBlock x:Name="UsedSizeText" FontSize="20" FontWeight="SemiBold" Foreground="#FFE65100"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#142E7D32" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Free" FontSize="11" Foreground="#FF2E7D32"/>
+                            <TextBlock x:Name="FreeSizeText" FontSize="20" FontWeight="SemiBold" Foreground="#FF2E7D32"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Folders" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock x:Name="FolderCountText" FontSize="20" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
             <!-- Usage bar -->
-            <ProgressBar x:Name="UsageBar" Minimum="0" Maximum="100" Height="12" CornerRadius="6" Visibility="Collapsed" />
+            <ProgressBar x:Name="UsageBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" Visibility="Collapsed" />
 
-            <!-- Breadcrumb navigation for drill-down -->
+            <!-- Breadcrumb navigation -->
             <StackPanel x:Name="BreadcrumbBar" Orientation="Horizontal" Spacing="4" Visibility="Collapsed" />
 
             <!-- Tree map -->
             <TextBlock x:Name="TreeMapHeader" Text="" Visibility="Collapsed" Style="{StaticResource BodyStrongTextBlockStyle}" />
             <Border x:Name="TreeMapContainer" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="4" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                    CornerRadius="10" Padding="4"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
                     MinHeight="300">
                 <Canvas x:Name="TreeMapCanvas" />
             </Border>
@@ -69,7 +93,7 @@
             <TextBlock x:Name="FileTypesHeader" Text="" Visibility="Collapsed" Style="{StaticResource BodyStrongTextBlockStyle}" />
             <StackPanel x:Name="FileTypesList" Spacing="4" Visibility="Collapsed" />
 
-            <!-- Top folders list -->
+            <!-- Top folders -->
             <TextBlock x:Name="TopFoldersHeader" Text="" Visibility="Collapsed" Style="{StaticResource BodyStrongTextBlockStyle}" />
             <StackPanel x:Name="TopFoldersList" Spacing="4" />
 

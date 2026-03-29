@@ -269,105 +269,130 @@ public sealed partial class RamOptimizerPage : Page
     private Grid CreateProcessRow(string name, string memory, string category,
         bool isHeader = false, bool isEssential = false, int pid = 0)
     {
+        Brush? headerBg = null;
+        Brush? rowBorder = null;
+        try { headerBg = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["CardBackgroundFillColorSecondaryBrush"]; } catch { }
+        try { rowBorder = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["CardStrokeColorDefaultBrush"]; } catch { }
+
         var grid = new Grid
         {
             Padding = new Thickness(12, 8, 12, 8),
-            ColumnSpacing = 8,
-            Background = isHeader
-                ? (Brush)Microsoft.UI.Xaml.Application.Current.Resources["CardBackgroundFillColorSecondaryBrush"]
-                : null,
+            ColumnSpacing = 12,
+            Background = isHeader ? headerBg : null,
             CornerRadius = isHeader ? new CornerRadius(6) : new CornerRadius(0),
-            BorderBrush = isHeader ? null : (Brush)Microsoft.UI.Xaml.Application.Current.Resources["CardStrokeColorDefaultBrush"],
+            BorderBrush = isHeader ? null : rowBorder,
             BorderThickness = isHeader ? new Thickness(0) : new Thickness(0, 0, 0, 0.5),
             Tag = isHeader ? null : (object)pid
         };
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(3, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) }); // sparkline
-        if (!isHeader)
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // end btn
+        // Fixed 5-column layout for ALL rows (header + data)
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(3, GridUnitType.Star) }); // 0: Process name
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });                  // 1: Memory
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });                  // 2: Category
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });                   // 3: Trend/Sparkline
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(50) });                   // 4: End btn
 
+        // Col 0: Process name
         var nameText = new TextBlock
         {
             Text = name,
             FontWeight = isHeader ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal,
             FontSize = isHeader ? 12 : 13,
             VerticalAlignment = VerticalAlignment.Center,
+            TextTrimming = TextTrimming.CharacterEllipsis,
             Opacity = isEssential ? 0.5 : 1.0
         };
         Grid.SetColumn(nameText, 0);
         grid.Children.Add(nameText);
 
+        // Col 1: Memory (right-aligned)
         var memText = new TextBlock
         {
             Text = memory,
             FontWeight = isHeader ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal,
             FontSize = isHeader ? 12 : 13,
-            VerticalAlignment = VerticalAlignment.Center
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Right
         };
         Grid.SetColumn(memText, 1);
         grid.Children.Add(memText);
 
-        // Category badge
-        var catBorder = new Border
+        // Col 2: Category badge (center-aligned)
+        if (isHeader)
         {
-            CornerRadius = new CornerRadius(4),
-            Padding = new Thickness(8, 2, 8, 2),
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Background = isHeader ? null : GetCategoryBrush(category)
-        };
-        var catText = new TextBlock
+            var catLabel = new TextBlock
+            {
+                Text = category, FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            Grid.SetColumn(catLabel, 2);
+            grid.Children.Add(catLabel);
+        }
+        else
         {
-            Text = category,
-            FontSize = 11,
-            FontWeight = isHeader ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal,
-            Opacity = isHeader ? 1.0 : 0.9
-        };
-        catBorder.Child = catText;
-        Grid.SetColumn(catBorder, 2);
-        grid.Children.Add(catBorder);
+            var catBorder = new Border
+            {
+                CornerRadius = new CornerRadius(4),
+                Padding = new Thickness(8, 2, 8, 2),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Background = GetCategoryBrush(category)
+            };
+            catBorder.Child = new TextBlock
+            {
+                Text = category, FontSize = 10,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Opacity = 0.9
+            };
+            Grid.SetColumn(catBorder, 2);
+            grid.Children.Add(catBorder);
+        }
 
-        // End process button (not for header or essential processes)
-        if (!isHeader && !isEssential && pid > 0)
+        // Col 3: Trend sparkline / header label
+        if (isHeader)
         {
-            // Sparkline canvas for trend
-            var spark = new Canvas { Width = 80, Height = 16, VerticalAlignment = VerticalAlignment.Center };
+            var trendH = new TextBlock
+            {
+                Text = "Trend", FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            Grid.SetColumn(trendH, 3);
+            grid.Children.Add(trendH);
+        }
+        else
+        {
+            var spark = new Canvas
+            {
+                Width = 80, Height = 16,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
             Grid.SetColumn(spark, 3);
             grid.Children.Add(spark);
 
-            // Pre-fill sparkline if tracking
             var trend = _tracker.GetTrend(pid);
             if (trend is not null && trend.Samples.Count >= 2)
                 RenderSparkline(spark, trend);
+        }
 
+        // Col 4: End button (data rows only, non-essential)
+        if (!isHeader && !isEssential && pid > 0)
+        {
             var endBtn = new Button
             {
                 Content = "End",
                 FontSize = 11,
-                Padding = new Thickness(10, 2, 10, 2),
+                Padding = new Thickness(8, 2, 8, 2),
                 VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 Tag = pid
             };
             endBtn.Click += EndProcess_Click;
             Grid.SetColumn(endBtn, 4);
             grid.Children.Add(endBtn);
-        }
-        else if (!isHeader)
-        {
-            // Still add sparkline for essential processes
-            var spark = new Canvas { Width = 80, Height = 16, VerticalAlignment = VerticalAlignment.Center };
-            Grid.SetColumn(spark, 3);
-            grid.Children.Add(spark);
-        }
-        else
-        {
-            // Header: trend label
-            var trendH = new TextBlock { Text = "Trend", FontSize = 12,
-                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center };
-            Grid.SetColumn(trendH, 3);
-            grid.Children.Add(trendH);
         }
 
         return grid;
@@ -378,12 +403,13 @@ public sealed partial class RamOptimizerPage : Page
         if (sender is not Button btn || btn.Tag is not int pid) return;
 
         Process? proc = null;
-        try { proc = Process.GetProcessById(pid); } catch { return; }
+        try { proc = Process.GetProcessById(pid); } catch { StatusText.Text = "Process no longer exists."; return; }
 
+        var procName = proc.ProcessName;
         var dialog = new ContentDialog
         {
             Title = "End process?",
-            Content = $"Are you sure you want to end \"{proc.ProcessName}\" (PID {pid})?\nUnsaved work in this application will be lost.",
+            Content = $"Are you sure you want to end \"{procName}\" (PID {pid})?\nUnsaved work in this application will be lost.",
             PrimaryButtonText = "End Process",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
@@ -392,14 +418,83 @@ public sealed partial class RamOptimizerPage : Page
 
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
 
+        var killed = false;
+
+        // Attempt 1: .NET Kill with entire process tree
         try
         {
-            proc.Kill();
-            StatusText.Text = $"Process \"{proc.ProcessName}\" ended.";
+            proc.Kill(entireProcessTree: true);
+            await proc.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(3));
+            killed = proc.HasExited;
         }
-        catch (Exception ex)
+        catch { }
+
+        // Attempt 2: taskkill /F /T /PID (force + tree)
+        if (!killed)
         {
-            StatusText.Text = $"Cannot end process: {ex.Message}";
+            try
+            {
+                var psi = new ProcessStartInfo("taskkill", $"/F /T /PID {pid}")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                var tk = Process.Start(psi);
+                if (tk != null)
+                {
+                    await tk.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(3));
+                    killed = tk.ExitCode == 0;
+                }
+            }
+            catch { }
+        }
+
+        // Attempt 3: taskkill /F /IM name.exe (kill ALL instances by name)
+        // Apps like Discord, Chrome, Teams run multiple processes
+        if (!killed || Process.GetProcessesByName(procName).Length > 0)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("taskkill", $"/F /IM {procName}.exe")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                var tk = Process.Start(psi);
+                if (tk != null)
+                {
+                    await tk.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(3));
+                    killed = true;
+                }
+            }
+            catch { }
+        }
+
+        // Verify - check if ANY instance of this process still exists
+        await Task.Delay(500); // brief wait for processes to fully exit
+        var remaining = Process.GetProcessesByName(procName).Length;
+        killed = remaining == 0;
+
+        if (killed)
+        {
+            StatusText.Text = $"Process \"{procName}\" ended.";
+            // Remove all rows matching this process name from the list
+            for (int i = ProcessList.Children.Count - 1; i >= 0; i--)
+            {
+                if (ProcessList.Children[i] is Grid g && g.Children.OfType<TextBlock>().FirstOrDefault() is TextBlock tb
+                    && tb.Text.StartsWith(procName, StringComparison.OrdinalIgnoreCase))
+                {
+                    ProcessList.Children.RemoveAt(i);
+                }
+            }
+        }
+        else
+        {
+            StatusText.Text = $"Cannot end \"{procName}\" - may require administrator privileges.";
         }
     }
 
@@ -418,9 +513,13 @@ public sealed partial class RamOptimizerPage : Page
 
     private void ApplyLocalization()
     {
-        if (FindName("PageTitle") is Microsoft.UI.Xaml.Controls.TextBlock title)
-            title.Text = S._("ram.title");
-        if (FindName("PageSubtitle") is Microsoft.UI.Xaml.Controls.TextBlock subtitle)
-            subtitle.Text = S._("ram.subtitle");
+        if (FindName("PageTitle") is TextBlock title) title.Text = S._("ram.title");
+        if (FindName("PageSubtitle") is TextBlock subtitle) subtitle.Text = S._("ram.subtitle");
+        if (FindName("ScanBtn") is Button scan) scan.Content = S._("ram.analyze");
+        if (FindName("OptimizeBtn") is Button opt) opt.Content = S._("ram.optimize");
+        if (FindName("LblTotalRam") is TextBlock lt) lt.Text = S._("ram.totalRam");
+        if (FindName("LblInUse") is TextBlock li) li.Text = S._("ram.inUse");
+        if (FindName("LblAvail") is TextBlock la) la.Text = S._("ram.available");
+        if (FindName("LblReclaim") is TextBlock lr) lr.Text = S._("ram.reclaimable");
     }
 }

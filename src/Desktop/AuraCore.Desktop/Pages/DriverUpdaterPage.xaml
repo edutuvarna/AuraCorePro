@@ -3,19 +3,21 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
-            <StackPanel Spacing="4">
+            <!-- HEADER -->
+            <StackPanel Spacing="2">
                 <TextBlock x:Name="PageTitle" Text="Driver Updater" Style="{StaticResource TitleTextBlockStyle}" />
                 <TextBlock x:Name="PageSubtitle" Text="Scan, analyze, and backup your system drivers"
-                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
             <InfoBar x:Name="AdminWarning" Title="Admin recommended for backup"
                      Message="Driver backup and Windows Update check require administrator privileges."
                      Severity="Informational" IsOpen="False" IsClosable="True" />
 
-            <!-- Action Buttons -->
+            <!-- ACTION BAR -->
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <Button x:Name="ScanBtn" Content="Scan Drivers" Click="ScanBtn_Click"
                         Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
@@ -24,38 +26,56 @@
                 <Button x:Name="DevMgrBtn" Content="Device Manager" Click="DevMgrBtn_Click" Padding="24,10" />
                 <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
                 <TextBlock x:Name="StatusText" Text="Click Scan to analyze your drivers"
-                           VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
-            <!-- Summary Banner -->
-            <Border x:Name="SummaryBanner" Visibility="Collapsed" CornerRadius="8" Padding="20" BorderThickness="1">
-                <Grid ColumnSpacing="24">
+            <!-- SUMMARY CARDS -->
+            <Border x:Name="SummaryBanner" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10" Padding="20"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="Total" FontSize="11" Opacity="0.5" />
-                        <TextBlock x:Name="TotalText" FontSize="22" FontWeight="Bold" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="2">
-                        <TextBlock Text="Current" FontSize="11" Opacity="0.5" />
-                        <TextBlock x:Name="CurrentText" FontSize="22" FontWeight="Bold" Foreground="#2E7D32" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Spacing="2">
-                        <TextBlock Text="Outdated" FontSize="11" Opacity="0.5" />
-                        <TextBlock x:Name="OutdatedText" FontSize="22" FontWeight="Bold" Foreground="#E65100" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="3" Spacing="2">
-                        <TextBlock Text="Problems" FontSize="11" Opacity="0.5" />
-                        <TextBlock x:Name="ProblemsText" FontSize="22" FontWeight="Bold" Foreground="#C62828" />
-                    </StackPanel>
+
+                    <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Total" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock x:Name="TotalText" FontSize="20" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#142E7D32" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Current" FontSize="11" Foreground="#FF2E7D32"/>
+                            <TextBlock x:Name="CurrentText" FontSize="20" FontWeight="SemiBold" Foreground="#FF2E7D32"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#14E65100" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Outdated" FontSize="11" Foreground="#FFE65100"/>
+                            <TextBlock x:Name="OutdatedText" FontSize="20" FontWeight="SemiBold" Foreground="#FFE65100"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Background="#14C62828" CornerRadius="8" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Problems" FontSize="11" Foreground="#FFC62828"/>
+                            <TextBlock x:Name="ProblemsText" FontSize="20" FontWeight="SemiBold" Foreground="#FFC62828"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
-            <!-- Filter Buttons -->
+            <!-- FILTER BAR -->
             <StackPanel x:Name="FilterBar" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
                 <Button x:Name="FilterAll" Content="All" Click="FilterAll_Click" Padding="12,4" FontSize="12" />
                 <Button x:Name="FilterOutdated" Content="Outdated" Click="FilterOutdated_Click" Padding="12,4" FontSize="12" />
@@ -63,24 +83,38 @@
                 <TextBlock x:Name="FilterCountText" VerticalAlignment="Center" FontSize="12" Opacity="0.5" Margin="8,0,0,0" />
             </StackPanel>
 
-            <!-- Driver List -->
+            <!-- DRIVER LIST -->
             <StackPanel x:Name="DriverList" Spacing="6" />
 
-            <!-- Backup Result -->
-            <Border x:Name="BackupResult" Visibility="Collapsed" CornerRadius="8" Padding="20" BorderThickness="1"
-                    Background="#1A2E7D32" BorderBrush="#332E7D32">
-                <StackPanel Spacing="4" HorizontalAlignment="Center">
-                    <TextBlock x:Name="BackupTitle" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" />
-                    <TextBlock x:Name="BackupDetail" FontSize="13" Opacity="0.6" HorizontalAlignment="Center" />
-                </StackPanel>
+            <!-- BACKUP RESULT -->
+            <Border x:Name="BackupResult" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10" Padding="16,14"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE73E;" FontSize="20" Foreground="#FF2E7D32"
+                              VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock x:Name="BackupTitle" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="#FF2E7D32"/>
+                        <TextBlock x:Name="BackupDetail" FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </Grid>
             </Border>
 
-            <!-- Windows Update Results -->
+            <!-- WINDOWS UPDATE RESULTS -->
             <Border x:Name="WinUpdateCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="16,14"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="8">
-                    <TextBlock x:Name="WinUpdateTitle" Text="Available Driver Updates" FontWeight="SemiBold" FontSize="15" />
+                    <TextBlock x:Name="WinUpdateTitle" Text="Available Driver Updates"
+                               FontWeight="SemiBold" FontSize="14" />
                     <StackPanel x:Name="WinUpdateList" Spacing="4" />
                 </StackPanel>
             </Border>

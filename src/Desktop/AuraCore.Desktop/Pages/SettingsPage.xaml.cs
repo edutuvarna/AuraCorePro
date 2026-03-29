@@ -38,6 +38,7 @@ public sealed partial class SettingsPage : Page
     private void ApplyLocalization()
     {
         PageTitle.Text = S._("settings.title");
+        if (FindName("PageSubtitle") is TextBlock sub) sub.Text = S._("settings.subtitle");
         AccountTitle.Text = S._("settings.account");
         LblEmail.Text = S._("settings.email");
         LblSubscription.Text = S._("settings.subscription");

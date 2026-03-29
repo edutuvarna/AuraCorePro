@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="960">
+        <StackPanel Spacing="16" MaxWidth="960">
 
             <StackPanel Spacing="4">
                 <TextBlock x:Name="PageTitle" Text="Network Optimizer" Style="{StaticResource TitleTextBlockStyle}" />
@@ -27,7 +27,7 @@
             <!-- Speed Test Result -->
             <Border x:Name="SpeedTestCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="12">
                     <TextBlock Text="Speed Test Results" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <Grid ColumnSpacing="24">
@@ -60,7 +60,7 @@
             <!-- Current DNS Card -->
             <Border x:Name="DnsCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="8">
                     <TextBlock Text="Current DNS" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <Grid ColumnSpacing="24">
@@ -91,7 +91,7 @@
             <!-- Ping Results -->
             <Border x:Name="PingCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="8">
                     <TextBlock Text="Connection Test" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <StackPanel x:Name="PingList" Spacing="6" />
@@ -102,7 +102,7 @@
             <!-- DNS Benchmark Result -->
             <Border x:Name="BenchmarkCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="10">
                     <TextBlock Text="DNS Benchmark Results" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <TextBlock x:Name="BenchmarkRecommendation" Text="" FontSize="14" TextWrapping="Wrap" />
@@ -117,7 +117,7 @@
             <!-- Custom DNS Input -->
             <Border x:Name="CustomDnsCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="12">
                     <TextBlock Text="Custom DNS" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <TextBlock Text="Enter your own DNS server addresses (IPv4 format)"
@@ -154,7 +154,7 @@
             <!-- Adapters -->
             <Border x:Name="AdapterCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <StackPanel Spacing="8">
                     <TextBlock Text="Network Adapters" Style="{StaticResource BodyStrongTextBlockStyle}" />
                     <StackPanel x:Name="AdapterList" Spacing="10" />
@@ -164,7 +164,7 @@
             <!-- Result -->
             <Border x:Name="ResultCard" Visibility="Collapsed"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                    CornerRadius="10" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                 <TextBlock x:Name="ResultText" Style="{StaticResource BodyTextBlockStyle}" Foreground="#2E7D32" />
             </Border>
 

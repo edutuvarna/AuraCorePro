@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -17,7 +18,7 @@ public sealed class UpdateChecker
     private readonly DispatcherTimer _timer;
     private static UpdateChecker? _instance;
 
-    public const string CurrentVersion = "1.5.0";
+    public const string CurrentVersion = "1.6.0";
     private const int CheckIntervalMinutes = 5;
     private const int MaxRetries = 3;
 
@@ -28,6 +29,8 @@ public sealed class UpdateChecker
     public bool IsMandatory { get; private set; }
     public string LatestVersion { get; private set; } = "";
     public string DownloadUrl { get; private set; } = "";
+    public string DeltaUrl { get; private set; } = "";
+    public long? DeltaSize { get; private set; }
     public string ReleaseNotes { get; private set; } = "";
     public bool IsChecking { get; private set; }
     public bool IsDownloading { get; private set; }
@@ -138,6 +141,8 @@ public sealed class UpdateChecker
             var downloadUrl = root.TryGetProperty("downloadUrl", out var dProp) ? dProp.GetString() ?? "" : "";
             var releaseNotes = root.TryGetProperty("releaseNotes", out var rProp) ? rProp.GetString() ?? "" : "";
             var mandatory = root.TryGetProperty("isMandatory", out var mProp) && mProp.GetBoolean();
+            var deltaUrl = root.TryGetProperty("deltaUrl", out var duProp) && duProp.ValueKind == JsonValueKind.String ? duProp.GetString() ?? "" : "";
+            var deltaSize = root.TryGetProperty("deltaSize", out var dsProp) && dsProp.ValueKind == JsonValueKind.Number ? dsProp.GetInt64() : (long?)null;
 
             if (!mandatory && version == _skippedVersion && !forceNotify)
             {
@@ -155,12 +160,16 @@ public sealed class UpdateChecker
             IsMandatory = mandatory;
             LatestVersion = version;
             DownloadUrl = downloadUrl;
+            DeltaUrl = deltaUrl;
+            DeltaSize = deltaSize;
             ReleaseNotes = releaseNotes;
 
             UpdateFound?.Invoke(new UpdateInfo
             {
                 Version = version,
                 DownloadUrl = downloadUrl,
+                DeltaUrl = deltaUrl,
+                DeltaSize = deltaSize,
                 ReleaseNotes = releaseNotes,
                 IsMandatory = mandatory
             });
@@ -269,6 +278,105 @@ public sealed class UpdateChecker
         }
     }
 
+    /// <summary>
+    /// Download and apply a delta update (small zip with only changed files).
+    /// Returns true if successful, false to fall back to full installer.
+    /// </summary>
+    public async Task<bool> DownloadAndApplyDeltaAsync()
+    {
+        if (string.IsNullOrEmpty(DeltaUrl)) return false;
+        IsDownloading = true;
+        DownloadProgress = 0;
+
+        try
+        {
+            // Download delta zip
+            var response = await Http.GetAsync(DeltaUrl, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+
+            var totalBytes = response.Content.Headers.ContentLength ?? DeltaSize ?? -1;
+            var tempDir = Path.Combine(Path.GetTempPath(), "AuraCorePro-Updates");
+            Directory.CreateDirectory(tempDir);
+            var zipPath = Path.Combine(tempDir, $"delta-v{LatestVersion}.zip");
+
+            using (var contentStream = await response.Content.ReadAsStreamAsync())
+            using (var fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            {
+                var buffer = new byte[8192];
+                long totalRead = 0;
+                int bytesRead;
+                while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                    totalRead += bytesRead;
+                    if (totalBytes > 0)
+                    {
+                        DownloadProgress = (double)totalRead / totalBytes * 100;
+                        DownloadProgressChanged?.Invoke(DownloadProgress);
+                    }
+                }
+            }
+
+            DownloadProgress = 80;
+            DownloadProgressChanged?.Invoke(80);
+
+            // Determine app directory
+            var appDir = AppContext.BaseDirectory;
+            var extractDir = Path.Combine(tempDir, $"delta-v{LatestVersion}");
+            if (Directory.Exists(extractDir)) Directory.Delete(extractDir, true);
+
+            // Extract zip
+            ZipFile.ExtractToDirectory(zipPath, extractDir, overwriteFiles: true);
+
+            // Create a batch script that:
+            // 1. Waits for app to close
+            // 2. Copies new files over the app directory
+            // 3. Relaunches the app
+            // 4. Cleans up
+            var appExe = Path.Combine(appDir, "AuraCore.Desktop.exe");
+            var batchPath = Path.Combine(tempDir, "apply-delta.bat");
+            var batchContent =
+                "@echo off\r\n" +
+                "echo Applying AuraCore Pro update...\r\n" +
+                "timeout /t 3 /nobreak >nul\r\n" +
+                $"xcopy /s /y /q \"{extractDir}\\*\" \"{appDir}\"\r\n" +
+                $"start \"\" \"{appExe}\"\r\n" +
+                $"rd /s /q \"{extractDir}\" 2>nul\r\n" +
+                $"del \"{zipPath}\" 2>nul\r\n" +
+                "del \"%~f0\" 2>nul\r\n";
+            await File.WriteAllTextAsync(batchPath, batchContent);
+
+            DownloadProgress = 100;
+            DownloadProgressChanged?.Invoke(100);
+            DownloadCompleted?.Invoke(batchPath);
+
+            // Launch batch and exit
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = batchPath,
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            });
+
+            // Exit the app so files can be overwritten
+            Environment.Exit(0);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Delta] Failed: {ex.Message}, falling back to full installer");
+            DownloadFailed?.Invoke($"Delta failed: {ex.Message}. Falling back to full download.");
+            return false;
+        }
+        finally
+        {
+            IsDownloading = false;
+        }
+    }
+
+    /// <summary>True if a delta update is available (smaller, faster download)</summary>
+    public bool HasDelta => !string.IsNullOrEmpty(DeltaUrl);
+
     private void HandleRetry()
     {
         _retryCount++;
@@ -284,6 +392,9 @@ public sealed class UpdateInfo
 {
     public string Version { get; init; } = "";
     public string DownloadUrl { get; init; } = "";
+    public string DeltaUrl { get; init; } = "";
+    public long? DeltaSize { get; init; }
     public string ReleaseNotes { get; init; } = "";
     public bool IsMandatory { get; init; }
+    public bool HasDelta => !string.IsNullOrEmpty(DeltaUrl);
 }

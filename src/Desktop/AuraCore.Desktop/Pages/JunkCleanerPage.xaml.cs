@@ -265,9 +265,11 @@ public sealed partial class JunkCleanerPage : Page
 
     private void ApplyLocalization()
     {
-        if (FindName("PageTitle") is Microsoft.UI.Xaml.Controls.TextBlock title)
-            title.Text = S._("junk.title");
-        if (FindName("PageSubtitle") is Microsoft.UI.Xaml.Controls.TextBlock subtitle)
-            subtitle.Text = S._("junk.subtitle");
+        if (FindName("PageTitle") is TextBlock title) title.Text = S._("junk.title");
+        if (FindName("PageSubtitle") is TextBlock subtitle) subtitle.Text = S._("junk.subtitle");
+        if (FindName("ScanBtn") is Button scan) scan.Content = S._("junk.scan");
+        if (FindName("LblTotalSize") is TextBlock ts) ts.Text = S._("junk.totalSize");
+        if (FindName("LblFiles") is TextBlock lf) lf.Text = S._("junk.files");
+        if (FindName("LblCategories") is TextBlock lc) lc.Text = S._("junk.categories");
     }
 }

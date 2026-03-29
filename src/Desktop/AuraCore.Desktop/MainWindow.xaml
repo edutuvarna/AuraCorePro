@@ -6,22 +6,6 @@
     Title="Aura Core Pro">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.KeyboardAccelerators>
-            <!-- Navigation shortcuts: Ctrl+1 through Ctrl+9 -->
-            <KeyboardAccelerator Key="Number1" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number2" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number3" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number4" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number5" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number6" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number7" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number8" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <KeyboardAccelerator Key="Number9" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <!-- Ctrl+G = Gaming Mode toggle -->
-            <KeyboardAccelerator Key="G" Modifiers="Control" Invoked="Shortcut_Invoked" />
-            <!-- F5 = Refresh current page -->
-            <KeyboardAccelerator Key="F5" Invoked="Shortcut_Invoked" />
-        </Grid.KeyboardAccelerators>
         <NavigationView
             x:Name="NavView"
             IsBackButtonVisible="Collapsed"

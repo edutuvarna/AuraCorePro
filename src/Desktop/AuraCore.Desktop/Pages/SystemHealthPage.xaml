@@ -5,116 +5,323 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer Padding="32">
-        <StackPanel Spacing="20" MaxWidth="900">
+        <StackPanel Spacing="16" MaxWidth="900">
 
-            <StackPanel Spacing="4">
-                <TextBlock x:Name="PageTitle" Text="System Health Analyzer" Style="{StaticResource TitleTextBlockStyle}" />
-                <TextBlock x:Name="PageSubtitle" Text="Complete system diagnostic scan" 
-                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
+            <!-- HEADER -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="2">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock x:Name="PageTitle" Text="System Health Monitor"
+                                   Style="{StaticResource TitleTextBlockStyle}"/>
+                        <Border Background="#FF2563EB" CornerRadius="10" Padding="10,3,10,3"
+                                VerticalAlignment="Center">
+                            <TextBlock x:Name="LiveBadge" Text="LIVE" FontSize="10"
+                                       Foreground="White" FontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock x:Name="PageSubtitle" Text="Real-time system diagnostics and health monitoring"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                <TextBlock x:Name="RefreshInfo" Grid.Column="1" Text="Auto-refresh: 3s"
+                           VerticalAlignment="Top" Margin="0,6,0,0"
+                           FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+            </Grid>
 
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <Button x:Name="ScanBtn" Content="Run Full Scan" Click="ScanBtn_Click"
-                        Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
-                <Button x:Name="ExportPdfBtn" Content="Export PDF Report" Click="ExportPdfBtn_Click"
-                        Padding="24,10" IsEnabled="False" />
-                <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
-                <TextBlock x:Name="StatusText" Text="Ready" VerticalAlignment="Center" 
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
+            <!-- HERO SECTION: Score + 4 Mini Stats -->
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- OS Section -->
-            <Border x:Name="OsSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
+                <!-- Health Score Card -->
+                <Border x:Name="ScoreCard"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="12"
+                        Width="160" MinHeight="155" Padding="16">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
+                        <TextBlock x:Name="ScoreValue" Text="--"
+                                   FontSize="44" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="ScoreLabel" Text="..."
+                                   FontSize="12" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <ProgressBar x:Name="ScoreBar" Minimum="0" Maximum="100" Value="0"
+                                     Height="6" CornerRadius="3" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="ScoreCaption" Text="Health score"
+                                   FontSize="10" HorizontalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 4 Mini Stat Cards -->
+                <Grid Grid.Column="1" RowSpacing="10" ColumnSpacing="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- CPU Mini -->
+                    <Border Grid.Row="0" Grid.Column="0"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="CpuMiniLabel" Text="CPU usage" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <TextBlock x:Name="CpuMiniValue" Text="--" FontSize="24" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="CpuMiniUnit" Text="%" FontSize="13" VerticalAlignment="Bottom"
+                                           Margin="0,0,0,3"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                            <ProgressBar x:Name="CpuMiniBar" Minimum="0" Maximum="100"
+                                         Height="4" CornerRadius="2"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- RAM Mini -->
+                    <Border Grid.Row="0" Grid.Column="1"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="RamMiniLabel" Text="Memory" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <TextBlock x:Name="RamMiniValue" Text="--" FontSize="24" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="RamMiniUnit" Text="%" FontSize="13" VerticalAlignment="Bottom"
+                                           Margin="0,0,0,3"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                            <ProgressBar x:Name="RamMiniBar" Minimum="0" Maximum="100"
+                                         Height="4" CornerRadius="2"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Disk Mini -->
+                    <Border Grid.Row="1" Grid.Column="0"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="DiskMiniLabel" Text="Disk (C:)" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <TextBlock x:Name="DiskMiniValue" Text="--" FontSize="24" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="DiskMiniUnit" Text="%" FontSize="13" VerticalAlignment="Bottom"
+                                           Margin="0,0,0,3"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                            <ProgressBar x:Name="DiskMiniBar" Minimum="0" Maximum="100"
+                                         Height="4" CornerRadius="2"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Processes Mini -->
+                    <Border Grid.Row="1" Grid.Column="1"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="ProcMiniLabel" Text="Processes" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock x:Name="ProcMiniValue" Text="--" FontSize="24" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="ProcMiniTop" Text="" FontSize="11"
+                                       Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- SMART ALERTS (populated dynamically) -->
+            <StackPanel x:Name="AlertsPanel" Spacing="8"/>
+
+            <!-- DETAILS HEADER -->
+            <TextBlock x:Name="DetailsHeader" Text="System details"
+                       FontSize="16" FontWeight="SemiBold" Margin="0,8,0,0"/>
+
+            <!-- Detail Row 1: OS + CPU -->
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- OS Card -->
+                <Border Grid.Column="0"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="OsCardHeader" Text="Operating system" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="OsLine1" Text="..." FontSize="13"/>
+                        <TextBlock x:Name="OsLine2" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="OsLine3" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="OsLine4" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- CPU Card -->
+                <Border Grid.Column="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="CpuCardHeader" Text="Processor" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="CpuLine1" Text="..." FontSize="13"/>
+                        <TextBlock x:Name="CpuLine2" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="CpuLine3" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <ProgressBar x:Name="CpuDetailBar" Minimum="0" Maximum="100"
+                                     Height="4" CornerRadius="2" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Detail Row 2: Memory + GPU -->
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Memory Card -->
+                <Border Grid.Column="0"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="MemCardHeader" Text="Memory" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="MemLine1" Text="..." FontSize="13"/>
+                        <TextBlock x:Name="MemLine2" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="MemLine3" Text="" FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <ProgressBar x:Name="MemDetailBar" Minimum="0" Maximum="100"
+                                     Height="4" CornerRadius="2" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- GPU Card -->
+                <Border Grid.Column="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="GpuCardHeader" Text="Graphics (GPU)" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <StackPanel x:Name="GpuDetailList" Spacing="8"/>
+                        <TextBlock x:Name="GpuLoadedOnce" Text="Loaded once at startup" FontSize="10"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Drives Card (full width) -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="16,14">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Operating System" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="OsName" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="OsVersion" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="OsArch" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="OsMachine" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="OsUptime" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:Name="DrivesCardHeader" Text="Storage drives" FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <StackPanel x:Name="DrivesDetailList" Spacing="10"/>
                 </StackPanel>
             </Border>
 
-            <!-- CPU Section -->
-            <Border x:Name="CpuSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Processor" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="CpuName" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="CpuCores" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <ProgressBar x:Name="CpuBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
-                    <TextBlock x:Name="CpuUsage" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <!-- Bottom Row: Processes + Startup -->
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Top Processes -->
+                <Border Grid.Column="0"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="ProcCardHeader" Text="Top processes (by RAM)" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <StackPanel x:Name="ProcDetailList" Spacing="3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Startup Programs -->
+                <Border Grid.Column="1"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="10" Padding="16,14">
+                    <StackPanel Spacing="6">
+                        <TextBlock x:Name="StartupCardHeader" Text="Startup programs" FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <StackPanel x:Name="StartupDetailList" Spacing="3"/>
+                        <TextBlock x:Name="StartupLoadedOnce" Text="Loaded once at startup" FontSize="10"
+                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                   Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Battery Card (conditional) -->
+            <Border x:Name="BatteryCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="10" Padding="16,14">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="BatteryCardHeader" Text="Battery" FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock x:Name="BatteryLine1" Text="" FontSize="13"/>
+                    <ProgressBar x:Name="BatteryDetailBar" Minimum="0" Maximum="100"
+                                 Height="6" CornerRadius="3"/>
+                    <TextBlock x:Name="BatteryLine2" Text="" FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                 </StackPanel>
             </Border>
 
-            <!-- Memory Section -->
-            <Border x:Name="MemSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Memory" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="MemTotal" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="MemAvail" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <ProgressBar x:Name="MemBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
-                    <TextBlock x:Name="MemUsage" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                </StackPanel>
-            </Border>
-
-            <!-- Drives Section -->
-            <Border x:Name="DiskSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Storage Drives" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <StackPanel x:Name="DriveList" Spacing="12" />
-                </StackPanel>
-            </Border>
-
-            <!-- Processes Section -->
-            <Border x:Name="ProcSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Process Summary" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="ProcCount" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="ProcTopRam" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                </StackPanel>
-            </Border>
-
-            <!-- GPU Section -->
-            <Border x:Name="GpuSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Graphics (GPU)" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <StackPanel x:Name="GpuList" Spacing="10" />
-                </StackPanel>
-            </Border>
-
-            <!-- Battery Section -->
-            <Border x:Name="BatterySection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Battery" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <TextBlock x:Name="BatteryCharge" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <ProgressBar x:Name="BatteryBar" Minimum="0" Maximum="100" Height="8" CornerRadius="4" />
-                    <TextBlock x:Name="BatteryStatus" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                </StackPanel>
-            </Border>
-
-            <!-- Startup Programs -->
-            <Border x:Name="StartupSection" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="8" Padding="20" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                    Visibility="Collapsed">
-                <StackPanel Spacing="8">
-                    <TextBlock x:Name="StartupHeader" Text="Startup Programs" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <StackPanel x:Name="StartupList" Spacing="4" />
-                </StackPanel>
-            </Border>
+            <!-- FOOTER -->
+            <Grid Margin="0,4,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ExportPdfBtn" Content="Export PDF report"
+                        Click="ExportPdfBtn_Click" Padding="16,8"
+                        IsEnabled="False"/>
+                <TextBlock x:Name="LastRefreshText" Grid.Column="1" Text=""
+                           HorizontalAlignment="Right" VerticalAlignment="Center"
+                           FontSize="11"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+            </Grid>
 
         </StackPanel>
     </ScrollViewer>

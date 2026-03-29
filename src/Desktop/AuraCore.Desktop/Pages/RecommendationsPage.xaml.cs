@@ -164,9 +164,14 @@ public sealed partial class RecommendationsPage : Page
 
     private void ApplyLocalization()
     {
-        if (FindName("PageTitle") is Microsoft.UI.Xaml.Controls.TextBlock title)
-            title.Text = S._("rec.title");
-        if (FindName("PageSubtitle") is Microsoft.UI.Xaml.Controls.TextBlock subtitle)
-            subtitle.Text = S._("rec.subtitle");
+        if (FindName("PageTitle") is TextBlock title) title.Text = S._("rec.title");
+        if (FindName("PageSubtitle") is TextBlock subtitle) subtitle.Text = S._("rec.subtitle");
+        if (FindName("AnalyzeBtn") is Button btn) btn.Content = S._("rec.analyze");
+        if (FindName("LblCritical") is TextBlock lc) lc.Text = S._("rec.critical");
+        if (FindName("LblHigh") is TextBlock lh) lh.Text = S._("rec.high");
+        if (FindName("LblMedium") is TextBlock lm) lm.Text = S._("rec.medium");
+        if (FindName("LblTips") is TextBlock lt) lt.Text = S._("rec.tips");
+        if (FindName("AllGoodTitle") is TextBlock agt) agt.Text = S._("rec.allGood");
+        if (FindName("AllGoodDesc") is TextBlock agd) agd.Text = S._("rec.noIssues");
     }
 }

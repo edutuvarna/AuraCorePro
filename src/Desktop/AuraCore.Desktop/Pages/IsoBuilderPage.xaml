@@ -293,7 +293,8 @@
                             <StackPanel Spacing="12">
                                 <TextBlock x:Name="OutputFormatLabel" Text="Output Format" FontWeight="SemiBold" />
                                 <RadioButton x:Name="OutputUnattendOnly" Content="Generate files only (save to folder)" IsChecked="True" GroupName="output" Checked="OutputMode_Changed" />
-                                <RadioButton x:Name="OutputUsbWrite" Content="Write ISO + config to USB drive" GroupName="output" Checked="OutputMode_Changed" />
+                                <RadioButton x:Name="OutputStandaloneIso" Content="Create standalone ISO (for Ventoy / direct mount)" GroupName="output" Checked="OutputMode_Changed" />
+                                <RadioButton x:Name="OutputUsbWrite" Content="Write bootable USB drive (like Rufus)" GroupName="output" Checked="OutputMode_Changed" />
                                 <StackPanel x:Name="UsbPanel" Visibility="Collapsed" Spacing="12" Margin="28,0,0,0">
                                     <StackPanel Orientation="Horizontal" Spacing="12">
                                         <ComboBox x:Name="UsbDriveCombo" Header="USB Drive" Width="320" PlaceholderText="No USB drives" />

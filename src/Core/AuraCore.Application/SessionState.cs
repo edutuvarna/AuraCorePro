@@ -9,6 +9,7 @@ public static class SessionState
     public static string? UserRole { get; set; }
     public static string? UserTier { get; set; } = "free";
     public static string? UserId { get; set; }
+    public static Guid? DeviceId { get; set; }
 
     public static bool IsAdmin => UserRole == "admin";
     public static bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);

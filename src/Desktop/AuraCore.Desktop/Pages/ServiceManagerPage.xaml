@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="AuraCore.Desktop.Pages.ServiceManagerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="32">
+        <StackPanel Spacing="16" MaxWidth="960">
+
+            <!-- HEADER -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PageTitle" Text="Service Manager" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="PageSubtitle" Text="View, start, stop and configure Windows services"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- ADMIN WARNING -->
+            <InfoBar x:Name="AdminWarning"
+                     Title="Administrator required for service control"
+                     Message="Run AuraCore Pro as administrator to start, stop or change service startup types."
+                     Severity="Warning" IsOpen="False" IsClosable="False" />
+
+            <!-- ACTION BAR -->
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="ScanBtn" Content="Scan Services" Click="ScanBtn_Click"
+                        Style="{StaticResource AccentButtonStyle}" Padding="24,10" />
+                <Button x:Name="RefreshBtn" Content="Refresh" Click="ScanBtn_Click"
+                        Padding="24,10" Visibility="Collapsed" />
+                <ProgressRing x:Name="Progress" IsActive="False" Visibility="Collapsed" Width="28" Height="28" />
+                <TextBlock x:Name="StatusText" Text="Click Scan to list Windows services"
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- STATS SUB-CARD -->
+            <Border x:Name="SummaryCard" Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10" Padding="20"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Total" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Name="TotalText" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock Text="Running" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Name="RunningText" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Foreground="#2E7D32" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="2">
+                        <TextBlock Text="Stopped" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Name="StoppedText" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Spacing="2">
+                        <TextBlock Text="Disabled" Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock x:Name="DisabledText" Style="{StaticResource SubtitleTextBlockStyle}"
+                                   Foreground="#C62828" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- FILTER + SEARCH BAR -->
+            <StackPanel x:Name="FilterBar" Visibility="Collapsed" Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="FilterAll" Content="All" Click="Filter_Click" Tag="all"
+                            Style="{StaticResource AccentButtonStyle}" Padding="16,6" FontSize="12" />
+                    <Button x:Name="FilterRunning" Content="Running" Click="Filter_Click" Tag="running"
+                            Padding="16,6" FontSize="12" />
+                    <Button x:Name="FilterStopped" Content="Stopped" Click="Filter_Click" Tag="stopped"
+                            Padding="16,6" FontSize="12" />
+                    <Button x:Name="FilterDisabled" Content="Disabled" Click="Filter_Click" Tag="disabled"
+                            Padding="16,6" FontSize="12" />
+                    <Button x:Name="FilterAuto" Content="Auto-Start" Click="Filter_Click" Tag="auto"
+                            Padding="16,6" FontSize="12" />
+                </StackPanel>
+                <TextBox x:Name="SearchBox"
+                         PlaceholderText="Search by service name or description..."
+                         Width="480" HorizontalAlignment="Left"
+                         TextChanged="SearchBox_TextChanged" />
+            </StackPanel>
+
+            <!-- SERVICE LIST -->
+            <StackPanel x:Name="ServiceList" Spacing="4" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

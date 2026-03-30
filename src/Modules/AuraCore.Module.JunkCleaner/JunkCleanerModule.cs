@@ -12,6 +12,7 @@ public sealed class JunkCleanerModule : IOptimizationModule
     public string DisplayName => "AI Junk Cleaner";
     public OptimizationCategory Category => OptimizationCategory.DiskCleanup;
     public RiskLevel Risk => RiskLevel.Medium;
+    public SupportedPlatform Platform => SupportedPlatform.All;
 
     public JunkScanReport? LastReport { get; private set; }
 
@@ -21,74 +22,116 @@ public sealed class JunkCleanerModule : IOptimizationModule
 
         await Task.Run(() =>
         {
-            // 1. Windows Temp — all files
+            // 1. System/User Temp — all platforms
             categories.Add(ScanDirectory(
-                "Windows Temp",
-                "Temporary files created by Windows and applications",
+                "System Temp",
+                "Temporary files created by the OS and applications",
                 Path.GetTempPath(),
                 scanAll: true));
 
-            // 2. Prefetch
-            var prefetch = @"C:\Windows\Prefetch";
-            if (Directory.Exists(prefetch))
+            if (OperatingSystem.IsWindows())
             {
-                categories.Add(ScanDirectory(
-                    "Prefetch Cache",
-                    "Application launch optimization cache",
-                    prefetch,
-                    extensions: new[] { ".pf" }));
+                // 2. Prefetch (Windows only)
+                var prefetch = @"C:\Windows\Prefetch";
+                if (Directory.Exists(prefetch))
+                    categories.Add(ScanDirectory("Prefetch Cache", "Application launch optimization cache", prefetch, extensions: new[] { ".pf" }));
+
+                // 3. Windows Logs
+                var winLogs = @"C:\Windows\Logs";
+                if (Directory.Exists(winLogs))
+                    categories.Add(ScanDirectory("Windows Logs", "System and application log files", winLogs, extensions: new[] { ".log", ".etl" }));
+
+                // 4. Thumbnail Cache
+                var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var thumbCache = Path.Combine(localApp, @"Microsoft\Windows\Explorer");
+                if (Directory.Exists(thumbCache))
+                    categories.Add(ScanDirectory("Thumbnail Cache", "Windows Explorer thumbnail database files", thumbCache, extensions: new[] { ".db" }));
+
+                // 5. Recent Shortcuts
+                var recent = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
+                if (Directory.Exists(recent))
+                    categories.Add(ScanDirectory("Recent Shortcuts", "Shortcuts to recently opened files", recent, extensions: new[] { ".lnk" }));
+
+                // 6. Recycle Bin
+                categories.Add(ScanRecycleBin());
             }
 
-            // 3. Windows Logs
-            var winLogs = @"C:\Windows\Logs";
-            if (Directory.Exists(winLogs))
+            if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
             {
-                categories.Add(ScanDirectory(
-                    "Windows Logs",
-                    "System and application log files",
-                    winLogs,
-                    extensions: new[] { ".log", ".etl" }));
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+                // Linux/macOS: ~/.cache
+                var userCache = Path.Combine(home, ".cache");
+                if (Directory.Exists(userCache))
+                    categories.Add(ScanDirectory("User Cache", "Application cache files (~/.cache)", userCache, scanAll: true));
+
+                // Linux: /var/log (user-readable portions)
+                if (OperatingSystem.IsLinux() && Directory.Exists("/var/log"))
+                    categories.Add(ScanDirectory("System Logs", "Log files in /var/log", "/var/log", extensions: new[] { ".log", ".gz", ".old" }));
+
+                // Linux/macOS: /tmp (if different from GetTempPath)
+                var tmp = "/tmp";
+                if (Directory.Exists(tmp) && tmp != Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar))
+                    categories.Add(ScanDirectory("Global Temp", "Shared temporary files (/tmp)", tmp, scanAll: true));
+
+                // Trash
+                var trash = Path.Combine(home, ".local", "share", "Trash", "files");
+                if (Directory.Exists(trash))
+                    categories.Add(ScanDirectory("Trash", "Deleted files in Trash", trash, scanAll: true));
+
+                // Package manager caches
+                var aptCache = "/var/cache/apt/archives";
+                if (Directory.Exists(aptCache))
+                    categories.Add(ScanDirectory("APT Cache", "Downloaded package files", aptCache, extensions: new[] { ".deb" }));
+
+                var pipCache = Path.Combine(home, ".cache", "pip");
+                if (Directory.Exists(pipCache))
+                    categories.Add(ScanDirectory("Pip Cache", "Python package cache", pipCache, scanAll: true));
             }
 
-            // 4. Chrome Cache
-            var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var chromeCache = Path.Combine(localApp, @"Google\Chrome\User Data\Default\Cache\Cache_Data");
-            if (Directory.Exists(chromeCache))
+            // Browser caches — cross-platform paths
             {
-                categories.Add(ScanDirectory("Chrome Cache", "Google Chrome browser cache", chromeCache, scanAll: true));
-            }
+                var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-            // 5. Edge Cache
-            var edgeCache = Path.Combine(localApp, @"Microsoft\Edge\User Data\Default\Cache\Cache_Data");
-            if (Directory.Exists(edgeCache))
-            {
-                categories.Add(ScanDirectory("Edge Cache", "Microsoft Edge browser cache", edgeCache, scanAll: true));
-            }
+                // Chrome
+                var chromeCachePaths = new[]
+                {
+                    Path.Combine(localApp, @"Google\Chrome\User Data\Default\Cache\Cache_Data"),        // Windows
+                    Path.Combine(home, ".config/google-chrome/Default/Cache/Cache_Data"),                // Linux
+                    Path.Combine(home, "Library/Caches/Google/Chrome/Default/Cache/Cache_Data"),         // macOS
+                };
+                foreach (var p in chromeCachePaths)
+                    if (Directory.Exists(p)) { categories.Add(ScanDirectory("Chrome Cache", "Google Chrome browser cache", p, scanAll: true)); break; }
 
-            // 6. Thumbnail Cache
-            var thumbCache = Path.Combine(localApp, @"Microsoft\Windows\Explorer");
-            if (Directory.Exists(thumbCache))
-            {
-                categories.Add(ScanDirectory(
-                    "Thumbnail Cache",
-                    "Windows Explorer thumbnail database files",
-                    thumbCache,
-                    extensions: new[] { ".db" }));
-            }
+                // Edge
+                var edgeCachePaths = new[]
+                {
+                    Path.Combine(localApp, @"Microsoft\Edge\User Data\Default\Cache\Cache_Data"),
+                    Path.Combine(home, ".config/microsoft-edge/Default/Cache/Cache_Data"),
+                };
+                foreach (var p in edgeCachePaths)
+                    if (Directory.Exists(p)) { categories.Add(ScanDirectory("Edge Cache", "Microsoft Edge browser cache", p, scanAll: true)); break; }
 
-            // 7. Recent Shortcuts
-            var recent = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
-            if (Directory.Exists(recent))
-            {
-                categories.Add(ScanDirectory(
-                    "Recent Shortcuts",
-                    "Shortcuts to recently opened files",
-                    recent,
-                    extensions: new[] { ".lnk" }));
+                // Firefox
+                var firefoxPaths = new[]
+                {
+                    Path.Combine(localApp, @"Mozilla\Firefox\Profiles"),
+                    Path.Combine(home, ".mozilla/firefox"),
+                    Path.Combine(home, "Library/Caches/Firefox/Profiles"),
+                };
+                foreach (var ffDir in firefoxPaths)
+                {
+                    if (!Directory.Exists(ffDir)) continue;
+                    foreach (var profile in Directory.GetDirectories(ffDir, "*.default*"))
+                    {
+                        var cache2 = Path.Combine(profile, "cache2");
+                        if (Directory.Exists(cache2))
+                        { categories.Add(ScanDirectory("Firefox Cache", "Mozilla Firefox cache", cache2, scanAll: true)); break; }
+                    }
+                    break;
+                }
             }
-
-            // 8. Recycle Bin
-            categories.Add(ScanRecycleBin());
 
         }, ct);
 

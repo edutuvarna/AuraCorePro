@@ -56,9 +56,15 @@ public sealed partial class ExplorerPage : Page
                 }
                 TweakList.Children.Add(section);
             }
-            StatusText.Text = $"Found {report.Tweaks.Count} settings — {report.AppliedCount} active";
+            StatusText.Text = string.Format(S._("taskbar.foundSettings"), report.Tweaks.Count, report.AppliedCount);
+
+            TotalText.Text = report.Tweaks.Count.ToString();
+            ActiveText.Text = report.AppliedCount.ToString();
+            SafeText.Text = report.Tweaks.Count(t => t.Risk == "Safe").ToString();
+            PrivacyText.Text = report.Tweaks.Count(t => t.Category?.Contains("Privacy") == true || t.Id?.Contains("disable-recent") == true || t.Id?.Contains("disable-frequent") == true).ToString();
+            SummaryCard.Visibility = Visibility.Visible;
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally { ScanBtn.IsEnabled = true; Progress.IsActive = false; Progress.Visibility = Visibility.Collapsed; }
     }
 
@@ -105,7 +111,7 @@ public sealed partial class ExplorerPage : Page
         }
 
         UpdateApplyBtn();
-        StatusText.Text = $"Recommended preset applied — {recommended.Count} tweaks selected";
+        StatusText.Text = string.Format(S._("explorer.presetApplied"), recommended.Count);
     }
 
     private async void ApplyBtn_Click(object sender, RoutedEventArgs e)
@@ -116,22 +122,22 @@ public sealed partial class ExplorerPage : Page
         var dialog = new ContentDialog
         {
             Title = $"Apply {ids.Count} Explorer change(s)?",
-            Content = "This modifies registry settings and restarts Explorer. Your desktop will briefly flash.",
+            Content = S._("explorer.applyWarning"),
             PrimaryButtonText = "Apply", CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Primary
         };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
 
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Applying...";
+        StatusText.Text = S._("common.applying");
 
         var plan = new OptimizationPlan("explorer-tweaks", ids);
         var progress = new Progress<TaskProgress>(p => DispatcherQueue.TryEnqueue(() => StatusText.Text = p.StatusText));
         var result = await _module!.OptimizeAsync(plan, progress);
 
-        ResultText.Text = $"Applied {result.ItemsProcessed} change(s) — Explorer restarted. All changes reversible.";
+        ResultText.Text = string.Format(S._("explorer.changesApplied"), result.ItemsProcessed);
         ResultCard.Visibility = Visibility.Visible;
-        StatusText.Text = "Done!";
+        StatusText.Text = S._("common.done");
         Progress.IsActive = false; Progress.Visibility = Visibility.Collapsed;
     }
 

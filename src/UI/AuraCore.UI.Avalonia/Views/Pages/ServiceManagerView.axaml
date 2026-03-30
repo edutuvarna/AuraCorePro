@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.ServiceManagerView">
+  <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Service Manager" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="View and manage Windows services" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
+      </Button>
+    </Grid>
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,10" Margin="0,0,0,8">
+      <Grid ColumnDefinitions="*,*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/></StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><TextBlock Text="Running:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="RunningSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/></StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"><TextBlock Text="Stopped:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="StoppedSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/></StackPanel>
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8"><TextBlock Text="Auto:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="AutoSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/></StackPanel>
+      </Grid>
+    </Border>
+    <TextBox Grid.Row="2" x:Name="SearchBox" Watermark="Search services..." Background="#1A1A28" Foreground="{DynamicResource TextPrimaryBrush}"
+             BorderBrush="{DynamicResource BorderCardBrush}" CornerRadius="8" Padding="12,8" Margin="0,0,0,8" TextChanged="Search_Changed"/>
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+      <ScrollViewer>
+        <ItemsControl x:Name="SvcList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                <Grid ColumnDefinitions="*,100,80,80">
+                  <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding DisplayName}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding ServiceName}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/></StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding StartType}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                  <Border Grid.Column="2" CornerRadius="8" Padding="6,2" Background="{Binding StatusBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Status}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding StatusFg}"/></Border>
+                  <TextBlock Grid.Column="3" Text="{Binding Pid}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

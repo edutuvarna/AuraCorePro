@@ -60,6 +60,19 @@ public sealed partial class DiskHealthPage : Page
 
             var healthyCount = disks.Count(d => d.HealthStatus is "Healthy" or "OK");
             StatusText.Text = $"Found {disks.Count} drive(s) — {healthyCount} healthy";
+
+            // Summary card
+            TotalDrivesText.Text = disks.Count.ToString();
+            HealthyDrivesText.Text = $"{healthyCount} / {disks.Count}";
+            var tempsWithData = disks.Where(d => d.Temperature.HasValue).ToList();
+            AvgTempText.Text = tempsWithData.Count > 0
+                ? $"{tempsWithData.Average(d => d.Temperature!.Value):F0}°C"
+                : "N/A";
+            var totalGb = disks.Sum(d => d.SizeBytes) / (1024.0 * 1024 * 1024);
+            TotalCapText.Text = totalGb >= 1000
+                ? $"{totalGb / 1024:F1} TB"
+                : $"{totalGb:F0} GB";
+            SummaryCard.Visibility = Visibility.Visible;
         }
         catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
         finally

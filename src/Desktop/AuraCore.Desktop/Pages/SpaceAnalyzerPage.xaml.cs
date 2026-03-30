@@ -68,7 +68,7 @@ public sealed partial class SpaceAnalyzerPage : Page
     {
         ScanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = $"Scanning {path}...";
+        StatusText.Text = string.Format(S._("space.scanningPath"), path);
         TopFoldersList.Children.Clear();
         TreeMapCanvas.Children.Clear();
         FileTypesList.Children.Clear();
@@ -79,7 +79,7 @@ public sealed partial class SpaceAnalyzerPage : Page
 
             if (folders.Count == 0)
             {
-                StatusText.Text = "No accessible folders found.";
+                StatusText.Text = S._("space.noFolders");
                 return;
             }
 
@@ -114,7 +114,7 @@ public sealed partial class SpaceAnalyzerPage : Page
             // File type distribution
             if (fileTypes.Count > 0)
             {
-                FileTypesHeader.Text = "File Type Distribution";
+                FileTypesHeader.Text = S._("space.fileTypesHeader");
                 FileTypesHeader.Visibility = Visibility.Visible;
                 RenderFileTypes(fileTypes);
                 FileTypesList.Visibility = Visibility.Visible;
@@ -128,7 +128,7 @@ public sealed partial class SpaceAnalyzerPage : Page
 
             StatusText.Text = $"Scan complete — {folders.Count} folders analyzed";
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;

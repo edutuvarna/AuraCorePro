@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.DefenderManagerView">
+  <ScrollViewer>
+    <StackPanel Spacing="16">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock x:Name="PageTitle" Text="Windows Defender" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="SubText" Text="Monitor and manage Windows security" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+        <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="&#x1F504;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Refresh" FontSize="11" FontWeight="SemiBold"/>
+          </StackPanel>
+        </Button>
+      </Grid>
+      <!-- Protection Status -->
+      <Border x:Name="StatusCard" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <Grid ColumnDefinitions="Auto,*">
+          <StackPanel Spacing="4" Margin="0,0,24,0">
+            <TextBlock x:Name="ProtLevel" Text="--" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+            <TextBlock Text="Protection Level" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="EnabledCount" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="6" x:Name="TogglePanel"/>
+        </Grid>
+      </Border>
+      <!-- Firewall -->
+      <TextBlock Text="FIREWALL" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+      <Border CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Grid ColumnDefinitions="*,*,*">
+          <StackPanel Spacing="2"><TextBlock Text="Domain" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="FwDomain" Text="--" FontSize="12" FontWeight="SemiBold"/></StackPanel>
+          <StackPanel Grid.Column="1" Spacing="2"><TextBlock Text="Private" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="FwPrivate" Text="--" FontSize="12" FontWeight="SemiBold"/></StackPanel>
+          <StackPanel Grid.Column="2" Spacing="2"><TextBlock Text="Public" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="FwPublic" Text="--" FontSize="12" FontWeight="SemiBold"/></StackPanel>
+        </Grid>
+      </Border>
+      <!-- Signatures -->
+      <Border CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Grid ColumnDefinitions="*,*,*">
+          <StackPanel Spacing="2"><TextBlock Text="Signature Version" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="SigVer" Text="--" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+          <StackPanel Grid.Column="1" Spacing="2"><TextBlock Text="Engine" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="EngineVer" Text="--" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+          <StackPanel Grid.Column="2" Spacing="2"><TextBlock Text="Last Updated" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="SigDate" Text="--" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+        </Grid>
+      </Border>
+      <!-- Threats -->
+      <TextBlock Text="RECENT THREATS" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+      <ItemsControl x:Name="ThreatList">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14,8">
+              <Grid ColumnDefinitions="*,80,80">
+                <StackPanel><TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                  <TextBlock Text="{Binding Path}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" TextTrimming="CharacterEllipsis"/></StackPanel>
+                <Border Grid.Column="1" CornerRadius="8" Padding="6,2" Background="{Binding SevBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <TextBlock Text="{Binding Severity}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding SevFg}"/></Border>
+                <TextBlock Grid.Column="2" Text="{Binding Status}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

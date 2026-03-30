@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctrl="clr-namespace:AuraCore.UI.Avalonia.Views.Controls"
+        x:Class="AuraCore.UI.Avalonia.Views.MainWindow"
+        Title="AuraCore Pro"
+        Width="1280" Height="820"
+        MinWidth="900" MinHeight="600"
+        Background="{DynamicResource BgDeepBrush}"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="40">
+
+  <Grid ColumnDefinitions="260,*">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+    <Border Grid.Column="0"
+            Background="{DynamicResource BgSurfaceBrush}"
+            BorderBrush="{DynamicResource BorderSubtleBrush}"
+            BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Logo + Title -->
+        <StackPanel Grid.Row="0" Margin="20,16,20,20" Spacing="4">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <ctrl:OrbitalLogo Width="40" Height="40"/>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="AuraCore Pro" FontSize="16" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock Text="System Optimizer" FontSize="10"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+          </StackPanel>
+          <!-- User + Tier Badge -->
+          <Border CornerRadius="{StaticResource RadiusMd}"
+                  Background="{DynamicResource BgCardBrush}"
+                  Padding="10,6" Margin="0,8,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel VerticalAlignment="Center" Spacing="1">
+                <TextBlock x:Name="UserEmailLabel" Text="Guest" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock x:Name="UserStatusLabel" Text="Not signed in" FontSize="9"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+              </StackPanel>
+              <Border Grid.Column="1" x:Name="TierBadge" CornerRadius="8"
+                      Padding="8,3" VerticalAlignment="Center" Background="#2000D4AA">
+                <TextBlock x:Name="TierBadgeText" Text="FREE" FontSize="9" FontWeight="Bold"
+                           Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              </Border>
+            </Grid>
+          </Border>
+        </StackPanel>
+
+        <!-- Dynamic Navigation (built from code-behind) -->
+        <ScrollViewer Grid.Row="1" Margin="8,0">
+          <StackPanel x:Name="NavPanel" Spacing="2"/>
+        </ScrollViewer>
+
+        <!-- Bottom: Platform + Settings -->
+        <StackPanel Grid.Row="2" Margin="12,0,12,16" Spacing="4">
+          <Border Background="{DynamicResource BgCardBrush}"
+                  CornerRadius="{StaticResource RadiusMd}"
+                  Padding="12,8" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Border Width="8" Height="8" CornerRadius="4"
+                      Background="{DynamicResource SuccessBrush}"/>
+              <TextBlock x:Name="PlatformLabel" Text="Windows"
+                         FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+          </Border>
+          <Button Tag="settings" Classes="nav-item" Click="Nav_Click">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="&#x2699;" FontSize="14" VerticalAlignment="Center"/>
+              <TextBlock x:Name="SettingsNavLabel" Text="Settings" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+
+      </Grid>
+    </Border>
+
+    <!-- ══ CONTENT AREA ═════════════════════════════════════ -->
+    <Border Grid.Column="1" Background="{DynamicResource BgDeepBrush}">
+      <ContentControl x:Name="ContentArea" Margin="24"/>
+    </Border>
+
+  </Grid>
+</Window>

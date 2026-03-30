@@ -14,6 +14,7 @@ public sealed class RamOptimizerModule : IOptimizationModule
     public string DisplayName => "RAM Optimizer";
     public OptimizationCategory Category => OptimizationCategory.MemoryOptimization;
     public RiskLevel Risk => RiskLevel.Medium;
+    public SupportedPlatform Platform => SupportedPlatform.All;
 
     public RamReport? LastReport { get; private set; }
 
@@ -80,8 +81,8 @@ public sealed class RamOptimizerModule : IOptimizationModule
                     var beforeMem = proc.WorkingSet64;
 
                     // EmptyWorkingSet trims the working set — pages move to standby list
-                    // They come back instantly if needed, so this is safe
-                    if (EmptyWorkingSet(proc.Handle))
+                    // Windows only — Linux uses different approach
+                    if (OperatingSystem.IsWindows() && EmptyWorkingSet(proc.Handle))
                     {
                         proc.Refresh();
                         var afterMem = proc.WorkingSet64;
@@ -117,13 +118,37 @@ public sealed class RamOptimizerModule : IOptimizationModule
 
     private RamReport BuildReport()
     {
-        // Get memory stats
-        var memInfo = new MEMORYSTATUSEX();
-        GlobalMemoryStatusEx(ref memInfo);
+        double totalGb = 0, usedGb = 0, availGb = 0;
+        int usagePct = 0;
 
-        var totalGb = memInfo.ullTotalPhys / (1024.0 * 1024 * 1024);
-        var availGb = memInfo.ullAvailPhys / (1024.0 * 1024 * 1024);
-        var usedGb = totalGb - availGb;
+        if (OperatingSystem.IsWindows())
+        {
+            var memInfo = new MEMORYSTATUSEX();
+            GlobalMemoryStatusEx(ref memInfo);
+            totalGb = memInfo.ullTotalPhys / (1024.0 * 1024 * 1024);
+            availGb = memInfo.ullAvailPhys / (1024.0 * 1024 * 1024);
+            usedGb = totalGb - availGb;
+            usagePct = (int)memInfo.dwMemoryLoad;
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            try
+            {
+                long totalKb = 0, availKb = 0;
+                foreach (var line in File.ReadLines("/proc/meminfo"))
+                {
+                    if (line.StartsWith("MemTotal:"))
+                        totalKb = ParseKb(line);
+                    else if (line.StartsWith("MemAvailable:"))
+                        availKb = ParseKb(line);
+                }
+                totalGb = totalKb / (1024.0 * 1024);
+                availGb = availKb / (1024.0 * 1024);
+                usedGb = totalGb - availGb;
+                usagePct = totalGb > 0 ? (int)((usedGb / totalGb) * 100) : 0;
+            }
+            catch { }
+        }
 
         // Get all processes sorted by working set
         var procList = new List<ProcessMemoryInfo>();
@@ -174,10 +199,18 @@ public sealed class RamOptimizerModule : IOptimizationModule
             TotalGb = totalGb,
             UsedGb = usedGb,
             AvailableGb = availGb,
-            UsagePercent = (int)memInfo.dwMemoryLoad,
+            UsagePercent = usagePct,
             TopProcesses = procList.Take(50).ToList(),
             TotalReclaimableBytes = reclaimable
         };
+    }
+
+    private static long ParseKb(string line)
+    {
+        var parts = line.Split(':', StringSplitOptions.TrimEntries);
+        if (parts.Length < 2) return 0;
+        var numStr = parts[1].Replace("kB", "").Trim();
+        return long.TryParse(numStr, out var kb) ? kb : 0;
     }
 
     [DllImport("psapi.dll", SetLastError = true)]

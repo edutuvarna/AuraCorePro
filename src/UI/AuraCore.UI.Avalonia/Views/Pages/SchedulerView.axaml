@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.SchedulerView">
+  <ScrollViewer>
+    <StackPanel Spacing="16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Auto-Schedule" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Schedule automatic optimization tasks" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <ItemsControl x:Name="TaskList">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Border Margin="0,0,0,8" CornerRadius="12" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Width="40" Height="40" CornerRadius="10" Background="{Binding IconBg}" VerticalAlignment="Center" Margin="0,0,16,0">
+                  <TextBlock Text="{Binding Icon}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                  <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                  <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+                  <TextBlock Text="{Binding Schedule}" FontSize="10" Foreground="{DynamicResource AccentBlueBrush}"/></StackPanel>
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4">
+                  <Border CornerRadius="8" Padding="8,3" Background="{Binding StatusBg}" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Status}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding StatusFg}"/></Border>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Border CornerRadius="{StaticResource RadiusMd}" Background="#0DF59E0B" Padding="16,10" BorderBrush="#20F59E0B" BorderThickness="1">
+        <TextBlock Text="Scheduled tasks will run automatically in the background. Configure intervals in Settings." FontSize="11" Foreground="#F59E0B"/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

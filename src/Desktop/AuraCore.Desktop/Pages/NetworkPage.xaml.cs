@@ -29,7 +29,7 @@ public sealed partial class NetworkPage : Page
         ScanBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Diagnosing network...";
+        StatusText.Text = S._("net.diagnosingMsg");
         DnsPresetList.Children.Clear();
         PingList.Children.Clear();
         AdapterList.Children.Clear();
@@ -37,12 +37,12 @@ public sealed partial class NetworkPage : Page
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
-            StatusText.Text = "Detecting DNS and pinging servers...";
+            StatusText.Text = S._("net.detectingDns");
             await _module.ScanAsync(new ScanOptions());
             var report = _module.LastReport;
-            if (report is null) { StatusText.Text = "No data."; return; }
+            if (report is null) { StatusText.Text = S._("common.noData"); return; }
 
             // DNS info
             DnsProviderText.Text = report.CurrentDns.ProviderName;
@@ -254,7 +254,7 @@ public sealed partial class NetworkPage : Page
     private async void FlushDns_Click(object sender, RoutedEventArgs e)
     {
         await RunAction("flush-dns");
-        ResultText.Text = "DNS cache flushed successfully.";
+        ResultText.Text = S._("net.dnsFlushed");
         ResultCard.Visibility = Visibility.Visible;
     }
 
@@ -262,8 +262,8 @@ public sealed partial class NetworkPage : Page
     {
         var dialog = new ContentDialog
         {
-            Title = "Reset network adapter?",
-            Content = "This will briefly disconnect your internet (2-3 seconds) while the adapter restarts.",
+            Title = S._("net.resetAdapterTitle"),
+            Content = S._("net.resetAdapterMsg"),
             PrimaryButtonText = "Reset",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot
@@ -271,7 +271,7 @@ public sealed partial class NetworkPage : Page
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
 
         await RunAction("reset-adapter");
-        ResultText.Text = "Network adapter reset. Connection should be restored.";
+        ResultText.Text = S._("net.adapterReset");
         ResultCard.Visibility = Visibility.Visible;
     }
 
@@ -279,7 +279,7 @@ public sealed partial class NetworkPage : Page
     {
         var dialog = new ContentDialog
         {
-            Title = "Reset Winsock catalog?",
+            Title = S._("net.resetWinsockTitle"),
             Content = "This resets the Windows network stack to defaults.\nA restart may be required for full effect.",
             PrimaryButtonText = "Reset",
             CloseButtonText = "Cancel",

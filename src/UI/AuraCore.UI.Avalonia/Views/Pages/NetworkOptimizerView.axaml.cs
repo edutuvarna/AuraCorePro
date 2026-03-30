@@ -1,0 +1,55 @@
+using global::Avalonia.Controls;
+using global::Avalonia.Interactivity;
+using global::Avalonia.Media;
+using AuraCore.Application;
+using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Module.NetworkOptimizer;
+using AuraCore.Module.NetworkOptimizer.Models;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace AuraCore.UI.Avalonia.Views.Pages;
+
+public record AdapterItem(string Name, string Desc, string Ip, string Speed);
+public record DnsPresetItem(string Name, string Servers, string Category, string ActiveLabel, ISolidColorBrush ActiveBrush);
+
+public partial class NetworkOptimizerView : UserControl
+{
+    private readonly NetworkOptimizerModule? _module;
+    public NetworkOptimizerView()
+    {
+        InitializeComponent();
+        Loaded += (s, e) => ApplyLocalization();
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        _module = App.Services.GetServices<IOptimizationModule>().OfType<NetworkOptimizerModule>().FirstOrDefault();
+        Loaded += async (s, e) => await RunScan();
+}
+    private async Task RunScan()
+    {
+        if (_module is null) return;
+        ScanLabel.Text = "Scanning...";
+        try
+        {
+            await _module.ScanAsync(new ScanOptions());
+            var r = _module.LastReport; if (r is null) return;
+            DnsPrimary.Text = r.CurrentDns.Primary;
+            DnsSecondary.Text = r.CurrentDns.Secondary;
+            DnsProvider.Text = r.CurrentDns.ProviderName;
+            DnsLatency.Text = r.CurrentDns.ResponseTimeMs > 0 ? $"{r.CurrentDns.ResponseTimeMs:F0}ms" : "--";
+            AdapterList.ItemsSource = r.Adapters.Select(a => new AdapterItem(a.Name, a.Description, a.IpAddress, a.Speed)).ToList();
+            DnsPresetList.ItemsSource = r.AvailableDnsPresets.Select(p => new DnsPresetItem(
+                p.Name, $"{p.Primary} / {p.Secondary}", p.Category,
+                p.IsCurrentlyActive ? "Active" : "",
+                new SolidColorBrush(Color.Parse(p.IsCurrentlyActive ? "#22C55E" : "#555570"))
+            )).ToList();
+        }
+        catch { SubText.Text = "Scan failed"; }
+        finally { ScanLabel.Text = "Scan"; }
+}
+    private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
+
+    private void ApplyLocalization()
+    {
+        PageTitle.Text = LocalizationService._("nav.network");
+    }
+}

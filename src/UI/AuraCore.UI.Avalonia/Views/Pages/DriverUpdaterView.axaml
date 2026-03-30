@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.DriverUpdaterView">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Driver Updater" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Scan, analyze, and backup system drivers"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Backup_Click"
+              VerticalAlignment="Center" Padding="12,8" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F4BE;" FontSize="12"/>
+          <TextBlock x:Name="BackupLabel" Text="Backup Drivers" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" Classes="action-btn" Click="Scan_Click"
+              VerticalAlignment="Center" Padding="12,8">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F50D;" FontSize="12"/>
+          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- Stats -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
+            Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}"
+            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalDrivers" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Current:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="CurrentDrivers" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Outdated:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="OutdatedDrivers" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Problems:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="ProblemDrivers" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Driver List -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
+            Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}"
+            BorderThickness="1" Padding="4">
+      <Grid RowDefinitions="Auto,*">
+        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+          <Grid ColumnDefinitions="2*,*,100,100,80">
+            <TextBlock Text="DEVICE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="1" Text="MANUFACTURER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="2" Text="VERSION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="3" Text="DATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="4" Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl x:Name="DriverList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                  <Grid ColumnDefinitions="2*,*,100,100,80">
+                    <StackPanel VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Text="{Binding Class}" FontSize="9"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding Mfr}" FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Version}" FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Date}" FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                    <Border Grid.Column="4" CornerRadius="8" Padding="6,2"
+                            Background="{Binding StatusBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}" FontSize="9" FontWeight="SemiBold"
+                                 Foreground="{Binding StatusFg}"/>
+                    </Border>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- Bottom: WinUpdate + DevMgr -->
+    <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*" Margin="0,12,0,0">
+      <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8" Margin="0,0,8,0">
+        <TextBlock Text="Open Windows Update" FontSize="11" FontWeight="SemiBold"/>
+      </Button>
+      <Button Grid.Column="1" Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
+        <TextBlock Text="Open Device Manager" FontSize="11" FontWeight="SemiBold"/>
+      </Button>
+    </Grid>
+  </Grid>
+</UserControl>

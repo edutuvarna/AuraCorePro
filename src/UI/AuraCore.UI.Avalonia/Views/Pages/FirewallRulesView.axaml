@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.FirewallRulesView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Manage Windows Firewall inbound and outbound rules"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <!-- Stats -->
+      <Grid ColumnDefinitions="*,*,*">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Total Rules" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="TotalRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Enabled" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="EnabledRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Blocked" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="BlockedRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource ErrorBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <!-- Rules list -->
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>
+            <Button x:Name="ScanBtn" Content="Scan Rules" Click="Scan_Click" Grid.Column="1"
+                    Classes="action-btn" Padding="16,8"/>
+          </Grid>
+          <TextBlock x:Name="SubText" Text="Click Scan to load firewall rules (requires admin)" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <ItemsControl x:Name="RulesList"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

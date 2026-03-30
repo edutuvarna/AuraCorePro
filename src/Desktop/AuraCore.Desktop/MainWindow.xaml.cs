@@ -155,6 +155,14 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             ["disk-cleanup"] = "nav.diskCleanup",
             ["defender-manager"] = "nav.defender",
             ["iso-builder"] = "nav.isoBuilder",
+            ["service-manager"] = "nav.serviceManager",
+            ["autorun-manager"] = "nav.autorunManager",
+            ["process-monitor"] = "nav.processMonitor",
+            ["hosts-editor"] = "nav.hostsEditor",
+            ["privacy-cleaner"] = "nav.privacyCleaner",
+            ["driver-updater"] = "nav.driverUpdater",
+            ["battery-optimizer"] = "nav.batteryOptimizer",
+            ["startup-optimizer"] = "nav.startupOptimizer",
             ["admin"] = "nav.admin",
         };
 
@@ -167,16 +175,20 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             else if (item is NavigationViewItemHeader header)
             {
                 var ht = header.Content?.ToString() ?? "";
-                if (ht.Contains("Optimization") || ht.Contains("Optimizasyon"))
+                if (ht.Contains("Optim", StringComparison.OrdinalIgnoreCase))
                     header.Content = Services.S._("nav.optimization");
-                else if (ht.Contains("Customization") || ht.Contains("Ki"))
+                else if (ht.Contains("Custom", StringComparison.OrdinalIgnoreCase) || ht.Contains("Kişisel", StringComparison.OrdinalIgnoreCase))
                     header.Content = Services.S._("nav.customization");
-                else if (ht.Contains("Advanced") || ht.Contains("Gelismis"))
+                else if (ht.Contains("Advanced", StringComparison.OrdinalIgnoreCase) || ht.Contains("Geli", StringComparison.OrdinalIgnoreCase))
                     header.Content = Services.S._("nav.advancedTools");
-                else if (ht.Contains("Tools") || ht.Contains("Ara"))
+                else if (ht.Contains("Tools", StringComparison.OrdinalIgnoreCase) || ht.Contains("Araç", StringComparison.OrdinalIgnoreCase))
                     header.Content = Services.S._("nav.tools");
             }
         }
+
+        // WinUI3 built-in Settings item label
+        if (NavView.SettingsItem is NavigationViewItem settingsItem)
+            settingsItem.Content = Services.S._("nav.settings");
     }
 
     private void UpdateTierBadge()
@@ -273,11 +285,15 @@ public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
             "startup-optimizer" => typeof(StartupOptimizerPage),
             "scheduler" => typeof(SchedulerPage),
             "iso-builder" => typeof(IsoBuilderPage),
+            "service-manager" => typeof(ServiceManagerPage),
             "disk-cleanup" => typeof(DiskCleanupPage),
             "defender-manager" => typeof(DefenderPage),
             "privacy-cleaner" => typeof(PrivacyCleanerPage),
             "driver-updater" => typeof(DriverUpdaterPage),
             "battery-optimizer" => typeof(BatteryOptimizerPage),
+            "autorun-manager" => typeof(AutorunManagerPage),
+            "process-monitor" => typeof(ProcessMonitorPage),
+            "hosts-editor" => typeof(HostsEditorPage),
             "admin" => typeof(AdminPanelPage),
             _ => typeof(DashboardPage)
         };

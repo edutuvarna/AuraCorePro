@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.ProcessMonitorView">
+  <Grid RowDefinitions="Auto,Auto,*">
+
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Process Monitor" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubtitleText" Text="Monitor, kill, and manage running processes"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <!-- Search -->
+      <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+              Padding="8,4" Margin="0,0,8,0" VerticalAlignment="Center" MinWidth="200">
+        <TextBox x:Name="SearchBox" Watermark="Search processes..."
+                 Background="Transparent" BorderThickness="0"
+                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
+                 TextChanged="SearchBox_TextChanged"/>
+      </Border>
+      <!-- Auto-refresh toggle -->
+      <Button Grid.Column="2" x:Name="AutoRefreshBtn" Classes="action-btn"
+              Click="AutoRefresh_Click" VerticalAlignment="Center"
+              Padding="12,8" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F504;" FontSize="12"/>
+          <TextBlock x:Name="AutoRefreshLabel" Text="Auto: OFF" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <!-- Scan button -->
+      <Button Grid.Column="3" Classes="action-btn" Click="Scan_Click"
+              VerticalAlignment="Center" Padding="12,8">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F50D;" FontSize="12"/>
+          <TextBlock x:Name="ScanBtnLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- Stats Bar -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Processes:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="ProcCount" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Total CPU:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalCpu" Text="--%" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Total RAM:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalRam" Text="-- MB" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentPurpleBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <TextBlock x:Name="LastScanTime" Text="" FontSize="10"
+                     Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Process List -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="4">
+      <Grid RowDefinitions="Auto,*">
+        <!-- Column Headers -->
+        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+          <Grid ColumnDefinitions="60,2*,*,80,80,80,120">
+            <TextBlock Text="PID" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="1" Text="NAME" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="2" Text="DESCRIPTION" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="3" Text="CPU %" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="RAM MB" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
+            <TextBlock Grid.Column="5" Text="THREADS" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
+            <TextBlock Grid.Column="6" Text="ACTIONS" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+          </Grid>
+        </Border>
+        <!-- Scrollable process rows -->
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl x:Name="ProcessList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,1"
+                        CornerRadius="4" Background="Transparent">
+                  <Grid ColumnDefinitions="60,2*,*,80,80,80,120">
+                    <TextBlock Text="{Binding Pid}" FontSize="11"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Description}" FontSize="10"
+                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="3" Text="{Binding CpuText}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{Binding CpuBrush}" TextAlignment="Right" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="{Binding RamText}" FontSize="11"
+                               Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="{Binding Threads}" FontSize="11"
+                               Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"
+                               VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="4"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <Button Tag="{Binding KillTag}" Classes="action-btn" Padding="6,3"
+                              Click="Action_Click" FontSize="10" Content="Kill"/>
+                      <Button Tag="{Binding SuspendTag}" Classes="action-btn" Padding="6,3"
+                              Click="Action_Click" FontSize="10" Content="{Binding SuspendLabel}"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+  </Grid>
+</UserControl>

@@ -26,33 +26,33 @@ public sealed partial class UpgradePage : Page
 
         var panel = new StackPanel { Spacing = 12 };
 
-        panel.Children.Add(new TextBlock { Text = $"Choose your {tierName} billing plan:", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+        panel.Children.Add(new TextBlock { Text = string.Format(S._("upg.choosePlan"), tierName), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
 
-        var monthlyBtn = new RadioButton { Content = $"Monthly — {monthlyPrice}/month", IsChecked = true, GroupName = "plan" };
-        var yearlyBtn = new RadioButton { Content = $"Yearly — {yearlyPrice}/year (save ~20%)", GroupName = "plan" };
+        var monthlyBtn = new RadioButton { Content = string.Format(S._("upg.monthly"), monthlyPrice), IsChecked = true, GroupName = "plan" };
+        var yearlyBtn = new RadioButton { Content = string.Format(S._("upg.yearly"), yearlyPrice), GroupName = "plan" };
         panel.Children.Add(monthlyBtn);
         panel.Children.Add(yearlyBtn);
 
-        panel.Children.Add(new TextBlock { Text = "Payment method:", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 12, 0, 0) });
+        panel.Children.Add(new TextBlock { Text = S._("upg.paymentMethod"), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 12, 0, 0) });
 
-        var stripeBtn = new RadioButton { Content = "Credit/Debit Card (Stripe)", IsChecked = true, GroupName = "method" };
-        var btcBtn = new RadioButton { Content = "Bitcoin (BTC)", GroupName = "method" };
-        var usdtBtn = new RadioButton { Content = "USDT (ERC-20)", GroupName = "method" };
+        var stripeBtn = new RadioButton { Content = S._("upg.stripe"), IsChecked = true, GroupName = "method" };
+        var btcBtn = new RadioButton { Content = S._("upg.btc"), GroupName = "method" };
+        var usdtBtn = new RadioButton { Content = S._("upg.usdt"), GroupName = "method" };
         panel.Children.Add(stripeBtn);
         panel.Children.Add(btcBtn);
         panel.Children.Add(usdtBtn);
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Card payments are instant. Crypto payments are activated within 1 hour after confirmation.",
+            Text = S._("upg.paymentNote"),
             FontSize = 12, Opacity = 0.5, Margin = new Thickness(0, 8, 0, 0), TextWrapping = TextWrapping.Wrap
         });
 
         var dialog = new ContentDialog
         {
-            Title = $"Upgrade to {tierName}",
+            Title = string.Format(S._("upg.upgradeTitle"), tierName),
             Content = panel,
-            PrimaryButtonText = "Continue",
+            PrimaryButtonText = S._("upg.continueBtn"),
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = this.XamlRoot
@@ -89,7 +89,7 @@ public sealed partial class UpgradePage : Page
 
             if (string.IsNullOrEmpty(token))
             {
-                await ShowErrorDialog("Please sign in first to make a payment.");
+                await ShowErrorDialog(S._("upg.signInFirst"));
                 return;
             }
 
@@ -102,7 +102,7 @@ public sealed partial class UpgradePage : Page
             var response = await Http.SendAsync(request);
             if (!response.IsSuccessStatusCode)
             {
-                await ShowErrorDialog("Failed to create payment. Please try again.");
+                await ShowErrorDialog(S._("upg.createFailed"));
                 return;
             }
 
@@ -129,7 +129,7 @@ public sealed partial class UpgradePage : Page
 
         panel.Children.Add(new TextBlock
         {
-            Text = $"Send exactly ${amount:F2} in {coinName} to:",
+            Text = string.Format(S._("upg.sendAmount"), amount, coinName),
             FontSize = 14, TextWrapping = TextWrapping.Wrap
         });
 
@@ -145,7 +145,7 @@ public sealed partial class UpgradePage : Page
 
         var copyBtn = new Button
         {
-            Content = "Copy Address",
+            Content = S._("upg.copyAddress"),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             Margin = new Thickness(0, 4, 0, 0)
         };
@@ -154,35 +154,35 @@ public sealed partial class UpgradePage : Page
             var dp = new Windows.ApplicationModel.DataTransfer.DataPackage();
             dp.SetText(address);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
-            copyBtn.Content = "Copied!";
+            copyBtn.Content = S._("upg.copied");
         };
         panel.Children.Add(copyBtn);
 
         panel.Children.Add(new TextBlock
         {
-            Text = $"Amount: ${amount:F2} {currency}\n\nAfter sending, paste your TX hash below:",
+            Text = string.Format(S._("upg.amountNote"), amount, currency),
             FontSize = 13, Opacity = 0.7, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0)
         });
 
         var txHashBox = new TextBox
         {
-            PlaceholderText = "Paste transaction hash here...",
+            PlaceholderText = S._("upg.txPlaceholder"),
             Margin = new Thickness(0, 4, 0, 0)
         };
         panel.Children.Add(txHashBox);
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Or email your TX hash to support@auracore.pro\nSubscription activated within 1 hour.",
+            Text = S._("upg.emailNote"),
             FontSize = 12, Opacity = 0.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0)
         });
 
         var dialog = new ContentDialog
         {
-            Title = $"Pay with {coinName}",
+            Title = string.Format(S._("upg.payWithTitle"), coinName),
             Content = panel,
-            PrimaryButtonText = "Submit TX Hash",
-            SecondaryButtonText = "I'll Email Later",
+            PrimaryButtonText = S._("upg.submitTx"),
+            SecondaryButtonText = S._("upg.emailLater"),
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot
         };
@@ -195,7 +195,7 @@ public sealed partial class UpgradePage : Page
         }
         else if (result == ContentDialogResult.Secondary)
         {
-            await ShowInfoDialog("Payment Created", $"Your payment ID: {paymentId}\n\nPlease email your TX hash to support@auracore.pro with this payment ID.\n\nYour subscription will be activated within 1 hour after verification.");
+            await ShowInfoDialog(S._("upg.paymentCreated"), string.Format(S._("upg.paymentCreatedMsg"), paymentId));
         }
     }
 
@@ -216,16 +216,16 @@ public sealed partial class UpgradePage : Page
 
             if (response.IsSuccessStatusCode)
             {
-                await ShowInfoDialog("Payment Submitted", "Thank you! Your transaction is being verified.\nYour subscription will be activated within 1 hour.");
+                await ShowInfoDialog(S._("upg.paymentSubmitted"), S._("upg.paymentSubmittedMsg"));
             }
             else
             {
-                await ShowErrorDialog("Failed to submit TX hash. Please email it to support@auracore.pro instead.");
+                await ShowErrorDialog(S._("upg.txFailed"));
             }
         }
         catch
         {
-            await ShowErrorDialog("Connection error. Please email your TX hash to support@auracore.pro instead.");
+            await ShowErrorDialog(S._("upg.connError"));
         }
     }
 

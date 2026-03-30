@@ -1,0 +1,217 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ══════════════════════════════════════════════════════
+       AuraCore Pro - "Cyber-Utility" Design System
+       Dark-first + Light variant, glassmorphic cards, neon accents
+       ══════════════════════════════════════════════════════ -->
+
+  <Style Selector="Window">
+    <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <!-- ═══ DARK THEME ═══ -->
+        <ResourceDictionary x:Key="Dark">
+          <!-- Backgrounds -->
+          <SolidColorBrush x:Key="BgDeepBrush" Color="#0A0A0F"/>
+          <SolidColorBrush x:Key="BgSurfaceBrush" Color="#12121A"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#1A1A28"/>
+          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#222235"/>
+          <SolidColorBrush x:Key="BgElevatedBrush" Color="#252538"/>
+
+          <!-- Accent: Teal -->
+          <SolidColorBrush x:Key="AccentPrimaryBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="AccentPrimaryDimBrush" Color="#00A888"/>
+
+          <!-- Accent: Blue -->
+          <SolidColorBrush x:Key="AccentBlueBrush" Color="#0080FF"/>
+
+          <!-- Accent: Purple -->
+          <SolidColorBrush x:Key="AccentPurpleBrush" Color="#8B5CF6"/>
+
+          <!-- Semantic -->
+          <SolidColorBrush x:Key="SuccessBrush" Color="#22C55E"/>
+          <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
+          <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
+          <SolidColorBrush x:Key="InfoBrush" Color="#3B82F6"/>
+
+          <!-- Text -->
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E8E8F0"/>
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8888A0"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#555570"/>
+
+          <!-- Borders -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#2A2A3A"/>
+          <SolidColorBrush x:Key="BorderCardBrush" Color="#33334A"/>
+
+          <!-- Window -->
+          <SolidColorBrush x:Key="WindowBgBrush" Color="#0A0A0F"/>
+          <SolidColorBrush x:Key="WindowFgBrush" Color="#E8E8F0"/>
+          <SolidColorBrush x:Key="SidebarBgBrush" Color="#12121A"/>
+          <SolidColorBrush x:Key="NavHoverBrush" Color="#1A1A28"/>
+          <SolidColorBrush x:Key="NavActiveBrush" Color="#1500D4AA"/>
+          <SolidColorBrush x:Key="SectionHeaderBrush" Color="#555570"/>
+          <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12FFFFFF"/>
+          <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#1500D4AA"/>
+        </ResourceDictionary>
+
+        <!-- ═══ LIGHT THEME ═══ -->
+        <ResourceDictionary x:Key="Light">
+          <!-- Backgrounds -->
+          <SolidColorBrush x:Key="BgDeepBrush" Color="#F5F5F8"/>
+          <SolidColorBrush x:Key="BgSurfaceBrush" Color="#EEEEF2"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#F0F0F5"/>
+          <SolidColorBrush x:Key="BgElevatedBrush" Color="#FAFAFE"/>
+
+          <!-- Accent: Teal (slightly deeper for light bg) -->
+          <SolidColorBrush x:Key="AccentPrimaryBrush" Color="#00A888"/>
+          <SolidColorBrush x:Key="AccentPrimaryDimBrush" Color="#008870"/>
+
+          <!-- Accent: Blue -->
+          <SolidColorBrush x:Key="AccentBlueBrush" Color="#0066DD"/>
+
+          <!-- Accent: Purple -->
+          <SolidColorBrush x:Key="AccentPurpleBrush" Color="#7C3AED"/>
+
+          <!-- Semantic -->
+          <SolidColorBrush x:Key="SuccessBrush" Color="#16A34A"/>
+          <SolidColorBrush x:Key="WarningBrush" Color="#D97706"/>
+          <SolidColorBrush x:Key="ErrorBrush" Color="#DC2626"/>
+          <SolidColorBrush x:Key="InfoBrush" Color="#2563EB"/>
+
+          <!-- Text -->
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A2E"/>
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64648A"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#9898B0"/>
+
+          <!-- Borders -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#D8D8E5"/>
+          <SolidColorBrush x:Key="BorderCardBrush" Color="#E0E0EC"/>
+
+          <!-- Window -->
+          <SolidColorBrush x:Key="WindowBgBrush" Color="#F5F5F8"/>
+          <SolidColorBrush x:Key="WindowFgBrush" Color="#1A1A2E"/>
+          <SolidColorBrush x:Key="SidebarBgBrush" Color="#EEEEF2"/>
+          <SolidColorBrush x:Key="NavHoverBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="NavActiveBrush" Color="#1500A888"/>
+          <SolidColorBrush x:Key="SectionHeaderBrush" Color="#9898B0"/>
+          <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#0D000000"/>
+          <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#1500A888"/>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- ── SHARED (theme-independent) RESOURCES ──────── -->
+
+      <!-- Spacing & Radius -->
+      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">14</CornerRadius>
+      <CornerRadius x:Key="RadiusXl">20</CornerRadius>
+      <Thickness x:Key="CardPadding">20</Thickness>
+      <Thickness x:Key="PageMargin">24</Thickness>
+
+      <!-- ── ORBITAL CORE LOGO (from landing page SVG) ── -->
+      <DrawingImage x:Key="OrbitalCoreLogo">
+        <DrawingGroup>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#1A06d6a0" Thickness="0.8"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="94" RadiusY="94"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#9906d6a0" Thickness="3" LineCap="Round"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+              <PathGeometry><PathFigure StartPoint="18,50" IsClosed="False">
+                <ArcSegment Point="182,78" Size="86,50" RotationAngle="-30" IsLargeArc="False" SweepDirection="Clockwise"/>
+              </PathFigure></PathGeometry>
+            </GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#990891b2" Thickness="3" LineCap="Round"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry>
+              <PathGeometry><PathFigure StartPoint="182,122" IsClosed="False">
+                <ArcSegment Point="18,150" Size="86,50" RotationAngle="-30" IsLargeArc="False" SweepDirection="Clockwise"/>
+              </PathFigure></PathGeometry>
+            </GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing Brush="#06d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="46,54" RadiusX="5" RadiusY="5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#B306d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="154,60" RadiusX="3.5" RadiusY="3.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#0891b2"><GeometryDrawing.Geometry><EllipseGeometry Center="154,140" RadiusX="5" RadiusY="5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#B30891b2"><GeometryDrawing.Geometry><EllipseGeometry Center="46,146" RadiusX="3.5" RadiusY="3.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#4D06d6a0" Thickness="1.5" LineCap="Round"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><LineGeometry StartPoint="100,12" EndPoint="100,78"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#4D06d6a0" Thickness="1.5" LineCap="Round"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><LineGeometry StartPoint="100,122" EndPoint="100,188"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing Brush="#8006d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="100,12" RadiusX="2.5" RadiusY="2.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#8006d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="100,188" RadiusX="2.5" RadiusY="2.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#06d6a0" Thickness="1"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="32" RadiusY="32"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing>
+            <GeometryDrawing.Pen><Pen Brush="#0891b2" Thickness="0.8"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="20" RadiusY="20"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing Brush="#4006d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="10" RadiusY="10"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#06d6a0"><GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="6" RadiusY="6"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#0891b2"><GeometryDrawing.Geometry><EllipseGeometry Center="100,100" RadiusX="3" RadiusY="3"/></GeometryDrawing.Geometry></GeometryDrawing>
+        </DrawingGroup>
+      </DrawingImage>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- ── DARK WINDOW STYLE ──────────────────────────── -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource WindowBgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource WindowFgBrush}" />
+  </Style>
+
+  <!-- ── NAV ITEM STYLE ──────────────────────────────── -->
+  <Style Selector="Button.nav-item">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.nav-item:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource NavHoverBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="Button.nav-item.active">
+    <Setter Property="Background" Value="{DynamicResource NavActiveBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+  </Style>
+  <Style Selector="Button.nav-item.active /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource NavActiveBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}" />
+  </Style>
+
+  <!-- ── ACTION BUTTON STYLE ──────────────────────── -->
+  <Style Selector="Button.action-btn">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnBgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="14,12" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.action-btn:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnHoverBrush}" />
+  </Style>
+
+</Styles>

@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.BloatwareRemovalView">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Bloatware Removal" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Remove pre-installed apps you don't need" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalApps" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Removable:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="RemovableApps" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Space:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalSize" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+      <Grid RowDefinitions="Auto,*">
+        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+          <Grid ColumnDefinitions="40,2*,100,80,80,80">
+            <TextBlock Text="" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="1" Text="APP NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="2" Text="CATEGORY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="3" Text="SIZE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="RISK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="ACTION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl x:Name="AppList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                  <Grid ColumnDefinitions="40,2*,100,80,80,80">
+                    <CheckBox IsChecked="{Binding CanRemove}" IsEnabled="{Binding CanRemove}" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Text="{Binding Publisher}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Size}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <Border Grid.Column="4" CornerRadius="8" Padding="6,2" Background="{Binding RiskBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding RiskText}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding RiskFg}"/>
+                    </Border>
+                    <Button Grid.Column="5" Tag="{Binding PkgName}" Classes="action-btn" Padding="6,3" Click="Remove_Click" FontSize="9"
+                            Content="Remove" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding CanRemove}"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+    <TextBlock Grid.Row="3" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
+  </Grid>
+</UserControl>

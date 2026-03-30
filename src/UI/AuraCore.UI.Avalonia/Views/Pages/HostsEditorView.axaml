@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.HostsEditorView">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Hosts File Editor" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubtitleText" Text="Manage /etc/hosts entries with a visual interface"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Backup_Click"
+              VerticalAlignment="Center" Padding="12,8" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F4BE;" FontSize="12"/>
+          <TextBlock Text="Backup" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" Classes="action-btn" Click="Reload_Click"
+              VerticalAlignment="Center" Padding="12,8">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F504;" FontSize="12"/>
+          <TextBlock x:Name="ReloadLabel" Text="Reload" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- Status Bar -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="File:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="FilePath" Text="--" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                     TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Entries:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="EntryCount" Text="--" FontSize="13" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Admin:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="AdminStatus" Text="--" FontSize="11" FontWeight="Bold"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+        <Border Grid.Column="3" x:Name="UnsavedBadge" IsVisible="False"
+                CornerRadius="8" Background="#20F59E0B" Padding="10,4">
+          <TextBlock Text="Unsaved Changes" FontSize="10" FontWeight="SemiBold"
+                     Foreground="{DynamicResource WarningBrush}"/>
+        </Border>
+      </Grid>
+    </Border>
+
+    <!-- Add Entry Row -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusMd}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="12" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="150,*,*,Auto">
+        <TextBox x:Name="NewIp" Watermark="IP Address" Margin="0,0,8,0"
+                 Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
+                 CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
+        <TextBox Grid.Column="1" x:Name="NewHost" Watermark="Hostname" Margin="0,0,8,0"
+                 Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
+                 CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
+        <TextBox Grid.Column="2" x:Name="NewComment" Watermark="Comment (optional)" Margin="0,0,8,0"
+                 Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
+                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
+                 CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
+        <Button Grid.Column="3" Classes="action-btn" Click="AddEntry_Click" Padding="14,6">
+          <TextBlock Text="+ Add" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"/>
+        </Button>
+      </Grid>
+    </Border>
+
+    <!-- Hosts Entry List -->
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+      <Grid RowDefinitions="Auto,*">
+        <!-- Column Headers -->
+        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+          <Grid ColumnDefinitions="40,150,2*,*,80,80">
+            <TextBlock Text="" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="1" Text="IP ADDRESS" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="2" Text="HOSTNAME" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="3" Text="COMMENT" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="4" Text="SOURCE" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="10" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl x:Name="HostsList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,1" CornerRadius="4"
+                        Background="Transparent" Opacity="{Binding RowOpacity}">
+                  <Grid ColumnDefinitions="40,150,2*,*,80,80">
+                    <!-- Toggle -->
+                    <CheckBox IsChecked="{Binding IsEnabled}" IsEnabled="{Binding CanEdit}"
+                              Click="Toggle_Click" Tag="{Binding ToggleTag}"
+                              VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding IpAddress}" FontSize="11"
+                               Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"
+                               FontFamily="Consolas, monospace"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Hostname}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Comment}" FontSize="10"
+                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="4" Text="{Binding SourceLabel}" FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <Button Grid.Column="5" Tag="{Binding DeleteTag}" Classes="action-btn"
+                            Padding="6,3" Click="Delete_Click" FontSize="10"
+                            Content="Delete" IsVisible="{Binding CanEdit}" HorizontalAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Border>
+
+    <!-- Bottom Bar: Import + Save -->
+    <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBox x:Name="ImportUrl" Watermark="Block list URL (e.g. StevenBlack hosts)"
+                 MinWidth="350" Background="Transparent"
+                 BorderBrush="{DynamicResource BorderSubtleBrush}"
+                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="11"
+                 CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
+        <Button Classes="action-btn" Click="Import_Click" Padding="12,6">
+          <TextBlock Text="Import Block List" FontSize="11" FontWeight="SemiBold"/>
+        </Button>
+      </StackPanel>
+      <Button Grid.Column="2" x:Name="SaveBtn" Click="Save_Click"
+              Background="{DynamicResource AccentPrimaryBrush}"
+              Foreground="#0A0A0F" Padding="20,10" CornerRadius="{StaticResource RadiusMd}"
+              FontWeight="Bold" FontSize="12" Content="Save Changes"
+              HorizontalAlignment="Right"/>
+    </Grid>
+
+  </Grid>
+</UserControl>

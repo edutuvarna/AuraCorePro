@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.ScanOptimizeView">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Module" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="PageSubtitle" Text="Scan and optimize"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click"
+              VerticalAlignment="Center" Padding="14,8" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F50D;" FontSize="12"/>
+          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" x:Name="OptimizeBtn" Classes="action-btn" Click="Optimize_Click"
+              VerticalAlignment="Center" Padding="14,8" IsEnabled="False">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x26A1;" FontSize="12"/>
+          <TextBlock x:Name="OptimizeLabel" Text="Optimize" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+
+    <!-- Stats -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Items Found:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="ItemsFound" Text="--" FontSize="15" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Space:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="SpaceSaved" Text="--" FontSize="15" FontWeight="Bold"
+                     Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Risk:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <Border CornerRadius="8" Padding="10,2" Background="#2000D4AA" VerticalAlignment="Center">
+            <TextBlock x:Name="RiskLabel" Text="--" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}"/>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Main Content -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+      <Grid>
+        <!-- Before scan state -->
+        <StackPanel x:Name="BeforeScanPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+          <TextBlock x:Name="BeforeScanIcon" Text="&#x1F50D;" FontSize="48" HorizontalAlignment="Center"/>
+          <TextBlock Text="Click Scan to analyze your system" FontSize="14"
+                     Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="ModuleInfo" Text="" FontSize="11"
+                     Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- After scan state -->
+        <StackPanel x:Name="AfterScanPanel" IsVisible="False" Spacing="16">
+          <TextBlock x:Name="ScanResultText" Text="" FontSize="14" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"/>
+          <TextBlock x:Name="ScanDetailText" Text="" FontSize="12"
+                     Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Progress state -->
+        <StackPanel x:Name="ProgressPanel" IsVisible="False" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" Spacing="12">
+          <TextBlock x:Name="ProgressText" Text="Optimizing..." FontSize="16" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center"/>
+          <Border Height="6" CornerRadius="3" Background="#1A1A28" Width="300">
+            <Border x:Name="ProgressBar" Height="6" CornerRadius="3"
+                    Background="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Left" Width="0"/>
+          </Border>
+          <TextBlock x:Name="ProgressDetail" Text="" FontSize="11"
+                     Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Result state -->
+        <StackPanel x:Name="ResultPanel" IsVisible="False" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" Spacing="12">
+          <TextBlock Text="&#x2714;" FontSize="48" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource SuccessBrush}"/>
+          <TextBlock x:Name="ResultTitle" Text="Optimization Complete" FontSize="18" FontWeight="Bold"
+                     Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="ResultDetail" Text="" FontSize="13"
+                     Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"
+                     TextWrapping="Wrap" MaxWidth="400" TextAlignment="Center"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Bottom: Module metadata -->
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusMd}"
+            Background="#0D00D4AA" Padding="12,8" Margin="0,12,0,0"
+            BorderBrush="#2000D4AA" BorderThickness="1">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Text="&#x2699;" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
+        <TextBlock x:Name="ModuleMeta" Grid.Column="1" FontSize="11"
+                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+        <TextBlock x:Name="PlatformBadge" Grid.Column="2" FontSize="10"
+                   Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+      </Grid>
+    </Border>
+
+  </Grid>
+</UserControl>

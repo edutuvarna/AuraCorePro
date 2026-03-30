@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>AuraCore.Pro</AssemblyName>
+    <RootNamespace>AuraCore.UI.Avalonia</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.7" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Core -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\AuraCore.Domain\AuraCore.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\AuraCore.Application\AuraCore.Application.csproj" />
+    <ProjectReference Include="..\..\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <!-- ALL modules -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SystemHealth\AuraCore.Module.SystemHealth.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.JunkCleaner\AuraCore.Module.JunkCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.RamOptimizer\AuraCore.Module.RamOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.StorageCompression\AuraCore.Module.StorageCompression.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.RegistryOptimizer\AuraCore.Module.RegistryOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.BloatwareRemoval\AuraCore.Module.BloatwareRemoval.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.NetworkOptimizer\AuraCore.Module.NetworkOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.GamingMode\AuraCore.Module.GamingMode.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.AppInstaller\AuraCore.Module.AppInstaller.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ContextMenu\AuraCore.Module.ContextMenu.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.TaskbarTweaks\AuraCore.Module.TaskbarTweaks.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ExplorerTweaks\AuraCore.Module.ExplorerTweaks.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DiskCleanup\AuraCore.Module.DiskCleanup.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DefenderManager\AuraCore.Module.DefenderManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.PrivacyCleaner\AuraCore.Module.PrivacyCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DriverUpdater\AuraCore.Module.DriverUpdater.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.BatteryOptimizer\AuraCore.Module.BatteryOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.AutorunManager\AuraCore.Module.AutorunManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ProcessMonitor\AuraCore.Module.ProcessMonitor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.HostsEditor\AuraCore.Module.HostsEditor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.EnvironmentVariables\AuraCore.Module.EnvironmentVariables.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FirewallRules\AuraCore.Module.FirewallRules.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SymlinkManager\AuraCore.Module.SymlinkManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FileShredder\AuraCore.Module.FileShredder.csproj" />
+  </ItemGroup>
+</Project>

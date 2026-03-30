@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.GamingModeView">
+  <ScrollViewer>
+    <StackPanel Spacing="16">
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="4">
+          <TextBlock x:Name="PageTitle" Text="Gaming Mode" FontSize="28" FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="SubText" Text="Boost gaming performance with one click"
+                     FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+        <Button Grid.Column="1" x:Name="ActivateBtn" Click="Activate_Click"
+                Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+                Padding="20,10" CornerRadius="{StaticResource RadiusMd}" FontWeight="Bold" FontSize="13">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="&#x26A1;" FontSize="14"/>
+            <TextBlock x:Name="ActivateLabel" Text="Activate" FontSize="13" FontWeight="Bold"/>
+          </StackPanel>
+        </Button>
+      </Grid>
+
+      <!-- Status -->
+      <Border CornerRadius="{StaticResource RadiusMd}" Padding="16,10"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+              x:Name="StatusBorder" Background="{DynamicResource BgCardBrush}">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Width="10" Height="10" CornerRadius="5" x:Name="StatusDot"
+                  Background="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+          <TextBlock Grid.Column="1" x:Name="StatusLabel" Text="Inactive" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          <TextBlock Grid.Column="2" x:Name="PowerPlanText" Text="" FontSize="11"
+                     Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+
+      <!-- Toggle List -->
+      <TextBlock Text="OPTIMIZATIONS" FontSize="10" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+      <StackPanel x:Name="TogglePanel" Spacing="6"/>
+
+      <!-- Background Processes -->
+      <TextBlock Text="BACKGROUND PROCESSES" FontSize="10" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+      <Border CornerRadius="{StaticResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+        <ScrollViewer MaxHeight="300">
+          <ItemsControl x:Name="ProcessList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                  <Grid ColumnDefinitions="Auto,*,80,80">
+                    <CheckBox IsChecked="{Binding Suggest}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{Binding MemText}" FontSize="11"
+                               Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="10"
+                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

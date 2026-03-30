@@ -36,19 +36,19 @@ public sealed partial class DiskCleanupPage : Page
     {
         ScanBtn.IsEnabled = false; CleanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Deep scanning system...";
+        StatusText.Text = S._("dc.deepScanning");
         CategoryList.Children.Clear(); ResultCard.Visibility = Visibility.Collapsed;
         _categorySelections.Clear();
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
             await _module.ScanAsync(new ScanOptions());
             _lastReport = _module.LastReport;
 
             if (_lastReport is null || _lastReport.TotalFiles == 0)
             {
-                StatusText.Text = "No reclaimable space found - your system is already clean!";
+                StatusText.Text = S._("dc.noSpaceFound");
                 SummaryCard.Visibility = Visibility.Collapsed;
                 return;
             }
@@ -61,11 +61,11 @@ public sealed partial class DiskCleanupPage : Page
 
             // Select All / Deselect All
             var selectAllRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(0, 4, 0, 4) };
-            var selectAllBtn = new Button { Content = "Select All", Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
+            var selectAllBtn = new Button { Content = S._("common.selectAll"), Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
             selectAllBtn.Click += (s, ev) => { foreach (var k in _categorySelections.Keys.ToList()) _categorySelections[k] = true; RebuildUI(); };
-            var deselectAllBtn = new Button { Content = "Deselect All", Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
+            var deselectAllBtn = new Button { Content = S._("common.deselectAll"), Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
             deselectAllBtn.Click += (s, ev) => { foreach (var k in _categorySelections.Keys.ToList()) _categorySelections[k] = false; RebuildUI(); };
-            var safeOnlyBtn = new Button { Content = "Safe Only", Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
+            var safeOnlyBtn = new Button { Content = S._("common.safeOnly"), Padding = new Thickness(12, 4, 12, 4), FontSize = 12 };
             safeOnlyBtn.Click += (s, ev) =>
             {
                 foreach (var cat in _lastReport.Categories)
@@ -84,7 +84,7 @@ public sealed partial class DiskCleanupPage : Page
             UpdateCleanBtn();
             StatusText.Text = $"Found {_lastReport.TotalSizeDisplay} reclaimable in {_lastReport.Categories.Count} categories";
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -263,7 +263,7 @@ public sealed partial class DiskCleanupPage : Page
 
         ScanBtn.IsEnabled = false; CleanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Deep cleaning...";
+        StatusText.Text = S._("dc.deepCleaning");
 
         try
         {
@@ -280,10 +280,10 @@ public sealed partial class DiskCleanupPage : Page
                 _ => $"{result.BytesFreed / (1024.0 * 1024 * 1024):F2} GB"
             };
 
-            ResultTitle.Text = $"Reclaimed {freedDisplay}";
+            ResultTitle.Text = string.Format(S._("dc.reclaimed"), freedDisplay);
             ResultDetail.Text = $"Deleted {result.ItemsProcessed:N0} files in {result.Duration.TotalSeconds:F1}s";
             ResultCard.Visibility = Visibility.Visible;
-            StatusText.Text = "Deep clean complete!";
+            StatusText.Text = S._("dc.deepCleanComplete");
             CategoryList.Children.Clear();
             SummaryCard.Visibility = Visibility.Collapsed;
             _lastReport = null;

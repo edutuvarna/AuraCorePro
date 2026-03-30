@@ -9,6 +9,13 @@ public interface IOptimizationModule
     OptimizationCategory Category { get; }
     RiskLevel Risk { get; }
 
+    /// <summary>
+    /// Which platform(s) this module supports.
+    /// Default: Windows (all existing modules are Windows-only).
+    /// Override to SupportedPlatform.All for cross-platform modules (e.g. HostsEditor).
+    /// </summary>
+    SupportedPlatform Platform => SupportedPlatform.Windows;
+
     Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default);
     Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan,

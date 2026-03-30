@@ -28,21 +28,21 @@ public sealed partial class RegistryPage : Page
     {
         ScanBtn.IsEnabled = false; FixBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Scanning registry...";
+        StatusText.Text = S._("reg.scanning");
         IssueList.Children.Clear(); ResultCard.Visibility = Visibility.Collapsed;
         _selections.Clear();
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
             await _module.ScanAsync(new ScanOptions());
             var report = _module.LastReport;
-            if (report is null) { StatusText.Text = "No data."; return; }
+            if (report is null) { StatusText.Text = S._("common.noData"); return; }
 
             if (report.TotalIssues == 0)
             {
-                StatusText.Text = "No registry issues found — your registry is clean!";
+                StatusText.Text = S._("reg.noIssuesFound");
                 SummaryCard.Visibility = Visibility.Collapsed;
                 return;
             }
@@ -164,11 +164,11 @@ public sealed partial class RegistryPage : Page
                 IssueList.Children.Add(section);
             }
 
-            StatusText.Text = $"Found {report.TotalIssues} issues — {report.SafeIssues} safe to fix";
+            StatusText.Text = string.Format(S._("reg.foundIssues"), report.TotalIssues, report.SafeIssues);
             FixAllSafeBtn.IsEnabled = report.SafeIssues > 0;
             LoadBackupHistory();
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -191,7 +191,7 @@ public sealed partial class RegistryPage : Page
         var dialog = new ContentDialog
         {
             Title = $"Fix {selected.Count} registry issue(s)?",
-            Content = "A full backup of your user registry will be created before any changes.\nThis backup can be restored at any time.\n\nNote: HKLM entries (Caution items) require running as Administrator.",
+            Content = S._("reg.backupWarning") + "\nThis backup can be restored at any time.\n\nNote: HKLM entries (Caution items) require running as Administrator.",
             PrimaryButtonText = "Create Backup & Fix",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
@@ -202,7 +202,7 @@ public sealed partial class RegistryPage : Page
 
         ScanBtn.IsEnabled = false; FixBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Creating backup...";
+        StatusText.Text = S._("reg.creatingBackup");
 
         try
         {
@@ -222,7 +222,7 @@ public sealed partial class RegistryPage : Page
             ResultCard.Visibility = Visibility.Visible;
             RestoreBtn.Visibility = Visibility.Visible;
             LoadBackupHistory();
-            StatusText.Text = "Registry optimization complete!";
+            StatusText.Text = S._("reg.optimizationComplete");
         }
         catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
         finally

@@ -44,7 +44,7 @@ public sealed partial class RamOptimizerPage : Page
             _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
             _refreshTimer.Tick += (s, ev) => RefreshTrendDisplay();
             _refreshTimer.Start();
-            StatusText.Text = "Trend tracking active — sampling every 5s...";
+            StatusText.Text = S._("ram.trendActive");
         }
         else
         {
@@ -52,7 +52,7 @@ public sealed partial class RamOptimizerPage : Page
             _refreshTimer?.Stop();
             _refreshTimer = null;
             LeakAlertCard.Visibility = Visibility.Collapsed;
-            StatusText.Text = "Trend tracking stopped.";
+            StatusText.Text = S._("ram.trendStopped");
         }
     }
 
@@ -154,17 +154,17 @@ public sealed partial class RamOptimizerPage : Page
         OptimizeBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Analyzing memory usage...";
+        StatusText.Text = S._("ram.analyzingMsg");
         ProcessList.Children.Clear();
         ResultCard.Visibility = Visibility.Collapsed;
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
             await _module.ScanAsync(new ScanOptions());
             var report = _module.LastReport;
-            if (report is null) { StatusText.Text = "Scan returned no data."; return; }
+            if (report is null) { StatusText.Text = S._("ram.noData"); return; }
 
             // Memory overview
             TotalRamText.Text = report.TotalDisplay;
@@ -210,8 +210,8 @@ public sealed partial class RamOptimizerPage : Page
     {
         var dialog = new ContentDialog
         {
-            Title = "Optimize RAM?",
-            Content = "This will trim the working set of non-essential processes.\nApplications will briefly use less RAM but can reclaim it as needed.\nThis is safe and non-destructive.",
+            Title = S._("ram.optimizeTitle"),
+            Content = S._("ram.optimizeMsg"),
             PrimaryButtonText = "Optimize",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
@@ -224,7 +224,7 @@ public sealed partial class RamOptimizerPage : Page
         OptimizeBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Optimizing RAM...";
+        StatusText.Text = S._("ram.optimizing");
 
         try
         {

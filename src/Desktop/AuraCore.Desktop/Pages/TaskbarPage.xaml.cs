@@ -56,9 +56,15 @@ public sealed partial class TaskbarPage : Page
                 }
                 TweakList.Children.Add(section);
             }
-            StatusText.Text = $"Found {report.Tweaks.Count} settings — {report.AppliedCount} active";
+            StatusText.Text = string.Format(S._("taskbar.foundSettings"), report.Tweaks.Count, report.AppliedCount);
+
+            TotalText.Text = report.Tweaks.Count.ToString();
+            ActiveText.Text = report.AppliedCount.ToString();
+            SafeText.Text = report.Tweaks.Count(t => t.Risk == "Safe").ToString();
+            CautionText.Text = report.Tweaks.Count(t => t.Risk == "Caution").ToString();
+            SummaryCard.Visibility = Visibility.Visible;
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally { ScanBtn.IsEnabled = true; Progress.IsActive = false; Progress.Visibility = Visibility.Collapsed; }
     }
 
@@ -77,22 +83,22 @@ public sealed partial class TaskbarPage : Page
         var dialog = new ContentDialog
         {
             Title = $"Apply {ids.Count} taskbar change(s)?",
-            Content = "This modifies registry settings and restarts Explorer. Your desktop will briefly flash.",
+            Content = S._("taskbar.modifyWarning"),
             PrimaryButtonText = "Apply", CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Primary
         };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
 
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Applying...";
+        StatusText.Text = S._("common.applying");
 
         var plan = new OptimizationPlan("taskbar-tweaks", ids);
         var progress = new Progress<TaskProgress>(p => DispatcherQueue.TryEnqueue(() => StatusText.Text = p.StatusText));
         var result = await _module!.OptimizeAsync(plan, progress);
 
-        ResultText.Text = $"Applied {result.ItemsProcessed} change(s) — Explorer restarted. All changes reversible.";
+        ResultText.Text = string.Format(S._("taskbar.changesApplied"), result.ItemsProcessed);
         ResultCard.Visibility = Visibility.Visible;
-        StatusText.Text = "Done!";
+        StatusText.Text = S._("common.done");
         Progress.IsActive = false; Progress.Visibility = Visibility.Collapsed;
     }
 

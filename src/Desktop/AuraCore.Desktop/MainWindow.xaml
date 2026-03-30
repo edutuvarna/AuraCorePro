@@ -123,6 +123,18 @@
                 <NavigationViewItem Content="ISO Builder" Tag="iso-builder">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE958;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="Service Manager" Tag="service-manager">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE90E;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Autorun Manager" Tag="autorun-manager">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE7E8;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Process Monitor" Tag="process-monitor">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xEBC4;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Hosts Editor" Tag="hosts-editor">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE8C4;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
 
                 <NavigationViewItem x:Name="AdminNavItem" Content="Admin Panel" Tag="admin" Visibility="Collapsed">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE7EF;" /></NavigationViewItem.Icon>

@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.RamOptimizerView">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="RAM Optimizer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Free up memory by trimming process working sets" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" x:Name="OptBtn" Click="Optimize_Click" Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+              Padding="16,8" CornerRadius="{StaticResource RadiusMd}" FontWeight="Bold" FontSize="12" IsEnabled="False">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x26A1;" FontSize="12"/><TextBlock x:Name="OptLabel" Text="Optimize" FontSize="12" FontWeight="Bold"/>
+        </StackPanel>
+      </Button>
+    </Grid>
+    <!-- RAM Bar -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20" Margin="0,0,0,12">
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock x:Name="UsedRam" Text="--" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
+            <TextBlock x:Name="TotalRam" Text="/ -- GB" FontSize="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock x:Name="RamPct" Text="--%"  FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock x:Name="Reclaimable" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+          </StackPanel>
+        </Grid>
+        <Border Height="8" CornerRadius="4" Background="#1A1A28">
+          <Border x:Name="RamBar" Height="8" CornerRadius="4" Background="{DynamicResource AccentBlueBrush}" HorizontalAlignment="Left" Width="0"/>
+        </Border>
+      </StackPanel>
+    </Border>
+    <!-- Stats -->
+    <TextBlock Grid.Row="2" Text="TOP MEMORY CONSUMERS" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+    <!-- Process List -->
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+      <ScrollViewer>
+        <ItemsControl x:Name="ProcessList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                <Grid ColumnDefinitions="60,2*,100,80,80">
+                  <TextBlock Text="{Binding Pid}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Memory}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
+                  <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                  <Border Grid.Column="4" CornerRadius="4" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          Background="{Binding EssentialBrush}"/>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+    <TextBlock Grid.Row="4" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
+  </Grid>
+</UserControl>

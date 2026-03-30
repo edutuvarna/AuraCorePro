@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.GenericModuleView">
+  <StackPanel Spacing="16">
+    <TextBlock x:Name="ModTitle" FontSize="28" FontWeight="Bold"
+               Foreground="{DynamicResource TextPrimaryBrush}"/>
+    <TextBlock x:Name="ModSubtitle" FontSize="13"
+               Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <Border CornerRadius="{StaticResource RadiusLg}"
+            Background="{DynamicResource BgCardBrush}"
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            Padding="32" MinHeight="300">
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+        <TextBlock x:Name="ModIcon" FontSize="48" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="ModStatus" Text="Module loaded successfully"
+                   FontSize="14" Foreground="{DynamicResource AccentPrimaryBrush}"
+                   HorizontalAlignment="Center"/>
+        <TextBlock Text="This module is active. Full UI will be ported in upcoming updates."
+                   FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                   HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="400"
+                   TextAlignment="Center"/>
+        <Border CornerRadius="6" Background="#1500D4AA" Padding="12,6" Margin="0,8,0,0"
+                HorizontalAlignment="Center">
+          <TextBlock x:Name="ModPlatform" FontSize="11"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"/>
+        </Border>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

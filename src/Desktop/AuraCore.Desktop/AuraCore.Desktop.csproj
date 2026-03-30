@@ -60,5 +60,12 @@
     <ProjectReference Include="../../Modules/AuraCore.Module.PrivacyCleaner/AuraCore.Module.PrivacyCleaner.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.DriverUpdater/AuraCore.Module.DriverUpdater.csproj" />
     <ProjectReference Include="../../Modules/AuraCore.Module.BatteryOptimizer/AuraCore.Module.BatteryOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.AutorunManager\AuraCore.Module.AutorunManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ProcessMonitor\AuraCore.Module.ProcessMonitor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.HostsEditor\AuraCore.Module.HostsEditor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.EnvironmentVariables\AuraCore.Module.EnvironmentVariables.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FirewallRules\AuraCore.Module.FirewallRules.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SymlinkManager\AuraCore.Module.SymlinkManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FileShredder\AuraCore.Module.FileShredder.csproj" />
   </ItemGroup>
 </Project>

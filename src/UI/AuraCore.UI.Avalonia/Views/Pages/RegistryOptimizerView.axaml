@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.RegistryOptimizerView">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Registry Optimizer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Find and fix broken registry entries" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
+      </Button>
+      <Button Grid.Column="2" x:Name="FixBtn" Click="Fix_Click" Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+              Padding="16,8" CornerRadius="{StaticResource RadiusMd}" FontWeight="Bold" FontSize="12" IsEnabled="False" Content="Fix Issues"/>
+    </Grid>
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Grid ColumnDefinitions="*,*,*">
+        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Issues:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="TotalIssues" Text="--" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/></StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><TextBlock Text="Safe:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="SafeIssues" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/></StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"><TextBlock Text="Caution:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          <TextBlock x:Name="CautionIssues" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/></StackPanel>
+      </Grid>
+    </Border>
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+      <ScrollViewer>
+        <ItemsControl x:Name="IssueList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Padding="12,8" Margin="0,1" CornerRadius="4">
+                <Grid ColumnDefinitions="*,120,80">
+                  <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding Desc}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding KeyPath}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" TextTrimming="CharacterEllipsis"/></StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
+                  <Border Grid.Column="2" CornerRadius="8" Padding="6,2" Background="{Binding RiskBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Risk}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding RiskFg}"/></Border>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+    <TextBlock Grid.Row="3" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
+  </Grid>
+</UserControl>

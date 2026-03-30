@@ -30,18 +30,18 @@ public sealed partial class StoragePage : Page
         CompressBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Analyzing storage...";
+        StatusText.Text = S._("storage.analyzing");
         FolderList.Children.Clear();
         ResultCard.Visibility = Visibility.Collapsed;
         _selections.Clear();
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
             await _module.ScanAsync(new ScanOptions());
             var report = _module.LastReport;
-            if (report is null) { StatusText.Text = "No data."; return; }
+            if (report is null) { StatusText.Text = S._("common.noData"); return; }
 
             // Summary
             FolderCountText.Text = report.Folders.Count.ToString();
@@ -169,7 +169,7 @@ public sealed partial class StoragePage : Page
                         var dlg = new ContentDialog
                         {
                             Title = $"Decompress {folder.DisplayName}?",
-                            Content = "This will reverse the compression and restore files to their original size.",
+                            Content = S._("storage.decompressConfirm"),
                             PrimaryButtonText = "Decompress", CloseButtonText = "Cancel",
                             XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Close
                         };
@@ -221,9 +221,9 @@ public sealed partial class StoragePage : Page
             }
 
             UpdateCompressBtn();
-            StatusText.Text = $"Found {report.Folders.Count} folders — estimated {report.SavingsDisplay} savings";
+            StatusText.Text = string.Format(S._("storage.foundFolders"), report.Folders.Count, report.SavingsDisplay);
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -307,7 +307,7 @@ public sealed partial class StoragePage : Page
         ResultTitle.Text = $"Compressed {result.ItemsProcessed} folder(s)";
         ResultDetail.Text = $"Estimated {savedDisplay} saved in {result.Duration.TotalSeconds:F1}s — fully reversible";
         ResultCard.Visibility = Visibility.Visible;
-        StatusText.Text = "Compression complete!";
+        StatusText.Text = S._("storage.compressionComplete");
 
         ScanBtn.IsEnabled = true;
         Progress.IsActive = false;

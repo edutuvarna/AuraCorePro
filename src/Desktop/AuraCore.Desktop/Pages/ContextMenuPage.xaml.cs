@@ -32,7 +32,7 @@ public sealed partial class ContextMenuPage : Page
         ApplyBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Scanning context menu settings...";
+        StatusText.Text = S._("ctx.scanningSettings");
         TweakList.Children.Clear();
         ResultCard.Visibility = Visibility.Collapsed;
         _tweakSelections.Clear();
@@ -40,11 +40,11 @@ public sealed partial class ContextMenuPage : Page
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
             await _module.ScanAsync(new ScanOptions());
             var report = _module.LastReport;
-            if (report is null) { StatusText.Text = "No data."; return; }
+            if (report is null) { StatusText.Text = S._("common.noData"); return; }
 
             // Classic menu toggle
             ClassicMenuToggle.IsOn = report.IsClassicMenuEnabled;
@@ -164,9 +164,17 @@ public sealed partial class ContextMenuPage : Page
                 TweakList.Children.Add(section);
             }
 
-            StatusText.Text = $"Found {report.Tweaks.Count} context menu options — {report.AppliedCount} currently applied";
+            StatusText.Text = string.Format(S._("ctx.foundOptions"), report.Tweaks.Count, report.AppliedCount);
+
+            TotalText.Text = report.Tweaks.Count.ToString();
+            AppliedText.Text = report.AppliedCount.ToString();
+            ClassicMenuStatText.Text = report.IsClassicMenuEnabled ? "Active" : "Inactive";
+            ClassicMenuStatText.Foreground = report.IsClassicMenuEnabled
+                ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 46, 125, 50))
+                : new SolidColorBrush(Windows.UI.Color.FromArgb(160, 128, 128, 128));
+            SummaryCard.Visibility = Visibility.Visible;
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -192,8 +200,8 @@ public sealed partial class ContextMenuPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = $"Apply {ids.Count} context menu change(s)?",
-            Content = "This will modify registry settings and restart Windows Explorer.\nYour desktop will briefly flash. All changes are reversible.",
+            Title = string.Format(S._("ctx.applyChangesConfirm"), ids.Count),
+            Content = S._("ctx.modifyRegistryWarning"),
             PrimaryButtonText = "Apply",
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
@@ -206,7 +214,7 @@ public sealed partial class ContextMenuPage : Page
         ApplyBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Applying changes...";
+        StatusText.Text = S._("ctx.applyingChanges");
 
         try
         {
@@ -219,10 +227,10 @@ public sealed partial class ContextMenuPage : Page
 
             var result = await _module.OptimizeAsync(plan, progress);
 
-            ResultTitle.Text = $"Applied {result.ItemsProcessed} change(s)";
+            ResultTitle.Text = $"{result.ItemsProcessed} " + (result.ItemsProcessed == 1 ? "değişiklik" : "değişiklik") + " uygulandı";
             ResultDetail.Text = "Explorer has been restarted. Right-click to see the changes.\nAll changes are reversible — run Scan again to toggle them off.";
             ResultCard.Visibility = Visibility.Visible;
-            StatusText.Text = "Changes applied! Right-click to verify.";
+            StatusText.Text = S._("ctx.changesApplied");
         }
         catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
         finally

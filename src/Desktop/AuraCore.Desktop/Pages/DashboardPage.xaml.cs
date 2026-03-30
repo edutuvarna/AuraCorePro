@@ -302,7 +302,7 @@ public sealed partial class DashboardPage : Page
         }
         catch (Exception ex)
         {
-            QuickActionStatus.Text = $"Cleanup error: {ex.Message}";
+            QuickActionStatus.Text = string.Format(S._("dash.cleanupError"), ex.Message);
         }
         finally
         {
@@ -326,7 +326,7 @@ public sealed partial class DashboardPage : Page
     {
         QuickActionStatus.Text = "Running health scan...";
         var mod = App.Current.Services.GetServices<IOptimizationModule>().FirstOrDefault(m => m.Id == "system-health");
-        if (mod is null) { QuickActionStatus.Text = "Health module not available."; return; }
+        if (mod is null) { QuickActionStatus.Text = S._("dash.healthUnavailable"); return; }
         try
         {
             var r = await mod.ScanAsync(new ScanOptions());
@@ -340,7 +340,7 @@ public sealed partial class DashboardPage : Page
                 (navView?.Content as Frame)?.Navigate(typeof(SystemHealthPage));
             }
         }
-        catch (Exception ex) { QuickActionStatus.Text = $"Health scan failed: {ex.Message}"; }
+        catch (Exception ex) { QuickActionStatus.Text = string.Format(S._("dash.healthFailed"), ex.Message); }
     }
 
     // ── ACTIVITY LOG ─────────────────────────────────────────

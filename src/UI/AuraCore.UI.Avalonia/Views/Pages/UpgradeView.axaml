@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.UpgradeView">
+  <ScrollViewer>
+    <StackPanel Spacing="24" HorizontalAlignment="Center" MaxWidth="600" Margin="0,40">
+
+      <!-- Lock Icon -->
+      <TextBlock Text="&#x26BF;" FontSize="64" HorizontalAlignment="Center"
+                 Foreground="#8B5CF6"/>
+
+      <!-- Title -->
+      <StackPanel Spacing="4" HorizontalAlignment="Center">
+        <TextBlock x:Name="TitleText" Text="Upgrade Required" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}" TextAlignment="Center"/>
+        <TextBlock x:Name="SubText" Text="This module requires a Pro subscription"
+                   FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
+      </StackPanel>
+
+      <!-- Plan Cards -->
+      <Grid ColumnDefinitions="*,*" Margin="0,16">
+        <!-- Free -->
+        <Border Grid.Column="0" Margin="0,0,8,0" CornerRadius="{StaticResource RadiusLg}"
+                Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}"
+                BorderThickness="1" Padding="24">
+          <StackPanel Spacing="12" HorizontalAlignment="Center">
+            <TextBlock Text="Free" FontSize="18" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" TextAlignment="Center"/>
+            <TextBlock Text="$0" FontSize="32" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Text="Basic optimization tools" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
+            <StackPanel Spacing="6">
+              <TextBlock Text="&#x2714; System Health" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="&#x2714; Junk Cleaner" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="&#x2714; RAM Optimizer" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="&#x2714; Network Optimizer" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="&#x2714; Gaming Mode" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+            <Border CornerRadius="{StaticResource RadiusMd}" Background="#208888A0"
+                    Padding="16,8" HorizontalAlignment="Center">
+              <TextBlock Text="Current Plan" FontSize="12" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <!-- Pro -->
+        <Border Grid.Column="1" Margin="8,0,0,0" CornerRadius="{StaticResource RadiusLg}"
+                Background="#0D00D4AA" BorderBrush="{DynamicResource AccentPrimaryBrush}"
+                BorderThickness="2" Padding="24">
+          <StackPanel Spacing="12" HorizontalAlignment="Center">
+            <TextBlock Text="Pro" FontSize="18" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}" TextAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2">
+              <TextBlock Text="$9.99" FontSize="32" FontWeight="Bold"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="/mo" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+            </StackPanel>
+            <TextBlock Text="All modules unlocked" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
+            <StackPanel Spacing="6">
+              <TextBlock Text="&#x2714; Everything in Free" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="&#x2714; Registry Optimizer" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="&#x2714; Bloatware Removal" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="&#x2714; Privacy Cleaner" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="&#x2714; ISO Builder" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock Text="&#x2714; Driver Updater" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+            </StackPanel>
+            <Button x:Name="UpgradeBtn" Click="Upgrade_Click"
+                    Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+                    Padding="20,10" CornerRadius="{StaticResource RadiusMd}"
+                    FontWeight="Bold" FontSize="13" HorizontalAlignment="Center"
+                    Content="Upgrade to Pro"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Yearly discount -->
+      <Border CornerRadius="{StaticResource RadiusMd}" Background="#0D8B5CF6"
+              Padding="16,10" HorizontalAlignment="Center"
+              BorderBrush="#208B5CF6" BorderThickness="1">
+        <TextBlock Text="Save 33% with yearly plan - $79.99/year ($6.67/mo)"
+                   FontSize="12" Foreground="#8B5CF6" TextAlignment="Center"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

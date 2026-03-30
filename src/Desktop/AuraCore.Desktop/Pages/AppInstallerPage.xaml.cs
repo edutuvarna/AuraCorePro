@@ -34,7 +34,7 @@ public sealed partial class AppInstallerPage : Page
         var modules = App.Current.Services.GetServices<IOptimizationModule>();
         _module = modules.FirstOrDefault(m => m.Id == "app-installer") as AppInstallerModule;
 
-        if (_module is null) { WingetStatusText.Text = "Module not available."; return; }
+        if (_module is null) { WingetStatusText.Text = S._("common.moduleUnavailable"); return; }
 
         await _module.ScanAsync(new ScanOptions());
         var report = _module.LastReport;
@@ -44,11 +44,11 @@ public sealed partial class AppInstallerPage : Page
 
         if (report is null || !report.WinGetAvailable)
         {
-            WingetStatusText.Text = "WinGet is not available. Please install App Installer from the Microsoft Store.";
+            WingetStatusText.Text = S._("apps.wingetUnavailable");
             return;
         }
 
-        WingetStatusText.Text = $"WinGet ready — {report.InstalledApps.Count} apps installed on this system";
+        WingetStatusText.Text = string.Format(S._("apps.wingetReady"), report.InstalledApps.Count);
         TabBar.Visibility = Visibility.Visible;
         RenderBundles(report);
     }
@@ -152,7 +152,7 @@ public sealed partial class AppInstallerPage : Page
                     };
                     badge.Child = new TextBlock
                     {
-                        Text = "INSTALLED",
+                        Text = S._("apps.installedBadge"),
                         FontSize = 10,
                         Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 46, 125, 50)),
                         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
@@ -168,7 +168,7 @@ public sealed partial class AppInstallerPage : Page
             var notInstalled = bundle.Apps.Count(a => !a.IsInstalled);
             var installBtn = new Button
             {
-                Content = notInstalled > 0 ? $"Install {notInstalled} App(s)" : "All Installed",
+                Content = notInstalled > 0 ? string.Format(S._("apps.installCount"), notInstalled) : S._("apps.allInstalled"),
                 IsEnabled = notInstalled > 0,
                 Padding = new Thickness(16, 8, 16, 8),
                 Margin = new Thickness(0, 4, 0, 0)
@@ -186,8 +186,8 @@ public sealed partial class AppInstallerPage : Page
 
                 var dialog = new ContentDialog
                 {
-                    Title = $"Install {capturedBundleName}?",
-                    Content = $"This will install {toInstall.Count} application(s) using WinGet.\nApps will be installed silently in the background.",
+                    Title = string.Format(S._("apps.installBundleTitle"), capturedBundleName),
+                    Content = string.Format(S._("apps.installBundleMsg"), toInstall.Count),
                     PrimaryButtonText = "Install",
                     CloseButtonText = "Cancel",
                     XamlRoot = this.XamlRoot,
@@ -231,7 +231,7 @@ public sealed partial class AppInstallerPage : Page
             {
                 SearchResults.Children.Add(new TextBlock
                 {
-                    Text = $"No results for \"{query}\"",
+                    Text = string.Format(S._("apps.noResults"), query),
                     Opacity = 0.6, Margin = new Thickness(0, 8, 0, 0)
                 });
                 return;
@@ -267,7 +267,7 @@ public sealed partial class AppInstallerPage : Page
                 Grid.SetColumn(verText, 2);
                 row.Children.Add(verText);
 
-                var installSingle = new Button { Content = "Install", Padding = new Thickness(12, 4, 12, 4), Tag = app.Id };
+                var installSingle = new Button { Content = S._("apps.installBtn"), Padding = new Thickness(12, 4, 12, 4), Tag = app.Id };
                 installSingle.Click += async (s, ev) =>
                 {
                     await RunBulkAction(new List<string> { $"install:{app.Id}" }, "Installing");
@@ -306,9 +306,9 @@ public sealed partial class AppInstallerPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = $"Install {toInstall.Count} app(s)?",
-            Content = "Selected apps will be installed silently using WinGet.",
-            PrimaryButtonText = "Install All",
+            Title = string.Format(S._("apps.installBundleTitle"), toInstall.Count),
+            Content = S._("apps.installBundleMsg").Replace("{0}", toInstall.Count.ToString()).Split('\n')[0],
+            PrimaryButtonText = S._("apps.installAllBtn"),
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
             DefaultButton = ContentDialogButton.Primary
@@ -323,7 +323,7 @@ public sealed partial class AppInstallerPage : Page
     {
         InstalledProgress.IsActive = true;
         InstalledProgress.Visibility = Visibility.Visible;
-        InstalledStatusText.Text = "Loading installed apps...";
+        InstalledStatusText.Text = S._("apps.loadingInstalled");
         InstalledList.Children.Clear();
         _uninstallSelections.Clear();
         _allInstalledApps.Clear();
@@ -339,9 +339,9 @@ public sealed partial class AppInstallerPage : Page
             _allInstalledApps = report.InstalledApps.OrderBy(a => a.Name).ToList();
             RenderInstalledApps(_allInstalledApps);
 
-            InstalledStatusText.Text = $"{report.InstalledApps.Count} apps found";
+            InstalledStatusText.Text = string.Format(S._("apps.appsFound"), report.InstalledApps.Count);
         }
-        catch (Exception ex) { InstalledStatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { InstalledStatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             InstalledProgress.IsActive = false;
@@ -384,14 +384,14 @@ public sealed partial class AppInstallerPage : Page
             Grid.SetColumn(pubText, 2);
             row.Children.Add(pubText);
 
-            var uninstallSingle = new Button { Content = "Remove", Padding = new Thickness(10, 3, 10, 3), Tag = app.Id, FontSize = 12 };
+            var uninstallSingle = new Button { Content = S._("common.remove"), Padding = new Thickness(10, 3, 10, 3), Tag = app.Id, FontSize = 12 };
             uninstallSingle.Click += async (s, ev) =>
             {
                 var dlg = new ContentDialog
                 {
-                    Title = $"Uninstall {app.Name}?",
-                    Content = "This will remove the application from your system.",
-                    PrimaryButtonText = "Uninstall",
+                    Title = string.Format(S._("apps.uninstallTitle"), app.Name),
+                    Content = S._("apps.uninstallMsg"),
+                    PrimaryButtonText = S._("apps.uninstallBtn"),
                     CloseButtonText = "Cancel",
                     XamlRoot = this.XamlRoot,
                     DefaultButton = ContentDialogButton.Close
@@ -424,7 +424,7 @@ public sealed partial class AppInstallerPage : Page
         ).ToList();
 
         RenderInstalledApps(filtered);
-        InstalledStatusText.Text = $"{filtered.Count} of {_allInstalledApps.Count} apps matching \"{filter}\"";
+        InstalledStatusText.Text = string.Format(S._("apps.installedCount"), filtered.Count, _allInstalledApps.Count, filter);
     }
 
     // ── EXPORT / IMPORT ───────────────────────────────────────
@@ -435,7 +435,7 @@ public sealed partial class AppInstallerPage : Page
 
         try
         {
-            InstalledStatusText.Text = "Exporting...";
+            InstalledStatusText.Text = S._("apps.exportingMsg");
             var json = await _module.ExportInstalledAppsAsync();
 
             var savePicker = new FileSavePicker();
@@ -448,17 +448,17 @@ public sealed partial class AppInstallerPage : Page
             WinRT.Interop.InitializeWithWindow.Initialize(savePicker, hwnd);
 
             var file = await savePicker.PickSaveFileAsync();
-            if (file is null) { InstalledStatusText.Text = "Export cancelled."; return; }
+            if (file is null) { InstalledStatusText.Text = S._("apps.exportCancelled"); return; }
 
             await FileIO.WriteTextAsync(file, json);
-            InstalledStatusText.Text = $"Exported {_allInstalledApps.Count} apps to {file.Name}";
+            InstalledStatusText.Text = string.Format(S._("apps.exportedMsg"), _allInstalledApps.Count, file.Name);
 
             ResultCard.Visibility = Visibility.Visible;
-            ResultText.Text = $"App list exported to {file.Path}";
+            ResultText.Text = string.Format(S._("apps.exportedPath"), file.Path);
         }
         catch (Exception ex)
         {
-            InstalledStatusText.Text = $"Export error: {ex.Message}";
+            InstalledStatusText.Text = string.Format(S._("apps.exportError"), ex.Message);
         }
     }
 
@@ -483,14 +483,14 @@ public sealed partial class AppInstallerPage : Page
 
             if (apps.Count == 0)
             {
-                InstalledStatusText.Text = "No valid apps found in the import file.";
+                InstalledStatusText.Text = S._("apps.noValidApps");
                 return;
             }
 
             // Show what will be installed
             var dialog = new ContentDialog
             {
-                Title = $"Import {apps.Count} app(s)?",
+                Title = string.Format(S._("apps.importTitle"), apps.Count),
                 Content = $"This will attempt to install {apps.Count} application(s) from the exported list:\n\n" +
                     string.Join("\n", apps.Take(10).Select(a => $"  • {a.Name} ({a.Id})")) +
                     (apps.Count > 10 ? $"\n  ...and {apps.Count - 10} more" : "") +
@@ -508,7 +508,7 @@ public sealed partial class AppInstallerPage : Page
         }
         catch (Exception ex)
         {
-            InstalledStatusText.Text = $"Import error: {ex.Message}";
+            InstalledStatusText.Text = string.Format(S._("apps.importError"), ex.Message);
         }
     }
 
@@ -526,9 +526,9 @@ public sealed partial class AppInstallerPage : Page
 
         var dialog = new ContentDialog
         {
-            Title = $"Uninstall {toRemove.Count} app(s)?",
-            Content = "Selected apps will be removed from your system.\nThis cannot be easily undone.",
-            PrimaryButtonText = "Uninstall All",
+            Title = string.Format(S._("apps.uninstallAllTitle"), toRemove.Count),
+            Content = S._("apps.uninstallAllMsg"),
+            PrimaryButtonText = S._("apps.uninstallAllBtn"),
             CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot,
             DefaultButton = ContentDialogButton.Close
@@ -544,7 +544,7 @@ public sealed partial class AppInstallerPage : Page
         if (_module is null) return;
 
         ResultCard.Visibility = Visibility.Visible;
-        ResultText.Text = $"{verb} {items.Count} app(s)...";
+        ResultText.Text = string.Format(S._("apps.actionRunning"), verb, items.Count);
 
         var plan = new OptimizationPlan("app-installer", items);
         var progress = new Progress<TaskProgress>(p =>
@@ -554,7 +554,7 @@ public sealed partial class AppInstallerPage : Page
 
         var result = await _module.OptimizeAsync(plan, progress);
 
-        ResultText.Text = $"Done — {result.ItemsProcessed} of {items.Count} succeeded ({result.Duration.TotalSeconds:F0}s)";
+        ResultText.Text = string.Format(S._("apps.actionDone"), result.ItemsProcessed, items.Count, (int)result.Duration.TotalSeconds);
     }
 
     // ── UPDATES TAB ──────────────────────────────────────────
@@ -566,7 +566,7 @@ public sealed partial class AppInstallerPage : Page
         if (_module is null) return;
         CheckUpdatesBtn.IsEnabled = false;
         UpdateProgress.IsActive = true; UpdateProgress.Visibility = Visibility.Visible;
-        UpdateStatusText.Text = "Checking for updates...";
+        UpdateStatusText.Text = S._("apps.checkingUpdates");
         UpdateList.Children.Clear();
         _updateSelections.Clear();
         UpdateAllBtn.IsEnabled = false; UpdateSelectedBtn.IsEnabled = false;
@@ -577,7 +577,7 @@ public sealed partial class AppInstallerPage : Page
 
             if (outdated.Count == 0)
             {
-                UpdateStatusText.Text = "All apps are up to date!";
+                UpdateStatusText.Text = S._("apps.allUpToDate");
                 return;
             }
 
@@ -617,13 +617,13 @@ public sealed partial class AppInstallerPage : Page
                 Grid.SetColumn(versionText, 2);
                 row.Children.Add(versionText);
 
-                var updateSingle = new Button { Content = "Update", Padding = new Thickness(12, 4, 12, 4), Tag = app.Id };
+                var updateSingle = new Button { Content = S._("apps.updateBtn"), Padding = new Thickness(12, 4, 12, 4), Tag = app.Id };
                 updateSingle.Click += async (s, ev) =>
                 {
                     updateSingle.IsEnabled = false;
-                    updateSingle.Content = "Updating...";
+                    updateSingle.Content = S._("apps.updatingBtn");
                     var (ok, _) = await _module.UpdateAppsAsync(new List<string> { app.Id });
-                    updateSingle.Content = ok > 0 ? "Updated!" : "Failed";
+                    updateSingle.Content = ok > 0 ? S._("apps.updatedBtn") : S._("apps.failedBtn");
                 };
                 Grid.SetColumn(updateSingle, 3);
                 row.Children.Add(updateSingle);
@@ -633,9 +633,9 @@ public sealed partial class AppInstallerPage : Page
 
             UpdateAllBtn.IsEnabled = true;
             UpdateSelectedCount();
-            UpdateStatusText.Text = $"{outdated.Count} update(s) available";
+            UpdateStatusText.Text = string.Format(S._("apps.updatesAvailable"), outdated.Count);
         }
-        catch (Exception ex) { UpdateStatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { UpdateStatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             CheckUpdatesBtn.IsEnabled = true;
@@ -655,8 +655,8 @@ public sealed partial class AppInstallerPage : Page
         if (_module is null) return;
         var dialog = new ContentDialog
         {
-            Title = "Update all apps?",
-            Content = "This will update all outdated applications using WinGet.\nApps will be updated silently in the background.",
+            Title = S._("apps.updateAllTitle"),
+            Content = S._("apps.updateAllMsg"),
             PrimaryButtonText = "Update All", CloseButtonText = "Cancel",
             XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Primary
         };
@@ -664,13 +664,13 @@ public sealed partial class AppInstallerPage : Page
 
         UpdateAllBtn.IsEnabled = false; UpdateSelectedBtn.IsEnabled = false;
         UpdateProgress.IsActive = true; UpdateProgress.Visibility = Visibility.Visible;
-        UpdateStatusText.Text = "Updating all apps...";
+        UpdateStatusText.Text = S._("apps.updatingAll");
 
         var progress = new Progress<TaskProgress>(p =>
             DispatcherQueue.TryEnqueue(() => UpdateStatusText.Text = p.StatusText));
         var (updated, failed) = await _module.UpdateAppsAsync(new List<string>(), progress);
 
-        UpdateStatusText.Text = $"Update complete — {updated} updated, {failed} failed";
+        UpdateStatusText.Text = string.Format(S._("apps.updateComplete"), updated, failed);
         UpdateProgress.IsActive = false; UpdateProgress.Visibility = Visibility.Collapsed;
     }
 
@@ -687,7 +687,7 @@ public sealed partial class AppInstallerPage : Page
             DispatcherQueue.TryEnqueue(() => UpdateStatusText.Text = p.StatusText));
         var (updated, failed) = await _module.UpdateAppsAsync(selected, progress);
 
-        UpdateStatusText.Text = $"Done — {updated} updated, {failed} failed";
+        UpdateStatusText.Text = string.Format(S._("apps.updateDone"), updated, failed);
         UpdateProgress.IsActive = false; UpdateProgress.Visibility = Visibility.Collapsed;
     }
 
@@ -700,11 +700,11 @@ public sealed partial class AppInstallerPage : Page
 
         if (bundles.Count == 0)
         {
-            CustomBundleStatus.Text = "No custom bundles yet. Create one!";
+            CustomBundleStatus.Text = S._("apps.noBundles");
             return;
         }
 
-        CustomBundleStatus.Text = $"{bundles.Count} custom bundle(s)";
+        CustomBundleStatus.Text = string.Format(S._("apps.bundleCount"), bundles.Count);
 
         foreach (var bundle in bundles)
         {
@@ -731,13 +731,13 @@ public sealed partial class AppInstallerPage : Page
             var btnPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
 
             // Install all button
-            var installBtn = new Button { Content = $"Install All ({bundle.Apps.Count})", Padding = new Thickness(12, 6, 12, 6), FontSize = 12 };
+            var installBtn = new Button { Content = string.Format(S._("apps.installAllCount"), bundle.Apps.Count), Padding = new Thickness(12, 6, 12, 6), FontSize = 12 };
             var capturedApps = bundle.Apps;
             installBtn.Click += async (s, ev) =>
             {
                 if (_module is null) return;
                 installBtn.IsEnabled = false;
-                installBtn.Content = "Installing...";
+                installBtn.Content = S._("apps.bundleInstalling");
                 var ids = capturedApps.Select(a => a.WinGetId).ToList();
                 var plan = new OptimizationPlan("app-installer", ids);
                 var progress = new Progress<TaskProgress>(p =>
@@ -745,20 +745,20 @@ public sealed partial class AppInstallerPage : Page
                     DispatcherQueue.TryEnqueue(() => installBtn.Content = p.StatusText);
                 });
                 var result = await _module.OptimizeAsync(plan, progress);
-                installBtn.Content = $"Done! ({result.ItemsProcessed} installed)";
+                installBtn.Content = string.Format(S._("apps.bundleDone"), result.ItemsProcessed);
                 installBtn.IsEnabled = true;
             };
             btnPanel.Children.Add(installBtn);
 
             // Delete button
-            var deleteBtn = new Button { Content = "Delete", Padding = new Thickness(10, 6, 10, 6), FontSize = 12 };
+            var deleteBtn = new Button { Content = S._("apps.deleteBtn"), Padding = new Thickness(10, 6, 10, 6), FontSize = 12 };
             var capturedId = bundle.Id;
             deleteBtn.Click += async (s, ev) =>
             {
                 var dlg = new ContentDialog
                 {
-                    Title = $"Delete \"{bundle.Name}\"?",
-                    Content = "This bundle will be permanently removed.",
+                    Title = string.Format(S._("apps.deleteBundleTitle"), bundle.Name),
+                    Content = S._("apps.deleteBundleMsg"),
                     PrimaryButtonText = "Delete", CloseButtonText = "Cancel",
                     XamlRoot = this.XamlRoot, DefaultButton = ContentDialogButton.Close
                 };
@@ -859,7 +859,7 @@ public sealed partial class AppInstallerPage : Page
 
         CustomBundleStore.Add(bundle);
         RenderCustomBundles();
-        CustomBundleStatus.Text = $"Created \"{bundleName}\" with {apps.Count} apps";
+        CustomBundleStatus.Text = string.Format(S._("apps.bundleCreated"), bundleName, apps.Count);
     }
 
     private void ApplyLocalization()

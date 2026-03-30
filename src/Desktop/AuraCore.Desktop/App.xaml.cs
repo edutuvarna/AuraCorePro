@@ -29,24 +29,58 @@ public partial class App : Microsoft.UI.Xaml.Application
     {
         var sc = new ServiceCollection();
 
-        // Register all modules
-        AuraCore.Module.SystemHealth.SystemHealthRegistration.AddSystemHealthModule(sc);
-        AuraCore.Module.JunkCleaner.JunkCleanerRegistration.AddJunkCleanerModule(sc);
-        AuraCore.Module.RamOptimizer.RamOptimizerRegistration.AddRamOptimizerModule(sc);
-        AuraCore.Module.StorageCompression.StorageCompressionRegistration.AddStorageCompressionModule(sc);
-        AuraCore.Module.RegistryOptimizer.RegistryOptimizerRegistration.AddRegistryOptimizerModule(sc);
-        AuraCore.Module.BloatwareRemoval.BloatwareRemovalRegistration.AddBloatwareRemovalModule(sc);
-        AuraCore.Module.NetworkOptimizer.NetworkOptimizerRegistration.AddNetworkOptimizerModule(sc);
-        AuraCore.Module.GamingMode.GamingModeRegistration.AddGamingModeModule(sc);
-        AuraCore.Module.AppInstaller.AppInstallerRegistration.AddAppInstallerModule(sc);
-        AuraCore.Module.ContextMenu.ContextMenuRegistration.AddContextMenuModule(sc);
-        AuraCore.Module.TaskbarTweaks.TaskbarTweaksRegistration.AddTaskbarTweaksModule(sc);
-        AuraCore.Module.ExplorerTweaks.ExplorerTweaksRegistration.AddExplorerTweaksModule(sc);
-        AuraCore.Module.DiskCleanup.DiskCleanupRegistration.AddDiskCleanupModule(sc);
-        AuraCore.Module.DefenderManager.DefenderManagerRegistration.AddDefenderManagerModule(sc);
-        AuraCore.Module.PrivacyCleaner.PrivacyCleanerRegistration.AddPrivacyCleanerModule(sc);
-        AuraCore.Module.DriverUpdater.DriverUpdaterRegistration.AddDriverUpdaterModule(sc);
-        AuraCore.Module.BatteryOptimizer.BatteryOptimizerRegistration.AddBatteryOptimizerModule(sc);
+        // ── Cross-platform modules (register on ALL platforms) ──
+        AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);
+
+        // ── Windows-only modules ──
+        if (OperatingSystem.IsWindows())
+        {
+            // System & Health
+            AuraCore.Module.SystemHealth.SystemHealthRegistration.AddSystemHealthModule(sc);
+
+            // Cleaning & Optimization
+            AuraCore.Module.JunkCleaner.JunkCleanerRegistration.AddJunkCleanerModule(sc);
+            AuraCore.Module.RamOptimizer.RamOptimizerRegistration.AddRamOptimizerModule(sc);
+            AuraCore.Module.StorageCompression.StorageCompressionRegistration.AddStorageCompressionModule(sc);
+            AuraCore.Module.RegistryOptimizer.RegistryOptimizerRegistration.AddRegistryOptimizerModule(sc);
+            AuraCore.Module.BloatwareRemoval.BloatwareRemovalRegistration.AddBloatwareRemovalModule(sc);
+            AuraCore.Module.DiskCleanup.DiskCleanupRegistration.AddDiskCleanupModule(sc);
+            AuraCore.Module.PrivacyCleaner.PrivacyCleanerRegistration.AddPrivacyCleanerModule(sc);
+
+            // Performance & Network
+            AuraCore.Module.NetworkOptimizer.NetworkOptimizerRegistration.AddNetworkOptimizerModule(sc);
+            AuraCore.Module.GamingMode.GamingModeRegistration.AddGamingModeModule(sc);
+
+            // Shell & Customization
+            AuraCore.Module.ContextMenu.ContextMenuRegistration.AddContextMenuModule(sc);
+            AuraCore.Module.TaskbarTweaks.TaskbarTweaksRegistration.AddTaskbarTweaksModule(sc);
+            AuraCore.Module.ExplorerTweaks.ExplorerTweaksRegistration.AddExplorerTweaksModule(sc);
+
+            // Tools
+            AuraCore.Module.AppInstaller.AppInstallerRegistration.AddAppInstallerModule(sc);
+            AuraCore.Module.DefenderManager.DefenderManagerRegistration.AddDefenderManagerModule(sc);
+            AuraCore.Module.DriverUpdater.DriverUpdaterRegistration.AddDriverUpdaterModule(sc);
+            AuraCore.Module.BatteryOptimizer.BatteryOptimizerRegistration.AddBatteryOptimizerModule(sc);
+            AuraCore.Module.AutorunManager.AutorunManagerRegistration.AddAutorunManagerModule(sc);
+            AuraCore.Module.ProcessMonitor.ProcessMonitorRegistration.AddProcessMonitorModule(sc);
+        }
+
+        // ── Linux-only modules (future) ──
+        // if (OperatingSystem.IsLinux())
+        // {
+        //     // sc.AddSystemdManagerModule();
+        //     // sc.AddPackageCleanerModule();
+        //     // sc.AddSwapOptimizerModule();
+        //     // sc.AddCronManagerModule();
+        // }
+
+        // ── macOS-only modules (future) ──
+        // if (OperatingSystem.IsMacOS())
+        // {
+        //     // sc.AddDefaultsOptimizerModule();
+        //     // sc.AddLaunchAgentManagerModule();
+        //     // sc.AddBrewManagerModule();
+        // }
 
         // Guards
         AuraCore.Guard.Licensing.LicensingRegistration.AddLicensingGuard(sc);

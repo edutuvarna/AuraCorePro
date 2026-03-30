@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.AdminPanelView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Admin Panel" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Server administration and analytics"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+
+      <!-- Quick Access -->
+      <Border CornerRadius="{StaticResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="16">
+          <TextBlock Text="Quick Access" FontSize="15" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="The full admin panel runs in your browser with charts, user management, audit logs, and more."
+                     FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+          <Button x:Name="OpenAdminBtn" Click="OpenAdmin_Click"
+                  Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+                  Padding="20,12" CornerRadius="{StaticResource RadiusMd}"
+                  HorizontalAlignment="Left" FontWeight="SemiBold" Cursor="Hand">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="&#x1F310;" FontSize="16" VerticalAlignment="Center"/>
+              <TextBlock Text="Open Admin Panel in Browser" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+          <TextBlock x:Name="AdminUrlText" Text="https://admin.auracore.pro" FontSize="11"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Server Status -->
+      <Border CornerRadius="{StaticResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Server Status" FontSize="15" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+            <TextBlock Text="API" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,8"/>
+            <TextBlock x:Name="ApiStatusText" Grid.Column="1" Text="Checking..." FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+            <TextBlock Grid.Column="2" Text="Version" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,16,8"/>
+            <TextBlock x:Name="ApiVersionText" Grid.Column="3" Text="--" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="1" Text="Uptime" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,8"/>
+            <TextBlock x:Name="UptimeText" Grid.Row="1" Grid.Column="1" Text="--" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="Memory" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,16,8"/>
+            <TextBlock x:Name="MemoryText" Grid.Row="1" Grid.Column="3" Text="--" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+
+            <TextBlock Grid.Row="2" Text="Environment" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,0"/>
+            <TextBlock x:Name="EnvText" Grid.Row="2" Grid.Column="1" Text="--" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </Grid>
+          <Button x:Name="RefreshStatusBtn" Click="RefreshStatus_Click" Content="Refresh"
+                  Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"
+                  HorizontalAlignment="Left" FontSize="12" Cursor="Hand"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Admin-only notice -->
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0DF59E0B" Padding="16,12"
+              BorderBrush="#20F59E0B" BorderThickness="1">
+        <TextBlock Text="Admin Panel is only accessible to users with the admin role."
+                   FontSize="12" Foreground="#F59E0B"/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

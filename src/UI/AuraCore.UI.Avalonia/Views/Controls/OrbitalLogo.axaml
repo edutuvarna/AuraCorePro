@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.OrbitalLogo"
+             Width="40" Height="40">
+
+  <Viewbox Stretch="Uniform">
+    <Canvas Width="200" Height="200" ClipToBounds="False">
+
+      <!-- Outer aura ring - breathing -->
+      <Ellipse Canvas.Left="6" Canvas.Top="6" Width="188" Height="188"
+               Fill="Transparent" Stroke="#06d6a0" StrokeThickness="0.8"
+               x:Name="AuraRing">
+        <Ellipse.Styles>
+          <Style Selector="Ellipse#AuraRing">
+            <Style.Animations>
+              <Animation Duration="0:0:3" IterationCount="INFINITE"
+                         PlaybackDirection="Alternate" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.08"/></KeyFrame>
+                <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.3"/></KeyFrame>
+              </Animation>
+            </Style.Animations>
+          </Style>
+        </Ellipse.Styles>
+      </Ellipse>
+
+      <!-- Vertical convergence lines (static) -->
+      <Line StartPoint="100,12" EndPoint="100,78"
+            Stroke="#06d6a0" StrokeThickness="1.5" Opacity="0.3"
+            StrokeLineCap="Round"/>
+      <Line StartPoint="100,122" EndPoint="100,188"
+            Stroke="#06d6a0" StrokeThickness="1.5" Opacity="0.3"
+            StrokeLineCap="Round"/>
+      <!-- Vertical endpoint dots -->
+      <Ellipse Canvas.Left="97.5" Canvas.Top="9.5" Width="5" Height="5"
+               Fill="#06d6a0" Opacity="0.5"/>
+      <Ellipse Canvas.Left="97.5" Canvas.Top="185.5" Width="5" Height="5"
+               Fill="#06d6a0" Opacity="0.5"/>
+
+      <!-- Orbital arcs + module dots (rotating group) -->
+      <Canvas x:Name="OrbitalCanvas" Width="200" Height="200">
+        <Canvas.RenderTransform>
+          <RotateTransform Angle="0" CenterX="100" CenterY="100"/>
+        </Canvas.RenderTransform>
+
+        <!-- Arc 1 (teal) - drawn as an arc path -->
+        <Path Stroke="#06d6a0" StrokeThickness="3" Opacity="0.6"
+              StrokeLineCap="Round"
+              Data="M 18,50 A 86,50 -30 0 1 182,78"/>
+        <!-- Arc 2 (cyan) -->
+        <Path Stroke="#0891b2" StrokeThickness="3" Opacity="0.6"
+              StrokeLineCap="Round"
+              Data="M 182,122 A 86,50 -30 0 1 18,150"/>
+
+        <!-- Module dots on orbits -->
+        <Ellipse Canvas.Left="41" Canvas.Top="49" Width="10" Height="10" Fill="#06d6a0"/>
+        <Ellipse Canvas.Left="150.5" Canvas.Top="56.5" Width="7" Height="7" Fill="#06d6a0" Opacity="0.7"/>
+        <Ellipse Canvas.Left="149" Canvas.Top="135" Width="10" Height="10" Fill="#0891b2"/>
+        <Ellipse Canvas.Left="42.5" Canvas.Top="142.5" Width="7" Height="7" Fill="#0891b2" Opacity="0.7"/>
+      </Canvas>
+
+      <!-- Core: layered circles -->
+      <Ellipse Canvas.Left="68" Canvas.Top="68" Width="64" Height="64"
+               Fill="Transparent" Stroke="#06d6a0" StrokeThickness="1" Opacity="0.15"/>
+      <Ellipse Canvas.Left="80" Canvas.Top="80" Width="40" Height="40"
+               Fill="Transparent" Stroke="#0891b2" StrokeThickness="0.8" Opacity="0.25"/>
+      <Ellipse Canvas.Left="90" Canvas.Top="90" Width="20" Height="20"
+               Fill="#06d6a0" Opacity="0.25"/>
+
+      <!-- Core glow - pulsing -->
+      <Ellipse Canvas.Left="94" Canvas.Top="94" Width="12" Height="12"
+               Fill="#06d6a0" x:Name="CoreGlow">
+        <Ellipse.Styles>
+          <Style Selector="Ellipse#CoreGlow">
+            <Style.Animations>
+              <Animation Duration="0:0:2" IterationCount="INFINITE"
+                         PlaybackDirection="Alternate" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.6"/></KeyFrame>
+                <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1.0"/></KeyFrame>
+              </Animation>
+            </Style.Animations>
+          </Style>
+        </Ellipse.Styles>
+      </Ellipse>
+
+      <!-- Core center dot (cyan) -->
+      <Ellipse Canvas.Left="97" Canvas.Top="97" Width="6" Height="6" Fill="#0891b2"/>
+
+    </Canvas>
+  </Viewbox>
+</UserControl>

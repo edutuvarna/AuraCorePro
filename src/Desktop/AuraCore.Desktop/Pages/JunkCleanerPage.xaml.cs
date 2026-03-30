@@ -29,19 +29,19 @@ public sealed partial class JunkCleanerPage : Page
     {
         ScanBtn.IsEnabled = false; CleanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Scanning for junk files...";
+        StatusText.Text = S._("junk.scanning");
         CategoryList.Children.Clear(); ResultCard.Visibility = Visibility.Collapsed;
         _categorySelections.Clear();
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
             var result = await _module.ScanAsync(new ScanOptions());
             _lastReport = _module.LastReport;
 
             if (_lastReport is null || _lastReport.TotalFiles == 0)
             {
-                StatusText.Text = "No junk files found — your system is clean!";
+                StatusText.Text = S._("junk.noFilesFound");
                 SummaryCard.Visibility = Visibility.Collapsed;
                 return;
             }
@@ -71,7 +71,7 @@ public sealed partial class JunkCleanerPage : Page
             UpdateCleanBtn();
             StatusText.Text = $"Found {_lastReport.TotalSizeDisplay} of junk in {_lastReport.Categories.Count} categories";
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -222,7 +222,7 @@ public sealed partial class JunkCleanerPage : Page
 
         ScanBtn.IsEnabled = false; CleanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Cleaning...";
+        StatusText.Text = S._("junk.cleaning");
 
         try
         {
@@ -238,10 +238,10 @@ public sealed partial class JunkCleanerPage : Page
                 _ => $"{result.BytesFreed / (1024.0 * 1024 * 1024):F2} GB"
             };
 
-            ResultTitle.Text = $"Cleaned {freedDisplay}";
+            ResultTitle.Text = string.Format(S._("junk.cleaned"), freedDisplay);
             ResultDetail.Text = $"Deleted {result.ItemsProcessed:N0} files in {result.Duration.TotalSeconds:F1}s";
             ResultCard.Visibility = Visibility.Visible;
-            StatusText.Text = "Done!";
+            StatusText.Text = S._("common.done");
             CategoryList.Children.Clear();
             SummaryCard.Visibility = Visibility.Collapsed;
             _lastReport = null;

@@ -47,7 +47,7 @@ public sealed partial class PaymentPage : Page
     private async Task StartCheckout()
     {
         ShowScreen("loading");
-        LoadingText.Text = "Creating checkout session...";
+        LoadingText.Text = AuraCore.Desktop.Services.S._("pay.creatingSession");
 
         try
         {
@@ -55,12 +55,12 @@ public sealed partial class PaymentPage : Page
 
             if (string.IsNullOrEmpty(_checkoutUrl))
             {
-                ShowError("Failed to create checkout session. Please check your connection and try again.");
+                ShowError(AuraCore.Desktop.Services.S._("pay.failedSession"));
                 return;
             }
 
             // Open Stripe checkout in default browser
-            LoadingText.Text = "Opening browser...";
+            LoadingText.Text = AuraCore.Desktop.Services.S._("pay.openingBrowser");
             await Windows.System.Launcher.LaunchUriAsync(new Uri(_checkoutUrl));
 
             // Show waiting screen and start polling for payment completion
@@ -136,7 +136,7 @@ public sealed partial class PaymentPage : Page
             {
                 DispatcherQueue?.TryEnqueue(() =>
                 {
-                    PollStatusText.Text = $"Waiting for payment... ({attempts * 5}s)";
+                    PollStatusText.Text = string.Format(AuraCore.Desktop.Services.S._("pay.waitingPayment"), attempts * 5);
                 });
 
                 var apiUrl = LoginWindow.ApiBaseUrl;
@@ -178,7 +178,7 @@ public sealed partial class PaymentPage : Page
             _polling = false;
             DispatcherQueue?.TryEnqueue(() =>
             {
-                PollStatusText.Text = "Payment not detected yet. If you completed payment, it may take a minute to process. Try reopening the app.";
+                PollStatusText.Text = AuraCore.Desktop.Services.S._("pay.paymentTimeout");
             });
         }
     }
@@ -188,8 +188,8 @@ public sealed partial class PaymentPage : Page
         var tierName = tier == "enterprise" ? "Enterprise" : "Pro";
 
         ShowScreen("success");
-        SuccessMessage.Text = $"Your {tierName} subscription is now active.\nAll premium features have been unlocked!";
-        TierUpdateText.Text = $"Account updated — you are now {tierName}!";
+        SuccessMessage.Text = string.Format(AuraCore.Desktop.Services.S._("pay.successMsg"), tierName);
+        TierUpdateText.Text = string.Format(AuraCore.Desktop.Services.S._("pay.tierUpdated"), tierName);
     }
 
     private void ShowScreen(string screen)

@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.SymlinkManagerView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Create, view, and delete symbolic links and junctions"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+
+      <!-- Create New -->
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Create New Link" FontSize="15" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <ComboBox x:Name="LinkTypeCombo" SelectedIndex="0" Width="260">
+            <ComboBoxItem Content="Symbolic Link (File)" Tag="file"/>
+            <ComboBoxItem Content="Symbolic Link (Directory)" Tag="dir"/>
+            <ComboBoxItem Content="Junction (Directory)" Tag="junction"/>
+            <ComboBoxItem Content="Hard Link (File)" Tag="hard"/>
+          </ComboBox>
+          <TextBox x:Name="LinkPathBox" Watermark="Link path (where the link will be created)" Width="500"/>
+          <TextBox x:Name="TargetPathBox" Watermark="Target path (what it points to)" Width="500"/>
+          <Button Content="Create Link" Click="CreateLink_Click" Classes="action-btn" Padding="16,10"
+                  HorizontalAlignment="Left"/>
+          <TextBlock x:Name="StatusText" Text="" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Scan Existing -->
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Existing Links" FontSize="15" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <Button Content="Scan Directory" Click="Scan_Click" Grid.Column="1"
+                    Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
+          </Grid>
+          <TextBox x:Name="ScanPathBox" Watermark="Directory to scan (e.g. C:\Users)" Width="500"/>
+          <ItemsControl x:Name="LinkList"/>
+          <TextBlock x:Name="ScanStatus" Text="Enter a directory and click Scan" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Info -->
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0DF59E0B" Padding="16,12"
+              BorderBrush="#20F59E0B" BorderThickness="1">
+        <TextBlock Text="Creating symbolic links requires administrator privileges on Windows."
+                   FontSize="12" Foreground="#F59E0B"/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

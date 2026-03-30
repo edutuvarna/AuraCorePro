@@ -54,7 +54,7 @@ public sealed partial class StartupOptimizerPage : Page
     {
         ScanBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Scanning startup programs...";
+        StatusText.Text = S._("startup.scanning");
         StartupList.Children.Clear();
 
         try
@@ -63,7 +63,7 @@ public sealed partial class StartupOptimizerPage : Page
 
             if (_items.Count == 0)
             {
-                StatusText.Text = "No startup programs found.";
+                StatusText.Text = S._("startup.noPrograms");
                 return;
             }
 
@@ -93,7 +93,7 @@ public sealed partial class StartupOptimizerPage : Page
 
             StatusText.Text = $"Found {_items.Count} startup programs — {enabled} enabled, {disabled} disabled";
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             ScanBtn.IsEnabled = true;
@@ -347,7 +347,7 @@ public sealed partial class StartupOptimizerPage : Page
     {
         BenchmarkBtn.IsEnabled = false;
         Progress.IsActive = true; Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Analyzing boot time...";
+        StatusText.Text = S._("startup.benchmarking");
 
         try
         {
@@ -441,7 +441,7 @@ public sealed partial class StartupOptimizerPage : Page
             }
             else
             {
-                BootHistoryHeader.Text = "Boot history unavailable (requires admin or Diagnostics-Performance event log)";
+                BootHistoryHeader.Text = S._("startup.noHistory");
             }
 
             BenchmarkCard.Visibility = Visibility.Visible;
@@ -449,7 +449,7 @@ public sealed partial class StartupOptimizerPage : Page
                 ? $"You could save ~{savingsSec:F0}s by disabling {highEnabled} high-impact startup programs"
                 : "Your startup looks optimized!";
         }
-        catch (Exception ex) { StatusText.Text = $"Benchmark error: {ex.Message}"; }
+        catch (Exception ex) { StatusText.Text = S._("common.errorPrefix") + ex.Message; }
         finally
         {
             BenchmarkBtn.IsEnabled = true;

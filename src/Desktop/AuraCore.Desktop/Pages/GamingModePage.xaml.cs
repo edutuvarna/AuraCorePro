@@ -53,7 +53,7 @@ public sealed partial class GamingModePage : Page
             DispatcherQueue.TryEnqueue(() =>
             {
                 AutoDetectStatusText.Text = "Game exited — Gaming Mode deactivated";
-                ModeStatusText.Text = "Gaming Mode is OFF";
+                ModeStatusText.Text = S._("game.off");
                 ModeStatusText.Foreground = null;
             });
         };
@@ -62,7 +62,7 @@ public sealed partial class GamingModePage : Page
     private void UpdateAutoDetectStatus()
     {
         var watcher = App.GameWatcher;
-        if (watcher is null) { AutoDetectStatusText.Text = "GameWatcher not initialized"; return; }
+        if (watcher is null) { AutoDetectStatusText.Text = S._("game.notInitialized"); return; }
 
         if (watcher.IsEnabled)
         {
@@ -142,14 +142,14 @@ public sealed partial class GamingModePage : Page
             if (state is null) return;
 
             // Update status
-            PowerPlanText.Text = $"Current power plan: {state.CurrentPowerPlan}";
+            PowerPlanText.Text = string.Format(S._("game.currentPlan"), state.CurrentPowerPlan);
             ModeDetailText.Text = state.IsActive
                 ? "Gaming Mode is currently active — your system is optimized"
                 : $"Found {state.BackgroundProcesses.Count} background processes using resources";
 
             if (state.IsActive)
             {
-                ModeStatusText.Text = "Gaming Mode is ON";
+                ModeStatusText.Text = S._("game.on");
                 ModeStatusText.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 46, 125, 50));
                 DeactivateBtn.Visibility = Visibility.Visible;
                 ActivateBtn.Visibility = Visibility.Collapsed;
@@ -258,7 +258,7 @@ public sealed partial class GamingModePage : Page
             var suspendable = state.BackgroundProcesses.Where(p => p.SuggestSuspend).ToList();
             if (suspendable.Count > 0)
             {
-                BgHeader.Text = $"Background Apps to Suspend ({suspendable.Count})";
+                BgHeader.Text = string.Format(S._("game.bgAppsHeader"), suspendable.Count);
                 BgHeader.Visibility = Visibility.Visible;
 
                 foreach (var proc in suspendable)
@@ -323,7 +323,7 @@ public sealed partial class GamingModePage : Page
         var enabledToggles = _toggleSelections.Where(kv => kv.Value).Select(kv => kv.Key).ToList();
         if (enabledToggles.Count == 0)
         {
-            ResultText.Text = "No optimizations selected. Toggle at least one option.";
+            ResultText.Text = S._("game.noOptSelected");
             ResultCard.Visibility = Visibility.Visible;
             return;
         }

@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.PaymentView">
+  <Grid>
+    <!-- ═══ LOADING SCREEN ═══ -->
+    <StackPanel x:Name="LoadingScreen" IsVisible="True"
+                VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+      <ProgressBar IsIndeterminate="True" Width="200"/>
+      <TextBlock x:Name="LoadingText" Text="Creating checkout session..."
+                 FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
+                 HorizontalAlignment="Center"/>
+    </StackPanel>
+
+    <!-- ═══ WAITING SCREEN ═══ -->
+    <StackPanel x:Name="WaitingScreen" IsVisible="False"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Spacing="20" MaxWidth="500">
+      <TextBlock Text="&#x1F4B3;" FontSize="48" HorizontalAlignment="Center"/>
+      <TextBlock Text="Complete Payment in Browser" FontSize="22" FontWeight="Bold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+      <TextBlock Text="A Stripe checkout page has been opened in your default browser. Complete the payment there and this page will update automatically."
+                 FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
+                 TextWrapping="Wrap" TextAlignment="Center"/>
+      <TextBlock x:Name="PollStatusText" Text="Waiting for payment..."
+                 FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <Button Content="Reopen Checkout" Click="Reopen_Click"
+                Classes="action-btn" Padding="16,10"/>
+        <Button Content="Cancel" Click="Back_Click"
+                Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                Padding="16,10" CornerRadius="{StaticResource RadiusMd}"/>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- ═══ SUCCESS SCREEN ═══ -->
+    <StackPanel x:Name="SuccessScreen" IsVisible="False"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Spacing="16" MaxWidth="500">
+      <Border Width="64" Height="64" CornerRadius="32"
+              Background="#2022C55E" HorizontalAlignment="Center">
+        <TextBlock Text="&#x2713;" FontSize="32" Foreground="#22C55E"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+      <TextBlock Text="Payment Successful!" FontSize="24" FontWeight="Bold"
+                 Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="SuccessMessage" Text="Welcome to AuraCore Pro!"
+                 FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
+                 HorizontalAlignment="Center" TextAlignment="Center"/>
+      <TextBlock x:Name="TierUpdateText" Text=""
+                 FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center"/>
+      <Button Content="Continue" Click="Continue_Click"
+              Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+              Padding="24,12" CornerRadius="{StaticResource RadiusMd}"
+              HorizontalAlignment="Center" FontWeight="SemiBold" Cursor="Hand"/>
+    </StackPanel>
+
+    <!-- ═══ ERROR SCREEN ═══ -->
+    <StackPanel x:Name="ErrorScreen" IsVisible="False"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Spacing="16" MaxWidth="500">
+      <Border Width="64" Height="64" CornerRadius="32"
+              Background="#20EF4444" HorizontalAlignment="Center">
+        <TextBlock Text="&#x2716;" FontSize="32" Foreground="#EF4444"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+      <TextBlock Text="Payment Error" FontSize="22" FontWeight="Bold"
+                 Foreground="{DynamicResource ErrorBrush}" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="ErrorText" Text="Something went wrong."
+                 FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
+                 HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <Button Content="Try Again" Click="TryAgain_Click"
+                Classes="action-btn" Padding="16,10"/>
+        <Button Content="Go Back" Click="Back_Click"
+                Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                Padding="16,10" CornerRadius="{StaticResource RadiusMd}"/>
+      </StackPanel>
+    </StackPanel>
+  </Grid>
+</UserControl>

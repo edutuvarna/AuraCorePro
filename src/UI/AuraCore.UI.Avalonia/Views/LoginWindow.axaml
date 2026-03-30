@@ -1,0 +1,100 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctrl="clr-namespace:AuraCore.UI.Avalonia.Views.Controls"
+        x:Class="AuraCore.UI.Avalonia.Views.LoginWindow"
+        Title="AuraCore Pro" Width="460" Height="620"
+        MinWidth="400" MinHeight="550"
+        Background="#0A0A0F"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="36">
+
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- Header -->
+    <StackPanel Margin="0,20,0,0" HorizontalAlignment="Center" Spacing="8">
+      <ctrl:OrbitalLogo Width="60" Height="60" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="TitleText" Text="AuraCore Pro" FontSize="22" FontWeight="Bold"
+                 Foreground="#E8E8F0" TextAlignment="Center"/>
+      <TextBlock x:Name="SubtitleText" Text="Sign in to unlock all features"
+                 FontSize="12" Foreground="#8888A0" TextAlignment="Center"/>
+    </StackPanel>
+
+    <!-- Main Content -->
+    <Border Grid.Row="1" Margin="32,16,32,24" CornerRadius="14"
+            Background="#12121A" BorderBrush="#2A2A3A" BorderThickness="1" Padding="24">
+      <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+        <!-- Tab Buttons -->
+        <Grid ColumnDefinitions="*,*" Margin="0,0,0,16">
+          <Button x:Name="LoginTab" Grid.Column="0" Click="LoginTab_Click"
+                  Background="#1500D4AA" Foreground="#00D4AA"
+                  HorizontalAlignment="Stretch" Padding="0,10"
+                  CornerRadius="8,0,0,8" FontWeight="Bold" FontSize="12"
+                  HorizontalContentAlignment="Center" Content="Sign In"/>
+          <Button x:Name="RegisterTab" Grid.Column="1" Click="RegisterTab_Click"
+                  Background="Transparent" Foreground="#8888A0"
+                  HorizontalAlignment="Stretch" Padding="0,10"
+                  CornerRadius="0,8,8,0" FontWeight="SemiBold" FontSize="12"
+                  HorizontalContentAlignment="Center" Content="Create Account"
+                  BorderBrush="#2A2A3A" BorderThickness="1"/>
+        </Grid>
+
+        <!-- Login Form -->
+        <StackPanel Grid.Row="1" x:Name="LoginForm" Spacing="12">
+          <TextBlock Text="Email" FontSize="11" Foreground="#8888A0" Margin="0,0,0,2"/>
+          <TextBox x:Name="LoginEmail" Watermark="you@example.com"
+                   Background="#1A1A28" Foreground="#E8E8F0" FontSize="13"
+                   BorderBrush="#33334A" CornerRadius="8" Padding="12,10"/>
+          <TextBlock Text="Password" FontSize="11" Foreground="#8888A0" Margin="0,4,0,2"/>
+          <TextBox x:Name="LoginPassword" PasswordChar="*" Watermark="Enter password"
+                   Background="#1A1A28" Foreground="#E8E8F0" FontSize="13"
+                   BorderBrush="#33334A" CornerRadius="8" Padding="12,10"/>
+          <Button x:Name="LoginBtn" Click="Login_Click"
+                  Background="#00D4AA" Foreground="#0A0A0F" FontWeight="Bold" FontSize="13"
+                  HorizontalAlignment="Stretch" Padding="0,12"
+                  CornerRadius="8" HorizontalContentAlignment="Center" Content="Sign In"
+                  Margin="0,8,0,0"/>
+          <Button x:Name="ForgotBtn" Click="Forgot_Click"
+                  Background="Transparent" Foreground="#8888A0" FontSize="11"
+                  HorizontalAlignment="Center" Padding="8,4" Content="Forgot password?"
+                  BorderThickness="0"/>
+        </StackPanel>
+
+        <!-- Register Form (hidden) -->
+        <StackPanel Grid.Row="1" x:Name="RegisterForm" Spacing="12" IsVisible="False">
+          <TextBlock Text="Email" FontSize="11" Foreground="#8888A0" Margin="0,0,0,2"/>
+          <TextBox x:Name="RegEmail" Watermark="you@example.com"
+                   Background="#1A1A28" Foreground="#E8E8F0" FontSize="13"
+                   BorderBrush="#33334A" CornerRadius="8" Padding="12,10"/>
+          <TextBlock Text="Password" FontSize="11" Foreground="#8888A0" Margin="0,4,0,2"/>
+          <TextBox x:Name="RegPassword" PasswordChar="*" Watermark="Min 6 characters"
+                   Background="#1A1A28" Foreground="#E8E8F0" FontSize="13"
+                   BorderBrush="#33334A" CornerRadius="8" Padding="12,10"/>
+          <TextBlock Text="Confirm Password" FontSize="11" Foreground="#8888A0" Margin="0,4,0,2"/>
+          <TextBox x:Name="RegConfirm" PasswordChar="*" Watermark="Repeat password"
+                   Background="#1A1A28" Foreground="#E8E8F0" FontSize="13"
+                   BorderBrush="#33334A" CornerRadius="8" Padding="12,10"/>
+          <Button x:Name="RegisterBtn" Click="Register_Click"
+                  Background="#00D4AA" Foreground="#0A0A0F" FontWeight="Bold" FontSize="13"
+                  HorizontalAlignment="Stretch" Padding="0,12"
+                  CornerRadius="8" HorizontalContentAlignment="Center" Content="Create Account"
+                  Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- Status -->
+        <StackPanel Grid.Row="2" Margin="0,12,0,0" Spacing="6" HorizontalAlignment="Center">
+          <TextBlock x:Name="StatusText" Text="" FontSize="11"
+                     Foreground="#EF4444" TextAlignment="Center" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Offline -->
+        <Button Grid.Row="3" x:Name="OfflineBtn" Click="Offline_Click"
+                Background="Transparent" Foreground="#555570" FontSize="11"
+                HorizontalAlignment="Center" Padding="8,8"
+                Content="Continue without signing in" BorderThickness="0" Margin="0,4,0,0"/>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

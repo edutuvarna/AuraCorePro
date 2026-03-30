@@ -32,20 +32,20 @@ public sealed partial class BloatwarePage : Page
         RemoveBtn.IsEnabled = false;
         Progress.IsActive = true;
         Progress.Visibility = Visibility.Visible;
-        StatusText.Text = "Scanning installed apps... (this may take a moment)";
+        StatusText.Text = S._("bloat.scanningApps");
         AppList.Children.Clear();
         ResultCard.Visibility = Visibility.Collapsed;
         _selectedApps.Clear();
 
         try
         {
-            if (_module is null) { StatusText.Text = "Module not available."; return; }
+            if (_module is null) { StatusText.Text = S._("common.moduleUnavailable"); return; }
 
             await _module.ScanAsync(new ScanOptions());
             _report = _module.LastReport;
             if (_report is null || _report.TotalApps == 0)
             {
-                StatusText.Text = "No apps found.";
+                StatusText.Text = S._("bloat.noAppsFound");
                 return;
             }
 
@@ -346,10 +346,10 @@ public sealed partial class BloatwarePage : Page
 
             var result = await _module.OptimizeAsync(plan, progress);
 
-            ResultTitle.Text = $"Removed {result.ItemsProcessed} app(s)";
+            ResultTitle.Text = string.Format(S._("bloat.removedApps"), result.ItemsProcessed);
             ResultDetail.Text = $"Completed in {result.Duration.TotalSeconds:F1} seconds";
             ResultCard.Visibility = Visibility.Visible;
-            StatusText.Text = "Removal complete!";
+            StatusText.Text = S._("bloat.removalComplete");
 
             // Clear list
             AppList.Children.Clear();

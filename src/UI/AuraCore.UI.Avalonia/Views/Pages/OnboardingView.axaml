@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.OnboardingView">
+  <Grid Background="{DynamicResource BgDeepBrush}">
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                Width="620" Spacing="28">
+
+      <!-- Step dots -->
+      <StackPanel x:Name="StepDots" Orientation="Horizontal" Spacing="8"
+                  HorizontalAlignment="Center"/>
+
+      <!-- Step content card -->
+      <Border CornerRadius="{StaticResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+              Padding="40" MinHeight="300">
+        <StackPanel VerticalAlignment="Center" Spacing="18" HorizontalAlignment="Center">
+          <TextBlock x:Name="StepIcon" Text="&#x2665;" FontSize="48"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"
+                     HorizontalAlignment="Center"/>
+          <TextBlock x:Name="StepTitle" Text="" FontSize="22" FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"
+                     HorizontalAlignment="Center" TextAlignment="Center"/>
+          <TextBlock x:Name="StepDescription" Text="" FontSize="14"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                     HorizontalAlignment="Center"/>
+          <TextBlock x:Name="StepDetail" Text="" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"
+                     TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Navigation -->
+      <Grid ColumnDefinitions="*,Auto,*">
+        <Button x:Name="BackBtn" Grid.Column="0" Content="Back" Click="BackBtn_Click"
+                Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                Padding="24,10" CornerRadius="{StaticResource RadiusMd}"
+                HorizontalAlignment="Left" IsVisible="False"/>
+
+        <TextBlock x:Name="StepCounter" Grid.Column="1" Text="1 / 6"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"
+                   Foreground="{DynamicResource TextMutedBrush}" FontSize="13"/>
+
+        <Button x:Name="NextBtn" Grid.Column="2" Content="Next" Click="NextBtn_Click"
+                Classes="action-btn" Padding="24,10"
+                HorizontalAlignment="Right"/>
+      </Grid>
+
+      <!-- Skip -->
+      <Button x:Name="SkipBtn" Content="Skip tutorial" Click="SkipBtn_Click"
+              Background="Transparent" Foreground="{DynamicResource TextMutedBrush}"
+              HorizontalAlignment="Center" FontSize="12"
+              Padding="12,6" Cursor="Hand"/>
+
+    </StackPanel>
+  </Grid>
+</UserControl>

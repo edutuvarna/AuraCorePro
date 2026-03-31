@@ -107,7 +107,10 @@ public sealed partial class MainWindow : Window
 
     private void BuildNavigation()
     {
-        var modules = App.Services.GetServices<IOptimizationModule>().ToList();
+        // Modules merged into other views (hide from sidebar)
+        var hiddenModules = new HashSet<string> { "network-monitor", "dns-benchmark" };
+        var modules = App.Services.GetServices<IOptimizationModule>()
+            .Where(m => !hiddenModules.Contains(m.Id)).ToList();
         foreach (var m in modules) _moduleMap[m.Id] = m;
 
         // Dashboard button (always first)
@@ -311,8 +314,6 @@ public sealed partial class MainWindow : Window
                 "brew-manager"       => new BrewManagerView(),
                 "timemachine-manager"=> new TimeMachineManagerView(),
                 // New Windows modules
-                "network-monitor"    => new NetworkMonitorView(),
-                "dns-benchmark"      => new DnsBenchmarkView(),
                 "font-manager"       => new FontManagerView(),
                 "wake-on-lan"        => new WakeOnLanView(),
                 // Tweak toggle list (shared view)

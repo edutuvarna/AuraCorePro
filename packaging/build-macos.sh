@@ -17,7 +17,7 @@ BUNDLE_ID="pro.auracore.app"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-PROJECT="$REPO_ROOT/src/UI/AuraCore.Pro/AuraCore.Pro.csproj"
+PROJECT="$REPO_ROOT/src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj"
 OUT_DIR="$SCRIPT_DIR/dist"
 PUBLISH_DIR="$OUT_DIR/publish-${RID}"
 APP_BUNDLE="$OUT_DIR/${APP_NAME}.app"

@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.DnsBenchmarkView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="DNS Benchmark" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Test DNS servers and find the fastest one for your connection"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="DNS Servers" FontSize="15" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <Button x:Name="BenchBtn" Content="Run Benchmark" Click="Bench_Click" Grid.Column="1"
+                    Classes="action-btn" Padding="16,8"/>
+          </Grid>
+          <TextBlock x:Name="SubText" Text="Click Run Benchmark to test popular DNS servers" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <ItemsControl x:Name="DnsList"/>
+          <TextBlock x:Name="RecommendText" Text="" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource SuccessBrush}"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

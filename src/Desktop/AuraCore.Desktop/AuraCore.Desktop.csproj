@@ -67,5 +67,9 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.FirewallRules\AuraCore.Module.FirewallRules.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.SymlinkManager\AuraCore.Module.SymlinkManager.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.FileShredder\AuraCore.Module.FileShredder.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.NetworkMonitor\AuraCore.Module.NetworkMonitor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DnsBenchmark\AuraCore.Module.DnsBenchmark.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FontManager\AuraCore.Module.FontManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.WakeOnLan\AuraCore.Module.WakeOnLan.csproj" />
   </ItemGroup>
 </Project>

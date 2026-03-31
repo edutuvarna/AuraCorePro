@@ -61,5 +61,9 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.LaunchAgentManager\AuraCore.Module.LaunchAgentManager.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.BrewManager\AuraCore.Module.BrewManager.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.TimeMachineManager\AuraCore.Module.TimeMachineManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.NetworkMonitor\AuraCore.Module.NetworkMonitor.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DnsBenchmark\AuraCore.Module.DnsBenchmark.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.FontManager\AuraCore.Module.FontManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.WakeOnLan\AuraCore.Module.WakeOnLan.csproj" />
   </ItemGroup>
 </Project>

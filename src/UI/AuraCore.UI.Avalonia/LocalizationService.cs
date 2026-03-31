@@ -1027,6 +1027,12 @@ public static class LocalizationService
         ["nav.launchAgentManager"] = "Launch Agent Manager",
         ["nav.brewManager"] = "Brew Manager",
         ["nav.timeMachineManager"] = "Time Machine Manager",
+
+        // ── New Windows Modules (Session 18) ──
+        ["nav.networkMonitor"] = "Network Monitor",
+        ["nav.dnsBenchmark"] = "DNS Benchmark",
+        ["nav.fontManager"] = "Font Manager",
+        ["nav.wakeOnLan"] = "Wake-on-LAN",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -1994,6 +2000,12 @@ public static class LocalizationService
         ["nav.launchAgentManager"] = "Launch Agent Yoneticisi",
         ["nav.brewManager"] = "Brew Yoneticisi",
         ["nav.timeMachineManager"] = "Time Machine Yoneticisi",
+
+        // ── New Windows Modules (Session 18) ──
+        ["nav.networkMonitor"] = "Ag Izleyici",
+        ["nav.dnsBenchmark"] = "DNS Benchmark",
+        ["nav.fontManager"] = "Font Yoneticisi",
+        ["nav.wakeOnLan"] = "Wake-on-LAN",
     };
 
     private static void Save()

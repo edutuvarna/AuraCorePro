@@ -310,6 +310,11 @@ public sealed partial class MainWindow : Window
                 "launchagent-manager"=> new LaunchAgentManagerView(),
                 "brew-manager"       => new BrewManagerView(),
                 "timemachine-manager"=> new TimeMachineManagerView(),
+                // New Windows modules
+                "network-monitor"    => new NetworkMonitorView(),
+                "dns-benchmark"      => new DnsBenchmarkView(),
+                "font-manager"       => new FontManagerView(),
+                "wake-on-lan"        => new WakeOnLanView(),
                 // Tweak toggle list (shared view)
                 "context-menu"       => new TweakListView(module),
                 "taskbar-tweaks"     => new TweakListView(module),

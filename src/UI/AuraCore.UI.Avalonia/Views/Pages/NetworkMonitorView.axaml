@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.NetworkMonitorView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Network Monitor" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Real-time network interface statistics and per-adapter bandwidth"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Grid ColumnDefinitions="*,*,*">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Interfaces" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="IfaceCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Total Sent" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="TotalSent" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Total Received" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="TotalRecv" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Network Interfaces" FontSize="15" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
+          </Grid>
+          <ItemsControl x:Name="IfaceList"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

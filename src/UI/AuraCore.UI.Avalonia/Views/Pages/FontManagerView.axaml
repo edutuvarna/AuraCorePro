@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.FontManagerView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Font Manager" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Browse installed fonts with live preview"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox x:Name="SearchBox" Watermark="Search fonts..." TextChanged="Search_Changed"/>
+        <TextBlock x:Name="FontCount" Grid.Column="1" Text="--" FontSize="13"
+                   Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+      </Grid>
+      <TextBox x:Name="PreviewText" Text="The quick brown fox jumps over the lazy dog. 0123456789"
+               Watermark="Preview text..." Margin="0,0,0,8"/>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <ItemsControl x:Name="FontList"/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

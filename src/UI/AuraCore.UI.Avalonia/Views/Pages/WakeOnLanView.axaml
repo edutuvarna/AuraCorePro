@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.WakeOnLanView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Wake-on-LAN" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Wake devices on your network by sending magic packets"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Send Magic Packet" FontSize="15" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBox x:Name="MacBox" Watermark="MAC Address (e.g. AA:BB:CC:DD:EE:FF)" Width="350"
+                   HorizontalAlignment="Left"/>
+          <TextBox x:Name="BroadcastBox" Text="255.255.255.255" Watermark="Broadcast IP" Width="250"
+                   HorizontalAlignment="Left"/>
+          <Button Content="Send Wake Packet" Click="Send_Click" Classes="action-btn" Padding="16,10"
+                  HorizontalAlignment="Left"/>
+          <TextBlock x:Name="StatusText" Text="" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Recent Devices" FontSize="15" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <ItemsControl x:Name="HistoryList"/>
+          <TextBlock x:Name="HistoryStatus" Text="Send a packet to add device to history" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0D0080FF" Padding="16,12"
+              BorderBrush="#200080FF" BorderThickness="1">
+        <TextBlock Text="The target device must have Wake-on-LAN enabled in BIOS and in the network adapter settings. Both devices must be on the same subnet."
+                   FontSize="12" Foreground="#6699CC" TextWrapping="Wrap"/>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

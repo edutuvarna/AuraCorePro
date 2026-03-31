@@ -46,6 +46,10 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.AutorunManager.AutorunManagerRegistration.AddAutorunManagerModule(sc);
             AuraCore.Module.EnvironmentVariables.EnvironmentVariablesRegistration.AddEnvironmentVariablesModule(sc);
             AuraCore.Module.FirewallRules.FirewallRulesRegistration.AddFirewallRulesModule(sc);
+            AuraCore.Module.NetworkMonitor.NetworkMonitorRegistration.AddNetworkMonitorModule(sc);
+            AuraCore.Module.DnsBenchmark.DnsBenchmarkRegistration.AddDnsBenchmarkModule(sc);
+            AuraCore.Module.FontManager.FontManagerRegistration.AddFontManagerModule(sc);
+            AuraCore.Module.WakeOnLan.WakeOnLanRegistration.AddWakeOnLanModule(sc);
         }
 
         // ── Linux-only modules (Faz 2+) ──

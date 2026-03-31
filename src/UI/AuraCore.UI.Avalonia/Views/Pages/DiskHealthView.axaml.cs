@@ -20,25 +20,37 @@ public partial class DiskHealthView : UserControl
     private async Task RunScan()
     {
         ScanLabel.Text = "Scanning...";
+        SubText.Text = "Scanning drives...";
         try
         {
-            // Collect raw data on background thread (no UI objects)
             var rawData = await Task.Run(() =>
             {
-                var drives = DriveInfo.GetDrives().Where(d => d.IsReady).ToList();
-                return drives.Select(d =>
+                var list = new List<(string Name, string Info, string Size, string Type, string Format, string Health, double UsedPct)>();
+                foreach (var d in DriveInfo.GetDrives())
                 {
-                    var totalGb = d.TotalSize / (1024.0 * 1024 * 1024);
-                    var freeGb = d.AvailableFreeSpace / (1024.0 * 1024 * 1024);
-                    var usedPct = (totalGb - freeGb) / totalGb * 100;
-                    var health = usedPct > 95 ? "Critical" : usedPct > 85 ? "Warning" : "Healthy";
-                    return (Name: $"{d.Name} ({d.VolumeLabel})",
-                            Info: $"{d.DriveFormat} - {freeGb:F1} GB free of {totalGb:F1} GB ({usedPct:F0}% used)",
-                            Size: $"{totalGb:F1} GB", Type: d.DriveType.ToString(),
-                            Format: d.DriveFormat, Health: health, UsedPct: usedPct);
-                }).ToList();
+                    try
+                    {
+                        if (!d.IsReady) continue;
+                        var totalGb = d.TotalSize / (1024.0 * 1024 * 1024);
+                        var freeGb = d.AvailableFreeSpace / (1024.0 * 1024 * 1024);
+                        var usedPct = totalGb > 0 ? (totalGb - freeGb) / totalGb * 100 : 0;
+                        var health = usedPct > 95 ? "Critical" : usedPct > 85 ? "Warning" : "Healthy";
+                        list.Add(($"{d.Name} ({d.VolumeLabel})",
+                            $"{d.DriveFormat} - {freeGb:F1} GB free of {totalGb:F1} GB ({usedPct:F0}% used)",
+                            $"{totalGb:F1} GB", d.DriveType.ToString(),
+                            d.DriveFormat, health, usedPct));
+                    }
+                    catch { }
+                }
+                return list;
             });
-            // Create UI brushes on UI thread
+
+            if (rawData.Count == 0)
+            {
+                SubText.Text = "No drives found";
+                return;
+            }
+
             var items = rawData.Select(d =>
             {
                 var (fg, bg) = d.Health switch
@@ -50,8 +62,9 @@ public partial class DiskHealthView : UserControl
                 return new DiskDisplayItem(d.Name, d.Info, d.Size, d.Type, d.Format, "N/A", d.Health, fg, bg);
             }).ToList();
             DriveList.ItemsSource = items;
+            SubText.Text = $"Found {items.Count} drive(s)";
         }
-        catch { }
+        catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
         finally { ScanLabel.Text = "Scan"; }
     }
 

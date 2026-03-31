@@ -6,7 +6,7 @@
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
           <TextBlock x:Name="PageTitle" Text="Disk Health" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="SMART status and drive diagnostics" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+          <TextBlock x:Name="SubText" Text="SMART status and drive diagnostics" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
         <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
@@ -15,23 +15,23 @@
       <ItemsControl x:Name="DriveList">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Border Margin="0,0,0,8" CornerRadius="12" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
+            <Border Margin="0,0,0,8" CornerRadius="10" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
               <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
-                  <StackPanel><TextBlock Text="{Binding Model}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                  <StackPanel><TextBlock Text="{Binding Model}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
                     <TextBlock Text="{Binding Info}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/></StackPanel>
                   <Border Grid.Column="1" CornerRadius="8" Padding="10,4" Background="{Binding HealthBg}" VerticalAlignment="Center">
                     <TextBlock Text="{Binding Health}" FontSize="11" FontWeight="Bold" Foreground="{Binding HealthFg}"/></Border>
                 </Grid>
                 <Grid ColumnDefinitions="*,*,*,*">
                   <StackPanel Spacing="2"><TextBlock Text="Size" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Size}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+                    <TextBlock Text="{Binding Size}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
                   <StackPanel Grid.Column="1" Spacing="2"><TextBlock Text="Type" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding MediaType}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}"/></StackPanel>
-                  <StackPanel Grid.Column="2" Spacing="2"><TextBlock Text="Interface" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Interface}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+                    <TextBlock Text="{Binding MediaType}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}"/></StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="2"><TextBlock Text="Format" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Interface}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
                   <StackPanel Grid.Column="3" Spacing="2"><TextBlock Text="Partitions" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Partitions}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
+                    <TextBlock Text="{Binding Partitions}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
                 </Grid>
               </StackPanel>
             </Border>

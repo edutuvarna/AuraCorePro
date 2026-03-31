@@ -32,10 +32,10 @@ public partial class NetworkOptimizerView : UserControl
         {
             await _module.ScanAsync(new ScanOptions());
             var r = _module.LastReport; if (r is null) return;
-            DnsPrimary.Text = r.CurrentDns.Primary;
+            DnsPrimary.Text = !string.IsNullOrEmpty(r.CurrentDns.Primary) ? r.CurrentDns.Primary : GetSystemDns();
             DnsSecondary.Text = r.CurrentDns.Secondary;
-            DnsProvider.Text = r.CurrentDns.ProviderName;
-            DnsLatency.Text = r.CurrentDns.ResponseTimeMs > 0 ? $"{r.CurrentDns.ResponseTimeMs:F0}ms" : "--";
+            DnsProvider.Text = !string.IsNullOrEmpty(r.CurrentDns.ProviderName) ? r.CurrentDns.ProviderName : "ISP Default";
+            DnsLatency.Text = r.CurrentDns.ResponseTimeMs > 0 ? $"{r.CurrentDns.ResponseTimeMs:F0}ms" : MeasureDnsLatency();
             AdapterList.ItemsSource = r.Adapters.Select(a => new AdapterItem(a.Name, a.Description, a.IpAddress, a.Speed)).ToList();
             DnsPresetList.ItemsSource = r.AvailableDnsPresets.Select(p => new DnsPresetItem(
                 p.Name, $"{p.Primary} / {p.Secondary}", p.Category,
@@ -63,6 +63,35 @@ public partial class NetworkOptimizerView : UserControl
             await RunScan();
         }
         catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
+    }
+
+    private static string GetSystemDns()
+    {
+        try
+        {
+            var nics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+                .Where(n => n.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up
+                    && n.NetworkInterfaceType != System.Net.NetworkInformation.NetworkInterfaceType.Loopback);
+            foreach (var nic in nics)
+            {
+                var dns = nic.GetIPProperties().DnsAddresses;
+                if (dns.Count > 0) return dns[0].ToString();
+            }
+        }
+        catch { }
+        return "--";
+    }
+
+    private static string MeasureDnsLatency()
+    {
+        try
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            System.Net.Dns.GetHostEntry("google.com");
+            sw.Stop();
+            return $"{sw.ElapsedMilliseconds}ms";
+        }
+        catch { return "--"; }
     }
 
     private void ApplyLocalization()

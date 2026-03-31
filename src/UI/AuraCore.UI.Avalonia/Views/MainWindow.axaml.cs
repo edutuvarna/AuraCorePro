@@ -190,6 +190,21 @@ public sealed partial class MainWindow : Window
             NavPanel.Children.Add(MakeNavButton("cron-manager", "\u23F0", LocalizationService._("nav.cronManager")));
         }
 
+        // macOS-only tools
+        if (OperatingSystem.IsMacOS())
+        {
+            NavPanel.Children.Add(new TextBlock
+            {
+                Text = LocalizationService._("nav.macosTools"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
+                Foreground = new SolidColorBrush(Color.Parse("#555570")),
+                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+            });
+            NavPanel.Children.Add(MakeNavButton("defaults-optimizer", "\u2699", LocalizationService._("nav.defaultsOptimizer")));
+            NavPanel.Children.Add(MakeNavButton("launchagent-manager", "\u26A1", LocalizationService._("nav.launchAgentManager")));
+            NavPanel.Children.Add(MakeNavButton("brew-manager", "\u267B", LocalizationService._("nav.brewManager")));
+            NavPanel.Children.Add(MakeNavButton("timemachine-manager", "\u23F0", LocalizationService._("nav.timeMachineManager")));
+        }
+
         // Admin Panel (admin only)
         if (SessionState.IsAdmin)
         {
@@ -290,6 +305,11 @@ public sealed partial class MainWindow : Window
                 "package-cleaner"    => new PackageCleanerView(),
                 "swap-optimizer"     => new SwapOptimizerView(),
                 "cron-manager"       => new CronManagerView(),
+                // macOS-only modules
+                "defaults-optimizer" => new DefaultsOptimizerView(),
+                "launchagent-manager"=> new LaunchAgentManagerView(),
+                "brew-manager"       => new BrewManagerView(),
+                "timemachine-manager"=> new TimeMachineManagerView(),
                 // Tweak toggle list (shared view)
                 "context-menu"       => new TweakListView(module),
                 "taskbar-tweaks"     => new TweakListView(module),

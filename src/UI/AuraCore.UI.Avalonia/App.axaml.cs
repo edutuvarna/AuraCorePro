@@ -60,7 +60,10 @@ public partial class App : global::Avalonia.Application
         // ── macOS-only modules (Faz 3) ──
         if (OperatingSystem.IsMacOS())
         {
-            // TODO: DefaultsOptimizer, LaunchAgentManager, BrewManager
+            AuraCore.Module.DefaultsOptimizer.DefaultsOptimizerRegistration.AddDefaultsOptimizerModule(sc);
+            AuraCore.Module.LaunchAgentManager.LaunchAgentManagerRegistration.AddLaunchAgentManagerModule(sc);
+            AuraCore.Module.BrewManager.BrewManagerRegistration.AddBrewManagerModule(sc);
+            AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
         }
 
         _services = sc.BuildServiceProvider();

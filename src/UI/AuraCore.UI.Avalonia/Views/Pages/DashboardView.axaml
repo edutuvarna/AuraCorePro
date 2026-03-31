@@ -143,28 +143,7 @@
           <StackPanel Spacing="16">
             <TextBlock x:Name="QuickActionsLabel" Text="Quick Actions" FontSize="15" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
-            <StackPanel Spacing="8">
-              <Button Classes="action-btn" Click="ScanAll_Click">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                  <TextBlock Text="&#x1F50D;" FontSize="16"/>
-                  <StackPanel>
-                    <TextBlock Text="Full System Scan" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock Text="Analyze all modules" FontSize="10"
-                               Foreground="{DynamicResource TextMutedBrush}"/>
-                  </StackPanel>
-                </StackPanel>
-              </Button>
-              <Button Classes="action-btn">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                  <TextBlock Text="&#x1F4CA;" FontSize="16"/>
-                  <StackPanel>
-                    <TextBlock Text="Performance Report" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock Text="Generate system report" FontSize="10"
-                               Foreground="{DynamicResource TextMutedBrush}"/>
-                  </StackPanel>
-                </StackPanel>
-              </Button>
-            </StackPanel>
+            <StackPanel x:Name="QuickActionsPanel" Spacing="8"/>
           </StackPanel>
         </Border>
       </Grid>

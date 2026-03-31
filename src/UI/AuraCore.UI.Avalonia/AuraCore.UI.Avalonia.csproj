@@ -57,5 +57,9 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.PackageCleaner\AuraCore.Module.PackageCleaner.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.SwapOptimizer\AuraCore.Module.SwapOptimizer.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.CronManager\AuraCore.Module.CronManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DefaultsOptimizer\AuraCore.Module.DefaultsOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.LaunchAgentManager\AuraCore.Module.LaunchAgentManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.BrewManager\AuraCore.Module.BrewManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.TimeMachineManager\AuraCore.Module.TimeMachineManager.csproj" />
   </ItemGroup>
 </Project>

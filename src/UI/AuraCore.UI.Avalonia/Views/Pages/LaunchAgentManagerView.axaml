@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.LaunchAgentManagerView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+      <StackPanel Spacing="4">
+        <TextBlock x:Name="PageTitle" Text="Launch Agent Manager" FontSize="28" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Manage macOS LaunchAgents and LaunchDaemons (startup services)"
+                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+      </StackPanel>
+      <Grid ColumnDefinitions="*,*,*">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="User Agents" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="UserAgents" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="System Agents" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="SystemAgents" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
+          </StackPanel>
+        </Border>
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Daemons" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="DaemonCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Launch Items" FontSize="15" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <Button Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
+          </Grid>
+          <TextBlock x:Name="SubText" Text="Click Scan to list LaunchAgents/Daemons (macOS only)" FontSize="12"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <ItemsControl x:Name="AgentList"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

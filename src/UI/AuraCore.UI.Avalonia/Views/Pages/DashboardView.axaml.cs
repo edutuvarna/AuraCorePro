@@ -108,11 +108,32 @@ public partial class DashboardView : UserControl
                     ramPct = (int)mem.dwMemoryLoad;
                 }
             }
+            else if (OperatingSystem.IsLinux())
+            {
+                // Linux: read /proc/meminfo
+                try
+                {
+                    long totalKb = 0, availKb = 0;
+                    foreach (var line in File.ReadLines("/proc/meminfo"))
+                    {
+                        if (line.StartsWith("MemTotal:"))
+                            totalKb = ParseMemKb(line);
+                        else if (line.StartsWith("MemAvailable:"))
+                            availKb = ParseMemKb(line);
+                    }
+                    totalGb = totalKb / (1024.0 * 1024);
+                    var availGb = availKb / (1024.0 * 1024);
+                    usedGb = totalGb - availGb;
+                    ramPct = totalGb > 0 ? (int)(usedGb / totalGb * 100) : 0;
+                }
+                catch { }
+            }
             else
             {
+                // macOS/other fallback
                 var gcInfo = GC.GetGCMemoryInfo();
                 totalGb = gcInfo.TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024);
-                usedGb = totalGb * 0.5; // fallback estimate
+                usedGb = totalGb * 0.5;
                 ramPct = 50;
             }
             RamValue.Text = $"{usedGb:F1}";
@@ -143,9 +164,15 @@ public partial class DashboardView : UserControl
             ? $"{uptime.Days}d {uptime.Hours}h"
             : $"{uptime.Hours}h {uptime.Minutes}m";
 
-        OsLabel.Text = OperatingSystem.IsWindows() ? "Windows"
-                     : OperatingSystem.IsLinux() ? "Linux"
-                     : OperatingSystem.IsMacOS() ? "macOS" : "Unknown";
+        OsLabel.Text = OperatingSystem.IsWindows() ? "\u2B22 Windows"
+                     : OperatingSystem.IsLinux() ? "\u2B22 Linux"
+                     : OperatingSystem.IsMacOS() ? "\u2B22 macOS" : "Unknown";
+
+        OsLabel.Foreground = OperatingSystem.IsWindows()
+            ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#0080FF"))
+            : OperatingSystem.IsLinux()
+            ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#F59E0B"))
+            : new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#8B5CF6"));
 
         // RAM info — real used/total
         if (OperatingSystem.IsWindows())
@@ -158,6 +185,23 @@ public partial class DashboardView : UserControl
                 RamValue.Text = $"{total - avail:F1}";
                 RamTotal.Text = $"/ {total:F1} GB";
             }
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            try
+            {
+                long totalKb = 0, availKb = 0;
+                foreach (var line in File.ReadLines("/proc/meminfo"))
+                {
+                    if (line.StartsWith("MemTotal:")) totalKb = ParseMemKb(line);
+                    else if (line.StartsWith("MemAvailable:")) availKb = ParseMemKb(line);
+                }
+                var total = totalKb / (1024.0 * 1024);
+                var avail = availKb / (1024.0 * 1024);
+                RamValue.Text = $"{total - avail:F1}";
+                RamTotal.Text = $"/ {total:F1} GB";
+            }
+            catch { RamValue.Text = "N/A"; }
         }
         else
         {
@@ -192,11 +236,75 @@ public partial class DashboardView : UserControl
         ModuleList.ItemsSource = items;
 
         CpuValue.Text = "--";
+
+        // OS-aware Quick Actions
+        BuildQuickActions();
+    }
+
+    private void BuildQuickActions()
+    {
+        QuickActionsPanel.Children.Clear();
+
+        // Common action - Full System Scan
+        QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Full System Scan", "Analyze all modules", ScanAll_Click));
+
+        if (OperatingSystem.IsWindows())
+        {
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Clean Junk Files", "Temp, cache, logs cleanup", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Optimize RAM", "Free up working set memory", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u2692", "Registry Clean", "Scan for registry issues", null));
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Clean Package Cache", "APT/pip/npm cache cleanup", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Systemd Status", "Check failed services", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Swap Status", "Monitor swap usage", null));
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Brew Cleanup", "Clean Homebrew cache", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Defaults Tweaks", "Apply macOS optimizations", null));
+            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Launch Agents", "Manage startup items", null));
+        }
+    }
+
+    private static Button MakeQuickAction(string icon, string title, string subtitle, EventHandler<RoutedEventArgs>? handler)
+    {
+        var btn = new Button();
+        btn.Classes.Add("action-btn");
+        if (handler != null) btn.Click += handler;
+        btn.Content = new StackPanel
+        {
+            Orientation = global::Avalonia.Layout.Orientation.Horizontal,
+            Spacing = 10,
+            Children =
+            {
+                new TextBlock { Text = icon, FontSize = 16, VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center },
+                new StackPanel
+                {
+                    Children =
+                    {
+                        new TextBlock { Text = title, FontSize = 12, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
+                        new TextBlock { Text = subtitle, FontSize = 10,
+                            Foreground = new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#8888A0")) }
+                    }
+                }
+            }
+        };
+        return btn;
     }
 
     private void ScanAll_Click(object? sender, RoutedEventArgs e)
     {
         // TODO: trigger full scan across all modules
+    }
+
+    private static long ParseMemKb(string line)
+    {
+        var parts = line.Split(':', StringSplitOptions.TrimEntries);
+        if (parts.Length < 2) return 0;
+        var numStr = parts[1].Replace("kB", "").Trim();
+        return long.TryParse(numStr, out var kb) ? kb : 0;
     }
 
     // P/Invoke for real system memory on Windows

@@ -1020,6 +1020,13 @@ public static class LocalizationService
         ["nav.packageCleaner"] = "Package Cleaner",
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Manager",
+
+        // ── macOS-only Modules ──
+        ["nav.macosTools"] = "MACOS TOOLS",
+        ["nav.defaultsOptimizer"] = "Defaults Optimizer",
+        ["nav.launchAgentManager"] = "Launch Agent Manager",
+        ["nav.brewManager"] = "Brew Manager",
+        ["nav.timeMachineManager"] = "Time Machine Manager",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -1980,6 +1987,13 @@ public static class LocalizationService
         ["nav.packageCleaner"] = "Paket Temizleyici",
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Yoneticisi",
+
+        // ── macOS-only Modules ──
+        ["nav.macosTools"] = "MACOS ARACLARI",
+        ["nav.defaultsOptimizer"] = "Defaults Optimizer",
+        ["nav.launchAgentManager"] = "Launch Agent Yoneticisi",
+        ["nav.brewManager"] = "Brew Yoneticisi",
+        ["nav.timeMachineManager"] = "Time Machine Yoneticisi",
     };
 
     private static void Save()

@@ -75,8 +75,7 @@ public partial class CategoryCleanView : UserControl
             var card = new Border
             {
                 CornerRadius = new CornerRadius(10), Padding = new Thickness(16, 12),
-                Background = global::Avalonia.Application.Current!.FindResource("BgElevated") is Color c
-                    ? new SolidColorBrush(c) : new SolidColorBrush(Color.Parse("#252538")),
+                Background = new SolidColorBrush(Color.Parse("#252538")),
                 BorderBrush = new SolidColorBrush(Color.Parse("#33334A")), BorderThickness = new Thickness(1)
             };
 

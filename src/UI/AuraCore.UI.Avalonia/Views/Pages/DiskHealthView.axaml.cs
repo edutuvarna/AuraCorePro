@@ -9,21 +9,21 @@ public record DiskDisplayItem(string Model, string Info, string Size, string Med
 
 public partial class DiskHealthView : UserControl
 {
-
     public DiskHealthView()
     {
         InitializeComponent();
-        Loaded += (s, e) => ApplyLocalization();
+        Loaded += async (s, e) => { await RunScan(); ApplyLocalization(); };
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
-        Loaded += async (s, e) => { await RunScan(); ApplyLocalization(); };
-}
-private async Task RunScan()
+    }
+
+    private async Task RunScan()
     {
         ScanLabel.Text = "Scanning...";
         try
         {
-            var items = await Task.Run(() =>
+            // Collect raw data on background thread (no UI objects)
+            var rawData = await Task.Run(() =>
             {
                 var drives = DriveInfo.GetDrives().Where(d => d.IsReady).ToList();
                 return drives.Select(d =>
@@ -32,25 +32,28 @@ private async Task RunScan()
                     var freeGb = d.AvailableFreeSpace / (1024.0 * 1024 * 1024);
                     var usedPct = (totalGb - freeGb) / totalGb * 100;
                     var health = usedPct > 95 ? "Critical" : usedPct > 85 ? "Warning" : "Healthy";
-                    var (fg, bg) = health switch
-                    {
-                        "Critical" => (P("#EF4444"), P("#20EF4444")),
-                        "Warning"  => (P("#F59E0B"), P("#20F59E0B")),
-                        _          => (P("#22C55E"), P("#2022C55E"))
-                    };
-                    return new DiskDisplayItem(
-                        $"{d.Name} ({d.VolumeLabel})",
-                        $"{d.DriveFormat} - {freeGb:F1} GB free of {totalGb:F1} GB ({usedPct:F0}% used)",
-                        $"{totalGb:F1} GB", d.DriveType.ToString(),
-                        d.DriveFormat, "N/A", health, fg, bg
-                    );
+                    return (Name: $"{d.Name} ({d.VolumeLabel})",
+                            Info: $"{d.DriveFormat} - {freeGb:F1} GB free of {totalGb:F1} GB ({usedPct:F0}% used)",
+                            Size: $"{totalGb:F1} GB", Type: d.DriveType.ToString(),
+                            Format: d.DriveFormat, Health: health, UsedPct: usedPct);
                 }).ToList();
             });
+            // Create UI brushes on UI thread
+            var items = rawData.Select(d =>
+            {
+                var (fg, bg) = d.Health switch
+                {
+                    "Critical" => (P("#EF4444"), P("#20EF4444")),
+                    "Warning"  => (P("#F59E0B"), P("#20F59E0B")),
+                    _          => (P("#22C55E"), P("#2022C55E"))
+                };
+                return new DiskDisplayItem(d.Name, d.Info, d.Size, d.Type, d.Format, "N/A", d.Health, fg, bg);
+            }).ToList();
             DriveList.ItemsSource = items;
         }
         catch { }
         finally { ScanLabel.Text = "Scan"; }
-}
+    }
 
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();

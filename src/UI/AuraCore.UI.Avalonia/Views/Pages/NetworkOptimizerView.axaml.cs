@@ -48,6 +48,23 @@ public partial class NetworkOptimizerView : UserControl
 }
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
 
+
+    private async void SwitchDns_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn || _module is null) return;
+        var presetName = btn.Tag?.ToString();
+        if (string.IsNullOrEmpty(presetName)) return;
+        SubText.Text = $"Switching DNS to {presetName}...";
+        try
+        {
+            var plan = new OptimizationPlan(_module.Id, new[] { $"dns:{presetName}" });
+            var result = await _module.OptimizeAsync(plan);
+            SubText.Text = result.Success ? $"Switched to {presetName}" : "Failed - try as admin";
+            await RunScan();
+        }
+        catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
+    }
+
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.network");

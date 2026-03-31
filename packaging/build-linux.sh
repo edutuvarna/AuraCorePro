@@ -18,7 +18,7 @@ HOMEPAGE="https://auracore.pro"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-PROJECT="$REPO_ROOT/src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj"
+PROJECT="$REPO_ROOT/src/UI/AuraCore.Pro/AuraCore.Pro.csproj"
 OUT_DIR="$SCRIPT_DIR/dist"
 PUBLISH_DIR="$OUT_DIR/publish-linux-x64"
 
@@ -55,10 +55,10 @@ mv publish-linux-x64 "$APP_NAME"
 cat > "$APP_NAME/run.sh" << 'LAUNCHER'
 #!/bin/bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
-exec "$DIR/AuraCore.UI.Avalonia" "$@"
+exec "$DIR/AuraCore.Pro" "$@"
 LAUNCHER
 chmod +x "$APP_NAME/run.sh"
-chmod +x "$APP_NAME/AuraCore.UI.Avalonia"
+chmod +x "$APP_NAME/AuraCore.Pro"
 tar -czf "$TARBALL" "$APP_NAME"
 echo "    Created: $TARBALL"
 
@@ -76,12 +76,12 @@ mkdir -p "$DEB_DIR/usr/share/pixmaps"
 
 # Copy published files
 cp -r "$OUT_DIR/$APP_NAME/"* "$DEB_DIR/usr/lib/$APP_NAME/"
-chmod +x "$DEB_DIR/usr/lib/$APP_NAME/AuraCore.UI.Avalonia"
+chmod +x "$DEB_DIR/usr/lib/$APP_NAME/AuraCore.Pro"
 
 # Create launcher script
 cat > "$DEB_DIR/usr/bin/$APP_NAME" << BINSCRIPT
 #!/bin/bash
-exec /usr/lib/$APP_NAME/AuraCore.UI.Avalonia "\$@"
+exec /usr/lib/$APP_NAME/AuraCore.Pro "\$@"
 BINSCRIPT
 chmod +x "$DEB_DIR/usr/bin/$APP_NAME"
 
@@ -138,13 +138,13 @@ mkdir -p "$APPIMAGE_DIR/usr/share/applications"
 mkdir -p "$APPIMAGE_DIR/usr/share/icons/hicolor/256x256/apps"
 
 cp -r "$OUT_DIR/$APP_NAME/"* "$APPIMAGE_DIR/usr/lib/$APP_NAME/"
-chmod +x "$APPIMAGE_DIR/usr/lib/$APP_NAME/AuraCore.UI.Avalonia"
+chmod +x "$APPIMAGE_DIR/usr/lib/$APP_NAME/AuraCore.Pro"
 
 # AppRun
 cat > "$APPIMAGE_DIR/AppRun" << 'APPRUN'
 #!/bin/bash
 HERE="$(dirname "$(readlink -f "${0}")")"
-exec "$HERE/usr/lib/auracorepro/AuraCore.UI.Avalonia" "$@"
+exec "$HERE/usr/lib/auracorepro/AuraCore.Pro" "$@"
 APPRUN
 chmod +x "$APPIMAGE_DIR/AppRun"
 

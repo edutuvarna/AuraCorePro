@@ -89,8 +89,8 @@ Get-ChildItem "$OutDir\*.zip" | ForEach-Object {
 
 Write-Host ""
 Write-Host "  Distribution:" -ForegroundColor Yellow
-Write-Host "    Windows: Extract zip, run AuraCore.UI.Avalonia.exe"
-Write-Host "    Linux:   Extract zip, chmod +x AuraCore.UI.Avalonia, ./AuraCore.UI.Avalonia"
+Write-Host "    Windows: Extract zip, run AuraCore.Pro.exe"
+Write-Host "    Linux:   Extract zip, chmod +x AuraCore.Pro, ./AuraCore.Pro"
 Write-Host "             OR use build-linux.sh on Linux for .deb + AppImage"
 Write-Host "    macOS:   Extract zip, use build-macos.sh on macOS for .app bundle"
 Write-Host "             OR right-click Open to bypass Gatekeeper"

@@ -17,7 +17,7 @@ BUNDLE_ID="pro.auracore.app"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-PROJECT="$REPO_ROOT/src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj"
+PROJECT="$REPO_ROOT/src/UI/AuraCore.Pro/AuraCore.Pro.csproj"
 OUT_DIR="$SCRIPT_DIR/dist"
 PUBLISH_DIR="$OUT_DIR/publish-${RID}"
 APP_BUNDLE="$OUT_DIR/${APP_NAME}.app"
@@ -54,7 +54,7 @@ mkdir -p "$APP_BUNDLE/Contents/Resources"
 
 # Copy published files to MacOS directory
 cp -r "$PUBLISH_DIR/"* "$APP_BUNDLE/Contents/MacOS/"
-chmod +x "$APP_BUNDLE/Contents/MacOS/AuraCore.UI.Avalonia"
+chmod +x "$APP_BUNDLE/Contents/MacOS/AuraCore.Pro"
 
 # Info.plist
 cp "$SCRIPT_DIR/Info.plist" "$APP_BUNDLE/Contents/"

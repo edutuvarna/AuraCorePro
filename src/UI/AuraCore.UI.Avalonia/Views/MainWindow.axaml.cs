@@ -175,6 +175,21 @@ public sealed partial class MainWindow : Window
             NavPanel.Children.Add(MakeNavButton("iso-builder", "\u25CE", LocalizationService._("nav.isoBuilder")));
         }
 
+        // Linux-only tools
+        if (OperatingSystem.IsLinux())
+        {
+            NavPanel.Children.Add(new TextBlock
+            {
+                Text = LocalizationService._("nav.linuxTools"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
+                Foreground = new SolidColorBrush(Color.Parse("#555570")),
+                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+            });
+            NavPanel.Children.Add(MakeNavButton("systemd-manager", "\u2699", LocalizationService._("nav.systemdManager")));
+            NavPanel.Children.Add(MakeNavButton("package-cleaner", "\u267B", LocalizationService._("nav.packageCleaner")));
+            NavPanel.Children.Add(MakeNavButton("swap-optimizer", "\u26A1", LocalizationService._("nav.swapOptimizer")));
+            NavPanel.Children.Add(MakeNavButton("cron-manager", "\u23F0", LocalizationService._("nav.cronManager")));
+        }
+
         // Admin Panel (admin only)
         if (SessionState.IsAdmin)
         {
@@ -270,6 +285,11 @@ public sealed partial class MainWindow : Window
                 "firewall-rules"     => new FirewallRulesView(),
                 "symlink-manager"    => new SymlinkManagerView(),
                 "file-shredder"      => new FileShredderView(),
+                // Linux-only modules
+                "systemd-manager"    => new SystemdManagerView(),
+                "package-cleaner"    => new PackageCleanerView(),
+                "swap-optimizer"     => new SwapOptimizerView(),
+                "cron-manager"       => new CronManagerView(),
                 // Tweak toggle list (shared view)
                 "context-menu"       => new TweakListView(module),
                 "taskbar-tweaks"     => new TweakListView(module),

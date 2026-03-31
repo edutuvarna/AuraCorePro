@@ -1013,6 +1013,13 @@ public static class LocalizationService
         ["nav.firewallRules"] = "Firewall Rules",
         ["nav.symlinkManager"] = "Symlink Manager",
         ["nav.fileShredder"] = "File Shredder",
+
+        // ── Linux-only Modules ──
+        ["nav.linuxTools"] = "LINUX TOOLS",
+        ["nav.systemdManager"] = "Systemd Manager",
+        ["nav.packageCleaner"] = "Package Cleaner",
+        ["nav.swapOptimizer"] = "Swap Optimizer",
+        ["nav.cronManager"] = "Cron Manager",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -1966,6 +1973,13 @@ public static class LocalizationService
         ["nav.firewallRules"] = "Guvenlik Duvari Kurallari",
         ["nav.symlinkManager"] = "Sembolik Baglanti Yoneticisi",
         ["nav.fileShredder"] = "Dosya Imha Edici",
+
+        // ── Linux-only Modules ──
+        ["nav.linuxTools"] = "LINUX ARACLARI",
+        ["nav.systemdManager"] = "Systemd Yoneticisi",
+        ["nav.packageCleaner"] = "Paket Temizleyici",
+        ["nav.swapOptimizer"] = "Swap Optimizer",
+        ["nav.cronManager"] = "Cron Yoneticisi",
     };
 
     private static void Save()

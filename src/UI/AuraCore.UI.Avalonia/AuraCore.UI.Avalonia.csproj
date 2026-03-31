@@ -53,5 +53,9 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.FirewallRules\AuraCore.Module.FirewallRules.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.SymlinkManager\AuraCore.Module.SymlinkManager.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.FileShredder\AuraCore.Module.FileShredder.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SystemdManager\AuraCore.Module.SystemdManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.PackageCleaner\AuraCore.Module.PackageCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SwapOptimizer\AuraCore.Module.SwapOptimizer.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.CronManager\AuraCore.Module.CronManager.csproj" />
   </ItemGroup>
 </Project>

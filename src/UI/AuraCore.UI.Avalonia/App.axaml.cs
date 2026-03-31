@@ -51,7 +51,10 @@ public partial class App : global::Avalonia.Application
         // ── Linux-only modules (Faz 2+) ──
         if (OperatingSystem.IsLinux())
         {
-            // TODO: SystemdManager, PackageCleaner, SwapOptimizer, CronManager
+            AuraCore.Module.SystemdManager.SystemdManagerRegistration.AddSystemdManagerModule(sc);
+            AuraCore.Module.PackageCleaner.PackageCleanerRegistration.AddPackageCleanerModule(sc);
+            AuraCore.Module.SwapOptimizer.SwapOptimizerRegistration.AddSwapOptimizerModule(sc);
+            AuraCore.Module.CronManager.CronManagerRegistration.AddCronManagerModule(sc);
         }
 
         // ── macOS-only modules (Faz 3) ──

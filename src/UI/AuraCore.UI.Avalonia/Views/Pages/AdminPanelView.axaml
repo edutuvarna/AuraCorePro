@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock Text="Admin Panel" FontSize="28" FontWeight="Bold"
+        <TextBlock Text="Admin Panel" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Server administration and analytics"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -13,9 +13,9 @@
       <!-- Quick Access -->
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
-        <StackPanel Spacing="16">
-          <TextBlock Text="Quick Access" FontSize="15" FontWeight="SemiBold"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Quick Access" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="The full admin panel runs in your browser with charts, user management, audit logs, and more."
                      FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
@@ -36,9 +36,9 @@
       <!-- Server Status -->
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Server Status" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Server Status" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
             <TextBlock Text="API" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,8"/>

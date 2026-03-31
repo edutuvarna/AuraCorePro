@@ -5,7 +5,7 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Driver Updater" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Driver Updater" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubText" Text="Scan, analyze, and backup system drivers"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>

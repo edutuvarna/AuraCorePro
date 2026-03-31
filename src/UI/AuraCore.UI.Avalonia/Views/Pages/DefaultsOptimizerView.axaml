@@ -4,15 +4,15 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Defaults Optimizer" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Defaults Optimizer" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Read and write macOS system preferences via defaults command"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Quick Tweaks" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Quick Tweaks" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="macOS-only optimizations via defaults command" FontSize="12"
                      Foreground="{DynamicResource TextMutedBrush}"/>
@@ -22,9 +22,9 @@
         </StackPanel>
       </Border>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Custom Defaults Read" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Custom Defaults Read" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBox x:Name="DomainBox" Watermark="Domain (e.g. com.apple.dock)" Width="300"/>

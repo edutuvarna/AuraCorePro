@@ -114,13 +114,12 @@ public partial class TweakListView : UserControl
             info.Children.Add(new TextBlock
             {
                 Text = t.Name, FontSize = 12, FontWeight = FontWeight.SemiBold,
-                Foreground = global::Avalonia.Application.Current!.FindResource("TextPrimaryBrush") as ISolidColorBrush
+                Foreground = new SolidColorBrush(Color.Parse("#E8E8F0"))
             });
             info.Children.Add(new TextBlock
             {
-                Text = t.Desc, FontSize = 10,
-                Foreground = global::Avalonia.Application.Current!.FindResource("TextMutedBrush") as ISolidColorBrush,
-                TextWrapping = TextWrapping.Wrap
+                Text = t.Desc, FontSize = 10, TextWrapping = TextWrapping.Wrap,
+                Foreground = new SolidColorBrush(Color.Parse("#555570"))
             });
             Grid.SetColumn(info, 1);
             grid.Children.Add(info);

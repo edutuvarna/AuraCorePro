@@ -6,7 +6,7 @@
 
       <!-- Header -->
       <StackPanel Spacing="4">
-        <TextBlock x:Name="HeaderTitle" Text="Settings" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="HeaderTitle" Text="Settings" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="HeaderSub" Text="Configure AuraCore Pro preferences"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -15,9 +15,9 @@
       <!-- Appearance -->
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
-        <StackPanel Spacing="16">
-          <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="15" FontWeight="SemiBold"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <StackPanel Spacing="12">
+          <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
@@ -51,9 +51,9 @@
       <!-- About -->
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock x:Name="AboutLabel" Text="About" FontSize="15" FontWeight="SemiBold"
+          <TextBlock x:Name="AboutLabel" Text="About" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
             <TextBlock Text="Version" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
@@ -79,9 +79,9 @@
       <!-- Account -->
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock x:Name="AccountLabel" Text="Account" FontSize="15" FontWeight="SemiBold"
+          <TextBlock x:Name="AccountLabel" Text="Account" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>

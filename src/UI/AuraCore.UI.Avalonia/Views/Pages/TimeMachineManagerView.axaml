@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Time Machine Manager" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Time Machine Manager" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Monitor Time Machine backups, status, and exclusions"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -26,10 +26,10 @@
         </Border>
       </Grid>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Time Machine Details" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="Time Machine Details" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
@@ -40,9 +40,9 @@
         </StackPanel>
       </Border>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Exclusions" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Exclusions" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ItemsControl x:Name="ExclusionList"/>
         </StackPanel>

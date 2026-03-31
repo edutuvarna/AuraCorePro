@@ -4,7 +4,7 @@
   <Grid RowDefinitions="Auto,Auto,*,Auto">
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Registry Optimizer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="Registry Optimizer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubText" Text="Find and fix broken registry entries" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center" Margin="0,0,8,0">
@@ -16,7 +16,7 @@
     <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
       <Grid ColumnDefinitions="*,*,*">
         <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Issues:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalIssues" Text="--" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/></StackPanel>
+          <TextBlock x:Name="TotalIssues" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/></StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><TextBlock Text="Safe:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
           <TextBlock x:Name="SafeIssues" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/></StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"><TextBlock Text="Caution:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>

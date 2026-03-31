@@ -4,15 +4,15 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Wake-on-LAN" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Wake-on-LAN" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Wake devices on your network by sending magic packets"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Send Magic Packet" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Send Magic Packet" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBox x:Name="MacBox" Watermark="MAC Address (e.g. AA:BB:CC:DD:EE:FF)" Width="350"
                    HorizontalAlignment="Left"/>
@@ -24,9 +24,9 @@
         </StackPanel>
       </Border>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Recent Devices" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Recent Devices" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ItemsControl x:Name="HistoryList"/>
           <TextBlock x:Name="HistoryStatus" Text="Send a packet to add device to history" FontSize="12"

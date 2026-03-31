@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Systemd Manager" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Systemd Manager" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="List, start, stop, restart and manage systemd services"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -40,7 +40,7 @@
         </Border>
       </Grid>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <TextBox x:Name="SearchBox" Watermark="Search services..." Width="300" HorizontalAlignment="Left"

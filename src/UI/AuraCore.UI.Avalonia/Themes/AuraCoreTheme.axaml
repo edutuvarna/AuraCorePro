@@ -8,7 +8,7 @@
 
   <Style Selector="Window">
     <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
-    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontSize" Value="12.5" />
   </Style>
 
   <Styles.Resources>
@@ -108,12 +108,12 @@
       <!-- ── SHARED (theme-independent) RESOURCES ──────── -->
 
       <!-- Spacing & Radius -->
-      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
-      <CornerRadius x:Key="RadiusMd">10</CornerRadius>
-      <CornerRadius x:Key="RadiusLg">14</CornerRadius>
-      <CornerRadius x:Key="RadiusXl">20</CornerRadius>
-      <Thickness x:Key="CardPadding">20</Thickness>
-      <Thickness x:Key="PageMargin">24</Thickness>
+      <CornerRadius x:Key="RadiusSm">4</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">10</CornerRadius>
+      <CornerRadius x:Key="RadiusXl">14</CornerRadius>
+      <Thickness x:Key="CardPadding">14</Thickness>
+      <Thickness x:Key="PageMargin">20</Thickness>
 
       <!-- ── ORBITAL CORE LOGO (from landing page SVG) ── -->
       <DrawingImage x:Key="OrbitalCoreLogo">
@@ -180,7 +180,7 @@
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="Padding" Value="10,7" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Cursor" Value="Hand" />
@@ -204,7 +204,7 @@
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="Padding" Value="14,12" />
+    <Setter Property="Padding" Value="12,9" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}" />
     <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
     <Setter Property="BorderThickness" Value="1" />

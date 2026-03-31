@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Create, view, and delete symbolic links and junctions"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -12,9 +12,9 @@
 
       <!-- Create New -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Create New Link" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Create New Link" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ComboBox x:Name="LinkTypeCombo" SelectedIndex="0" Width="260">
             <ComboBoxItem Content="Symbolic Link (File)" Tag="file"/>
@@ -32,10 +32,10 @@
 
       <!-- Scan Existing -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Existing Links" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="Existing Links" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Scan Directory" Click="Scan_Click" Grid.Column="1"
                     Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>

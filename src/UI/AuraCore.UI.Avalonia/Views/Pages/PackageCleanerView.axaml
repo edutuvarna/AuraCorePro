@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Package Cleaner" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Package Cleaner" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Clean package manager caches, orphaned packages, and old kernels"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -33,10 +33,10 @@
         </Border>
       </Grid>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Cache Categories" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="Cache Categories" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>

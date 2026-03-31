@@ -1,8 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.GenericModuleView">
-  <StackPanel Spacing="16">
-    <TextBlock x:Name="ModTitle" FontSize="28" FontWeight="Bold"
+  <StackPanel Spacing="12">
+    <TextBlock x:Name="ModTitle" FontSize="22" FontWeight="Bold"
                Foreground="{DynamicResource TextPrimaryBrush}"/>
     <TextBlock x:Name="ModSubtitle" FontSize="13"
                Foreground="{DynamicResource TextSecondaryBrush}"/>

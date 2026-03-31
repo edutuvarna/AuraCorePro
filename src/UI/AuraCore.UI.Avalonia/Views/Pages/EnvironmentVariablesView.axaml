@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Environment Variables" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Environment Variables" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="View and edit system/user environment variables and PATH"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -12,10 +12,10 @@
 
       <!-- PATH Editor -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="PATH Entries (User)" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="PATH Entries (User)" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <TextBlock x:Name="PathCount" Grid.Column="1" Text="0 entries" FontSize="12"
                        Foreground="{DynamicResource TextMutedBrush}"/>
@@ -30,10 +30,10 @@
 
       <!-- All Variables -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="User Environment Variables" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="User Environment Variables" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Refresh" Click="Refresh_Click" Padding="12,6"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}" Grid.Column="1"/>

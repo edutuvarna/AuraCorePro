@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Cron Manager" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Cron Manager" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="View and manage scheduled cron jobs"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -27,10 +27,10 @@
       </Grid>
       <!-- User cron -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="User Crontab" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="User Crontab" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
@@ -41,9 +41,9 @@
       </Border>
       <!-- System cron -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="System Cron Directories" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="System Cron Directories" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ItemsControl x:Name="SystemCronList"/>
         </StackPanel>

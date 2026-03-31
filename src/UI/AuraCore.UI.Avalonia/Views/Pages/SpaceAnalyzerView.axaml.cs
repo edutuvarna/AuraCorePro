@@ -34,7 +34,7 @@ public partial class SpaceAnalyzerView : UserControl
                 var usedGb = totalGb - freeGb;
                 return new FolderDisplayItem(
                     $"{d.Name} ({d.VolumeLabel})", d.Name, $"{totalGb:F1} GB",
-                    "\u1F4BE", $"{freeGb:F1} GB free",
+                    "\u25CB", $"{freeGb:F1} GB free",
                     new SolidColorBrush(Color.Parse("#3B82F6")), 60 * (usedGb / totalGb)
                 );
             }).ToList();
@@ -89,7 +89,7 @@ public partial class SpaceAnalyzerView : UserControl
             var maxSize = items.Count > 0 ? items.Max(i => i.Size) : 1;
             var colors = new[] { "#4285F4", "#EA4335", "#FBBC04", "#34A853", "#9C27B0", "#FF7043", "#00ACC1", "#795548" };
             FolderList.ItemsSource = items.Select((f, i) => new FolderDisplayItem(
-                f.Name, f.FullPath, FormatBytes(f.Size), "\u1F4C1",
+                f.Name, f.FullPath, FormatBytes(f.Size), "\u25A0",
                 $"{f.Count} files",
                 new SolidColorBrush(Color.Parse(colors[i % colors.Length])),
                 maxSize > 0 ? 60.0 * f.Size / maxSize : 0

@@ -4,7 +4,7 @@
   <Grid>
     <!-- ═══ LOADING SCREEN ═══ -->
     <StackPanel x:Name="LoadingScreen" IsVisible="True"
-                VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
       <ProgressBar IsIndeterminate="True" Width="200"/>
       <TextBlock x:Name="LoadingText" Text="Creating checkout session..."
                  FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"
@@ -36,10 +36,10 @@
     <!-- ═══ SUCCESS SCREEN ═══ -->
     <StackPanel x:Name="SuccessScreen" IsVisible="False"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                Spacing="16" MaxWidth="500">
+                Spacing="12" MaxWidth="500">
       <Border Width="64" Height="64" CornerRadius="32"
               Background="#2022C55E" HorizontalAlignment="Center">
-        <TextBlock Text="&#x2713;" FontSize="32" Foreground="#22C55E"
+        <TextBlock Text="&#x2713;" FontSize="24" Foreground="#22C55E"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
       </Border>
       <TextBlock Text="Payment Successful!" FontSize="24" FontWeight="Bold"
@@ -59,10 +59,10 @@
     <!-- ═══ ERROR SCREEN ═══ -->
     <StackPanel x:Name="ErrorScreen" IsVisible="False"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                Spacing="16" MaxWidth="500">
+                Spacing="12" MaxWidth="500">
       <Border Width="64" Height="64" CornerRadius="32"
               Background="#20EF4444" HorizontalAlignment="Center">
-        <TextBlock Text="&#x2716;" FontSize="32" Foreground="#EF4444"
+        <TextBlock Text="&#x2716;" FontSize="24" Foreground="#EF4444"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
       </Border>
       <TextBlock Text="Payment Error" FontSize="22" FontWeight="Bold"

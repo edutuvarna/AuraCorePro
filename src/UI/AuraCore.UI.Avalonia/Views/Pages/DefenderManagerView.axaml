@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DefenderManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="12">
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Windows Defender" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="PageTitle" Text="Windows Defender" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="Monitor and manage Windows security" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
         <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
@@ -16,10 +16,10 @@
       </Grid>
       <!-- Protection Status -->
       <Border x:Name="StatusCard" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <Grid ColumnDefinitions="Auto,*">
           <StackPanel Spacing="4" Margin="0,0,24,0">
-            <TextBlock x:Name="ProtLevel" Text="--" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+            <TextBlock x:Name="ProtLevel" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
             <TextBlock Text="Protection Level" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="EnabledCount" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>

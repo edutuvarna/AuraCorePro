@@ -19,27 +19,29 @@ public partial class ServiceManagerView : UserControl
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
-
     private async Task RunScan()
     {
         if (!OperatingSystem.IsWindows()) { SubText.Text = "Windows only"; return; }
         ScanLabel.Text = "Scanning...";
         try
         {
-            _allItems = await Task.Run(() =>
+            var rawData = await Task.Run(() =>
             {
                 var services = ServiceController.GetServices();
                 return services.Select(s =>
                 {
-                    var (fg, bg) = s.Status == ServiceControllerStatus.Running
-                        ? (P("#22C55E"), P("#2022C55E"))
-                        : (P("#8888A0"), P("#208888A0"));
                     string startType;
                     try { startType = s.StartType.ToString(); } catch { startType = "Unknown"; }
-                    return new ServiceDisplayItem(s.DisplayName, s.ServiceName, startType,
-                        s.Status.ToString(), fg, bg, "");
-                }).OrderBy(s => s.DisplayName).ToList();
+                    return (Name: s.DisplayName, Svc: s.ServiceName, Start: startType, Stat: s.Status.ToString());
+                }).OrderBy(s => s.Name).ToList();
             });
+            _allItems = rawData.Select(s =>
+            {
+                var (fg, bg) = s.Stat == "Running"
+                    ? (P("#22C55E"), P("#2022C55E"))
+                    : (P("#8888A0"), P("#208888A0"));
+                return new ServiceDisplayItem(s.Name, s.Svc, s.Start, s.Stat, fg, bg, "");
+            }).ToList();
             ApplyFilter();
             TotalSvc.Text = _allItems.Count.ToString();
             RunningSvc.Text = _allItems.Count(s => s.Status == "Running").ToString();
@@ -57,7 +59,7 @@ public partial class ServiceManagerView : UserControl
             : _allItems.Where(s => s.DisplayName.Contains(q, StringComparison.OrdinalIgnoreCase)
                 || s.ServiceName.Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
         SvcList.ItemsSource = filtered;
-}
+    }
 
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();

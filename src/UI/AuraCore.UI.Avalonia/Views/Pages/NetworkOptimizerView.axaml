@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.NetworkOptimizerView">
   <ScrollViewer>
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="12">
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Network Optimizer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="PageTitle" Text="Network Optimizer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="Optimize network settings and DNS" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
         <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
@@ -15,7 +15,7 @@
         </Button>
       </Grid>
       <!-- Current DNS -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
         <Grid ColumnDefinitions="*,*,*">
           <StackPanel Spacing="4"><TextBlock Text="Current DNS" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="DnsPrimary" Text="--" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>

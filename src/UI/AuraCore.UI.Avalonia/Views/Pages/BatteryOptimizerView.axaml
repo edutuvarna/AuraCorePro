@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.BatteryOptimizerView">
   <ScrollViewer>
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="12">
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Battery Optimizer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="PageTitle" Text="Battery Optimizer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="Monitor battery health and optimize power usage" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
         <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
@@ -13,7 +13,7 @@
         </Button>
       </Grid>
       <!-- Battery Status -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <Grid ColumnDefinitions="Auto,*">
           <StackPanel Spacing="4" Margin="0,0,24,0">
             <TextBlock x:Name="ChargePct" Text="--%"  FontSize="42" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>

@@ -6,7 +6,7 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Tweaks" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Tweaks" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="PageSubtitle" Text="Toggle system tweaks"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>

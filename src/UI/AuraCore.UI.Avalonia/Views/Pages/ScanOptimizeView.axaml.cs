@@ -77,6 +77,8 @@ public partial class ScanOptimizeView : UserControl
         // Space saved stat visibility
         if (!_behavior.ShowSpaceSaved)
             SpaceSaved.Text = "N/A";
+
+        Loaded += async (s, e) => await RunScan();
     }
 
     private async Task RunScan()

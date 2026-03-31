@@ -4,7 +4,7 @@
   <Grid RowDefinitions="Auto,Auto,Auto,*">
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Service Manager" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="Service Manager" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubText" Text="View and manage Windows services" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">

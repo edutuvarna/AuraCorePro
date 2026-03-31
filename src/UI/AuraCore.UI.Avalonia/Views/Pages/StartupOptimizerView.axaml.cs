@@ -14,7 +14,7 @@ public partial class StartupOptimizerView : UserControl
     {
         "OneDrive", "Teams", "Spotify", "Discord", "Steam", "EpicGamesLauncher",
         "GoogleDriveSync", "Dropbox", "Skype", "Slack", "Zoom", "Opera",
-};
+    };
 
     public StartupOptimizerView()
     {
@@ -24,20 +24,26 @@ public partial class StartupOptimizerView : UserControl
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
-
     private async Task RunScan()
     {
         if (!OperatingSystem.IsWindows()) { SubText.Text = "Windows only feature"; return; }
         ScanLabel.Text = "Scanning...";
         try
         {
-            var items = await Task.Run(() =>
+            // Collect raw data on background thread (no UI objects)
+            var rawData = await Task.Run(() =>
             {
-                var list = new List<StartupDisplayItem>();
-                ScanRegistryRun(list, Registry.CurrentUser, "HKCU");
-                ScanRegistryRun(list, Registry.LocalMachine, "HKLM");
+                var list = new List<(string Name, string Cmd, string Hive, string Impact, bool Enabled)>();
+                ScanReg(list, Registry.CurrentUser, "HKCU");
+                ScanReg(list, Registry.LocalMachine, "HKLM");
                 return list;
             });
+            // Create UI brushes on UI thread
+            var items = rawData.Select(r =>
+            {
+                var (fg, bg) = r.Impact == "High" ? (P("#F59E0B"), P("#20F59E0B")) : (P("#22C55E"), P("#2022C55E"));
+                return new StartupDisplayItem(r.Name, r.Cmd, r.Hive, r.Impact, fg, bg, "", r.Enabled);
+            }).ToList();
             ItemList.ItemsSource = items;
             TotalItems.Text = items.Count.ToString();
             EnabledItems.Text = items.Count(i => i.IsEnabled).ToString();
@@ -47,7 +53,7 @@ public partial class StartupOptimizerView : UserControl
         finally { ScanLabel.Text = "Scan"; }
     }
 
-    private static void ScanRegistryRun(List<StartupDisplayItem> list, RegistryKey hive, string hiveName)
+    private static void ScanReg(List<(string, string, string, string, bool)> list, RegistryKey hive, string hiveName)
     {
         try
         {
@@ -57,12 +63,11 @@ public partial class StartupOptimizerView : UserControl
             {
                 var cmd = key.GetValue(name)?.ToString() ?? "";
                 var impact = HighImpact.Any(h => name.Contains(h, StringComparison.OrdinalIgnoreCase)) ? "High" : "Low";
-                var (fg, bg) = impact == "High" ? (P("#F59E0B"), P("#20F59E0B")) : (P("#22C55E"), P("#2022C55E"));
-                list.Add(new StartupDisplayItem(name, cmd, hiveName, impact, fg, bg, "", true));
+                list.Add((name, cmd, hiveName, impact, true));
             }
         }
         catch { }
-}
+    }
 
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();

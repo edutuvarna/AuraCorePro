@@ -3,12 +3,8 @@ using System.Runtime.InteropServices;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Threading;
-using AuraCore.Application.Interfaces.Modules;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
-
-public record ModuleListItem(string Name, string Category, string Platform);
 
 public partial class DashboardView : UserControl
 {
@@ -28,15 +24,14 @@ public partial class DashboardView : UserControl
 
     private void ApplyLocalization()
     {
-        WelcomeLabel.Text = LocalizationService._("dash.welcomeBack");
-        HeroTitle.Text = LocalizationService._("dash.systemOverview");
-        StatusLabel.Text = LocalizationService._("dash.allHealthy");
-        CpuLabel.Text = LocalizationService._("dash.cpuUsage");
-        RamLabel.Text = LocalizationService._("dash.ramUsage");
-        DiskLabel.Text = LocalizationService._("dash.diskUsage");
-        UptimeLabel.Text = LocalizationService._("dash.uptime");
-        ModulesLabel.Text = LocalizationService._("dash.activeModules");
-        QuickActionsLabel.Text = LocalizationService._("dash.quickActions");
+        HeroTitle.Text = "Dashboard";
+        WelcomeLabel.Text = "AI Powered System Intelligence";
+        StatusLabel.Text = "LIVE";
+        CpuLabel.Text = "CPU";
+        RamLabel.Text = "RAM";
+        DiskLabel.Text = OperatingSystem.IsWindows() ? "Disk (C:)" : "Disk (/)";
+        UptimeLabel.Text = "Uptime";
+        QuickActionsLabel.Text = "Quick Actions";
     }
 
     private void StartLiveMonitoring()
@@ -152,17 +147,17 @@ public partial class DashboardView : UserControl
 
     private void LoadData()
     {
-        // Platform info
-        var os = RuntimeInformation.OSDescription;
-        var arch = RuntimeInformation.OSArchitecture;
-        var cpus = Environment.ProcessorCount;
-        PlatformInfo.Text = $"{os} | {arch} | {cpus} cores | .NET {Environment.Version}";
+        // System info card
+        SysOsText.Text = RuntimeInformation.OSDescription;
+        SysCpuText.Text = $"{Environment.ProcessorCount} cores | {RuntimeInformation.OSArchitecture}";
 
         // Uptime
         var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-        UptimeValue.Text = uptime.Days > 0
+        var uptimeStr = uptime.Days > 0
             ? $"{uptime.Days}d {uptime.Hours}h"
             : $"{uptime.Hours}h {uptime.Minutes}m";
+        UptimeValue.Text = uptimeStr;
+        SysUptimeText.Text = uptimeStr;
 
         OsLabel.Text = OperatingSystem.IsWindows() ? "\u2B22 Windows"
                      : OperatingSystem.IsLinux() ? "\u2B22 Linux"
@@ -184,6 +179,7 @@ public partial class DashboardView : UserControl
                 var avail = mem.ullAvailPhys / (1024.0 * 1024 * 1024);
                 RamValue.Text = $"{total - avail:F1}";
                 RamTotal.Text = $"/ {total:F1} GB";
+                SysRamText.Text = $"{total - avail:F1} / {total:F1} GB";
             }
         }
         else if (OperatingSystem.IsLinux())
@@ -200,6 +196,7 @@ public partial class DashboardView : UserControl
                 var avail = availKb / (1024.0 * 1024);
                 RamValue.Text = $"{total - avail:F1}";
                 RamTotal.Text = $"/ {total:F1} GB";
+                SysRamText.Text = $"{total - avail:F1} / {total:F1} GB";
             }
             catch { RamValue.Text = "N/A"; }
         }
@@ -209,6 +206,7 @@ public partial class DashboardView : UserControl
             var total = gcInfo.TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024);
             RamValue.Text = $"{total:F1}";
             RamTotal.Text = "GB (total)";
+            SysRamText.Text = $"{total:F1} GB (total)";
         }
 
         // Disk info
@@ -224,16 +222,6 @@ public partial class DashboardView : UserControl
                 DiskBar.Width = parent.Bounds.Width * pct;
         }
         catch { DiskValue.Text = "N/A"; }
-
-        // Loaded modules
-        var modules = App.Services.GetServices<IOptimizationModule>().ToList();
-        ModuleCount.Text = $"{modules.Count} loaded";
-        var items = modules.Select(m => new ModuleListItem(
-            m.DisplayName,
-            m.Category.ToString(),
-            m.Platform.ToString()
-        )).ToList();
-        ModuleList.ItemsSource = items;
 
         CpuValue.Text = "--";
 

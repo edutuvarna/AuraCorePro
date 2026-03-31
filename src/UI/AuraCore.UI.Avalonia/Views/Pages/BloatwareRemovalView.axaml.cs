@@ -53,6 +53,7 @@ public partial class BloatwareRemovalView : UserControl
                     a.SizeDisplay, a.Risk.ToString(), fg, bg, canRemove, a.PackageFullName);
             }).ToList();
             AppList.ItemsSource = items;
+            RemoveBtn.IsEnabled = items.Any(i => i.CanRemove);
         }
         catch { SubText.Text = "Scan failed"; }
         finally { ScanLabel.Text = "Scan"; }
@@ -70,21 +71,31 @@ public partial class BloatwareRemovalView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
 
-    private async void Remove_Click(object? sender, RoutedEventArgs e)
+    private async void RemoveSelected_Click(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn || _module is null) return;
-        var pkg = btn.Tag?.ToString();
-        if (string.IsNullOrEmpty(pkg)) return;
-        StatusText.Text = "Removing...";
-        try
+        if (_module is null) return;
+        var items = AppList.ItemsSource as IEnumerable<BloatDisplayItem>;
+        if (items is null) return;
+        var toRemove = items.Where(i => i.CanRemove).ToList();
+        if (toRemove.Count == 0) return;
+        RemoveBtn.IsEnabled = false;
+        var removed = 0;
+        long freed = 0;
+        foreach (var item in toRemove)
         {
-            var plan = new OptimizationPlan(_module.Id, new[] { pkg });
-            var result = await _module.OptimizeAsync(plan);
-            StatusText.Text = result.Success ? $"Removed. Freed {FormatBytes(result.BytesFreed)}" : "Failed - try as admin";
-            await RunScan();
+            StatusText.Text = $"Removing {item.Name}... ({removed + 1}/{toRemove.Count})";
+            try
+            {
+                var plan = new OptimizationPlan(_module.Id, new[] { item.PkgName });
+                var result = await _module.OptimizeAsync(plan);
+                if (result.Success) { removed++; freed += result.BytesFreed; }
+            }
+            catch { }
         }
-        catch (System.Exception ex) { StatusText.Text = ex.Message; }
-}
+        StatusText.Text = $"Done! Removed {removed}/{toRemove.Count} apps. Freed {FormatBytes(freed)}";
+        await RunScan();
+        RemoveBtn.IsEnabled = true;
+    }
 
     private void ApplyLocalization()
     {

@@ -3,162 +3,172 @@
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DashboardView">
 
   <ScrollViewer>
-    <StackPanel Spacing="24">
+    <StackPanel Spacing="12" MaxWidth="900">
 
       <!-- ── HERO ──────────────────────────────────────── -->
       <Grid ColumnDefinitions="*,Auto">
-        <StackPanel Spacing="4">
-          <TextBlock x:Name="WelcomeLabel" Text="Welcome back" FontSize="13"
-                     Foreground="{DynamicResource TextSecondaryBrush}"/>
-          <TextBlock x:Name="HeroTitle" Text="System Overview"
-                     FontSize="28" FontWeight="Bold"
+        <StackPanel Spacing="2">
+          <TextBlock x:Name="HeroTitle" Text="Dashboard"
+                     FontSize="22" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="WelcomeLabel" Text="AI Powered System Intelligence"
+                     FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
-        <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}"
-                Background="#1500D4AA" Padding="14,8"
+        <Border Grid.Column="1" CornerRadius="12"
+                Background="#1500D4AA" Padding="10,5"
                 VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Border Width="8" Height="8" CornerRadius="4"
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="7" Height="7" CornerRadius="4"
                     Background="{DynamicResource SuccessBrush}"/>
-            <TextBlock x:Name="StatusLabel" Text="All Systems Healthy"
-                       FontSize="12" FontWeight="SemiBold"
+            <TextBlock x:Name="StatusLabel" Text="LIVE"
+                       FontSize="10" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentPrimaryBrush}"/>
           </StackPanel>
         </Border>
       </Grid>
 
-      <!-- ── KPI Cards ─────────────────────────────────── -->
+      <!-- ── KPI Cards (accent stripe style) ───────────── -->
       <Grid ColumnDefinitions="*,*,*,*">
         <!-- CPU -->
-        <Border Grid.Column="0" Margin="0,0,8,0" CornerRadius="{StaticResource RadiusLg}"
+        <Border Grid.Column="0" Margin="0,0,6,0" CornerRadius="{StaticResource RadiusMd}"
                 Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
-          <StackPanel Spacing="8">
-            <TextBlock x:Name="CpuLabel" Text="CPU Usage" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock x:Name="CpuValue" Text="--" FontSize="32" FontWeight="Bold"
-                         Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="%" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
-                         VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+          <Grid>
+            <Border Background="#3B82F6" Width="3" CornerRadius="8,0,0,8" HorizontalAlignment="Left"/>
+            <StackPanel Margin="14,12,12,12" Spacing="6">
+              <TextBlock x:Name="CpuLabel" Text="CPU" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock x:Name="CpuValue" Text="--" FontSize="24" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Text="%" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+              </StackPanel>
+              <Border Height="3" CornerRadius="2" Background="#1A1A28">
+                <Border x:Name="CpuBar" Height="3" CornerRadius="2"
+                        Background="#3B82F6" HorizontalAlignment="Left" Width="0"/>
+              </Border>
             </StackPanel>
-            <Border Height="4" CornerRadius="2" Background="#1A1A28">
-              <Border x:Name="CpuBar" Height="4" CornerRadius="2"
-                      Background="{DynamicResource AccentPrimaryBrush}"
-                      HorizontalAlignment="Left" Width="0"/>
-            </Border>
-          </StackPanel>
+          </Grid>
         </Border>
         <!-- RAM -->
-        <Border Grid.Column="1" Margin="4,0" CornerRadius="{StaticResource RadiusLg}"
+        <Border Grid.Column="1" Margin="3,0" CornerRadius="{StaticResource RadiusMd}"
                 Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
-          <StackPanel Spacing="8">
-            <TextBlock x:Name="RamLabel" Text="RAM Used" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock x:Name="RamValue" Text="--" FontSize="32" FontWeight="Bold"
-                         Foreground="{DynamicResource AccentBlueBrush}"/>
-              <TextBlock x:Name="RamTotal" Text="/ -- GB" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
-                         VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+          <Grid>
+            <Border Background="#8B5CF6" Width="3" CornerRadius="8,0,0,8" HorizontalAlignment="Left"/>
+            <StackPanel Margin="14,12,12,12" Spacing="6">
+              <TextBlock x:Name="RamLabel" Text="RAM" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock x:Name="RamValue" Text="--" FontSize="24" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock x:Name="RamTotal" Text="/ -- GB" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+              </StackPanel>
+              <Border Height="3" CornerRadius="2" Background="#1A1A28">
+                <Border x:Name="RamBar" Height="3" CornerRadius="2"
+                        Background="#8B5CF6" HorizontalAlignment="Left" Width="0"/>
+              </Border>
             </StackPanel>
-            <Border Height="4" CornerRadius="2" Background="#1A1A28">
-              <Border x:Name="RamBar" Height="4" CornerRadius="2"
-                      Background="{DynamicResource AccentBlueBrush}"
-                      HorizontalAlignment="Left" Width="0"/>
-            </Border>
-          </StackPanel>
+          </Grid>
         </Border>
         <!-- Disk -->
-        <Border Grid.Column="2" Margin="4,0" CornerRadius="{StaticResource RadiusLg}"
+        <Border Grid.Column="2" Margin="3,0" CornerRadius="{StaticResource RadiusMd}"
                 Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
-          <StackPanel Spacing="8">
-            <TextBlock x:Name="DiskLabel" Text="Disk Free" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock x:Name="DiskValue" Text="--" FontSize="32" FontWeight="Bold"
-                         Foreground="{DynamicResource AccentPurpleBrush}"/>
-              <TextBlock Text="GB" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
-                         VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+          <Grid>
+            <Border Background="#F59E0B" Width="3" CornerRadius="8,0,0,8" HorizontalAlignment="Left"/>
+            <StackPanel Margin="14,12,12,12" Spacing="6">
+              <TextBlock x:Name="DiskLabel" Text="Disk (C:)" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <StackPanel Orientation="Horizontal" Spacing="2">
+                <TextBlock x:Name="DiskValue" Text="--" FontSize="24" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Text="GB" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+              </StackPanel>
+              <Border Height="3" CornerRadius="2" Background="#1A1A28">
+                <Border x:Name="DiskBar" Height="3" CornerRadius="2"
+                        Background="#F59E0B" HorizontalAlignment="Left" Width="0"/>
+              </Border>
             </StackPanel>
-            <Border Height="4" CornerRadius="2" Background="#1A1A28">
-              <Border x:Name="DiskBar" Height="4" CornerRadius="2"
-                      Background="{DynamicResource AccentPurpleBrush}"
-                      HorizontalAlignment="Left" Width="0"/>
-            </Border>
-          </StackPanel>
+          </Grid>
         </Border>
         <!-- Uptime -->
-        <Border Grid.Column="3" Margin="8,0,0,0" CornerRadius="{StaticResource RadiusLg}"
+        <Border Grid.Column="3" Margin="6,0,0,0" CornerRadius="{StaticResource RadiusMd}"
                 Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
-          <StackPanel Spacing="8">
-            <TextBlock x:Name="UptimeLabel" Text="Uptime" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="UptimeValue" Text="--" FontSize="28" FontWeight="Bold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-            <TextBlock x:Name="OsLabel" Text="" FontSize="11"
-                       Foreground="{DynamicResource TextMutedBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-
-      <!-- ── Large cards row ───────────────────────────── -->
-      <Grid ColumnDefinitions="2*,*">
-        <!-- Active Modules -->
-        <Border Grid.Column="0" Margin="0,0,8,0" CornerRadius="{StaticResource RadiusLg}"
-                Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
-          <StackPanel Spacing="16">
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock x:Name="ModulesLabel" Text="Active Modules" FontSize="15" FontWeight="SemiBold"
+                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+          <Grid>
+            <Border Background="#EC4899" Width="3" CornerRadius="8,0,0,8" HorizontalAlignment="Left"/>
+            <StackPanel Margin="14,12,12,12" Spacing="6">
+              <TextBlock x:Name="UptimeLabel" Text="Uptime" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="UptimeValue" Text="--" FontSize="22" FontWeight="Bold"
                          Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="ModuleCount" Grid.Column="1" Text="0 loaded"
-                         FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
-            </Grid>
-            <ItemsControl x:Name="ModuleList">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <Border Margin="0,0,0,6" CornerRadius="8" Background="#12FFFFFF" Padding="14,10">
-                    <Grid ColumnDefinitions="Auto,*,Auto">
-                      <Border Width="6" Height="6" CornerRadius="3"
-                              Background="{DynamicResource AccentPrimaryBrush}"
-                              VerticalAlignment="Center" Margin="0,0,10,0"/>
-                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-                        <TextBlock Text="{Binding Category}" FontSize="10"
-                                   Foreground="{DynamicResource TextMutedBrush}"/>
-                      </StackPanel>
-                      <TextBlock Grid.Column="2" Text="{Binding Platform}" FontSize="10"
-                                 Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-        </Border>
-        <!-- Quick Actions -->
-        <Border Grid.Column="1" Margin="8,0,0,0" CornerRadius="{StaticResource RadiusLg}"
-                Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
-          <StackPanel Spacing="16">
-            <TextBlock x:Name="QuickActionsLabel" Text="Quick Actions" FontSize="15" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-            <StackPanel x:Name="QuickActionsPanel" Spacing="8"/>
-          </StackPanel>
+              <TextBlock x:Name="OsLabel" Text="" FontSize="10"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+          </Grid>
         </Border>
       </Grid>
 
-      <!-- ── Platform Info ─────────────────────────────── -->
-      <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="#0D00D4AA" Padding="16,12"
-              BorderBrush="#2000D4AA" BorderThickness="1">
-        <Grid ColumnDefinitions="Auto,*">
-          <TextBlock Text="&#x2699;" FontSize="16" VerticalAlignment="Center" Margin="0,0,12,0"/>
-          <TextBlock x:Name="PlatformInfo" Grid.Column="1"
-                     FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
-                     VerticalAlignment="Center" TextWrapping="Wrap"/>
-        </Grid>
+      <!-- ── System Information ────────────────────────── -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,14">
+        <StackPanel Spacing="12">
+          <TextBlock Text="System Information" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2" Margin="0,0,12,8">
+              <TextBlock Text="Operating System" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="SysOsText" Text="--" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2" Margin="0,0,0,8">
+              <TextBlock Text="Processor" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="SysCpuText" Text="--" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2" Margin="0,0,12,0">
+              <TextBlock Text="Memory" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="SysRamText" Text="--" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+              <TextBlock Text="Uptime" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="SysUptimeText" Text="--" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
       </Border>
+
+      <!-- ── Quick Actions ─────────────────────────────── -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,14">
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="QuickActionsLabel" Text="Quick Actions" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel x:Name="QuickActionsPanel" Spacing="6"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ── Recent Activity ───────────────────────────── -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,14">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Recent Activity" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel x:Name="ActivityLogPanel" Spacing="4">
+            <TextBlock Text="No recent activity" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ── Live indicator ────────────────────────────── -->
+      <TextBlock Text="Live - updating every 2 seconds"
+                 FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center" Opacity="0.4"/>
 
     </StackPanel>
   </ScrollViewer>

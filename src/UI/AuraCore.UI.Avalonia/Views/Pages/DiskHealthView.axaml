@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DiskHealthView">
   <ScrollViewer>
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="12">
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Disk Health" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="PageTitle" Text="Disk Health" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="SMART status and drive diagnostics" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
         <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
@@ -15,7 +15,7 @@
       <ItemsControl x:Name="DriveList">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
-            <Border Margin="0,0,0,8" CornerRadius="12" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
+            <Border Margin="0,0,0,8" CornerRadius="12" Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
               <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="*,Auto">
                   <StackPanel><TextBlock Text="{Binding Model}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>

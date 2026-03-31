@@ -6,7 +6,7 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Module" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Module" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="PageSubtitle" Text="Scan and optimize"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -36,12 +36,12 @@
       <Grid ColumnDefinitions="*,*,*">
         <StackPanel Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Items Found:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="ItemsFound" Text="--" FontSize="15" FontWeight="Bold"
+          <TextBlock x:Name="ItemsFound" Text="--" FontSize="13" FontWeight="Bold"
                      Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Space:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="SpaceSaved" Text="--" FontSize="15" FontWeight="Bold"
+          <TextBlock x:Name="SpaceSaved" Text="--" FontSize="13" FontWeight="Bold"
                      Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
@@ -57,10 +57,10 @@
     <!-- Main Content -->
     <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
             Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
       <Grid>
         <!-- Before scan state -->
-        <StackPanel x:Name="BeforeScanPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+        <StackPanel x:Name="BeforeScanPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
           <TextBlock x:Name="BeforeScanIcon" Text="&#x1F50D;" FontSize="48" HorizontalAlignment="Center"/>
           <TextBlock Text="Click Scan to analyze your system" FontSize="14"
                      Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
@@ -69,7 +69,7 @@
         </StackPanel>
 
         <!-- After scan state -->
-        <StackPanel x:Name="AfterScanPanel" IsVisible="False" Spacing="16">
+        <StackPanel x:Name="AfterScanPanel" IsVisible="False" Spacing="12">
           <TextBlock x:Name="ScanResultText" Text="" FontSize="14" FontWeight="SemiBold"
                      Foreground="{DynamicResource AccentPrimaryBrush}"/>
           <TextBlock x:Name="ScanDetailText" Text="" FontSize="12"

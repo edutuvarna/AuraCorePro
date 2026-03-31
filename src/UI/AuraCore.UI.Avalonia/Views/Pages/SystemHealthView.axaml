@@ -7,7 +7,7 @@
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="System Health" FontSize="28" FontWeight="Bold"
+          <TextBlock x:Name="PageTitle" Text="System Health" FontSize="22" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Real-time system monitoring and diagnostics"
                      FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -30,7 +30,7 @@
                 BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
                 Padding="32" MinWidth="180" MinHeight="180">
           <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
-            <TextBlock x:Name="ScoreValue" Text="--" FontSize="52" FontWeight="Bold"
+            <TextBlock x:Name="ScoreValue" Text="--" FontSize="40" FontWeight="Bold"
                        Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center"/>
             <TextBlock Text="Health Score" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
                        HorizontalAlignment="Center"/>
@@ -102,7 +102,7 @@
       </Grid>
 
       <!-- Drives Section -->
-      <TextBlock Text="Storage Drives" FontSize="15" FontWeight="SemiBold"
+      <TextBlock Text="Storage Drives" FontSize="13" FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,8,0,0"/>
       <ItemsControl x:Name="DriveList">
         <ItemsControl.ItemTemplate>
@@ -138,7 +138,7 @@
       </ItemsControl>
 
       <!-- GPU Section -->
-      <TextBlock x:Name="GpuHeader" Text="Graphics" FontSize="15" FontWeight="SemiBold"
+      <TextBlock x:Name="GpuHeader" Text="Graphics" FontSize="13" FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}" IsVisible="False"/>
       <ItemsControl x:Name="GpuList">
         <ItemsControl.ItemTemplate>

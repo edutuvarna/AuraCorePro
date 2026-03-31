@@ -51,7 +51,7 @@
     <ScrollViewer Grid.Column="2" Grid.Row="0" Margin="32,24">
       <Grid>
         <!-- Panel 0: Select ISO -->
-        <StackPanel x:Name="Panel_0" IsVisible="True" Spacing="16" MaxWidth="600">
+        <StackPanel x:Name="Panel_0" IsVisible="True" Spacing="12" MaxWidth="600">
           <TextBlock Text="Select Windows ISO" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Choose a Windows 10 or 11 ISO file to customize." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
@@ -59,7 +59,7 @@
             <TextBlock x:Name="IsoPathText" Text="No file selected" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>
           <Border x:Name="IsoInfoPanel" IsVisible="False" Background="{DynamicResource BgCardBrush}"
-                  CornerRadius="{StaticResource RadiusMd}" Padding="20"
+                  CornerRadius="{StaticResource RadiusMd}" Padding="14"
                   BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Margin="0,8,0,0">
             <StackPanel Spacing="6">
               <TextBlock x:Name="IsoOsText" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -70,7 +70,7 @@
         </StackPanel>
 
         <!-- Panel 1: User Account -->
-        <StackPanel x:Name="Panel_1" IsVisible="False" Spacing="16" MaxWidth="600">
+        <StackPanel x:Name="Panel_1" IsVisible="False" Spacing="12" MaxWidth="600">
           <TextBlock Text="User Account" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Configure the default user account for Windows." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <RadioButton x:Name="LocalAccountRadio" Content="Local Account (no Microsoft account)" IsChecked="True" GroupName="account" Margin="0,8,0,0"/>
@@ -228,10 +228,10 @@
         </StackPanel>
 
         <!-- Panel 11: Review and Build -->
-        <StackPanel x:Name="Panel_11" IsVisible="False" Spacing="16" MaxWidth="600">
+        <StackPanel x:Name="Panel_11" IsVisible="False" Spacing="12" MaxWidth="600">
           <TextBlock Text="Review and Build" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Border Background="{DynamicResource BgCardBrush}" CornerRadius="{StaticResource RadiusMd}"
-                  BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="20">
+                  BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
             <StackPanel Spacing="12">
               <TextBlock Text="Output Format" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
               <RadioButton x:Name="OutputUnattendOnly" Content="Generate files only (save to folder)" IsChecked="True" GroupName="output"/>
@@ -239,7 +239,7 @@
             </StackPanel>
           </Border>
           <Border Background="{DynamicResource BgCardBrush}" CornerRadius="{StaticResource RadiusMd}"
-                  BorderBrush="{DynamicResource AccentPrimaryBrush}" BorderThickness="1" Padding="20">
+                  BorderBrush="{DynamicResource AccentPrimaryBrush}" BorderThickness="1" Padding="14">
             <StackPanel Spacing="8">
               <TextBlock Text="Build Summary" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
               <TextBlock x:Name="SummaryText" Text="" FontFamily="Cascadia Mono, Consolas, monospace" FontSize="12"

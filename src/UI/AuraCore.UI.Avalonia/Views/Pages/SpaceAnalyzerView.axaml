@@ -4,7 +4,7 @@
   <Grid RowDefinitions="Auto,Auto,*">
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Space Analyzer" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="Space Analyzer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="PathLabel" Text="Select a drive to analyze" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Button Grid.Column="1" x:Name="BackBtn" Click="Back_Click" Classes="action-btn" Padding="14,8" VerticalAlignment="Center" Margin="0,0,8,0" IsVisible="False" Content="&#x2190; Back"/>

@@ -97,18 +97,18 @@ public partial class CategoryCleanView : UserControl
             info.Children.Add(new TextBlock
             {
                 Text = cat.Name, FontSize = 13, FontWeight = FontWeight.SemiBold,
-                Foreground = global::Avalonia.Application.Current!.FindResource("TextPrimaryBrush") as ISolidColorBrush
+                Foreground = new SolidColorBrush(Color.Parse("#E8E8F0"))
             });
             info.Children.Add(new TextBlock
             {
                 Text = cat.Desc, FontSize = 10, TextWrapping = TextWrapping.Wrap,
-                Foreground = global::Avalonia.Application.Current!.FindResource("TextMutedBrush") as ISolidColorBrush
+                Foreground = new SolidColorBrush(Color.Parse("#555570"))
             });
             var meta = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
             meta.Children.Add(new TextBlock
             {
                 Text = $"{cat.Files} files", FontSize = 10,
-                Foreground = global::Avalonia.Application.Current!.FindResource("TextSecondaryBrush") as ISolidColorBrush
+                Foreground = new SolidColorBrush(Color.Parse("#8888A0"))
             });
             if (cat.NeedAdmin)
                 meta.Children.Add(new TextBlock

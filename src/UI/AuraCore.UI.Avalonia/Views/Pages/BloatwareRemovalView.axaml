@@ -2,14 +2,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.BloatwareRemovalView">
   <Grid RowDefinitions="Auto,Auto,*,Auto">
-    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Bloatware Removal" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubText" Text="Remove pre-installed apps you don't need" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="Bloatware Removal" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Remove pre-installed apps you don't need" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
+      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Margin="0,0,8,0" Padding="14,8">
         <StackPanel Orientation="Horizontal" Spacing="6">
           <TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Button>
+      <Button Grid.Column="2" x:Name="RemoveBtn" Click="RemoveSelected_Click" IsEnabled="False"
+              Background="{DynamicResource ErrorBrush}" Foreground="White"
+              Padding="14,8" CornerRadius="{StaticResource RadiusMd}" VerticalAlignment="Center"
+              FontWeight="Bold" FontSize="11">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x2716;" FontSize="11"/>
+          <TextBlock x:Name="RemoveBtnLabel" Text="Remove Selected" FontSize="11" FontWeight="Bold"/>
         </StackPanel>
       </Button>
     </Grid>
@@ -34,13 +43,12 @@
             BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
       <Grid RowDefinitions="Auto,*">
         <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
-          <Grid ColumnDefinitions="40,2*,100,80,80,80">
+          <Grid ColumnDefinitions="40,2*,100,80,80">
             <TextBlock Text="" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="1" Text="APP NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="2" Text="CATEGORY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
             <TextBlock Grid.Column="3" Text="SIZE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
             <TextBlock Grid.Column="4" Text="RISK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="ACTION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
         </Border>
         <ScrollViewer Grid.Row="1">
@@ -48,7 +56,7 @@
             <ItemsControl.ItemTemplate>
               <DataTemplate>
                 <Border Padding="12,6" Margin="0,1" CornerRadius="4">
-                  <Grid ColumnDefinitions="40,2*,100,80,80,80">
+                  <Grid ColumnDefinitions="40,2*,100,80,80">
                     <CheckBox IsChecked="{Binding CanRemove}" IsEnabled="{Binding CanRemove}" VerticalAlignment="Center"/>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                       <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
@@ -59,8 +67,6 @@
                     <Border Grid.Column="4" CornerRadius="8" Padding="6,2" Background="{Binding RiskBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
                       <TextBlock Text="{Binding RiskText}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding RiskFg}"/>
                     </Border>
-                    <Button Grid.Column="5" Tag="{Binding PkgName}" Classes="action-btn" Padding="6,3" Click="Remove_Click" FontSize="9"
-                            Content="Remove" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding CanRemove}"/>
                   </Grid>
                 </Border>
               </DataTemplate>

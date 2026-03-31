@@ -128,7 +128,7 @@ public sealed partial class MainWindow : Window
             // Section header
             NavPanel.Children.Add(new TextBlock
             {
-                Text = LocalizationService._(labelKey), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
+                Text = LocalizationService._(labelKey), FontSize = 9, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
                 Foreground = new SolidColorBrush(Color.Parse("#555570")),
                 Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
             });

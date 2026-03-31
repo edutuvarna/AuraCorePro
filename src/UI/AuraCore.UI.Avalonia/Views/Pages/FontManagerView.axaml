@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Font Manager" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Font Manager" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Browse installed fonts with live preview"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -17,7 +17,7 @@
       <TextBox x:Name="PreviewText" Text="The quick brown fox jumps over the lazy dog. 0123456789"
                Watermark="Preview text..." Margin="0,0,0,8"/>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <ItemsControl x:Name="FontList"/>
       </Border>
     </StackPanel>

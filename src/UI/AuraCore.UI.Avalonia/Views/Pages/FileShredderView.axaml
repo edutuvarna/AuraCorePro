@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="File Shredder" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="File Shredder" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Securely delete files beyond recovery with multi-pass overwrite"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -12,9 +12,9 @@
 
       <!-- Method Selection -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Shred Method" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Shred Method" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <RadioButton x:Name="Method1Pass" Content="Quick (1 pass - zero fill)" IsChecked="True" GroupName="method"/>
           <RadioButton x:Name="Method3Pass" Content="Standard (3 pass - DoD Short)" GroupName="method"/>
@@ -24,9 +24,9 @@
 
       <!-- File Selection -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Files to Shred" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Files to Shred" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Content="Add Files..." Click="AddFiles_Click" Classes="action-btn" Padding="16,8"/>
@@ -48,7 +48,7 @@
       <!-- Progress -->
       <Border x:Name="ProgressPanel" IsVisible="False" CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="8">
           <TextBlock x:Name="ProgressLabel" Text="Shredding..." FontSize="14" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>

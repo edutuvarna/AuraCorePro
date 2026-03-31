@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.GamingModeView">
   <ScrollViewer>
-    <StackPanel Spacing="16">
+    <StackPanel Spacing="12">
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Gaming Mode" FontSize="28" FontWeight="Bold"
+          <TextBlock x:Name="PageTitle" Text="Gaming Mode" FontSize="22" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="Boost gaming performance with one click"
                      FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>

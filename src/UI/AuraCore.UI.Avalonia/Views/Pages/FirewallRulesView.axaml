@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Manage Windows Firewall inbound and outbound rules"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -35,7 +35,7 @@
       </Grid>
       <!-- Rules list -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>

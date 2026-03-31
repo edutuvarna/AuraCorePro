@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Swap Optimizer" FontSize="28" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Swap Optimizer" FontSize="22" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Monitor and optimize Linux swap usage and swappiness settings"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -33,10 +33,10 @@
         </Border>
       </Grid>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Swap Partitions/Files" FontSize="15" FontWeight="SemiBold"
+            <TextBlock Text="Swap Partitions/Files" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
             <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
@@ -46,9 +46,9 @@
         </StackPanel>
       </Border>
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="24">
+              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
         <StackPanel Spacing="12">
-          <TextBlock Text="Swappiness Recommendations" FontSize="15" FontWeight="SemiBold"
+          <TextBlock Text="Swappiness Recommendations" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="RecommendationText" Text="" FontSize="12" TextWrapping="Wrap"
                      Foreground="{DynamicResource TextSecondaryBrush}"/>

@@ -32,11 +32,19 @@ public sealed class StripeController : ControllerBase
             return Unauthorized(new { error = "Invalid token" });
         var user = await _db.Users.FindAsync(new object[] { userId }, ct);
         if (user is null) return NotFound(new { error = "User not found" });
-        var secretKey = _config["Stripe:SecretKey"];
-        if (string.IsNullOrEmpty(secretKey))
+        var secretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? _config["Stripe:SecretKey"];
+        if (string.IsNullOrEmpty(secretKey) || secretKey == "LOADED_FROM_ENV")
             return StatusCode(503, new { error = "Stripe is not configured" });
         StripeConfiguration.ApiKey = secretKey;
-        var (amount, description) = GetPricing(req.Tier, req.Plan, req.DeviceCount);
+        var validTiers = new[] { "pro", "enterprise" };
+        if (!validTiers.Contains(req.Tier?.ToLower()))
+            return BadRequest(new { error = "Invalid tier" });
+        var validPlans = new[] { "monthly", "yearly" };
+        if (!validPlans.Contains(req.Plan?.ToLower()))
+            return BadRequest(new { error = "Invalid plan" });
+        var currency = (req.Currency?.ToLower()) switch { "try" => "try", "eur" => "eur", _ => "usd" };
+        var (amount, description) = GetPricing(req.Tier, req.Plan, req.DeviceCount, currency);
+        var locale = currency == "try" ? "tr" : "en";
         var options = new SessionCreateOptions
         {
             PaymentMethodTypes = new List<string> { "card" },
@@ -48,7 +56,7 @@ public sealed class StripeController : ControllerBase
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        Currency = "usd",
+                        Currency = currency,
                         UnitAmount = (long)(amount * 100),
                         Recurring = new SessionLineItemPriceDataRecurringOptions { Interval = req.Plan == "yearly" ? "year" : "month" },
                         ProductData = new SessionLineItemPriceDataProductDataOptions { Name = $"AuraCore Pro - {req.Tier.ToUpper()}", Description = description }
@@ -58,15 +66,71 @@ public sealed class StripeController : ControllerBase
             },
             SuccessUrl = _config["Stripe:SuccessUrl"] ?? "https://auracore.pro?payment=success",
             CancelUrl = _config["Stripe:CancelUrl"] ?? "https://auracore.pro#pricing",
-            Locale = "en",
-            Metadata = new Dictionary<string, string> { { "userId", userId.ToString() }, { "tier", req.Tier }, { "plan", req.Plan }, { "deviceCount", req.DeviceCount.ToString() } }
+            Locale = locale,
+            Metadata = new Dictionary<string, string> { { "userId", userId.ToString() }, { "tier", req.Tier }, { "plan", req.Plan }, { "deviceCount", req.DeviceCount.ToString() }, { "currency", currency } }
         };
         try
         {
             var service = new SessionService();
             var session = await service.CreateAsync(options, cancellationToken: ct);
-            _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = "USD", Plan = req.Plan, Tier = req.Tier, Status = "pending" });
+            _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = currency.ToUpper(), Plan = req.Plan, Tier = req.Tier, Status = "pending" });
             await _db.SaveChangesAsync(ct);
+            return Ok(new { sessionId = session.Id, url = session.Url });
+        }
+        catch (StripeException ex)
+        {
+            return StatusCode(502, new { error = "Payment error: " + ex.Message });
+        }
+    }
+
+    [HttpPost("guest-checkout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GuestCheckout([FromBody] GuestCheckoutRequest req, CancellationToken ct)
+    {
+        var secretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? _config["Stripe:SecretKey"];
+        if (string.IsNullOrEmpty(secretKey) || secretKey == "LOADED_FROM_ENV")
+            return StatusCode(503, new { error = "Stripe is not configured" });
+        StripeConfiguration.ApiKey = secretKey;
+
+        var validTiers = new[] { "pro", "enterprise" };
+        if (!validTiers.Contains(req.Tier?.ToLower()))
+            return BadRequest(new { error = "Invalid tier" });
+        var validPlans = new[] { "monthly", "yearly" };
+        if (!validPlans.Contains(req.Plan?.ToLower()))
+            return BadRequest(new { error = "Invalid plan" });
+
+        var currency = (req.Currency?.ToLower()) switch { "try" => "try", "eur" => "eur", _ => "usd" };
+        var (amount, description) = GetPricing(req.Tier, req.Plan, req.DeviceCount, currency);
+        var locale = currency == "try" ? "tr" : "en";
+
+        var options = new SessionCreateOptions
+        {
+            PaymentMethodTypes = new List<string> { "card" },
+            Mode = "subscription",
+            LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = currency,
+                        UnitAmount = (long)(amount * 100),
+                        Recurring = new SessionLineItemPriceDataRecurringOptions { Interval = req.Plan == "yearly" ? "year" : "month" },
+                        ProductData = new SessionLineItemPriceDataProductDataOptions { Name = $"AuraCore Pro - {req.Tier.ToUpper()}", Description = description }
+                    },
+                    Quantity = 1
+                }
+            },
+            SuccessUrl = _config["Stripe:SuccessUrl"] ?? "https://auracore.pro?payment=success",
+            CancelUrl = _config["Stripe:CancelUrl"] ?? "https://auracore.pro#pricing",
+            Locale = locale,
+            Metadata = new Dictionary<string, string> { { "tier", req.Tier }, { "plan", req.Plan }, { "deviceCount", req.DeviceCount.ToString() }, { "currency", currency }, { "source", "website" } }
+        };
+
+        try
+        {
+            var service = new SessionService();
+            var session = await service.CreateAsync(options, cancellationToken: ct);
             return Ok(new { sessionId = session.Id, url = session.Url });
         }
         catch (StripeException ex)
@@ -79,8 +143,8 @@ public sealed class StripeController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Webhook(CancellationToken ct)
     {
-        var webhookSecret = _config["Stripe:WebhookSecret"];
-        if (string.IsNullOrEmpty(webhookSecret)) return BadRequest(new { error = "Webhook secret not configured" });
+        var webhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? _config["Stripe:WebhookSecret"];
+        if (string.IsNullOrEmpty(webhookSecret) || webhookSecret == "LOADED_FROM_ENV") return BadRequest(new { error = "Webhook secret not configured" });
         using var reader = new StreamReader(Request.Body);
         var json = await reader.ReadToEndAsync(ct);
         Event stripeEvent;
@@ -113,7 +177,7 @@ public sealed class StripeController : ControllerBase
     {
         var userIdClaim = User.FindFirst("sub");
         if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId)) return Unauthorized();
-        StripeConfiguration.ApiKey = _config["Stripe:SecretKey"];
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? _config["Stripe:SecretKey"];
         var sub = await _db.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId && s.Status == "active", ct);
         if (sub is null || string.IsNullOrEmpty(sub.StripeCustomerId)) return NotFound(new { error = "No active subscription" });
         var options = new Stripe.BillingPortal.SessionCreateOptions { Customer = sub.StripeCustomerId, ReturnUrl = "https://admin.auracore.pro" };
@@ -122,14 +186,25 @@ public sealed class StripeController : ControllerBase
         return Ok(new { url = session.Url });
     }
 
-    private static (decimal amount, string description) GetPricing(string tier, string plan, int deviceCount)
+    private static (decimal amount, string description) GetPricing(string tier, string plan, int deviceCount, string currency = "usd")
     {
         decimal basePrice, extraDevicePrice;
-        if (tier == "enterprise") { basePrice = plan == "yearly" ? 129.99m : 12.99m; extraDevicePrice = plan == "yearly" ? 15.00m : 1.50m; }
-        else { basePrice = plan == "yearly" ? 49.99m : 4.99m; extraDevicePrice = plan == "yearly" ? 20.00m : 2.00m; }
+        if (currency == "try")
+        {
+            // TRY pricing
+            if (tier == "enterprise") { basePrice = plan == "yearly" ? 3590m : 449m; extraDevicePrice = plan == "yearly" ? 312m : 39m; }
+            else { basePrice = plan == "yearly" ? 1190m : 149m; extraDevicePrice = plan == "yearly" ? 472m : 59m; }
+        }
+        else
+        {
+            // USD pricing
+            if (tier == "enterprise") { basePrice = plan == "yearly" ? 129.99m : 12.99m; extraDevicePrice = plan == "yearly" ? 15.00m : 1.50m; }
+            else { basePrice = plan == "yearly" ? 49.99m : 4.99m; extraDevicePrice = plan == "yearly" ? 20.00m : 2.00m; }
+        }
         var extra = Math.Max(0, deviceCount - 1);
         var total = basePrice + (extra * extraDevicePrice);
-        var desc = $"{(tier == "enterprise" ? "Enterprise" : "Pro")} {(plan == "yearly" ? "Yearly" : "Monthly")} - {deviceCount} device(s)";
+        var cur = currency.ToUpper();
+        var desc = $"{(tier == "enterprise" ? "Enterprise" : "Pro")} {(plan == "yearly" ? "Yearly" : "Monthly")} - {deviceCount} device(s) ({cur})";
         return (total, desc);
     }
 
@@ -197,4 +272,5 @@ public sealed class StripeController : ControllerBase
     }
 }
 
-public sealed record CreateSessionRequest(string Tier = "pro", string Plan = "monthly", int DeviceCount = 1);
+public sealed record CreateSessionRequest(string Tier = "pro", string Plan = "monthly", int DeviceCount = 1, string Currency = "usd");
+public sealed record GuestCheckoutRequest(string Tier = "pro", string Plan = "monthly", int DeviceCount = 1, string Currency = "usd");

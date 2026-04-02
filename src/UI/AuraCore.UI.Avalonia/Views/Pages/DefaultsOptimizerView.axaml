@@ -4,13 +4,18 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Defaults Optimizer" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Defaults Optimizer" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Read and write macOS system preferences via defaults command"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <TextBlock Text="Quick Tweaks" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -21,8 +26,13 @@
                   HorizontalAlignment="Left"/>
         </StackPanel>
       </Border>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <TextBlock Text="Custom Defaults Read" FontSize="13" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>

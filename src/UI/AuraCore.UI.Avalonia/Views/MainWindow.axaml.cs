@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
+using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
@@ -116,6 +118,50 @@ public sealed partial class MainWindow : Window
                 ApplyTierLocking();
                 SettingsNavLabel.Text = LocalizationService._("nav.settings");
             });
+
+        // ── Status bar wiring ────────────────────────────
+        StatusBarService.StatusChanged += text =>
+            Dispatcher.UIThread.Post(() => GlobalStatusText.Text = text);
+
+        StatusBarService.ProgressChanged += (op, fraction) =>
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (fraction < 0 || string.IsNullOrEmpty(op))
+                {
+                    GlobalProgressText.Text = "";
+                    GlobalProgressBarBorder.IsVisible = false;
+                    GlobalProgressBarFill.Width = 0;
+                }
+                else
+                {
+                    GlobalProgressText.Text = op;
+                    GlobalProgressBarBorder.IsVisible = true;
+                    GlobalProgressBarFill.Width = 80 * Math.Clamp(fraction, 0, 1);
+                }
+            });
+
+        // Memory usage timer (updates every 5 seconds)
+        var memTimer = new global::Avalonia.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(5)
+        };
+        memTimer.Tick += (_, _) => UpdateMemoryDisplay();
+        memTimer.Start();
+        UpdateMemoryDisplay();
+    }
+
+    private void UpdateMemoryDisplay()
+    {
+        try
+        {
+            var proc = Process.GetCurrentProcess();
+            var usedMb = proc.WorkingSet64 / (1024.0 * 1024);
+            GlobalMemoryText.Text = $"RAM: {usedMb:F0} MB";
+        }
+        catch
+        {
+            GlobalMemoryText.Text = "";
+        }
     }
 
     private void BuildNavigation()

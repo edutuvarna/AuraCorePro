@@ -224,10 +224,14 @@ public sealed class HostsEditorModule : IOptimizationModule
                 var principal = new System.Security.Principal.WindowsPrincipal(identity);
                 return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
             }
-            else
+            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
             {
                 // Linux/macOS: root = uid 0
                 return Environment.UserName == "root" || getuid() == 0;
+            }
+            else
+            {
+                return false;
             }
         }
         catch { return false; }

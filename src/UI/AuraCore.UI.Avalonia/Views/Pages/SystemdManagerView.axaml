@@ -4,43 +4,68 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Systemd Manager" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Systemd Manager" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="List, start, stop, restart and manage systemd services"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Grid ColumnDefinitions="*,*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Total" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="TotalSvc" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Running" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="RunningSvc" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Failed" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="FailedSvc" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource ErrorBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Enabled" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="EnabledSvc" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
           </StackPanel>
         </Border>
       </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <TextBox x:Name="SearchBox" Watermark="Search services..." Width="300" HorizontalAlignment="Left"

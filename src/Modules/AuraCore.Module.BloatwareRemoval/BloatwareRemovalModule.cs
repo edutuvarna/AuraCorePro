@@ -89,7 +89,7 @@ public sealed class BloatwareRemovalModule : IOptimizationModule
             // PowerShell outputs an array of objects
             apps = ParsePowerShellOutput(output);
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[bloatware-removal] Error: {ex.Message}"); }
 
         return apps;
     }
@@ -128,7 +128,7 @@ public sealed class BloatwareRemovalModule : IOptimizationModule
                                 .Sum(f => { try { return f.Length; } catch { return 0L; } });
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[bloatware-removal] Error: {ex.Message}"); }
                 }
 
                 // Build a friendly display name from the package name
@@ -157,7 +157,7 @@ public sealed class BloatwareRemovalModule : IOptimizationModule
                 });
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[bloatware-removal] Error: {ex.Message}"); }
 
         // Sort: bloat first, then caution, then user, then system
         apps.Sort((a, b) =>

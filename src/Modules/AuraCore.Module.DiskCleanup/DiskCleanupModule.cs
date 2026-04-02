@@ -143,7 +143,7 @@ public sealed class DiskCleanupModule : IOptimizationModule
             }
 
             // 7. Windows Installer Patch Cache
-            var patchCache = @"C:\Windows\Installer\$PatchCache$";
+            var patchCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), @"Installer\$PatchCache$");
             if (Directory.Exists(patchCache))
             {
                 categories.Add(ScanDir("Installer Patch Cache",
@@ -161,7 +161,7 @@ public sealed class DiskCleanupModule : IOptimizationModule
             }
 
             // 9. Old Windows Installation
-            var windowsOld = @"C:\Windows.old";
+            var windowsOld = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)) ?? @"C:\", "Windows.old");
             if (Directory.Exists(windowsOld))
             {
                 categories.Add(ScanDir("Previous Windows Installation",
@@ -511,6 +511,13 @@ public sealed class DiskCleanupModule : IOptimizationModule
             using var hasher = SHA256.Create();
             var bufferSize = 8192;
 
+            if (stream.Length < bufferSize)
+            {
+                // Very small file - hash entire content directly
+                var hash = hasher.ComputeHash(stream);
+                return $"{stream.Length}:{Convert.ToHexString(hash)}";
+            }
+
             if (stream.Length <= bufferSize * 2)
             {
                 // Small file - hash entire content
@@ -520,9 +527,9 @@ public sealed class DiskCleanupModule : IOptimizationModule
 
             // Large file - hash first 8KB + last 8KB
             var buffer = new byte[bufferSize * 2];
-            stream.Read(buffer, 0, bufferSize);
+            var bytesReadFirst = stream.Read(buffer, 0, bufferSize);
             stream.Seek(-bufferSize, SeekOrigin.End);
-            stream.Read(buffer, bufferSize, bufferSize);
+            var bytesReadLast = stream.Read(buffer, bufferSize, bufferSize);
 
             var partialHash = hasher.ComputeHash(buffer);
             return $"{stream.Length}:{Convert.ToHexString(partialHash)}";

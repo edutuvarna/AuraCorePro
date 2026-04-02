@@ -4,29 +4,53 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Manage Windows Firewall inbound and outbound rules"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <!-- Stats -->
       <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
-            <TextBlock Text="Total Rules" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="14" Height="14" CornerRadius="3">
+                <Border.Background>
+                  <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x25A0;" FontSize="6" Foreground="#F59E0B"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="Total Rules" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
             <TextBlock x:Name="TotalRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Enabled" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="EnabledRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Blocked" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="BlockedRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource ErrorBrush}"/>
@@ -34,11 +58,25 @@
         </Border>
       </Grid>
       <!-- Rules list -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#EF4444" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x26D4;" FontSize="8" Foreground="#EF4444"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>
+            </StackPanel>
             <Button x:Name="ScanBtn" Content="Scan Rules" Click="Scan_Click" Grid.Column="1"
                     Classes="action-btn" Padding="16,8"/>
           </Grid>

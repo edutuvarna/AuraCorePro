@@ -13,6 +13,8 @@ namespace AuraCore.API.Controllers;
 public sealed class TotpController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
+    private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _totpAttempts = new();
+
     public TotpController(AuraCoreDbContext db) => _db = db;
 
     private Guid? GetUserId()
@@ -72,14 +74,33 @@ public sealed class TotpController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Validate([FromBody] TotpLoginRequest req, CancellationToken ct)
     {
+        var email = req.Email?.ToLower() ?? "";
+
+        // Rate limiting: max 5 attempts per 15 minutes
+        if (_totpAttempts.TryGetValue(email, out var attempt))
+        {
+            if (attempt.ResetAt > DateTime.UtcNow && attempt.Count >= 5)
+                return StatusCode(429, new { error = "Too many attempts. Try again later." });
+            if (attempt.ResetAt <= DateTime.UtcNow)
+                _totpAttempts.Remove(email);
+        }
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email.ToLowerInvariant().Trim(), ct);
         if (user is null) return NotFound(new { error = "User not found" });
         if (!user.TotpEnabled || string.IsNullOrEmpty(user.TotpSecret))
             return BadRequest(new { error = "2FA not enabled for this user" });
 
         if (!TotpService.ValidateCode(user.TotpSecret, req.Code))
+        {
+            // Track failed attempt
+            _totpAttempts[email] = _totpAttempts.TryGetValue(email, out var a)
+                ? (a.Count + 1, a.ResetAt)
+                : (1, DateTime.UtcNow.AddMinutes(15));
             return Unauthorized(new { error = "Invalid 2FA code" });
+        }
 
+        // Clear attempts on success
+        _totpAttempts.Remove(email);
         return Ok(new { valid = true, message = "2FA verified" });
     }
 

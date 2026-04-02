@@ -24,7 +24,9 @@ public sealed class CryptoController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreateCryptoPayment([FromBody] CryptoPaymentRequest req, CancellationToken ct)
     {
-        var userId = Guid.Parse(User.FindFirst("sub")!.Value);
+        var userIdClaim = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
 
         var amount = req.Plan == "yearly"
             ? (req.Tier == "enterprise" ? 129.99m : 49.99m)
@@ -79,7 +81,9 @@ public sealed class CryptoController : ControllerBase
     public async Task<IActionResult> ConfirmCryptoPayment(
         Guid paymentId, [FromBody] ConfirmCryptoRequest req, CancellationToken ct)
     {
-        var userId = Guid.Parse(User.FindFirst("sub")!.Value);
+        var userIdClaim = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
         var payment = await _db.Payments.FirstOrDefaultAsync(
             p => p.Id == paymentId && p.UserId == userId, ct);
 

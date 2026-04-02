@@ -19,8 +19,8 @@
           <!-- Backgrounds -->
           <SolidColorBrush x:Key="BgDeepBrush" Color="#0A0A0F"/>
           <SolidColorBrush x:Key="BgSurfaceBrush" Color="#12121A"/>
-          <SolidColorBrush x:Key="BgCardBrush" Color="#1A1A28"/>
-          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#222235"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#16162280"/>
+          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#2222358C"/>
           <SolidColorBrush x:Key="BgElevatedBrush" Color="#252538"/>
 
           <!-- Accent: Teal -->
@@ -39,6 +39,18 @@
           <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
           <SolidColorBrush x:Key="InfoBrush" Color="#3B82F6"/>
 
+          <!-- Semantic Backgrounds (transparent tints) -->
+          <SolidColorBrush x:Key="WarningBgBrush" Color="#F59E0B0D"/>
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#F59E0B33"/>
+          <SolidColorBrush x:Key="ErrorBgBrush" Color="#EF444420"/>
+          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#EF444430"/>
+          <SolidColorBrush x:Key="InfoBgBrush" Color="#3B82F60D"/>
+          <SolidColorBrush x:Key="InfoBorderBrush" Color="#3B82F620"/>
+          <SolidColorBrush x:Key="SuccessBgBrush" Color="#22C55E20"/>
+          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#22C55E30"/>
+          <SolidColorBrush x:Key="AccentBgBrush" Color="#00D4AA0D"/>
+          <SolidColorBrush x:Key="AccentBorderBrush" Color="#00D4AA20"/>
+
           <!-- Text -->
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E8E8F0"/>
           <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8888A0"/>
@@ -46,12 +58,12 @@
 
           <!-- Borders -->
           <SolidColorBrush x:Key="BorderSubtleBrush" Color="#2A2A3A"/>
-          <SolidColorBrush x:Key="BorderCardBrush" Color="#33334A"/>
+          <SolidColorBrush x:Key="BorderCardBrush" Color="#FFFFFF10"/>
 
           <!-- Window -->
           <SolidColorBrush x:Key="WindowBgBrush" Color="#0A0A0F"/>
           <SolidColorBrush x:Key="WindowFgBrush" Color="#E8E8F0"/>
-          <SolidColorBrush x:Key="SidebarBgBrush" Color="#12121A"/>
+          <SolidColorBrush x:Key="SidebarBgBrush" Color="#0D0D16"/>
           <SolidColorBrush x:Key="NavHoverBrush" Color="#1A1A28"/>
           <SolidColorBrush x:Key="NavActiveBrush" Color="#1500D4AA"/>
           <SolidColorBrush x:Key="SectionHeaderBrush" Color="#555570"/>
@@ -64,8 +76,8 @@
           <!-- Backgrounds -->
           <SolidColorBrush x:Key="BgDeepBrush" Color="#F5F5F8"/>
           <SolidColorBrush x:Key="BgSurfaceBrush" Color="#EEEEF2"/>
-          <SolidColorBrush x:Key="BgCardBrush" Color="#FFFFFF"/>
-          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#F0F0F5"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#FFFFFFEE"/>
+          <SolidColorBrush x:Key="BgCardHoverBrush" Color="#F0F0F5DD"/>
           <SolidColorBrush x:Key="BgElevatedBrush" Color="#FAFAFE"/>
 
           <!-- Accent: Teal (slightly deeper for light bg) -->
@@ -84,6 +96,18 @@
           <SolidColorBrush x:Key="ErrorBrush" Color="#DC2626"/>
           <SolidColorBrush x:Key="InfoBrush" Color="#2563EB"/>
 
+          <!-- Semantic Backgrounds (transparent tints) -->
+          <SolidColorBrush x:Key="WarningBgBrush" Color="#F59E0B10"/>
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#F59E0B30"/>
+          <SolidColorBrush x:Key="ErrorBgBrush" Color="#EF444415"/>
+          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#EF444425"/>
+          <SolidColorBrush x:Key="InfoBgBrush" Color="#3B82F610"/>
+          <SolidColorBrush x:Key="InfoBorderBrush" Color="#3B82F625"/>
+          <SolidColorBrush x:Key="SuccessBgBrush" Color="#22C55E15"/>
+          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#22C55E25"/>
+          <SolidColorBrush x:Key="AccentBgBrush" Color="#00A88810"/>
+          <SolidColorBrush x:Key="AccentBorderBrush" Color="#00A88820"/>
+
           <!-- Text -->
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A2E"/>
           <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64648A"/>
@@ -91,12 +115,12 @@
 
           <!-- Borders -->
           <SolidColorBrush x:Key="BorderSubtleBrush" Color="#D8D8E5"/>
-          <SolidColorBrush x:Key="BorderCardBrush" Color="#E0E0EC"/>
+          <SolidColorBrush x:Key="BorderCardBrush" Color="#00000010"/>
 
           <!-- Window -->
           <SolidColorBrush x:Key="WindowBgBrush" Color="#F5F5F8"/>
           <SolidColorBrush x:Key="WindowFgBrush" Color="#1A1A2E"/>
-          <SolidColorBrush x:Key="SidebarBgBrush" Color="#EEEEF2"/>
+          <SolidColorBrush x:Key="SidebarBgBrush" Color="#EAEAF0"/>
           <SolidColorBrush x:Key="NavHoverBrush" Color="#FFFFFF"/>
           <SolidColorBrush x:Key="NavActiveBrush" Color="#1500A888"/>
           <SolidColorBrush x:Key="SectionHeaderBrush" Color="#9898B0"/>
@@ -107,12 +131,46 @@
 
       <!-- ── SHARED (theme-independent) RESOURCES ──────── -->
 
+      <!-- ── KPI ICONS (DrawingImage, theme-independent) ── -->
+      <!-- CPU: chip/processor -->
+      <DrawingImage x:Key="CpuIcon">
+        <GeometryDrawing Brush="#3B82F6">
+          <GeometryDrawing.Geometry>
+            <PathGeometry Figures="M9,2 L15,2 15,4 13,4 13,5 16,5 16,8 17,8 17,6 19,6 19,10 17,10 17,8 16,8 16,11 17,11 17,9 19,9 19,13 17,13 17,11 16,11 16,14 13,14 13,15 15,15 15,17 9,17 9,15 11,15 11,14 8,14 8,11 7,11 7,13 5,13 5,9 7,9 7,11 8,11 8,8 7,8 7,10 5,10 5,6 7,6 7,8 8,8 8,5 11,5 11,4 9,4 Z M10,7 L10,12 14,12 14,7 Z"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingImage>
+      <!-- RAM: memory stick -->
+      <DrawingImage x:Key="RamIcon">
+        <GeometryDrawing Brush="#8B5CF6">
+          <GeometryDrawing.Geometry>
+            <PathGeometry Figures="M3,6 L21,6 21,16 19,16 19,18 17,18 17,16 15,16 15,18 13,18 13,16 11,16 11,18 9,18 9,16 7,16 7,18 5,18 5,16 3,16 Z M5,8 L5,14 7,14 7,8 Z M9,8 L9,14 11,14 11,8 Z M13,8 L13,14 15,14 15,8 Z M17,8 L17,14 19,14 19,8 Z"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingImage>
+      <!-- Disk: hard drive -->
+      <DrawingImage x:Key="DiskIcon">
+        <GeometryDrawing Brush="#F59E0B">
+          <GeometryDrawing.Geometry>
+            <PathGeometry Figures="M4,5 L20,5 20,19 4,19 Z M6,7 L6,13 18,13 18,7 Z M6,15 L6,17 18,17 18,15 Z M15,15.5 A1,1 0 1,1 15,16.5 A1,1 0 1,1 15,15.5 Z"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingImage>
+      <!-- Uptime: clock -->
+      <DrawingImage x:Key="UptimeIcon">
+        <GeometryDrawing Brush="#EC4899">
+          <GeometryDrawing.Geometry>
+            <PathGeometry Figures="M12,2 A10,10 0 1,1 12,22 A10,10 0 1,1 12,2 Z M12,4 A8,8 0 1,1 12,20 A8,8 0 1,1 12,4 Z M11,7 L13,7 13,12.5 16,14.5 15,16 11,13.5 Z"/>
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingImage>
+
       <!-- Spacing & Radius -->
-      <CornerRadius x:Key="RadiusSm">4</CornerRadius>
-      <CornerRadius x:Key="RadiusMd">8</CornerRadius>
-      <CornerRadius x:Key="RadiusLg">10</CornerRadius>
-      <CornerRadius x:Key="RadiusXl">14</CornerRadius>
-      <Thickness x:Key="CardPadding">14</Thickness>
+      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+      <CornerRadius x:Key="RadiusXl">16</CornerRadius>
+      <Thickness x:Key="CardPadding">16</Thickness>
       <Thickness x:Key="PageMargin">20</Thickness>
 
       <!-- ── ORBITAL CORE LOGO (from landing page SVG) ── -->
@@ -180,7 +238,7 @@
     <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="Padding" Value="10,7" />
+    <Setter Property="Padding" Value="8,6" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Cursor" Value="Hand" />

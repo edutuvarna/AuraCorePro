@@ -4,40 +4,66 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Swap Optimizer" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Swap Optimizer" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Monitor and optimize Linux swap usage and swappiness settings"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
       <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Swap Total" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="SwapTotal" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Swap Used" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="SwapUsed" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
           </StackPanel>
         </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-                BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
           <StackPanel Spacing="4">
             <TextBlock Text="Swappiness" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="Swappiness" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
           </StackPanel>
         </Border>
       </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Swap Partitions/Files" FontSize="13" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+                <TextBlock Text="&#x25C6;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="Swap Partitions/Files" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
             <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
           <ItemsControl x:Name="SwapList"/>
@@ -45,11 +71,22 @@
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
       </Border>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Swappiness Recommendations" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+              <TextBlock Text="&#x25C6;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Swappiness Recommendations" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <TextBlock x:Name="RecommendationText" Text="" FontSize="12" TextWrapping="Wrap"
                      Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>

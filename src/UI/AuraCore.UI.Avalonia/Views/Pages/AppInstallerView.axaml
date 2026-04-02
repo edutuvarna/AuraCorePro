@@ -1,0 +1,218 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.AppInstallerView">
+  <ScrollViewer>
+    <StackPanel Spacing="20">
+
+      <!-- Header -->
+      <StackPanel Spacing="4">
+        <TextBlock Text="App Installer" FontSize="16" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Search, install and update apps via winget"
+                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+        <Border Padding="8,4" CornerRadius="4" HorizontalAlignment="Left" Margin="0,4,0,0">
+          <Border.Background>
+            <SolidColorBrush Color="#F59E0B" Opacity="0.1"/>
+          </Border.Background>
+          <TextBlock Text="Windows only - requires winget" FontSize="10"
+                     Foreground="#F59E0B" FontWeight="SemiBold"/>
+        </Border>
+      </StackPanel>
+
+      <!-- Tab Bar -->
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Border x:Name="SearchTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
+                PointerPressed="Tab_Click" Tag="search">
+          <Border.Background>
+            <SolidColorBrush Color="#00D4AA" Opacity="0.15"/>
+          </Border.Background>
+          <TextBlock Text="Search" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}"/>
+        </Border>
+        <Border x:Name="BundlesTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
+                PointerPressed="Tab_Click" Tag="bundles">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+          </Border.Background>
+          <TextBlock Text="Bundles" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </Border>
+        <Border x:Name="InstalledTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
+                PointerPressed="Tab_Click" Tag="installed">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+          </Border.Background>
+          <TextBlock Text="Installed" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </Border>
+        <Border x:Name="UpdatesTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
+                PointerPressed="Tab_Click" Tag="updates">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+          </Border.Background>
+          <TextBlock Text="Updates" FontSize="11" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </Border>
+      </StackPanel>
+
+      <!-- ═══ Install Queue Panel (visible when queue has items) ═══ -->
+      <Border x:Name="QueuePanel" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+              Padding="14,10" IsVisible="False">
+        <Border.Background>
+          <SolidColorBrush Color="#00D4AA" Opacity="0.04"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#00D4AA" Opacity="0.12"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#00D4AA" Opacity="0.2"/>
+                </Border.Background>
+                <TextBlock Text="&#x25B6;" FontSize="8" FontWeight="Bold" Foreground="#00D4AA"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock x:Name="QueueTitle" Text="Install Queue" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+            <Button Grid.Column="1" x:Name="CancelQueueBtn" Content="Cancel" FontSize="10"
+                    Padding="10,3" Click="CancelQueue_Click" IsVisible="False"/>
+          </Grid>
+          <ItemsControl x:Name="QueueList"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ═══ Tab 1: Search ═══ -->
+      <StackPanel x:Name="SearchPanel" Spacing="12">
+        <TextBox x:Name="SearchBox" Watermark="Search winget packages..." KeyDown="SearchBox_KeyDown"/>
+
+        <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#00D4AA" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x2315;" FontSize="9" FontWeight="Bold" Foreground="#00D4AA"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="Search Results" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+            <ItemsControl x:Name="SearchResults"/>
+            <TextBlock x:Name="SearchEmpty" Text="Type a query and press Enter to search"
+                       FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Center" Margin="0,12"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- ═══ Tab 2: Bundles ═══ -->
+      <StackPanel x:Name="BundlesPanel" Spacing="12" IsVisible="False">
+        <TextBlock Text="Quick-install preset app bundles. Select a bundle, pick apps, and install them all at once."
+                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+        <!-- Bundle cards generated in code-behind -->
+        <WrapPanel x:Name="BundleCards" Orientation="Horizontal"/>
+        <!-- Bundle detail / app list -->
+        <Border x:Name="BundleDetailPanel" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+                Padding="14,12" IsVisible="False">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+              <TextBlock x:Name="BundleDetailTitle" Text="" FontSize="13" FontWeight="Bold"
+                         Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+              <Button Grid.Column="1" x:Name="BundleSelectAllBtn" Content="Select All"
+                      FontSize="10" Padding="10,4" Click="BundleSelectAll_Click" Margin="0,0,6,0"/>
+              <Button Grid.Column="2" x:Name="BundleInstallBtn" Content="Install Selected"
+                      FontSize="10" Padding="10,4" Click="BundleInstall_Click" Classes="accent"/>
+            </Grid>
+            <ItemsControl x:Name="BundleAppList"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- ═══ Tab 3: Installed ═══ -->
+      <StackPanel x:Name="InstalledPanel" Spacing="12" IsVisible="False">
+        <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#8B5CF6" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x25A3;" FontSize="9" FontWeight="Bold" Foreground="#8B5CF6"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="Installed Apps" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="InstalledCount" Text="" FontSize="11"
+                         Foreground="{DynamicResource TextMutedBrush}" Margin="6,0,0,0"/>
+            </StackPanel>
+            <ItemsControl x:Name="InstalledList"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- ═══ Tab 4: Updates ═══ -->
+      <StackPanel x:Name="UpdatesPanel" Spacing="12" IsVisible="False">
+        <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="16" Height="16" CornerRadius="4">
+                  <Border.Background>
+                    <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
+                  </Border.Background>
+                  <TextBlock Text="&#x2B06;" FontSize="9" FontWeight="Bold" Foreground="#F59E0B"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Available Updates" FontSize="11" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock x:Name="UpdateCount" Text="" FontSize="11"
+                           Foreground="{DynamicResource TextMutedBrush}" Margin="6,0,0,0"/>
+              </StackPanel>
+              <Button x:Name="UpdateAllBtn" Grid.Column="1" Content="Update All"
+                      Click="UpdateAll_Click" Classes="accent" Padding="10,4" FontSize="10"/>
+            </Grid>
+            <ItemsControl x:Name="UpdateList"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Status Bar -->
+      <Border CornerRadius="{StaticResource RadiusMd}" Padding="10,6">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.015"/>
+        </Border.Background>
+        <TextBlock x:Name="StatusText" Text="Ready" FontSize="10"
+                   Foreground="{DynamicResource TextMutedBrush}"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

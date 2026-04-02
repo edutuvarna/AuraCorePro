@@ -16,6 +16,15 @@ public sealed class CrashReportController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Submit([FromBody] CrashReportRequest request, CancellationToken ct)
     {
+        if (string.IsNullOrEmpty(request.AppVersion) || request.AppVersion.Length > 32)
+            return BadRequest(new { error = "Invalid AppVersion" });
+        if (request.ExceptionType?.Length > 512)
+            return BadRequest(new { error = "ExceptionType too long" });
+        if (request.StackTrace?.Length > 50000)
+            return BadRequest(new { error = "StackTrace too long (max 50KB)" });
+        if (request.SystemInfo?.Length > 10000)
+            return BadRequest(new { error = "SystemInfo too long" });
+
         var report = new CrashReport
         {
             DeviceId = request.DeviceId,

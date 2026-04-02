@@ -41,6 +41,9 @@ public sealed class AdminUpdateController : ControllerBase
         _db.AppUpdates.Add(update);
         await _db.SaveChangesAsync(ct);
 
+        // Send Discord webhook notification (fire-and-forget)
+        _ = SendDiscordChangelogAsync(update);
+
         return Ok(new
         {
             message = $"Update v{update.Version} published successfully",
@@ -79,6 +82,50 @@ public sealed class AdminUpdateController : ControllerBase
         await _db.SaveChangesAsync(ct);
 
         return Ok(new { message = $"Update v{update.Version} deleted" });
+    }
+
+    /// <summary>Send changelog embed to Discord #changelog via webhook</summary>
+    private static async Task SendDiscordChangelogAsync(AppUpdate update)
+    {
+        try
+        {
+            var webhookUrl = Environment.GetEnvironmentVariable("DISCORD_WEBHOOK_URL");
+            if (string.IsNullOrEmpty(webhookUrl)) return;
+
+            var notes = update.ReleaseNotes ?? "No release notes provided.";
+            if (notes.Length > 1800) notes = notes[..1800] + "...";
+
+            var payload = new
+            {
+                content = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISCORD_UPDATES_ROLE_ID"))
+                    ? "" : $"<@&{Environment.GetEnvironmentVariable("DISCORD_UPDATES_ROLE_ID")}>",
+                embeds = new[]
+                {
+                    new
+                    {
+                        title = $"🚀 AuraCore Pro v{update.Version} Released!",
+                        description = notes,
+                        color = 54442, // #00D4AA in decimal
+                        fields = new[]
+                        {
+                            new { name = "Channel", value = update.Channel, inline = true },
+                            new { name = "Mandatory", value = update.IsMandatory ? "Yes" : "No", inline = true },
+                            new { name = "Download", value = $"[Download]({update.BinaryUrl})", inline = true }
+                        },
+                        footer = new { text = "AuraCore Pro • auracore.pro" },
+                        timestamp = update.PublishedAt.ToString("o")
+                    }
+                }
+            };
+
+            using var client = new HttpClient();
+            var json = System.Text.Json.JsonSerializer.Serialize(payload);
+            await client.PostAsync(webhookUrl, new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Discord webhook error: {ex.Message}");
+        }
     }
 }
 

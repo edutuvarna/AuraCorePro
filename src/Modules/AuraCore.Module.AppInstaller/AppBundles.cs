@@ -2,9 +2,9 @@ using AuraCore.Module.AppInstaller.Models;
 
 namespace AuraCore.Module.AppInstaller;
 
-internal static class AppBundles
+public static class AppBundles
 {
-    internal static List<AppBundle> GetAll() => new()
+    public static List<AppBundle> GetAll() => new()
     {
         new AppBundle
         {

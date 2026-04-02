@@ -6,16 +6,20 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Process Monitor" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Process Monitor" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubtitleText" Text="Monitor, kill, and manage running processes"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
       </StackPanel>
       <!-- Search -->
-      <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+      <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
               Padding="8,4" Margin="0,0,8,0" VerticalAlignment="Center" MinWidth="200">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <TextBox x:Name="SearchBox" Watermark="Search processes..."
                  Background="Transparent" BorderThickness="0"
                  Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
@@ -41,10 +45,14 @@
     </Grid>
 
     <!-- Stats Bar -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
             Padding="16,10" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="*,*,*,*">
         <StackPanel Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Processes:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
@@ -72,10 +80,13 @@
     </Border>
 
     <!-- Process List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
-            Padding="4">
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="4">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid RowDefinitions="Auto,*">
         <!-- Column Headers -->
         <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
@@ -101,8 +112,13 @@
           <ItemsControl x:Name="ProcessList">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Padding="12,6" Margin="0,1"
-                        CornerRadius="4" Background="Transparent">
+                <Border Padding="12,6" Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
+                  <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+                  </Border.BorderBrush>
                   <Grid ColumnDefinitions="60,2*,*,80,80,80,120">
                     <TextBlock Text="{Binding Pid}" FontSize="11"
                                Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>

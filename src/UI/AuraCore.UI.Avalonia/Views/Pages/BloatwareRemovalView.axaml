@@ -1,11 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.BloatwareRemovalView">
-  <Grid RowDefinitions="Auto,Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <!-- Row 0: Header+buttons, Row 1: Stats, Row 2: Block warning, Row 3: App list, Row 4: Status -->
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Bloatware Removal" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubText" Text="Remove pre-installed apps you don't need" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="Bloatware Removal" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Remove pre-installed apps you don't need" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
       </StackPanel>
       <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Margin="0,0,8,0" Padding="14,8">
         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -22,8 +23,13 @@
         </StackPanel>
       </Button>
     </Grid>
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="*,*,*">
         <StackPanel Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
@@ -39,10 +45,34 @@
         </StackPanel>
       </Grid>
     </Border>
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
-      <Grid RowDefinitions="Auto,*">
-        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+    <!-- Block from returning option -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusMd}" Padding="10,6" Margin="0,0,0,8"
+            IsVisible="{Binding #BlockReturnCheck.IsChecked}">
+      <Border.Background>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.06"/>
+      </Border.Background>
+      <TextBlock Text="Removed apps will also be blocked from reinstalling on Windows updates (registry policy)."
+                 FontSize="10" Foreground="#F59E0B" TextWrapping="Wrap"/>
+    </Border>
+
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="4">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
+      <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Options row -->
+        <Border Padding="12,6" Margin="0,0,0,2">
+          <StackPanel Orientation="Horizontal" Spacing="16">
+            <CheckBox x:Name="BlockReturnCheck" FontSize="10" VerticalAlignment="Center">
+              <TextBlock Text="Block removed apps from returning" FontSize="10"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </CheckBox>
+          </StackPanel>
+        </Border>
+        <Border Grid.Row="1" Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
           <Grid ColumnDefinitions="40,2*,100,80,80">
             <TextBlock Text="" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="1" Text="APP NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
@@ -51,30 +81,11 @@
             <TextBlock Grid.Column="4" Text="RISK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
         </Border>
-        <ScrollViewer Grid.Row="1">
-          <ItemsControl x:Name="AppList">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Padding="12,6" Margin="0,1" CornerRadius="4">
-                  <Grid ColumnDefinitions="40,2*,100,80,80">
-                    <CheckBox IsChecked="{Binding CanRemove}" IsEnabled="{Binding CanRemove}" VerticalAlignment="Center"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                      <TextBlock Text="{Binding Publisher}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                    <TextBlock Grid.Column="3" Text="{Binding Size}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
-                    <Border Grid.Column="4" CornerRadius="8" Padding="6,2" Background="{Binding RiskBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding RiskText}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding RiskFg}"/>
-                    </Border>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
+        <ScrollViewer Grid.Row="2">
+          <ItemsControl x:Name="AppList"/>
         </ScrollViewer>
       </Grid>
     </Border>
-    <TextBlock Grid.Row="3" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
+    <TextBlock Grid.Row="4" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
   </Grid>
 </UserControl>

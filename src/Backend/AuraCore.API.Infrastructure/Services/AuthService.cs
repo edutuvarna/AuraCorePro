@@ -24,6 +24,10 @@ public sealed class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(string email, string password, CancellationToken ct = default)
     {
+        email = email?.Trim().ToLowerInvariant() ?? "";
+        if (string.IsNullOrEmpty(email) || email.Length > 254)
+            return new AuthResult(false, Error: "Invalid email");
+
         var existing = await _db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
         if (existing is not null)
             return new AuthResult(false, Error: "Email already registered");
@@ -133,8 +137,13 @@ public sealed class AuthService : IAuthService
 
     public string GenerateAccessToken(User user)
     {
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config["Jwt:Secret"] ?? "AuraCorePro-Default-Secret-Key-Change-In-Production-Min32Chars!"));
+        var secret = Environment.GetEnvironmentVariable("JWT_SECRET")
+            ?? _config["Jwt:Secret"]
+            ?? throw new InvalidOperationException("JWT_SECRET env var or Jwt:Secret config must be set");
+        if (secret == "LOADED_FROM_ENV" || secret.Length < 32)
+            throw new InvalidOperationException("JWT secret must be a real key with at least 32 characters");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
         var claims = new[]
         {

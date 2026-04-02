@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock Text="Admin Panel" FontSize="22" FontWeight="Bold"
+        <TextBlock Text="Admin Panel" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Server administration and analytics"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -66,8 +66,8 @@
       </Border>
 
       <!-- Admin-only notice -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0DF59E0B" Padding="16,12"
-              BorderBrush="#20F59E0B" BorderThickness="1">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}" Padding="16,12"
+              BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
         <TextBlock Text="Admin Panel is only accessible to users with the admin role."
                    FontSize="12" Foreground="#F59E0B"/>
       </Border>

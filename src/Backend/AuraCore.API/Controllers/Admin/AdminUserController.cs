@@ -20,6 +20,10 @@ public sealed class AdminUserController : ControllerBase
         [FromQuery] int pageSize = 50,
         CancellationToken ct = default)
     {
+        if (pageSize > 100) pageSize = 100;
+        if (pageSize < 1) pageSize = 10;
+        if (page < 1) page = 1;
+
         var query = _db.Users.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -65,13 +69,17 @@ public sealed class AdminUserController : ControllerBase
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req, CancellationToken ct)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email, ct);
-        if (user is null) return NotFound(new { error = "User not found" });
+        if (user is null)
+        {
+            // Always return success to prevent email enumeration
+            return Ok(new { message = "If this email is registered, password has been reset." });
+        }
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
         user.UpdatedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
 
-        return Ok(new { message = $"Password reset for {req.Email}" });
+        return Ok(new { message = "If this email is registered, password has been reset." });
     }
 
     [HttpDelete("{id:guid}")]
@@ -79,6 +87,43 @@ public sealed class AdminUserController : ControllerBase
     {
         var user = await _db.Users.FindAsync(new object[] { id }, ct);
         if (user is null) return NotFound();
+
+        // Prevent deleting yourself
+        var callerId = User.FindFirst("sub")?.Value;
+        if (callerId == id.ToString())
+            return BadRequest(new { error = "Cannot delete your own account" });
+
+        // Delete related records first (foreign key constraints)
+        var refreshTokens = await _db.RefreshTokens.Where(r => r.UserId == id).ToListAsync(ct);
+        _db.RefreshTokens.RemoveRange(refreshTokens);
+
+        var loginAttempts = await _db.LoginAttempts.Where(a => a.Email == user.Email).ToListAsync(ct);
+        _db.LoginAttempts.RemoveRange(loginAttempts);
+
+        var licenses = await _db.Licenses.Where(l => l.UserId == id).ToListAsync(ct);
+        foreach (var lic in licenses)
+        {
+            var devices = await _db.Devices.Where(d => d.LicenseId == lic.Id).ToListAsync(ct);
+            _db.Devices.RemoveRange(devices);
+        }
+        _db.Licenses.RemoveRange(licenses);
+
+        var payments = await _db.Payments.Where(p => p.UserId == id).ToListAsync(ct);
+        _db.Payments.RemoveRange(payments);
+
+        var subscriptions = await _db.Subscriptions.Where(s => s.UserId == id).ToListAsync(ct);
+        _db.Subscriptions.RemoveRange(subscriptions);
+
+        // CrashReports and TelemetryEvents are linked via Device, not directly to User
+        var deviceIds = licenses.SelectMany(l => _db.Devices.Where(d => d.LicenseId == l.Id).Select(d => d.Id)).ToList();
+        if (deviceIds.Count > 0)
+        {
+            var crashReports = await _db.CrashReports.Where(c => deviceIds.Contains(c.DeviceId)).ToListAsync(ct);
+            _db.CrashReports.RemoveRange(crashReports);
+
+            var telemetry = await _db.TelemetryEvents.Where(t => deviceIds.Contains(t.DeviceId)).ToListAsync(ct);
+            _db.TelemetryEvents.RemoveRange(telemetry);
+        }
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync(ct);

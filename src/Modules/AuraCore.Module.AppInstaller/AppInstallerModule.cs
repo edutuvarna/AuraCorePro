@@ -163,7 +163,7 @@ public sealed class AppInstallerModule : IOptimizationModule
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); }
         return results.Take(20).ToList();
     }
 
@@ -204,7 +204,7 @@ public sealed class AppInstallerModule : IOptimizationModule
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); }
         return apps;
     }
 
@@ -215,7 +215,7 @@ public sealed class AppInstallerModule : IOptimizationModule
             var output = await RunWinGetOutputAsync("--version", default);
             return !string.IsNullOrEmpty(output) && output.Contains("v");
         }
-        catch { return false; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); return false; }
     }
 
     private static async Task<bool> RunWinGetAsync(string args, CancellationToken ct)
@@ -236,7 +236,7 @@ public sealed class AppInstallerModule : IOptimizationModule
             await proc.WaitForExitAsync(ct);
             return proc.ExitCode == 0;
         }
-        catch { return false; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); return false; }
     }
 
     private static async Task<string> RunWinGetOutputAsync(string args, CancellationToken ct)
@@ -259,7 +259,7 @@ public sealed class AppInstallerModule : IOptimizationModule
             await proc.WaitForExitAsync(ct);
             return output;
         }
-        catch { return ""; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); return ""; }
     }
     public async Task<List<OutdatedApp>> GetOutdatedAppsAsync(CancellationToken ct = default)
     {
@@ -294,7 +294,7 @@ public sealed class AppInstallerModule : IOptimizationModule
                 }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[app-installer] Error: {ex.Message}"); }
         return results;
     }
 

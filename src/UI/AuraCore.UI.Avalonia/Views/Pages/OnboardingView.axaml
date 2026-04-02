@@ -11,21 +11,26 @@
 
       <!-- Step content card -->
       <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+              BorderThickness="1"
               Padding="40" MinHeight="300">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel VerticalAlignment="Center" Spacing="18" HorizontalAlignment="Center">
-          <TextBlock x:Name="StepIcon" Text="&#x2665;" FontSize="48"
+          <TextBlock x:Name="StepIcon" Text="&#x2665;" FontSize="32"
                      Foreground="{DynamicResource AccentPrimaryBrush}"
                      HorizontalAlignment="Center"/>
-          <TextBlock x:Name="StepTitle" Text="" FontSize="22" FontWeight="Bold"
+          <TextBlock x:Name="StepTitle" Text="" FontSize="16" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"
                      HorizontalAlignment="Center" TextAlignment="Center"/>
-          <TextBlock x:Name="StepDescription" Text="" FontSize="14"
+          <TextBlock x:Name="StepDescription" Text="" FontSize="12"
                      Foreground="{DynamicResource TextSecondaryBrush}"
                      TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
                      HorizontalAlignment="Center"/>
-          <TextBlock x:Name="StepDetail" Text="" FontSize="12"
+          <TextBlock x:Name="StepDetail" Text="" FontSize="11"
                      Foreground="{DynamicResource TextMutedBrush}"
                      TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
                      HorizontalAlignment="Center"/>
@@ -35,7 +40,7 @@
       <!-- Navigation -->
       <Grid ColumnDefinitions="*,Auto,*">
         <Button x:Name="BackBtn" Grid.Column="0" Content="Back" Click="BackBtn_Click"
-                Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                Background="{DynamicResource ActionBtnBgBrush}" Foreground="{DynamicResource TextSecondaryBrush}"
                 Padding="24,10" CornerRadius="{StaticResource RadiusMd}"
                 HorizontalAlignment="Left" IsVisible="False"/>
 

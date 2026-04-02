@@ -6,6 +6,7 @@ using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.BatteryOptimizer;
 using AuraCore.Module.BatteryOptimizer.Models;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -49,6 +50,34 @@ public partial class BatteryOptimizerView : UserControl
         catch { SubText.Text = "Scan failed"; } finally { ScanLabel.Text = "Scan"; }
 }
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();
+
+    private async void BatteryReport_Click(object? s, RoutedEventArgs e)
+    {
+        try
+        {
+            var reportPath = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                "battery-report.html");
+
+            var psi = new ProcessStartInfo("powercfg", $"/batteryreport /output \"{reportPath}\"")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                Verb = "runas"
+            };
+            using var proc = Process.Start(psi);
+            if (proc != null) await proc.WaitForExitAsync();
+
+            if (System.IO.File.Exists(reportPath))
+            {
+                Process.Start(new ProcessStartInfo(reportPath) { UseShellExecute = true });
+            }
+        }
+        catch (Exception ex)
+        {
+            SubText.Text = $"Report failed: {ex.Message}";
+        }
+    }
 
     private void ApplyLocalization()
     {

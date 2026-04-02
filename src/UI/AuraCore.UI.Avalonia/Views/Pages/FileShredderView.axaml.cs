@@ -57,7 +57,7 @@ public partial class FileShredderView : UserControl
             }
             FileCount.Text = $"{_files.Count} file(s) selected";
         }
-        catch { }
+        catch (Exception ex) { FileCount.Text = $"Error selecting files: {ex.Message}"; }
     }
 
     private void ClearFiles_Click(object? sender, RoutedEventArgs e)
@@ -121,7 +121,7 @@ public partial class FileShredderView : UserControl
                     }
 
                     // Rename to random name before delete (obscure original filename)
-                    var dir = System.IO.Path.GetDirectoryName(filePath)!;
+                    var dir = System.IO.Path.GetDirectoryName(filePath) ?? Environment.CurrentDirectory;
                     var randomName = System.IO.Path.Combine(dir, Guid.NewGuid().ToString("N")[..12] + ".tmp");
                     File.Move(filePath, randomName);
                     File.Delete(randomName);

@@ -52,7 +52,8 @@ public partial class PaymentView : UserControl
 
             // Open Stripe checkout in default browser
             LoadingText.Text = LocalizationService._("pay.openingBrowser");
-            Process.Start(new ProcessStartInfo(_checkoutUrl) { UseShellExecute = true });
+            var proc = Process.Start(new ProcessStartInfo(_checkoutUrl) { UseShellExecute = true });
+            proc?.Dispose();
 
             // Show waiting screen and start polling
             ShowScreen("waiting");
@@ -143,7 +144,7 @@ public partial class PaymentView : UserControl
                     }
                 }
             }
-            catch { /* continue polling */ }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Poll error: {ex.Message}"); }
         }
 
         if (_polling)
@@ -180,7 +181,7 @@ public partial class PaymentView : UserControl
     {
         if (!string.IsNullOrEmpty(_checkoutUrl))
         {
-            try { Process.Start(new ProcessStartInfo(_checkoutUrl) { UseShellExecute = true }); }
+            try { Process.Start(new ProcessStartInfo(_checkoutUrl) { UseShellExecute = true })?.Dispose(); }
             catch { }
         }
     }

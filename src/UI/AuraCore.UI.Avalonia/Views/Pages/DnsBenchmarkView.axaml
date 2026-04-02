@@ -4,7 +4,7 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="DNS Benchmark" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="DNS Benchmark" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Test DNS servers and find the fastest one for your connection"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>

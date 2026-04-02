@@ -4,18 +4,32 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="File Shredder" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="File Shredder" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Securely delete files beyond recovery with multi-pass overwrite"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
 
       <!-- Method Selection -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Shred Method" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#EF4444" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x2699;" FontSize="8" Foreground="#EF4444"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Shred Method" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <RadioButton x:Name="Method1Pass" Content="Quick (1 pass - zero fill)" IsChecked="True" GroupName="method"/>
           <RadioButton x:Name="Method3Pass" Content="Standard (3 pass - DoD Short)" GroupName="method"/>
           <RadioButton x:Name="Method7Pass" Content="Secure (7 pass - DoD 5220.22-M)" GroupName="method"/>
@@ -23,11 +37,25 @@
       </Border>
 
       <!-- File Selection -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Files to Shred" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#EF4444" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x25A0;" FontSize="8" Foreground="#EF4444"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Files to Shred" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Content="Add Files..." Click="AddFiles_Click" Classes="action-btn" Padding="16,8"/>
             <Button Content="Clear All" Click="ClearFiles_Click" Padding="12,8"
@@ -41,14 +69,19 @@
 
       <!-- Shred Button -->
       <Button x:Name="ShredBtn" Content="SHRED FILES PERMANENTLY" Click="Shred_Click"
-              Background="#20EF4444" Foreground="#EF4444" FontWeight="Bold"
+              Background="{DynamicResource ErrorBgBrush}" Foreground="#EF4444" FontWeight="Bold"
               Padding="24,14" CornerRadius="{StaticResource RadiusMd}"
               HorizontalAlignment="Left" Cursor="Hand" FontSize="14"/>
 
       <!-- Progress -->
       <Border x:Name="ProgressPanel" IsVisible="False" CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+              BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="8">
           <TextBlock x:Name="ProgressLabel" Text="Shredding..." FontSize="14" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -60,8 +93,8 @@
       </Border>
 
       <!-- Warning -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="#20EF4444" Padding="16,12"
-              BorderBrush="#30EF4444" BorderThickness="1">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource ErrorBgBrush}" Padding="16,12"
+              BorderBrush="{DynamicResource ErrorBorderBrush}" BorderThickness="1">
         <TextBlock Text="WARNING: Shredded files CANNOT be recovered. This operation is irreversible. Make sure you have selected the correct files before proceeding."
                    FontSize="12" Foreground="#EF4444" TextWrapping="Wrap"/>
       </Border>

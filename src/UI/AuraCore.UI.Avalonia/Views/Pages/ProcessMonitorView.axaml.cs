@@ -23,6 +23,7 @@ public partial class ProcessMonitorView : UserControl
     private bool _autoRefresh;
     private volatile bool _isScanning;
     private string _searchFilter = "";
+    private bool _initialized;
 
     public ProcessMonitorView()
     {
@@ -30,11 +31,16 @@ public partial class ProcessMonitorView : UserControl
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
-_module = App.Services.GetServices<IOptimizationModule>()
+        _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<ProcessMonitorModule>().FirstOrDefault();
-        Loaded += async (s, e) => await RunScan();
+        Loaded += async (s, e) =>
+        {
+            if (_initialized) return;
+            _initialized = true;
+            await RunScan();
+        };
         Unloaded += (s, e) => StopAutoRefresh();
-}
+    }
 
     private async Task RunScan()
     {
@@ -120,8 +126,11 @@ _module = App.Services.GetServices<IOptimizationModule>()
     {
         _autoRefresh = false;
         AutoRefreshLabel.Text = "Auto: OFF";
-        _autoTimer?.Stop();
-        _autoTimer = null;
+        if (_autoTimer is not null)
+        {
+            _autoTimer.Stop();
+            _autoTimer = null;
+        }
     }
 
     private void SearchBox_TextChanged(object? sender, TextChangedEventArgs e)

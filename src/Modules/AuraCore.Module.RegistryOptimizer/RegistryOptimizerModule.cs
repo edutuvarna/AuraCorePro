@@ -124,10 +124,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                             });
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
         }
     }
 
@@ -165,10 +165,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                         });
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
     }
 
     private static void ScanInvalidSharedDlls(List<RegistryIssue> issues, CancellationToken ct)
@@ -201,7 +201,7 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                 count++;
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
     }
 
     private static void ScanObsoleteMuiCache(List<RegistryIssue> issues, CancellationToken ct)
@@ -239,7 +239,7 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                 count++;
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
     }
 
     private static void ScanStaleAppPaths(List<RegistryIssue> issues, CancellationToken ct)
@@ -274,10 +274,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
             }
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
     }
 
     private static void ScanEmptyKeys(List<RegistryIssue> issues, CancellationToken ct)
@@ -320,10 +320,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                             count++;
                         }
                     }
-                    catch { }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
                 }
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
         }
     }
 
@@ -354,15 +354,38 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
                 case IssueType.OrphanedUninstallEntry:
                 case IssueType.StaleAppPath:
                 case IssueType.InvalidSharedDll:
-                    // These are in HKLM — need admin. Skip if not elevated.
-                    // For now, mark as requiring elevation
+                    try
+                    {
+                        // Attempt HKLM fix - requires elevation
+                        if (issue.Type == IssueType.InvalidSharedDll)
+                        {
+                            // SharedDLLs: delete the value (DLL path) from the key
+                            using var sharedKey = Registry.LocalMachine.OpenSubKey(
+                                @"SOFTWARE\Microsoft\Windows\CurrentVersion\SharedDLLs", writable: true);
+                            if (sharedKey != null)
+                            {
+                                sharedKey.DeleteValue(issue.ValueName ?? "", throwOnMissingValue: false);
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            // OrphanedUninstallEntry / StaleAppPath: delete the subkey tree
+                            var subPath = issue.KeyPath.Replace(@"HKLM\", "");
+                            Registry.LocalMachine.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+                            return true;
+                        }
+                    }
+                    catch (UnauthorizedAccessException) { /* Needs admin - skip */ }
+                    catch (System.Security.SecurityException) { /* Needs admin - skip */ }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
                     return false;
 
                 default:
                     return false;
             }
         }
-        catch { return false; }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); return false; }
     }
 
     // ── BACKUP ───────────────────────────────────────────────
@@ -391,7 +414,7 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
             using var proc = Process.Start(psi);
             if (proc is not null) await proc.WaitForExitAsync();
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
 
         return backupFile;
     }
@@ -411,7 +434,7 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
             using var proc = Process.Start(psi);
             if (proc is not null) await proc.WaitForExitAsync();
         }
-        catch { }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[registry-optimizer] Error: {ex.Message}"); }
     }
 }
 

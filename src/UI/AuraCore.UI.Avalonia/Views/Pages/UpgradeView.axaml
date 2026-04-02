@@ -10,7 +10,7 @@
 
       <!-- Title -->
       <StackPanel Spacing="4" HorizontalAlignment="Center">
-        <TextBlock x:Name="TitleText" Text="Upgrade Required" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="TitleText" Text="Upgrade Required" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}" TextAlignment="Center"/>
         <TextBlock x:Name="SubText" Text="This module requires a Pro subscription"
                    FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>

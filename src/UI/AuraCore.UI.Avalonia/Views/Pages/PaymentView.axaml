@@ -15,8 +15,8 @@
     <StackPanel x:Name="WaitingScreen" IsVisible="False"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 Spacing="20" MaxWidth="500">
-      <TextBlock Text="&#x1F4B3;" FontSize="48" HorizontalAlignment="Center"/>
-      <TextBlock Text="Complete Payment in Browser" FontSize="22" FontWeight="Bold"
+      <TextBlock Text="&#x1F4B3;" FontSize="32" HorizontalAlignment="Center"/>
+      <TextBlock Text="Complete Payment in Browser" FontSize="16" FontWeight="Bold"
                  Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
       <TextBlock Text="A Stripe checkout page has been opened in your default browser. Complete the payment there and this page will update automatically."
                  FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
@@ -38,7 +38,7 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 Spacing="12" MaxWidth="500">
       <Border Width="64" Height="64" CornerRadius="32"
-              Background="#2022C55E" HorizontalAlignment="Center">
+              Background="{DynamicResource SuccessBgBrush}" HorizontalAlignment="Center">
         <TextBlock Text="&#x2713;" FontSize="24" Foreground="#22C55E"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
       </Border>
@@ -61,11 +61,11 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 Spacing="12" MaxWidth="500">
       <Border Width="64" Height="64" CornerRadius="32"
-              Background="#20EF4444" HorizontalAlignment="Center">
+              Background="{DynamicResource ErrorBgBrush}" HorizontalAlignment="Center">
         <TextBlock Text="&#x2716;" FontSize="24" Foreground="#EF4444"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
       </Border>
-      <TextBlock Text="Payment Error" FontSize="22" FontWeight="Bold"
+      <TextBlock Text="Payment Error" FontSize="16" FontWeight="Bold"
                  Foreground="{DynamicResource ErrorBrush}" HorizontalAlignment="Center"/>
       <TextBlock x:Name="ErrorText" Text="Something went wrong."
                  FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"

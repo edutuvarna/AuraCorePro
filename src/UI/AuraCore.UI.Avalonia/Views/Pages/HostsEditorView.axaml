@@ -6,7 +6,7 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Hosts File Editor" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Hosts File Editor" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubtitleText" Text="Manage /etc/hosts entries with a visual interface"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -29,11 +29,22 @@
 
     <!-- Status Bar -->
     <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
-            Padding="16,10" Margin="0,0,0,12">
+            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="*,*,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="8">
+          <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
+            <Border.Background>
+              <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
+            </Border.Background>
+            <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#F59E0B"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
           <TextBlock Text="File:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
                      VerticalAlignment="Center"/>
           <TextBlock x:Name="FilePath" Text="--" FontSize="11" FontWeight="SemiBold"
@@ -44,7 +55,7 @@
           <TextBlock Text="Entries:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
                      VerticalAlignment="Center"/>
           <TextBlock x:Name="EntryCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+                     Foreground="#F59E0B" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Admin:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
@@ -62,9 +73,13 @@
 
     <!-- Add Entry Row -->
     <Border Grid.Row="2" CornerRadius="{StaticResource RadiusMd}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
-            Padding="12" Margin="0,0,0,12">
+            BorderThickness="1" Padding="12" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="150,*,*,Auto">
         <TextBox x:Name="NewIp" Watermark="IP Address" Margin="0,0,8,0"
                  Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -87,16 +102,33 @@
 
     <!-- Hosts Entry List -->
     <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+            BorderThickness="1" Padding="4">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid RowDefinitions="Auto,*">
         <!-- Column Headers -->
-        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+        <Border Padding="12,8" CornerRadius="8,8,0,0">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
+          </Border.Background>
           <Grid ColumnDefinitions="40,150,2*,*,80,80">
             <TextBlock Text="" FontSize="10" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="1" Text="IP ADDRESS" FontSize="10" FontWeight="Bold"
-                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x25C9;" FontSize="8" Foreground="#F59E0B"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="IP ADDRESS" FontSize="10" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
             <TextBlock Grid.Column="2" Text="HOSTNAME" FontSize="10" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="3" Text="COMMENT" FontSize="10" FontWeight="Bold"
@@ -111,7 +143,7 @@
           <ItemsControl x:Name="HostsList">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Padding="12,6" Margin="0,1" CornerRadius="4"
+                <Border Padding="12,6" Margin="2,1" CornerRadius="6"
                         Background="Transparent" Opacity="{Binding RowOpacity}">
                   <Grid ColumnDefinitions="40,150,2*,*,80,80">
                     <!-- Toggle -->

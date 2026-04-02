@@ -8,7 +8,7 @@
     <Border Grid.Column="0" Grid.RowSpan="2" Background="{DynamicResource BgCardBrush}">
       <Grid RowDefinitions="Auto,*,Auto">
         <StackPanel Grid.Row="0" Margin="20,20,20,12" Spacing="4">
-          <TextBlock Text="ISO Builder" FontSize="20" FontWeight="Bold"
+          <TextBlock Text="ISO Builder" FontSize="16" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="StepIndicator" Text="Step 1 of 12" FontSize="12"
                      Foreground="{DynamicResource TextMutedBrush}"/>
@@ -52,7 +52,7 @@
       <Grid>
         <!-- Panel 0: Select ISO -->
         <StackPanel x:Name="Panel_0" IsVisible="True" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Select Windows ISO" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Select Windows ISO" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Choose a Windows 10 or 11 ISO file to customize." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
             <Button Content="Browse ISO File..." Click="BrowseIso_Click" Classes="action-btn" Padding="16,10"/>
@@ -71,7 +71,7 @@
 
         <!-- Panel 1: User Account -->
         <StackPanel x:Name="Panel_1" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="User Account" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="User Account" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Configure the default user account for Windows." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <RadioButton x:Name="LocalAccountRadio" Content="Local Account (no Microsoft account)" IsChecked="True" GroupName="account" Margin="0,8,0,0"/>
           <RadioButton x:Name="MsAccountRadio" Content="Microsoft Account (standard setup)" GroupName="account"/>
@@ -84,7 +84,7 @@
 
         <!-- Panel 2: OOBE Settings -->
         <StackPanel x:Name="Panel_2" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="OOBE Settings" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="OOBE Settings" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Skip Windows setup screens and pre-configure regional settings." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <CheckBox x:Name="SkipOobeCheck" Content="Skip all OOBE screens" IsChecked="True"/>
           <CheckBox x:Name="SkipEulaCheck" Content="Auto-accept EULA" IsChecked="True"/>
@@ -112,7 +112,7 @@
 
         <!-- Panel 3: WiFi -->
         <StackPanel x:Name="Panel_3" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="WiFi Auto-Connect" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="WiFi Auto-Connect" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Pre-configure WiFi so Windows connects right after installation." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <CheckBox x:Name="EnableWifiCheck" Content="Enable WiFi Auto-Connect"/>
           <StackPanel x:Name="WifiPanel" IsVisible="False" Spacing="12" Margin="28,0,0,0">
@@ -131,9 +131,9 @@
 
         <!-- Panel 4: Win11 Bypass -->
         <StackPanel x:Name="Panel_4" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Win11 Bypass" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <Border Background="#14F59E0B" CornerRadius="{StaticResource RadiusSm}" Padding="12"
-                  BorderBrush="#33F59E0B" BorderThickness="1">
+          <TextBlock Text="Win11 Bypass" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusSm}" Padding="12"
+                  BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
             <TextBlock Text="Advanced: Only use if you know what you're doing! May cause stability issues on unsupported hardware."
                        Foreground="#F59E0B" FontSize="12" TextWrapping="Wrap"/>
           </Border>
@@ -146,7 +146,7 @@
 
         <!-- Panel 5: Bloatware Removal -->
         <StackPanel x:Name="Panel_5" IsVisible="False" Spacing="12" MaxWidth="700">
-          <TextBlock Text="Bloatware Removal" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Bloatware Removal" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Select pre-installed apps to remove during installation." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Content="Select All" Click="SelectAllBloat_Click" Padding="12,6"
@@ -159,7 +159,7 @@
 
         <!-- Panel 6: EXE Bundler -->
         <StackPanel x:Name="Panel_6" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Custom EXE Bundler" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Custom EXE Bundler" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Add .exe/.msi installers to auto-run after first boot." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
             <Button Content="Add Files..." Click="AddExe_Click" Classes="action-btn" Padding="16,8"/>
@@ -173,14 +173,14 @@
 
         <!-- Panel 7: Driver Backup -->
         <StackPanel x:Name="Panel_7" IsVisible="False" Spacing="12" MaxWidth="700">
-          <TextBlock Text="Driver Backup" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Driver Backup" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Export current hardware drivers and bundle them." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
             <Button x:Name="ScanDriversBtn" Content="Scan My Drivers" Click="ScanDrivers_Click" Classes="action-btn" Padding="16,8"/>
             <TextBlock x:Name="DriverScanStatus" Text="" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
           </StackPanel>
-          <Border Background="#14F59E0B" CornerRadius="{StaticResource RadiusSm}" Padding="12"
-                  BorderBrush="#33F59E0B" BorderThickness="1">
+          <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusSm}" Padding="12"
+                  BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
             <TextBlock Text="Requires Administrator: Run AuraCore Pro as admin to scan drivers."
                        Foreground="#F59E0B" FontSize="12" TextWrapping="Wrap"/>
           </Border>
@@ -190,7 +190,7 @@
 
         <!-- Panel 8: Winget Apps -->
         <StackPanel x:Name="Panel_8" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Winget App List" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Winget App List" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Auto-install apps via Winget after first boot (requires internet)." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel x:Name="WingetAppList" Spacing="4"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
@@ -203,7 +203,7 @@
 
         <!-- Panel 9: Registry Presets -->
         <StackPanel x:Name="Panel_9" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Registry Presets" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Registry Presets" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Apply pre-built optimization presets. Multiple can be combined." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <CheckBox x:Name="PresetDefaultCheck" Content="Default (Balanced) - Clean taskbar, disable ads" IsChecked="True" Margin="0,8,0,0"/>
           <CheckBox x:Name="PresetGamingCheck" Content="Gaming PC - Disable Game DVR, High Performance"/>
@@ -214,7 +214,7 @@
 
         <!-- Panel 10: Post-Install -->
         <StackPanel x:Name="Panel_10" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Post-Install Actions" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Post-Install Actions" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock Text="Additional tweaks applied after Windows first login." Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <CheckBox x:Name="InstallWingetCheck" Content="Install Winget package manager" IsChecked="True" Margin="0,4,0,0"/>
           <CheckBox x:Name="EnableDarkModeCheck" Content="Enable Dark Mode" IsChecked="True"/>
@@ -229,11 +229,18 @@
 
         <!-- Panel 11: Review and Build -->
         <StackPanel x:Name="Panel_11" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Review and Build" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Review and Build" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Border Background="{DynamicResource BgCardBrush}" CornerRadius="{StaticResource RadiusMd}"
                   BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14">
             <StackPanel Spacing="12">
-              <TextBlock Text="Output Format" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+                  <TextBlock Text="&#x2139;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Output Format" FontSize="11" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+              </StackPanel>
               <RadioButton x:Name="OutputUnattendOnly" Content="Generate files only (save to folder)" IsChecked="True" GroupName="output"/>
               <RadioButton x:Name="OutputStandaloneIso" Content="Create standalone ISO" GroupName="output"/>
             </StackPanel>
@@ -241,15 +248,22 @@
           <Border Background="{DynamicResource BgCardBrush}" CornerRadius="{StaticResource RadiusMd}"
                   BorderBrush="{DynamicResource AccentPrimaryBrush}" BorderThickness="1" Padding="14">
             <StackPanel Spacing="8">
-              <TextBlock Text="Build Summary" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+                  <TextBlock Text="&#x2139;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Build Summary" FontSize="11" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+              </StackPanel>
               <TextBlock x:Name="SummaryText" Text="" FontFamily="Cascadia Mono, Consolas, monospace" FontSize="12"
                          Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
               <TextBlock x:Name="EstimatedTimeText" Text="" FontSize="13" FontWeight="SemiBold"
                          Foreground="{DynamicResource AccentPrimaryBrush}"/>
             </StackPanel>
           </Border>
-          <Border Background="#10F59E0B" CornerRadius="{StaticResource RadiusMd}" Padding="16"
-                  BorderBrush="#26F59E0B" BorderThickness="1">
+          <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusMd}" Padding="16"
+                  BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
             <StackPanel Spacing="8">
               <TextBlock Text="By clicking Build, you acknowledge that AuraCore Pro modifies Windows installation files. You are responsible for ensuring compatibility."
                          Foreground="{DynamicResource TextMutedBrush}" FontSize="11" TextWrapping="Wrap"/>
@@ -284,7 +298,7 @@
           Background="{DynamicResource BgDeepBrush}">
       <Grid Margin="32" MaxWidth="800" HorizontalAlignment="Center" RowDefinitions="Auto,*,Auto">
         <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
-          <TextBlock x:Name="BuildingTitle" Text="Building Custom ISO..." FontSize="22" FontWeight="Bold"
+          <TextBlock x:Name="BuildingTitle" Text="Building Custom ISO..." FontSize="16" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ProgressBar x:Name="TerminalProgress" Value="0" Maximum="100" Height="4"
                        Foreground="{DynamicResource AccentPrimaryBrush}"/>

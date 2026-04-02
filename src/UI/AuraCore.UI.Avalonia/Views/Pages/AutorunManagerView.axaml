@@ -6,10 +6,10 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Autorun Manager" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Autorun Manager" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="SubtitleText" Text="Manage programs that start with Windows"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
       </StackPanel>
       <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click"
               VerticalAlignment="Center" Padding="14,8">
@@ -22,14 +22,25 @@
 
     <!-- Stats Bar -->
     <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
-            Padding="16,10" Margin="0,0,0,12">
+            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="*,*,*,*">
         <StackPanel Orientation="Horizontal" Spacing="8">
+          <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
+            <Border.Background>
+              <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
+            </Border.Background>
+            <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#3B82F6"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
           <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
           <TextBlock x:Name="TotalCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+                     Foreground="#3B82F6" VerticalAlignment="Center"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Enabled:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
@@ -51,13 +62,30 @@
 
     <!-- Autorun Entry List -->
     <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+            BorderThickness="1" Padding="4">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid RowDefinitions="Auto,*">
-        <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+        <Border Padding="12,8" CornerRadius="8,8,0,0">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
+          </Border.Background>
           <Grid ColumnDefinitions="40,2*,*,100,80,120">
             <TextBlock Text="" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="1" Text="NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x25B6;" FontSize="8" Foreground="#3B82F6"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
             <TextBlock Grid.Column="2" Text="LOCATION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="3" Text="RISK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
             <TextBlock Grid.Column="4" Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
@@ -68,7 +96,7 @@
           <ItemsControl x:Name="AutorunList">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Padding="12,8" Margin="0,1" CornerRadius="4" Background="Transparent">
+                <Border Padding="12,8" Margin="2,1" CornerRadius="6" Background="Transparent">
                   <Grid ColumnDefinitions="40,2*,*,100,80,120">
                     <CheckBox IsChecked="{Binding IsEnabled}" Tag="{Binding ToggleTag}"
                               Click="Toggle_Click" VerticalAlignment="Center"/>

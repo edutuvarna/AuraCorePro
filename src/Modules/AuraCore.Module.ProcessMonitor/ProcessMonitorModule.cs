@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,8 @@ public sealed class ProcessMonitorModule : IOptimizationModule
     public ProcessReport? LastReport { get; private set; }
 
     // Cached data for fast refresh
-    private Dictionary<int, (TimeSpan cpu, DateTime sampleTime)> _prevSample = new();
-    private readonly Dictionary<int, string> _descCache = new();
+    private ConcurrentDictionary<int, (TimeSpan cpu, DateTime sampleTime)> _prevSample = new();
+    private readonly ConcurrentDictionary<int, string> _descCache = new();
 
     // P/Invoke for Suspend/Resume
     [DllImport("ntdll.dll", SetLastError = true)]
@@ -36,8 +37,8 @@ public sealed class ProcessMonitorModule : IOptimizationModule
 
         await Task.Run(() =>
         {
-            Dictionary<int, (TimeSpan cpu, DateTime sampleTime)> sample1;
-            Dictionary<int, (TimeSpan cpu, DateTime sampleTime)> sample2;
+            ConcurrentDictionary<int, (TimeSpan cpu, DateTime sampleTime)> sample1;
+            ConcurrentDictionary<int, (TimeSpan cpu, DateTime sampleTime)> sample2;
 
             if (hasPrev)
             {
@@ -61,12 +62,13 @@ public sealed class ProcessMonitorModule : IOptimizationModule
                 ct.ThrowIfCancellationRequested();
                 try
                 {
+                    if (p.HasExited) continue;
                     var cpu = 0.0;
                     if (sample1.TryGetValue(p.Id, out var t1) && sample2.TryGetValue(p.Id, out var t2))
                     {
                         var elapsed = (t2.sampleTime - t1.sampleTime).TotalMilliseconds;
-                        if (elapsed > 0)
-                            cpu = (t2.cpu - t1.cpu).TotalMilliseconds / elapsed / Environment.ProcessorCount * 100;
+                        if (elapsed <= 0) cpu = 0;
+                        else cpu = (t2.cpu - t1.cpu).TotalMilliseconds / elapsed / Environment.ProcessorCount * 100;
                     }
                     cpu = Math.Max(0, Math.Min(100, cpu));
 
@@ -92,7 +94,7 @@ public sealed class ProcessMonitorModule : IOptimizationModule
                             if (!string.IsNullOrEmpty(fp))
                                 description = FileVersionInfo.GetVersionInfo(fp).FileDescription ?? "";
                         }
-                        catch { }
+                        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[{nameof(ProcessMonitorModule)}] Error: {ex.Message}"); }
                         _descCache[p.Id] = description;
                     }
 
@@ -111,7 +113,7 @@ public sealed class ProcessMonitorModule : IOptimizationModule
                         StartTime    = TryGetStartTime(p),
                     });
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[process-monitor] Error: {ex.Message}"); }
                 finally { p.Dispose(); }
             }
         }, ct);
@@ -143,7 +145,7 @@ public sealed class ProcessMonitorModule : IOptimizationModule
                     switch (action)
                     {
                         case "kill":
-                            proc.Kill(entireProcessTree: false);
+                            proc.Kill(entireProcessTree: true);
                             break;
                         case "killtree":
                             proc.Kill(entireProcessTree: true);
@@ -175,7 +177,7 @@ public sealed class ProcessMonitorModule : IOptimizationModule
                     }
                     done++;
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[process-monitor] Error: {ex.Message}"); }
                 progress?.Report(new TaskProgress(Id, done * 100.0 / Math.Max(ids.Count, 1), id));
             }
         }, ct);
@@ -186,14 +188,14 @@ public sealed class ProcessMonitorModule : IOptimizationModule
     public Task<bool> CanRollbackAsync(string opId, CancellationToken ct = default) => Task.FromResult(false);
     public Task RollbackAsync(string opId, CancellationToken ct = default) => Task.CompletedTask;
 
-    private static Dictionary<int, (TimeSpan cpu, DateTime sampleTime)> TakeCpuSample()
+    private static ConcurrentDictionary<int, (TimeSpan cpu, DateTime sampleTime)> TakeCpuSample()
     {
-        var result = new Dictionary<int, (TimeSpan, DateTime)>();
+        var result = new ConcurrentDictionary<int, (TimeSpan, DateTime)>();
         var now = DateTime.UtcNow;
         foreach (var p in Process.GetProcesses())
         {
             try { result[p.Id] = (p.TotalProcessorTime, now); }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[process-monitor] Error: {ex.Message}"); }
             finally { p.Dispose(); }
         }
         return result;
@@ -201,7 +203,7 @@ public sealed class ProcessMonitorModule : IOptimizationModule
 
     private static DateTime TryGetStartTime(Process p)
     {
-        try { return p.StartTime; } catch { return DateTime.MinValue; }
+        try { return p.StartTime; } catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[process-monitor] Error: {ex.Message}"); return DateTime.MinValue; }
     }
 }
 

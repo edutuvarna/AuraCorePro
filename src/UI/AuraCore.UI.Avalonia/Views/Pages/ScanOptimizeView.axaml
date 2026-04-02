@@ -6,7 +6,7 @@
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Module" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Module" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="PageSubtitle" Text="Scan and optimize"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -46,7 +46,7 @@
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Risk:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <Border CornerRadius="8" Padding="10,2" Background="#2000D4AA" VerticalAlignment="Center">
+          <Border CornerRadius="8" Padding="10,2" Background="{DynamicResource AccentBgBrush}" VerticalAlignment="Center">
             <TextBlock x:Name="RiskLabel" Text="--" FontSize="11" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentPrimaryBrush}"/>
           </Border>
@@ -61,7 +61,7 @@
       <Grid>
         <!-- Before scan state -->
         <StackPanel x:Name="BeforeScanPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-          <TextBlock x:Name="BeforeScanIcon" Text="&#x1F50D;" FontSize="48" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="BeforeScanIcon" Text="&#x1F50D;" FontSize="32" HorizontalAlignment="Center"/>
           <TextBlock Text="Click Scan to analyze your system" FontSize="14"
                      Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
           <TextBlock x:Name="ModuleInfo" Text="" FontSize="11"
@@ -81,7 +81,7 @@
                     HorizontalAlignment="Center" Spacing="12">
           <TextBlock x:Name="ProgressText" Text="Optimizing..." FontSize="16" FontWeight="SemiBold"
                      Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center"/>
-          <Border Height="6" CornerRadius="3" Background="#1A1A28" Width="300">
+          <Border Height="6" CornerRadius="3" Background="#FFFFFF0A" Width="300">
             <Border x:Name="ProgressBar" Height="6" CornerRadius="3"
                     Background="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Left" Width="0"/>
           </Border>
@@ -92,7 +92,7 @@
         <!-- Result state -->
         <StackPanel x:Name="ResultPanel" IsVisible="False" VerticalAlignment="Center"
                     HorizontalAlignment="Center" Spacing="12">
-          <TextBlock Text="&#x2714;" FontSize="48" HorizontalAlignment="Center"
+          <TextBlock Text="&#x2714;" FontSize="32" HorizontalAlignment="Center"
                      Foreground="{DynamicResource SuccessBrush}"/>
           <TextBlock x:Name="ResultTitle" Text="Optimization Complete" FontSize="18" FontWeight="Bold"
                      Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"/>
@@ -105,8 +105,8 @@
 
     <!-- Bottom: Module metadata -->
     <Border Grid.Row="3" CornerRadius="{StaticResource RadiusMd}"
-            Background="#0D00D4AA" Padding="12,8" Margin="0,12,0,0"
-            BorderBrush="#2000D4AA" BorderThickness="1">
+            Background="{DynamicResource AccentBgBrush}" Padding="12,8" Margin="0,12,0,0"
+            BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1">
       <Grid ColumnDefinitions="Auto,*,Auto">
         <TextBlock Text="&#x2699;" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
         <TextBlock x:Name="ModuleMeta" Grid.Column="1" FontSize="11"

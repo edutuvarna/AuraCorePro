@@ -4,16 +4,30 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Wake-on-LAN" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Wake-on-LAN" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Wake devices on your network by sending magic packets"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Send Magic Packet" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x26A1;" FontSize="8" Foreground="#3B82F6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Send Magic Packet" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <TextBox x:Name="MacBox" Watermark="MAC Address (e.g. AA:BB:CC:DD:EE:FF)" Width="350"
                    HorizontalAlignment="Left"/>
           <TextBox x:Name="BroadcastBox" Text="255.255.255.255" Watermark="Broadcast IP" Width="250"
@@ -23,18 +37,32 @@
           <TextBlock x:Name="StatusText" Text="" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
       </Border>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Recent Devices" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#3B82F6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Recent Devices" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <ItemsControl x:Name="HistoryList"/>
           <TextBlock x:Name="HistoryStatus" Text="Send a packet to add device to history" FontSize="12"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
       </Border>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0D0080FF" Padding="16,12"
-              BorderBrush="#200080FF" BorderThickness="1">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource InfoBgBrush}" Padding="16,12"
+              BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1">
         <TextBlock Text="The target device must have Wake-on-LAN enabled in BIOS and in the network adapter settings. Both devices must be on the same subnet."
                    FontSize="12" Foreground="#6699CC" TextWrapping="Wrap"/>
       </Border>

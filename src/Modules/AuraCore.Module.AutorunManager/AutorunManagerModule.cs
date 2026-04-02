@@ -232,7 +232,8 @@ public sealed class AutorunManagerModule : IOptimizationModule
         if (cmd.StartsWith('"'))
         {
             var end = cmd.IndexOf('"', 1);
-            return end > 0 ? cmd[1..end] : cmd;
+            if (end <= 0) return cmd.Trim('"');
+            return cmd[1..end];
         }
         var space = cmd.IndexOf(' ');
         return space > 0 ? cmd[..space] : cmd;

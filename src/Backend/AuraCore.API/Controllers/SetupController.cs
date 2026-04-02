@@ -32,6 +32,13 @@ public sealed class SetupController : ControllerBase
         if (adminExists)
             return Forbid();
 
+        var setupToken = Environment.GetEnvironmentVariable("AURACORE_SETUP_TOKEN");
+        if (!string.IsNullOrEmpty(setupToken))
+        {
+            if (request.SetupToken != setupToken)
+                return Unauthorized(new { error = "Invalid setup token" });
+        }
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email, ct);
         if (user is null)
             return NotFound(new { error = "User not found. Register first." });
@@ -49,4 +56,4 @@ public sealed class SetupController : ControllerBase
     }
 }
 
-public sealed record PromoteRequest(string Email);
+public sealed record PromoteRequest(string Email, string? SetupToken = null);

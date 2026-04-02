@@ -4,18 +4,32 @@
   <ScrollViewer>
     <StackPanel Spacing="20">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock Text="Create, view, and delete symbolic links and junctions"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
 
       <!-- Create New -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock Text="Create New Link" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x2B06;" FontSize="8" Foreground="#3B82F6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Create New Link" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
           <ComboBox x:Name="LinkTypeCombo" SelectedIndex="0" Width="260">
             <ComboBoxItem Content="Symbolic Link (File)" Tag="file"/>
             <ComboBoxItem Content="Symbolic Link (Directory)" Tag="dir"/>
@@ -31,12 +45,26 @@
       </Border>
 
       <!-- Scan Existing -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="Existing Links" FontSize="13" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Border Width="16" Height="16" CornerRadius="4">
+                <Border.Background>
+                  <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
+                </Border.Background>
+                <TextBlock Text="&#x1F50D;" FontSize="8" Foreground="#3B82F6"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="Existing Links" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
             <Button Content="Scan Directory" Click="Scan_Click" Grid.Column="1"
                     Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </Grid>
@@ -48,8 +76,8 @@
       </Border>
 
       <!-- Info -->
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="#0DF59E0B" Padding="16,12"
-              BorderBrush="#20F59E0B" BorderThickness="1">
+      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}" Padding="16,12"
+              BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
         <TextBlock Text="Creating symbolic links requires administrator privileges on Windows."
                    FontSize="12" Foreground="#F59E0B"/>
       </Border>

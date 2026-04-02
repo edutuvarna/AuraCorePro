@@ -392,17 +392,22 @@ public partial class IsoBuilderView : UserControl
         {
             case "gaming":
                 foreach (var b in _bloatware) b.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Valve.Steam")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Discord.Discord")!.Selected = true;
+                var steam = _wingetApps.FirstOrDefault(w => w.WingetId == "Valve.Steam");
+                if (steam != null) steam.Selected = true;
+                var discord = _wingetApps.FirstOrDefault(w => w.WingetId == "Discord.Discord");
+                if (discord != null) discord.Selected = true;
                 PresetGamingCheck.IsChecked = true; PresetDefaultCheck.IsChecked = true;
                 EnableDarkModeCheck.IsChecked = true;
                 break;
             case "office":
                 foreach (var b in _bloatware.Where(b => !b.Name.Contains("Office") && !b.Name.Contains("OneNote")))
                     b.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Mozilla.Firefox")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Google.Chrome")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Adobe.Acrobat.Reader.64-bit")!.Selected = true;
+                var firefox = _wingetApps.FirstOrDefault(w => w.WingetId == "Mozilla.Firefox");
+                if (firefox != null) firefox.Selected = true;
+                var chrome = _wingetApps.FirstOrDefault(w => w.WingetId == "Google.Chrome");
+                if (chrome != null) chrome.Selected = true;
+                var acrobat = _wingetApps.FirstOrDefault(w => w.WingetId == "Adobe.Acrobat.Reader.64-bit");
+                if (acrobat != null) acrobat.Selected = true;
                 PresetDefaultCheck.IsChecked = true; PresetOfficeCheck.IsChecked = true;
                 break;
             case "privacy":
@@ -412,11 +417,16 @@ public partial class IsoBuilderView : UserControl
                 DisableOneDriveCheck.IsChecked = true; DisableCopilotCheck.IsChecked = true;
                 break;
             case "developer":
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Microsoft.VisualStudioCode")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Git.Git")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "OpenJS.NodeJS.LTS")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Python.Python.3.12")!.Selected = true;
-                _wingetApps.FirstOrDefault(w => w.WingetId == "Microsoft.PowerToys")!.Selected = true;
+                var vscode = _wingetApps.FirstOrDefault(w => w.WingetId == "Microsoft.VisualStudioCode");
+                if (vscode != null) vscode.Selected = true;
+                var git = _wingetApps.FirstOrDefault(w => w.WingetId == "Git.Git");
+                if (git != null) git.Selected = true;
+                var node = _wingetApps.FirstOrDefault(w => w.WingetId == "OpenJS.NodeJS.LTS");
+                if (node != null) node.Selected = true;
+                var python = _wingetApps.FirstOrDefault(w => w.WingetId == "Python.Python.3.12");
+                if (python != null) python.Selected = true;
+                var powertoys = _wingetApps.FirstOrDefault(w => w.WingetId == "Microsoft.PowerToys");
+                if (powertoys != null) powertoys.Selected = true;
                 PresetDevCheck.IsChecked = true; PresetDefaultCheck.IsChecked = true;
                 ShowFileExtCheck.IsChecked = true; ShowHiddenFilesCheck.IsChecked = true;
                 break;

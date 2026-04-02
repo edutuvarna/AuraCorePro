@@ -1,27 +1,49 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.RamOptimizerView">
-  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
-    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto">
+    <!-- Header -->
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="RAM Optimizer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubText" Text="Free up memory by trimming process working sets" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        <TextBlock x:Name="PageTitle" Text="RAM Optimizer" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock x:Name="SubText" Text="Free up memory by trimming process working sets" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
       </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8" Margin="0,0,8,0">
+      <!-- Auto-Optimize Toggle -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0,0,12,0">
+        <TextBlock Text="Auto" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+        <CheckBox x:Name="AutoOptToggle" IsChecked="False" Click="AutoOpt_Toggle" VerticalAlignment="Center"
+                  ToolTip.Tip="Auto-optimize when RAM exceeds 85%"/>
+      </StackPanel>
+      <Button Grid.Column="2" Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8" Margin="0,0,8,0">
         <StackPanel Orientation="Horizontal" Spacing="6">
           <TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
         </StackPanel>
       </Button>
-      <Button Grid.Column="2" x:Name="OptBtn" Click="Optimize_Click" Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+      <Button Grid.Column="3" x:Name="OptBtn" Click="Optimize_Click" Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
               Padding="16,8" CornerRadius="{StaticResource RadiusMd}" FontWeight="Bold" FontSize="12" IsEnabled="False">
         <StackPanel Orientation="Horizontal" Spacing="6">
           <TextBlock Text="&#x26A1;" FontSize="12"/><TextBlock x:Name="OptLabel" Text="Optimize" FontSize="12" FontWeight="Bold"/>
         </StackPanel>
       </Button>
+      <!-- Boost Button (aggressive mode) -->
+      <Button Grid.Column="4" x:Name="BoostBtn" Click="Boost_Click"
+              Background="{DynamicResource ErrorBrush}" Foreground="White"
+              Padding="18,9" CornerRadius="{StaticResource RadiusMd}" FontWeight="Bold" FontSize="13" Margin="8,0,0,0"
+              ToolTip.Tip="Aggressive: EmptyWorkingSet on ALL processes">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="&#x1F680;" FontSize="13"/><TextBlock x:Name="BoostLabel" Text="Boost" FontSize="13" FontWeight="Bold"/>
+        </StackPanel>
+      </Button>
     </Grid>
-    <!-- RAM Bar -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="14" Margin="0,0,0,12">
+
+    <!-- RAM Bar - Glassmorphic -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="14,12" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <StackPanel Spacing="10">
         <Grid ColumnDefinitions="*,Auto">
           <StackPanel Orientation="Horizontal" Spacing="8">
@@ -33,28 +55,97 @@
             <TextBlock x:Name="Reclaimable" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
           </StackPanel>
         </Grid>
-        <Border Height="8" CornerRadius="4" Background="#1A1A28">
-          <Border x:Name="RamBar" Height="8" CornerRadius="4" Background="{DynamicResource AccentBlueBrush}" HorizontalAlignment="Left" Width="0"/>
+        <!-- Gradient Progress Bar -->
+        <Border Height="6" CornerRadius="3" Background="#FFFFFF0A">
+          <Border x:Name="RamBar" Height="6" CornerRadius="3" HorizontalAlignment="Left" Width="0">
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                <GradientStop Offset="0" Color="#3B82F6"/>
+                <GradientStop Offset="1" Color="#67E8F9"/>
+              </LinearGradientBrush>
+            </Border.Background>
+          </Border>
         </Border>
       </StackPanel>
     </Border>
-    <!-- Stats -->
-    <TextBlock Grid.Row="2" Text="TOP MEMORY CONSUMERS" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
-    <!-- Process List -->
-    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+
+    <!-- Historical RAM Graph (last hour) -->
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="14,10" Margin="0,0,0,12" Height="90">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
+      <Grid RowDefinitions="Auto,*">
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
+          <TextBlock Text="RAM USAGE — LAST HOUR" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}"/>
+          <TextBlock x:Name="GraphMinMax" Text="" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+        <Canvas Grid.Row="1" x:Name="RamGraphCanvas" ClipToBounds="True">
+          <Polyline x:Name="RamGraphLine" StrokeThickness="1.5" Opacity="0.7">
+            <Polyline.Stroke>
+              <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                <GradientStop Offset="0" Color="#8B5CF6"/>
+                <GradientStop Offset="1" Color="#67E8F9"/>
+              </LinearGradientBrush>
+            </Polyline.Stroke>
+          </Polyline>
+        </Canvas>
+      </Grid>
+    </Border>
+
+    <!-- Top Memory Consumers Section Title (icon badge 20x20) -->
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+      <Border Width="20" Height="20" CornerRadius="6" Background="{DynamicResource AccentBgBrush}">
+        <TextBlock Text="&#x25A0;" FontSize="9" Foreground="{DynamicResource AccentPrimaryBrush}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+      <TextBlock Text="TOP MEMORY CONSUMERS" FontSize="11" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextSecondaryBrush}"/>
+      <TextBlock Text="(Click W/B to toggle whitelist/blacklist)" FontSize="9" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+    </StackPanel>
+
+    <!-- Process List - Glassmorphic -->
+    <Border Grid.Row="4" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="4">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <ScrollViewer>
         <ItemsControl x:Name="ProcessList">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Border Padding="12,6" Margin="0,1" CornerRadius="4">
-                <Grid ColumnDefinitions="60,2*,100,80,80">
+              <Border Padding="12,6" Margin="0,1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1">
+                <Border.Background>
+                  <SolidColorBrush Color="#FFFFFF" Opacity="0.015"/>
+                </Border.Background>
+                <Border.BorderBrush>
+                  <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
+                </Border.BorderBrush>
+                <Grid ColumnDefinitions="50,2*,90,70,70,40,40">
                   <TextBlock Text="{Binding Pid}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
                   <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                   <TextBlock Grid.Column="2" Text="{Binding Memory}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
                   <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
                   <Border Grid.Column="4" CornerRadius="4" Width="8" Height="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           Background="{Binding EssentialBrush}"/>
+                  <!-- Whitelist toggle -->
+                  <Button Grid.Column="5" Tag="{Binding Name}" Click="ToggleWhitelist_Click"
+                          Background="Transparent" Foreground="{Binding WhitelistFg}" FontSize="9" FontWeight="Bold"
+                          Padding="4,2" CornerRadius="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          ToolTip.Tip="Toggle whitelist (never optimize)">
+                    <TextBlock Text="W" FontSize="9" FontWeight="Bold" Foreground="{Binding WhitelistFg}"/>
+                  </Button>
+                  <!-- Blacklist toggle -->
+                  <Button Grid.Column="6" Tag="{Binding Name}" Click="ToggleBlacklist_Click"
+                          Background="Transparent" Foreground="{Binding BlacklistFg}" FontSize="9" FontWeight="Bold"
+                          Padding="4,2" CornerRadius="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          ToolTip.Tip="Toggle blacklist (always optimize first)">
+                    <TextBlock Text="B" FontSize="9" FontWeight="Bold" Foreground="{Binding BlacklistFg}"/>
+                  </Button>
                 </Grid>
               </Border>
             </DataTemplate>
@@ -62,6 +153,7 @@
         </ItemsControl>
       </ScrollViewer>
     </Border>
-    <TextBlock Grid.Row="4" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
+
+    <TextBlock Grid.Row="5" x:Name="StatusText" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Margin="0,12,0,0"/>
   </Grid>
 </UserControl>

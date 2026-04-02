@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -7,6 +8,13 @@ using AuraCore.Domain.Enums;
 using AuraCore.Module.RamOptimizer.Models;
 
 namespace AuraCore.Module.RamOptimizer;
+
+/// <summary>Persisted whitelist/blacklist configuration.</summary>
+public sealed class RamOptimizerConfig
+{
+    public List<string> Whitelist { get; set; } = new(); // never optimize
+    public List<string> Blacklist { get; set; } = new(); // always optimize first
+}
 
 public sealed class RamOptimizerModule : IOptimizationModule
 {
@@ -17,6 +25,13 @@ public sealed class RamOptimizerModule : IOptimizationModule
     public SupportedPlatform Platform => SupportedPlatform.All;
 
     public RamReport? LastReport { get; private set; }
+
+    /// <summary>Loaded whitelist/blacklist config.</summary>
+    public RamOptimizerConfig Config { get; private set; } = new();
+
+    private static readonly string ConfigDir =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AuraCorePro");
+    private static readonly string ConfigPath = Path.Combine(ConfigDir, "ram_optimizer.json");
 
     // System-critical processes that should never be killed
     private static readonly HashSet<string> EssentialProcesses = new(StringComparer.OrdinalIgnoreCase)
@@ -45,6 +60,11 @@ public sealed class RamOptimizerModule : IOptimizationModule
         "widgetservice", "widgets"
     };
 
+    public RamOptimizerModule()
+    {
+        LoadConfig();
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         var report = await Task.Run(() => BuildReport(), ct);
@@ -59,13 +79,21 @@ public sealed class RamOptimizerModule : IOptimizationModule
         long freedBytes = 0;
         int optimized = 0;
 
+        var whitelistSet = new HashSet<string>(Config.Whitelist, StringComparer.OrdinalIgnoreCase);
+        var blacklistSet = new HashSet<string>(Config.Blacklist, StringComparer.OrdinalIgnoreCase);
+
         var processes = Process.GetProcesses();
-        int total = processes.Length;
+        // Sort: blacklisted first so they are always optimized
+        var sorted = processes.OrderByDescending(p =>
+        {
+            try { return blacklistSet.Contains(p.ProcessName) ? 1 : 0; } catch { return 0; }
+        }).ToArray();
+        int total = sorted.Length;
         int processed = 0;
 
         await Task.Run(() =>
         {
-            foreach (var proc in processes)
+            foreach (var proc in sorted)
             {
                 ct.ThrowIfCancellationRequested();
                 try
@@ -77,6 +105,9 @@ public sealed class RamOptimizerModule : IOptimizationModule
 
                     // Skip our own process
                     if (proc.Id == Environment.ProcessId) continue;
+
+                    // Skip whitelisted processes
+                    if (whitelistSet.Contains(name)) continue;
 
                     var beforeMem = proc.WorkingSet64;
 
@@ -94,7 +125,7 @@ public sealed class RamOptimizerModule : IOptimizationModule
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[RamOptimizer] EmptyWorkingSet failed: {ex.Message}"); }
                 finally
                 {
                     try { proc.Dispose(); } catch { }
@@ -108,6 +139,107 @@ public sealed class RamOptimizerModule : IOptimizationModule
         }, ct);
 
         return new OptimizationResult(Id, Guid.NewGuid().ToString(), true, optimized, freedBytes, DateTime.UtcNow - start);
+    }
+
+    /// <summary>Aggressive boost: EmptyWorkingSet on ALL non-essential processes regardless of size.</summary>
+    public async Task<OptimizationResult> BoostOptimizeAsync(
+        IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
+    {
+        var start = DateTime.UtcNow;
+        long freedBytes = 0;
+        int optimized = 0;
+
+        var whitelistSet = new HashSet<string>(Config.Whitelist, StringComparer.OrdinalIgnoreCase);
+        var processes = Process.GetProcesses();
+        int total = processes.Length;
+        int processed = 0;
+
+        await Task.Run(() =>
+        {
+            foreach (var proc in processes)
+            {
+                ct.ThrowIfCancellationRequested();
+                try
+                {
+                    var name = proc.ProcessName.ToLowerInvariant();
+                    if (EssentialProcesses.Contains(name)) continue;
+                    if (proc.Id == Environment.ProcessId) continue;
+                    if (whitelistSet.Contains(name)) continue;
+
+                    var beforeMem = proc.WorkingSet64;
+                    if (OperatingSystem.IsWindows() && EmptyWorkingSet(proc.Handle))
+                    {
+                        proc.Refresh();
+                        var afterMem = proc.WorkingSet64;
+                        var freed = beforeMem - afterMem;
+                        if (freed > 0) { freedBytes += freed; optimized++; }
+                    }
+                }
+                catch { }
+                finally { try { proc.Dispose(); } catch { } }
+                processed++;
+                progress?.Report(new TaskProgress(Id,
+                    total > 0 ? (double)processed / total * 100 : 100,
+                    $"Boost: {processed}/{total} processes"));
+            }
+        }, ct);
+
+        return new OptimizationResult(Id, Guid.NewGuid().ToString(), true, optimized, freedBytes, DateTime.UtcNow - start);
+    }
+
+    /// <summary>Check if a process name is whitelisted (never optimize).</summary>
+    public bool IsWhitelisted(string processName) =>
+        Config.Whitelist.Contains(processName, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Check if a process name is blacklisted (always optimize first).</summary>
+    public bool IsBlacklisted(string processName) =>
+        Config.Blacklist.Contains(processName, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Toggle whitelist status for a process.</summary>
+    public void ToggleWhitelist(string processName)
+    {
+        var idx = Config.Whitelist.FindIndex(n => n.Equals(processName, StringComparison.OrdinalIgnoreCase));
+        if (idx >= 0) Config.Whitelist.RemoveAt(idx);
+        else { Config.Whitelist.Add(processName); RemoveFromBlacklist(processName); }
+        SaveConfig();
+    }
+
+    /// <summary>Toggle blacklist status for a process.</summary>
+    public void ToggleBlacklist(string processName)
+    {
+        var idx = Config.Blacklist.FindIndex(n => n.Equals(processName, StringComparison.OrdinalIgnoreCase));
+        if (idx >= 0) Config.Blacklist.RemoveAt(idx);
+        else { Config.Blacklist.Add(processName); RemoveFromWhitelist(processName); }
+        SaveConfig();
+    }
+
+    private void RemoveFromWhitelist(string name) =>
+        Config.Whitelist.RemoveAll(n => n.Equals(name, StringComparison.OrdinalIgnoreCase));
+    private void RemoveFromBlacklist(string name) =>
+        Config.Blacklist.RemoveAll(n => n.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+    public void LoadConfig()
+    {
+        try
+        {
+            if (File.Exists(ConfigPath))
+            {
+                var json = File.ReadAllText(ConfigPath);
+                Config = JsonSerializer.Deserialize<RamOptimizerConfig>(json) ?? new();
+            }
+        }
+        catch { Config = new(); }
+    }
+
+    public void SaveConfig()
+    {
+        try
+        {
+            Directory.CreateDirectory(ConfigDir);
+            var json = JsonSerializer.Serialize(Config, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(ConfigPath, json);
+        }
+        catch { }
     }
 
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default)

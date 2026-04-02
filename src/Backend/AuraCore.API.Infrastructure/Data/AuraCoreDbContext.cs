@@ -17,6 +17,8 @@ public sealed class AuraCoreDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+    public DbSet<AppConfig> AppConfigs => Set<AppConfig>();
+    public DbSet<IpWhitelist> IpWhitelists => Set<IpWhitelist>();
 
     protected override void OnModelCreating(ModelBuilder m)
     {
@@ -137,6 +139,27 @@ public sealed class AuraCoreDbContext : DbContext
             e.Property(a => a.CreatedAt).HasDefaultValueSql("now()");
             e.HasIndex(a => new { a.Email, a.CreatedAt });
             e.HasIndex(a => new { a.IpAddress, a.CreatedAt });
+        });
+
+        m.Entity<IpWhitelist>(e => {
+            e.ToTable("ip_whitelists"); e.HasKey(i => i.Id);
+            e.Property(i => i.Id).HasDefaultValueSql("gen_random_uuid()");
+            e.Property(i => i.IpAddress).HasMaxLength(45).IsRequired();
+            e.HasIndex(i => i.IpAddress).IsUnique();
+            e.Property(i => i.Label).HasMaxLength(256);
+            e.Property(i => i.CreatedAt).HasDefaultValueSql("now()");
+        });
+
+        m.Entity<AppConfig>(e => {
+            e.ToTable("app_configs"); e.HasKey(c => c.Id);
+            e.Property(c => c.MaintenanceMessage).HasDefaultValue("");
+            e.Property(c => c.IsMaintenanceMode).HasDefaultValue(false);
+            e.Property(c => c.NewRegistrations).HasDefaultValue(true);
+            e.Property(c => c.TelemetryEnabled).HasDefaultValue(true);
+            e.Property(c => c.CrashReportsEnabled).HasDefaultValue(true);
+            e.Property(c => c.AutoUpdateEnabled).HasDefaultValue(true);
+            e.Property(c => c.LastUpdated).HasDefaultValueSql("now()");
+            e.HasData(new AppConfig { Id = 1 });
         });
     }
 }

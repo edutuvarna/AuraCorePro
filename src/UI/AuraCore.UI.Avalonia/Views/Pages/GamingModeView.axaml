@@ -6,7 +6,7 @@
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Gaming Mode" FontSize="22" FontWeight="Bold"
+          <TextBlock x:Name="PageTitle" Text="Gaming Mode" FontSize="16" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText" Text="Boost gaming performance with one click"
                      FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -21,10 +21,41 @@
         </Button>
       </Grid>
 
+      <!-- Auto-Detect Status -->
+      <Border CornerRadius="{StaticResource RadiusMd}" Padding="16,12"
+              BorderThickness="1" x:Name="AutoDetectBorder">
+        <Border.Background>
+          <SolidColorBrush Color="#A855F7" Opacity="0.06"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#A855F7" Opacity="0.12"/>
+        </Border.BorderBrush>
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Width="10" Height="10" CornerRadius="5" x:Name="AutoDetectDot"
+                  Background="#555570" VerticalAlignment="Center" Margin="0,0,12,0"/>
+          <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+            <TextBlock x:Name="AutoDetectLabel" Text="Auto-Detect: Off" FontSize="12" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="DetectedGameLabel" Text="" FontSize="11"
+                       Foreground="{DynamicResource AccentPrimaryBrush}" IsVisible="False"/>
+          </StackPanel>
+          <ToggleSwitch Grid.Column="2" x:Name="AutoDetectToggle"
+                        IsChecked="False" OnContent="ON" OffContent="OFF"
+                        Checked="AutoDetectToggle_Changed" Unchecked="AutoDetectToggle_Changed"
+                        VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+
       <!-- Status -->
       <Border CornerRadius="{StaticResource RadiusMd}" Padding="16,10"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
-              x:Name="StatusBorder" Background="{DynamicResource BgCardBrush}">
+              BorderThickness="1"
+              x:Name="StatusBorder">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <Grid ColumnDefinitions="Auto,*,Auto">
           <Border Width="10" Height="10" CornerRadius="5" x:Name="StatusDot"
                   Background="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
@@ -35,22 +66,126 @@
         </Grid>
       </Border>
 
+      <!-- Active Session Badge (overlay) -->
+      <Border x:Name="ActiveBadge" IsVisible="False" CornerRadius="{StaticResource RadiusMd}" Padding="14,10"
+              BorderThickness="1">
+        <Border.Background>
+          <SolidColorBrush Color="#22C55E" Opacity="0.08"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#22C55E" Opacity="0.2"/>
+        </Border.BorderBrush>
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Border Width="8" Height="8" CornerRadius="4" Background="#22C55E"
+                  VerticalAlignment="Center" Margin="0,0,10,0"/>
+          <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+            <TextBlock Text="GAMING MODE ACTIVE" FontSize="11" FontWeight="Bold"
+                       Foreground="#22C55E"/>
+            <TextBlock x:Name="SessionDurationText" Text="Duration: 0:00" FontSize="10"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+          </StackPanel>
+          <TextBlock Grid.Column="2" x:Name="ActiveBadgeIcon" Text="&#x1F3AE;" FontSize="18"
+                     VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+
+      <!-- GPU / Network / WU Status Row -->
+      <Grid ColumnDefinitions="*,*,*" x:Name="StatusRowGrid" IsVisible="False">
+        <!-- GPU Status -->
+        <Border Grid.Column="0" CornerRadius="{StaticResource RadiusMd}" Padding="10,8" Margin="0,0,3,0"
+                BorderThickness="1">
+          <Border.Background>
+            <SolidColorBrush Color="#8B5CF6" Opacity="0.06"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#8B5CF6" Opacity="0.12"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="2" HorizontalAlignment="Center">
+            <TextBlock Text="GPU" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock x:Name="GpuStatusLabel" Text="--" FontSize="10" FontWeight="SemiBold"
+                       Foreground="#8B5CF6" HorizontalAlignment="Center" TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+        <!-- Network QoS Status -->
+        <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Padding="10,8" Margin="3,0,3,0"
+                BorderThickness="1">
+          <Border.Background>
+            <SolidColorBrush Color="#3B82F6" Opacity="0.06"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="2" HorizontalAlignment="Center">
+            <TextBlock Text="NETWORK" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock x:Name="NetworkQosLabel" Text="--" FontSize="10" FontWeight="SemiBold"
+                       Foreground="#3B82F6" HorizontalAlignment="Center" TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+        <!-- Windows Update Status -->
+        <Border Grid.Column="2" CornerRadius="{StaticResource RadiusMd}" Padding="10,8" Margin="3,0,0,0"
+                BorderThickness="1">
+          <Border.Background>
+            <SolidColorBrush Color="#F59E0B" Opacity="0.06"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
+          </Border.BorderBrush>
+          <StackPanel Spacing="2" HorizontalAlignment="Center">
+            <TextBlock Text="WIN UPDATE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock x:Name="WinUpdateLabel" Text="--" FontSize="10" FontWeight="SemiBold"
+                       Foreground="#F59E0B" HorizontalAlignment="Center" TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
       <!-- Toggle List -->
-      <TextBlock Text="OPTIMIZATIONS" FontSize="10" FontWeight="SemiBold"
-                 Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+        <Border Width="16" Height="16" CornerRadius="4">
+          <Border.Background>
+            <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
+          </Border.Background>
+          <TextBlock Text="&#x2699;" FontSize="8" Foreground="#A855F7"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <TextBlock Text="OPTIMIZATIONS" FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextMutedBrush}"/>
+      </StackPanel>
       <StackPanel x:Name="TogglePanel" Spacing="6"/>
 
       <!-- Background Processes -->
-      <TextBlock Text="BACKGROUND PROCESSES" FontSize="10" FontWeight="SemiBold"
-                 Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,0"/>
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+        <Border Width="16" Height="16" CornerRadius="4">
+          <Border.Background>
+            <SolidColorBrush Color="#EC4899" Opacity="0.15"/>
+          </Border.Background>
+          <TextBlock Text="&#x25A0;" FontSize="8" Foreground="#EC4899"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <TextBlock Text="BACKGROUND PROCESSES" FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextMutedBrush}"/>
+      </StackPanel>
       <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="4">
+              BorderThickness="1" Padding="4">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <ScrollViewer MaxHeight="300">
           <ItemsControl x:Name="ProcessList">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Padding="12,6" Margin="0,1" CornerRadius="4">
+                <Border Padding="12,6" Margin="2,1" CornerRadius="6">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
                   <Grid ColumnDefinitions="Auto,*,80,80">
                     <CheckBox IsChecked="{Binding Suggest}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"

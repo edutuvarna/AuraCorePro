@@ -9,6 +9,22 @@ public sealed record GamingModeState
     public int RunningBackgroundApps { get; init; }
     public List<SuspendableProcess> BackgroundProcesses { get; init; } = new();
     public List<GamingToggle> Toggles { get; init; } = new();
+
+    // GPU optimization state
+    public string GpuVendor { get; init; } = "Unknown";
+    public string GpuStatus { get; init; } = "Not optimized";
+    public bool GpuOptimized { get; init; }
+
+    // Network QoS state
+    public bool NetworkQosActive { get; init; }
+    public string NetworkQosStatus { get; init; } = "Inactive";
+
+    // Windows Update state
+    public bool WindowsUpdatePaused { get; init; }
+    public string WindowsUpdateStatus { get; init; } = "Running";
+
+    // Session tracking
+    public DateTime? ActivatedAt { get; init; }
 }
 
 public sealed record SuspendableProcess

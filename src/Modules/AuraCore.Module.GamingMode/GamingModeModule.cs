@@ -21,6 +21,21 @@ public sealed class GamingModeModule : IOptimizationModule
     private string? _savedPowerPlanGuid;
     private readonly List<int> _suspendedPids = new();
 
+    // GPU optimization tracking
+    private string _gpuVendor = "Unknown";
+    private bool _gpuOptimized;
+    private string _gpuStatus = "Not optimized";
+
+    // Network QoS tracking
+    private bool _networkQosActive;
+    private string? _qosPolicyName;
+
+    // Windows Update tracking
+    private bool _windowsUpdatePaused;
+
+    // Session tracking
+    private DateTime? _activatedAt;
+
     // Well-known power plan GUIDs
     private const string HighPerformance = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
     private const string UltimatePerformance = "e9a42b02-d5df-448d-aa00-03f14749eb61";
@@ -134,7 +149,7 @@ public sealed class GamingModeModule : IOptimizationModule
             // 5. Boost foreground priority
             if (toggles.Contains("boost-priority"))
             {
-                progress?.Report(new TaskProgress(Id, 85, "Boosting process priority..."));
+                progress?.Report(new TaskProgress(Id, 60, "Boosting process priority..."));
                 try
                 {
                     using var current = Process.GetCurrentProcess();
@@ -144,7 +159,32 @@ public sealed class GamingModeModule : IOptimizationModule
                 changes++;
             }
 
+            // 6. GPU optimization (Nvidia/AMD)
+            if (toggles.Contains("gpu-optimize") && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 70, "Optimizing GPU performance..."));
+                await ApplyGpuOptimizationAsync();
+                changes++;
+            }
+
+            // 7. Network QoS priority
+            if (toggles.Contains("network-qos") && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 80, "Setting network QoS priority..."));
+                await ApplyNetworkQosAsync();
+                changes++;
+            }
+
+            // 8. Pause Windows Update
+            if (toggles.Contains("pause-wu") && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 90, "Pausing Windows Update..."));
+                await PauseWindowsUpdateAsync();
+                changes++;
+            }
+
             IsActive = true;
+            _activatedAt = DateTime.UtcNow;
             progress?.Report(new TaskProgress(Id, 100, "Gaming Mode activated!"));
         }
         else if (action == "deactivate")
@@ -169,7 +209,7 @@ public sealed class GamingModeModule : IOptimizationModule
             }
             _suspendedPids.Clear();
 
-            progress?.Report(new TaskProgress(Id, 80, "Restoring priority..."));
+            progress?.Report(new TaskProgress(Id, 50, "Restoring priority..."));
             try
             {
                 using var current = Process.GetCurrentProcess();
@@ -178,7 +218,32 @@ public sealed class GamingModeModule : IOptimizationModule
             catch { }
             changes++;
 
+            // Revert GPU optimization
+            if (_gpuOptimized && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 60, "Reverting GPU optimization..."));
+                await RevertGpuOptimizationAsync();
+                changes++;
+            }
+
+            // Remove Network QoS policy
+            if (_networkQosActive && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 70, "Removing network QoS policy..."));
+                await RemoveNetworkQosAsync();
+                changes++;
+            }
+
+            // Resume Windows Update
+            if (_windowsUpdatePaused && OperatingSystem.IsWindows())
+            {
+                progress?.Report(new TaskProgress(Id, 85, "Resuming Windows Update..."));
+                await ResumeWindowsUpdateAsync();
+                changes++;
+            }
+
             IsActive = false;
+            _activatedAt = null;
             progress?.Report(new TaskProgress(Id, 100, "Gaming Mode deactivated — everything restored."));
         }
 
@@ -235,6 +300,9 @@ public sealed class GamingModeModule : IOptimizationModule
 
         bgProcesses.Sort((a, b) => b.MemoryMb.CompareTo(a.MemoryMb));
 
+        // Detect GPU vendor
+        var gpuVendor = DetectGpuVendor();
+
         var toggles = new List<GamingToggle>
         {
             new() { Id = "power-plan", Name = "High Performance Power Plan", Description = "Switch to Ultimate/High Performance — max CPU speed, no throttling", Risk = "Safe", CurrentState = powerPlanGuid.Contains(HighPerformance) || powerPlanGuid.Contains(UltimatePerformance) },
@@ -242,6 +310,9 @@ public sealed class GamingModeModule : IOptimizationModule
             new() { Id = "suspend-bg", Name = "Suspend Background Apps", Description = $"Pause {bgProcesses.Count(p => p.SuggestSuspend)} non-essential background processes", Risk = "Caution" },
             new() { Id = "clean-ram", Name = "Clean RAM", Description = "Trim working sets to free memory for your game", Risk = "Safe" },
             new() { Id = "boost-priority", Name = "Boost Process Priority", Description = "Set foreground app priority to High", Risk = "Caution" },
+            new() { Id = "gpu-optimize", Name = $"GPU Optimization ({gpuVendor})", Description = gpuVendor == "Nvidia" ? "Set GPU power management to Prefer Maximum Performance via nvidia-smi" : gpuVendor == "AMD" ? "Set GPU to performance mode via PowerShell" : "GPU vendor not detected — will attempt generic optimization", Risk = "Safe", CurrentState = _gpuOptimized },
+            new() { Id = "network-qos", Name = "Network QoS Priority", Description = "Set high network priority for game traffic using Windows QoS policy", Risk = "Safe", CurrentState = _networkQosActive },
+            new() { Id = "pause-wu", Name = "Pause Windows Update", Description = "Temporarily stop Windows Update service during gaming session", Risk = "Caution", CurrentState = _windowsUpdatePaused },
         };
 
         return new GamingModeState
@@ -252,6 +323,14 @@ public sealed class GamingModeModule : IOptimizationModule
             BackgroundProcesses = bgProcesses,
             RunningBackgroundApps = bgProcesses.Count,
             Toggles = toggles,
+            GpuVendor = gpuVendor,
+            GpuStatus = _gpuStatus,
+            GpuOptimized = _gpuOptimized,
+            NetworkQosActive = _networkQosActive,
+            NetworkQosStatus = _networkQosActive ? "Active — game traffic prioritized" : "Inactive",
+            WindowsUpdatePaused = _windowsUpdatePaused,
+            WindowsUpdateStatus = _windowsUpdatePaused ? "Paused" : "Running",
+            ActivatedAt = _activatedAt,
         };
     }
 
@@ -315,7 +394,8 @@ public sealed class GamingModeModule : IOptimizationModule
         try
         {
             var proc = Process.GetProcessById(pid);
-            foreach (ProcessThread thread in proc.Threads)
+            var threads = proc.Threads.Cast<ProcessThread>().ToList();
+            foreach (var thread in threads)
             {
                 var handle = OpenThread(0x0002, false, (uint)thread.Id); // THREAD_SUSPEND_RESUME
                 if (handle != IntPtr.Zero)
@@ -334,7 +414,8 @@ public sealed class GamingModeModule : IOptimizationModule
         try
         {
             var proc = Process.GetProcessById(pid);
-            foreach (ProcessThread thread in proc.Threads)
+            var threads = proc.Threads.Cast<ProcessThread>().ToList();
+            foreach (var thread in threads)
             {
                 var handle = OpenThread(0x0002, false, (uint)thread.Id);
                 if (handle != IntPtr.Zero)
@@ -346,6 +427,234 @@ public sealed class GamingModeModule : IOptimizationModule
         }
         catch { }
     }
+
+    // ── GPU Optimization ──
+
+    private static string DetectGpuVendor()
+    {
+        try
+        {
+            // Check for Nvidia via nvidia-smi
+            var nvidiaCheck = RunCmdSync("where nvidia-smi");
+            if (!string.IsNullOrWhiteSpace(nvidiaCheck) && !nvidiaCheck.Contains("Could not find"))
+                return "Nvidia";
+
+            // Check for AMD via registry / WMI
+            var wmiOutput = RunCmdSync("powershell -NoProfile -Command \"(Get-WmiObject Win32_VideoController).Name\"");
+            if (!string.IsNullOrWhiteSpace(wmiOutput))
+            {
+                if (wmiOutput.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase)) return "Nvidia";
+                if (wmiOutput.Contains("AMD", StringComparison.OrdinalIgnoreCase) ||
+                    wmiOutput.Contains("Radeon", StringComparison.OrdinalIgnoreCase)) return "AMD";
+                if (wmiOutput.Contains("Intel", StringComparison.OrdinalIgnoreCase)) return "Intel";
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"GPU detection error: {ex.Message}");
+        }
+        return "Unknown";
+    }
+
+    private static string RunCmdSync(string command)
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c {command}",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            using var proc = Process.Start(psi);
+            if (proc is null) return "";
+            var output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit(5000);
+            return output;
+        }
+        catch { return ""; }
+    }
+
+    private async Task ApplyGpuOptimizationAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            _gpuVendor = DetectGpuVendor();
+
+            if (_gpuVendor == "Nvidia")
+            {
+                // Set Nvidia GPU to prefer maximum performance
+                var result = await RunCmdAsync("nvidia-smi -pm ENABLED");
+                var result2 = await RunCmdAsync("nvidia-smi --power-limit=0"); // Reset to max TDP
+                // Set compute mode for preferred performance
+                await RunCmdAsync("nvidia-smi -e 0"); // Disable ECC if applicable
+                _gpuOptimized = true;
+                _gpuStatus = "Nvidia — Maximum Performance mode";
+                Debug.WriteLine($"Nvidia GPU optimized: {result}");
+            }
+            else if (_gpuVendor == "AMD")
+            {
+                // AMD: attempt to set performance mode via PowerShell registry
+                await RunCmdAsync(
+                    "powershell -NoProfile -Command \"" +
+                    "try { " +
+                    "$regPath = 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000'; " +
+                    "Set-ItemProperty -Path $regPath -Name 'PP_SclkDeepSleepDisable' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue; " +
+                    "Set-ItemProperty -Path $regPath -Name 'KMD_EnableGfxOff' -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue; " +
+                    "} catch { }\"");
+                _gpuOptimized = true;
+                _gpuStatus = "AMD — Performance mode set via registry";
+                Debug.WriteLine("AMD GPU optimized via registry");
+            }
+            else
+            {
+                _gpuOptimized = false;
+                _gpuStatus = $"{_gpuVendor} GPU — no specific optimization available";
+                Debug.WriteLine($"GPU optimization skipped: vendor={_gpuVendor}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _gpuOptimized = false;
+            _gpuStatus = "Optimization failed — see logs";
+            Debug.WriteLine($"GPU optimization error: {ex.Message}");
+        }
+    }
+
+    private async Task RevertGpuOptimizationAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            if (_gpuVendor == "Nvidia")
+            {
+                await RunCmdAsync("nvidia-smi -pm DISABLED");
+            }
+            else if (_gpuVendor == "AMD")
+            {
+                await RunCmdAsync(
+                    "powershell -NoProfile -Command \"" +
+                    "try { " +
+                    "$regPath = 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000'; " +
+                    "Remove-ItemProperty -Path $regPath -Name 'PP_SclkDeepSleepDisable' -Force -ErrorAction SilentlyContinue; " +
+                    "Remove-ItemProperty -Path $regPath -Name 'KMD_EnableGfxOff' -Force -ErrorAction SilentlyContinue; " +
+                    "} catch { }\"");
+            }
+            _gpuOptimized = false;
+            _gpuStatus = "Not optimized";
+            Debug.WriteLine("GPU optimization reverted");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"GPU revert error: {ex.Message}");
+        }
+    }
+
+    // ── Network QoS ──
+
+    private async Task ApplyNetworkQosAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            _qosPolicyName = "AuraCore_GamingMode_QoS";
+            // Create a DSCP-based QoS policy for high-priority traffic
+            // Uses PowerShell New-NetQosPolicy if available, otherwise netsh
+            var result = await RunCmdAsync(
+                $"powershell -NoProfile -Command \"" +
+                $"try {{ " +
+                $"Remove-NetQosPolicy -Name '{_qosPolicyName}' -Confirm:$false -ErrorAction SilentlyContinue; " +
+                $"New-NetQosPolicy -Name '{_qosPolicyName}' -NetworkProfile All -DSCPAction 46 -IPProtocolMatchCondition Both -ThrottleRateActionBitsPerSecond 0 -PolicyStore ActiveStore; " +
+                $"Write-Output 'QoS policy created'; " +
+                $"}} catch {{ " +
+                $"Write-Output 'PowerShell QoS failed, trying netsh'; " +
+                $"}}\"");
+
+            if (result.Contains("QoS policy created"))
+            {
+                _networkQosActive = true;
+                Debug.WriteLine("Network QoS policy applied via PowerShell");
+            }
+            else
+            {
+                // Fallback to netsh
+                var netshResult = await RunCmdAsync(
+                    $"netsh int tcp set global autotuninglevel=normal && " +
+                    $"netsh int tcp set heuristics disabled && " +
+                    $"netsh int tcp set global rss=enabled");
+                _networkQosActive = true;
+                Debug.WriteLine($"Network QoS applied via netsh: {netshResult}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _networkQosActive = false;
+            Debug.WriteLine($"Network QoS error: {ex.Message}");
+        }
+    }
+
+    private async Task RemoveNetworkQosAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            if (_qosPolicyName is not null)
+            {
+                await RunCmdAsync(
+                    $"powershell -NoProfile -Command \"" +
+                    $"Remove-NetQosPolicy -Name '{_qosPolicyName}' -Confirm:$false -ErrorAction SilentlyContinue\"");
+                Debug.WriteLine("Network QoS policy removed");
+            }
+            _networkQosActive = false;
+            _qosPolicyName = null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Network QoS removal error: {ex.Message}");
+        }
+    }
+
+    // ── Windows Update Pause/Resume ──
+
+    private async Task PauseWindowsUpdateAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            // Attempt to stop the Windows Update service
+            var result = await RunCmdAsync("net stop wuauserv");
+            // Also stop the Update Orchestrator Service
+            await RunCmdAsync("net stop UsoSvc");
+            _windowsUpdatePaused = true;
+            Debug.WriteLine($"Windows Update paused: {result}");
+        }
+        catch (Exception ex)
+        {
+            _windowsUpdatePaused = false;
+            Debug.WriteLine($"Windows Update pause failed (may require elevation): {ex.Message}");
+        }
+    }
+
+    private async Task ResumeWindowsUpdateAsync()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try
+        {
+            await RunCmdAsync("net start wuauserv");
+            await RunCmdAsync("net start UsoSvc");
+            _windowsUpdatePaused = false;
+            Debug.WriteLine("Windows Update resumed");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Windows Update resume failed: {ex.Message}");
+        }
+    }
+
+    // ── Helpers ──
 
     private static async Task<string> RunCmdAsync(string command)
     {

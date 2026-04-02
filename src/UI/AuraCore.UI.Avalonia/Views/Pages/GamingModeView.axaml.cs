@@ -3,11 +3,13 @@ using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Layout;
 using global::Avalonia.Media;
+using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.GamingMode;
 using AuraCore.Module.GamingMode.Models;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -18,15 +20,49 @@ public partial class GamingModeView : UserControl
     private readonly GamingModeModule? _module;
     private readonly List<CheckBox> _toggleCbs = new();
 
+    // ── Session duration timer ──
+    private DispatcherTimer? _sessionTimer;
+
+    // ── Auto-Detect fields ──
+    private DispatcherTimer? _gameWatchTimer;
+    private bool _gameDetected;
+    private string? _detectedGameName;
+
+    private static readonly HashSet<string> KnownGames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "steam", "steamservice",
+        "csgo", "cs2", "dota2", "hl2", "left4dead2",
+        "fortniteClient-win64-shipping", "fortniteclient-win64-shipping", "rocketleague",
+        "league of legends", "leagueclient", "valorant", "valorant-win64-shipping", "riotclientservices",
+        "wow", "overwatch", "diablo iv", "hearthstone", "battle.net",
+        "fifa", "fc24", "fc25", "apexlegends", "battlefield", "needforspeed", "thesims4",
+        "assassinscreed", "farcry", "r6-siege",
+        "minecraft", "javaw",
+        "gta5", "gtav", "rdr2", "cyberpunk2077",
+        "eldenring", "darksouls", "sekiro",
+        "baldursgate3", "bg3", "hogwartslegacy",
+        "terraria", "stardewvalley", "witcher3",
+        "halo", "haloinfinite",
+        "cod", "moderwarfare", "blackops",
+        "pubg", "pubgtslgame", "rust", "ark",
+        "satisfactory", "factorio",
+        "totalwar", "civilization", "civ6",
+        "flightsimulator",
+        "godofwar", "horizonzerodawn",
+        "spiderman", "spidermanremastered", "ghostoftsushima",
+        "unrealengine", "unitycrashandler",
+    };
+
     public GamingModeView()
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+            Dispatcher.UIThread.Post(ApplyLocalization);
         _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<GamingModeModule>().FirstOrDefault();
         Loaded += async (s, e) => await RunScan();
+        Unloaded += (s, e) => { StopGameWatcher(); StopSessionTimer(); };
 }
 
     private async Task RunScan()
@@ -78,6 +114,8 @@ public partial class GamingModeView : UserControl
 
     private void UpdateStatus(bool active)
     {
+        var state = _module?.LastState;
+
         if (active)
         {
             StatusLabel.Text = "ACTIVE - Gaming Mode On";
@@ -86,6 +124,24 @@ public partial class GamingModeView : UserControl
             StatusBorder.Background = new SolidColorBrush(Color.Parse("#0D22C55E"));
             ActivateLabel.Text = "Deactivate";
             ActivateBtn.Background = new SolidColorBrush(Color.Parse("#EF4444"));
+
+            // Show active session badge
+            ActiveBadge.IsVisible = true;
+            StatusRowGrid.IsVisible = true;
+            StartSessionTimer();
+
+            // Update GPU/Network/WU status labels
+            if (state is not null)
+            {
+                GpuStatusLabel.Text = state.GpuOptimized ? state.GpuStatus : state.GpuVendor;
+                GpuStatusLabel.Foreground = new SolidColorBrush(Color.Parse(state.GpuOptimized ? "#22C55E" : "#8B5CF6"));
+
+                NetworkQosLabel.Text = state.NetworkQosActive ? "QoS Active" : "Inactive";
+                NetworkQosLabel.Foreground = new SolidColorBrush(Color.Parse(state.NetworkQosActive ? "#22C55E" : "#3B82F6"));
+
+                WinUpdateLabel.Text = state.WindowsUpdatePaused ? "Paused" : "Running";
+                WinUpdateLabel.Foreground = new SolidColorBrush(Color.Parse(state.WindowsUpdatePaused ? "#22C55E" : "#F59E0B"));
+            }
         }
         else
         {
@@ -95,28 +151,199 @@ public partial class GamingModeView : UserControl
             StatusBorder.Background = new SolidColorBrush(Color.Parse("#1A1A28"));
             ActivateLabel.Text = "Activate";
             ActivateBtn.Background = new SolidColorBrush(Color.Parse("#00D4AA"));
+
+            // Hide active session badge
+            ActiveBadge.IsVisible = false;
+            StatusRowGrid.IsVisible = false;
+            StopSessionTimer();
         }
+    }
+
+    // ── Session Duration Timer ──
+
+    private void StartSessionTimer()
+    {
+        if (_sessionTimer is not null) return;
+        _sessionTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _sessionTimer.Tick += SessionTimerTick;
+        _sessionTimer.Start();
+    }
+
+    private void StopSessionTimer()
+    {
+        if (_sessionTimer is null) return;
+        _sessionTimer.Tick -= SessionTimerTick;
+        _sessionTimer.Stop();
+        _sessionTimer = null;
+        SessionDurationText.Text = "Duration: 0:00";
+    }
+
+    private void SessionTimerTick(object? sender, EventArgs e)
+    {
+        var activatedAt = _module?.LastState?.ActivatedAt;
+        if (activatedAt is null) return;
+        var elapsed = DateTime.UtcNow - activatedAt.Value;
+        SessionDurationText.Text = elapsed.TotalHours >= 1
+            ? $"Duration: {elapsed:h\\:mm\\:ss}"
+            : $"Duration: {elapsed:m\\:ss}";
     }
 
     private async void Activate_Click(object? sender, RoutedEventArgs e)
     {
-        if (_module is null) return;
-        ActivateBtn.IsEnabled = false;
-        ActivateLabel.Text = "Working...";
+        try
+        {
+            if (_module is null) return;
+            ActivateBtn.IsEnabled = false;
+            ActivateLabel.Text = "Working...";
 
-        var isActive = _module.IsActive;
-        var ids = new List<string> { isActive ? "deactivate" : "activate" };
-        if (!isActive)
-            ids.AddRange(_toggleCbs.Where(cb => cb.IsChecked == true).Select(cb => cb.Tag!.ToString()!));
+            var isActive = _module.IsActive;
+            var ids = new List<string> { isActive ? "deactivate" : "activate" };
+            if (!isActive)
+                ids.AddRange(_toggleCbs.Where(cb => cb.IsChecked == true).Select(cb => cb.Tag!.ToString()!));
 
-        var plan = new OptimizationPlan(_module.Id, ids);
-        var progress = new Progress<TaskProgress>(p =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(() => SubText.Text = p.StatusText));
+            var plan = new OptimizationPlan(_module.Id, ids);
+            var progress = new Progress<TaskProgress>(p =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(() => SubText.Text = p.StatusText));
 
-        await _module.OptimizeAsync(plan, progress);
-        await RunScan();
-        ActivateBtn.IsEnabled = true;
+            await _module.OptimizeAsync(plan, progress);
+            await RunScan();
+            ActivateBtn.IsEnabled = true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in Activate_Click: {ex.Message}");
+        }
 }
+
+    // ── Auto-Detect wiring ──
+
+    private void AutoDetectToggle_Changed(object? sender, RoutedEventArgs e)
+    {
+        if (AutoDetectToggle.IsChecked == true)
+            StartGameWatcher();
+        else
+            StopGameWatcher();
+    }
+
+    private void StartGameWatcher()
+    {
+        if (_gameWatchTimer is not null) return;
+        _gameWatchTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+        _gameWatchTimer.Tick += GameWatchTick;
+        _gameWatchTimer.Start();
+        UpdateAutoDetectUI(watching: true, gameName: null);
+    }
+
+    private void StopGameWatcher()
+    {
+        if (_gameWatchTimer is null) return;
+        _gameWatchTimer.Tick -= GameWatchTick;
+        _gameWatchTimer.Stop();
+        _gameWatchTimer = null;
+
+        if (_gameDetected)
+        {
+            _gameDetected = false;
+            _detectedGameName = null;
+        }
+        UpdateAutoDetectUI(watching: false, gameName: null);
+    }
+
+    private void GameWatchTick(object? sender, EventArgs e)
+    {
+        string? foundGame = null;
+        try
+        {
+            foreach (var proc in Process.GetProcesses())
+            {
+                try
+                {
+                    if (KnownGames.Contains(proc.ProcessName))
+                    {
+                        foundGame = proc.ProcessName;
+                        break;
+                    }
+                }
+                catch { }
+                finally { try { proc.Dispose(); } catch { } }
+            }
+        }
+        catch { }
+
+        if (foundGame is not null && !_gameDetected)
+        {
+            _gameDetected = true;
+            _detectedGameName = foundGame;
+            UpdateAutoDetectUI(watching: true, gameName: foundGame);
+
+            // Auto-activate gaming mode if not already active
+            if (_module is not null && !_module.IsActive)
+                _ = AutoActivateAsync();
+        }
+        else if (foundGame is null && _gameDetected)
+        {
+            var lastGame = _detectedGameName;
+            _gameDetected = false;
+            _detectedGameName = null;
+            UpdateAutoDetectUI(watching: true, gameName: null);
+
+            // Auto-deactivate gaming mode
+            if (_module is not null && _module.IsActive)
+                _ = AutoDeactivateAsync();
+        }
+    }
+
+    private async Task AutoActivateAsync()
+    {
+        if (_module is null) return;
+        try
+        {
+            var ids = new List<string> { "activate", "power-plan", "notifications", "suspend-bg", "clean-ram", "gpu-optimize", "network-qos", "pause-wu" };
+            var plan = new OptimizationPlan(_module.Id, ids);
+            await _module.OptimizeAsync(plan);
+            await RunScan();
+        }
+        catch { }
+    }
+
+    private async Task AutoDeactivateAsync()
+    {
+        if (_module is null) return;
+        try
+        {
+            var plan = new OptimizationPlan(_module.Id, new List<string> { "deactivate" });
+            await _module.OptimizeAsync(plan);
+            await RunScan();
+        }
+        catch { }
+    }
+
+    private void UpdateAutoDetectUI(bool watching, string? gameName)
+    {
+        if (watching)
+        {
+            AutoDetectDot.Background = gameName is not null
+                ? new SolidColorBrush(Color.Parse("#22C55E"))
+                : new SolidColorBrush(Color.Parse("#A855F7"));
+            AutoDetectLabel.Text = gameName is not null
+                ? $"Game Detected: {gameName}"
+                : "Watching for games...";
+            AutoDetectLabel.Foreground = gameName is not null
+                ? new SolidColorBrush(Color.Parse("#22C55E"))
+                : new SolidColorBrush(Color.Parse("#A855F7"));
+            DetectedGameLabel.Text = gameName is not null
+                ? "Gaming Mode auto-activated"
+                : "";
+            DetectedGameLabel.IsVisible = gameName is not null;
+        }
+        else
+        {
+            AutoDetectDot.Background = new SolidColorBrush(Color.Parse("#555570"));
+            AutoDetectLabel.Text = "Auto-Detect: Off";
+            AutoDetectLabel.Foreground = new SolidColorBrush(Color.Parse("#8888A0"));
+            DetectedGameLabel.IsVisible = false;
+        }
+    }
 
     private void ApplyLocalization()
     {

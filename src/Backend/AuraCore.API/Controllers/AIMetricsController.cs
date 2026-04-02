@@ -10,11 +10,13 @@ public sealed class AIMetricsController : ControllerBase
     // ── In-memory store (beta) ────────────────────────────────────────
     private static readonly ConcurrentBag<AIMetricEntry> _metrics = new();
     private static readonly ConcurrentDictionary<string, DateOnly> _rateLimits = new();
+    private static bool _seeded;
 
     // ── POST /api/telemetry/ai-metrics ────────────────────────────────
     [HttpPost]
     public IActionResult Submit([FromBody] AIMetricRequest req)
     {
+        SeedSyntheticData();
         // --- Validation ---
         if (string.IsNullOrWhiteSpace(req.DeviceId) || req.DeviceId.Length > 128)
             return BadRequest(new { error = "Invalid deviceId (required, max 128 chars)" });
@@ -71,6 +73,7 @@ public sealed class AIMetricsController : ControllerBase
     [HttpGet("global")]
     public IActionResult GetGlobal()
     {
+        SeedSyntheticData();
         var all = _metrics.ToArray();
         if (all.Length == 0)
             return Ok(new { globalAvgCpu = 0.0, globalAvgRam = 0.0, globalAvgDiskUsed = 0.0, totalEntries = 0 });
@@ -112,6 +115,48 @@ public sealed class AIMetricsController : ControllerBase
         if (arr.Length <= 1) return 50;
         int lower = arr.Count(v => v < current);
         return (int)Math.Round(100.0 * lower / arr.Length);
+    }
+
+    // ── Synthetic seed data ──────────────────────────────────────────
+    private static void SeedSyntheticData()
+    {
+        if (_seeded || _metrics.Count > 0) return;
+        _seeded = true;
+
+        var rng = new Random(42); // deterministic for consistency
+        var osVersions = new[] {
+            "Windows 11 23H2", "Windows 11 23H2", "Windows 11 23H2",
+            "Windows 11 23H2", "Windows 11 23H2", "Windows 11 23H2",
+            "Windows 10 22H2", "Windows 10 22H2", "Windows 10 22H2",
+            "Ubuntu 22.04", "macOS 14.0"
+        };
+        var coreOptions = new[] { 4, 4, 6, 6, 8, 8, 8, 8, 12, 12, 16 };
+        var ramOptions = new[] { 8, 8, 16, 16, 16, 16, 32, 32, 32, 64 };
+
+        for (int i = 0; i < 100; i++)
+        {
+            var entry = new AIMetricEntry(
+                DeviceId: $"synthetic-{Guid.NewGuid():N}",
+                Date: DateOnly.FromDateTime(DateTime.Today.AddDays(-rng.Next(0, 30))),
+                AvgCpu: Math.Clamp(NormalRandom(rng, 28, 12), 2, 95),
+                AvgRam: Math.Clamp(NormalRandom(rng, 62, 15), 10, 98),
+                DiskUsedPct: Math.Clamp(NormalRandom(rng, 65, 18), 15, 95),
+                AnomalyCount: rng.NextDouble() < 0.6 ? 0 : rng.NextDouble() < 0.8 ? 1 : rng.Next(2, 6),
+                OsVersion: osVersions[rng.Next(osVersions.Length)],
+                CpuCores: coreOptions[rng.Next(coreOptions.Length)],
+                RamTotalGb: ramOptions[rng.Next(ramOptions.Length)]
+            );
+            _metrics.Add(entry);
+        }
+    }
+
+    private static double NormalRandom(Random rng, double mean, double stddev)
+    {
+        // Box-Muller transform
+        var u1 = 1.0 - rng.NextDouble();
+        var u2 = rng.NextDouble();
+        var z = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
+        return mean + z * stddev;
     }
 }
 

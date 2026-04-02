@@ -146,6 +146,29 @@ All notable changes to this project will be documented in this file.
 - IP Whitelist: CRUD endpoints
 - Revenue chart endpoint
 
+#### Forgot Password Flow
+- Standalone /forgot-password page (EN/TR, glassmorphic, 2-step: email → code → new password)
+- POST /api/auth/password/forgot: Resend email with 6-digit code, 10min TTL
+- POST /api/auth/password/reset: code validation + password strength check
+- password_reset_codes database table
+- Desktop app URL updated to clean URL
+
+#### Synthetic Data
+- Backend seed: 100 synthetic metric records on API startup (realistic distributions)
+- Client bootstrap: 7-day disk forecast data on first launch
+- Automatic cleanup when real data accumulates
+
+#### AI Localization
+- 56 new LocalizationService keys (EN/TR)
+- AI Insights page fully localized
+- Dashboard AI badges localized
+
+#### Release
+- Installer rebuilt with Inno Setup (self-contained Avalonia, no runtime needed)
+- GitHub Release v1.7.0 with AuraCorePro-Setup.exe
+- Landing page download links updated to v1.7.0
+- Discord server launched with changelog webhook integration
+
 ---
 
 ## [1.6.0] — 2026-03-31

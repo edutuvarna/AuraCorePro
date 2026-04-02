@@ -254,15 +254,36 @@
 ### v1.7.0 Release
 - [x] Changelog (Session 20+21+22 features)
 - [x] Version bump: 1.6.0 → 1.7.0
-- [ ] Installer rebuild
-- [ ] GitHub Release
-- [ ] Landing page download link update (v1.7.0)
+- [x] Installer rebuild (Inno Setup, self-contained Avalonia)
+- [x] GitHub Release (AuraCorePro-Setup.exe uploaded)
+- [x] Landing page download link update (v1.7.0)
+
+### Forgot Password Flow
+- [x] /forgot-password standalone page (EN/TR, glassmorphic)
+- [x] POST /api/auth/password/forgot (Resend email, 6-digit code, 10min TTL)
+- [x] POST /api/auth/password/reset (code validation, password update)
+- [x] Desktop app URL updated to clean URL
+
+### Synthetic Data
+- [x] Backend seed: 100 synthetic records on API startup
+- [x] Client bootstrap: 7-day disk forecast on first launch
+- [x] is_synthetic flag with automatic cleanup
+
+### AI Localization
+- [x] 56 new LocalizationService keys (EN/TR)
+- [x] AIInsightsView fully localized
+- [x] Dashboard AI badges localized
+
+### Discord Integration
+- [x] Discord server setup (channels, roles, onboarding)
+- [x] Changelog webhook (auto-post on update publish)
+- [x] AuraCore Manager bot deployed (ticket system, reaction roles)
 
 ## 🚀 NEXT MILESTONES
 
-### Backend Completion
-- [ ] Password reset flow (/api/auth/password/forgot + /reset)
-- [ ] Email service (Resend integration — key already configured)
+### Discord Bot AI
+- [ ] Anthropic API credit ($15 initial)
+- [ ] Enable Claude Haiku auto-responses in ticket channels
 
 ### Advanced (Future)
 - [ ] AI Phase 2: Claude API integration (Pro tier — natural language queries)

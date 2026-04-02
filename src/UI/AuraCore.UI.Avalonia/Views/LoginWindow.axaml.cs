@@ -19,7 +19,11 @@ public partial class LoginWindow : Window
     public LoginWindow()
     {
         InitializeComponent();
-        _ = TryAutoLoginAsync();
+        Loaded += async (s, e) =>
+        {
+            try { await TryAutoLoginAsync(); }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"AutoLogin error: {ex.Message}"); }
+        };
     }
 
     // ── AUTO LOGIN ────────────────────────────────────────
@@ -120,19 +124,26 @@ public partial class LoginWindow : Window
 
     private static void ParseLoginResponse(JsonDocument doc)
     {
-        SessionState.AccessToken = doc.RootElement.GetProperty("accessToken").GetString();
-        var refreshToken = doc.RootElement.GetProperty("refreshToken").GetString();
-        var user = doc.RootElement.GetProperty("user");
-        SessionState.UserEmail = user.GetProperty("email").GetString();
-        SessionState.UserRole = user.GetProperty("role").GetString();
-        SessionState.UserId = user.GetProperty("id").GetString();
-        SessionState.UserTier = user.TryGetProperty("tier", out var tierProp)
-            ? tierProp.GetString() ?? "free" : "free";
-        if (SessionState.UserRole == "admin") SessionState.UserTier = "admin";
-        SessionState.ApiBaseUrl = ApiBaseUrl;
+        try
+        {
+            SessionState.AccessToken = doc.RootElement.GetProperty("accessToken").GetString();
+            var refreshToken = doc.RootElement.GetProperty("refreshToken").GetString();
+            var user = doc.RootElement.GetProperty("user");
+            SessionState.UserEmail = user.GetProperty("email").GetString();
+            SessionState.UserRole = user.GetProperty("role").GetString();
+            SessionState.UserId = user.GetProperty("id").GetString();
+            SessionState.UserTier = user.TryGetProperty("tier", out var tierProp)
+                ? tierProp.GetString() ?? "free" : "free";
+            if (SessionState.UserRole == "admin") SessionState.UserTier = "admin";
+            SessionState.ApiBaseUrl = ApiBaseUrl;
 
-        // Store refresh token for persistence
-        SaveSetting("RefreshToken", refreshToken ?? "");
+            // Store refresh token for persistence
+            SaveSetting("RefreshToken", refreshToken ?? "");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[LoginWindow] Missing property in login response: {ex.Message}");
+        }
     }
 
     // ── SESSION ───────────────────────────────────────────
@@ -215,7 +226,7 @@ public partial class LoginWindow : Window
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = "https://auracore.pro/#forgot-password",
+                FileName = "https://auracore.pro/forgot-password",
                 UseShellExecute = true
             });
         }
@@ -332,39 +343,49 @@ public partial class LoginWindow : Window
     // ── SETTINGS PERSISTENCE ──────────────────────────────
 
     private static Dictionary<string, string>? _settingsCache;
+    private static readonly object _settingsLock = new();
 
     private static Dictionary<string, string> LoadSettings()
     {
-        if (_settingsCache != null) return _settingsCache;
-        try
+        lock (_settingsLock)
         {
-            if (File.Exists(SettingsFile))
+            if (_settingsCache != null) return _settingsCache;
+            try
             {
-                var json = File.ReadAllText(SettingsFile);
-                _settingsCache = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
-                return _settingsCache;
+                if (File.Exists(SettingsFile))
+                {
+                    var json = File.ReadAllText(SettingsFile);
+                    _settingsCache = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new();
+                    return _settingsCache;
+                }
             }
+            catch { }
+            _settingsCache = new();
+            return _settingsCache;
         }
-        catch { }
-        _settingsCache = new();
-        return _settingsCache;
     }
 
     public static string LoadSetting(string key)
     {
-        var settings = LoadSettings();
-        return settings.TryGetValue(key, out var val) ? val : "";
+        lock (_settingsLock)
+        {
+            var settings = LoadSettings();
+            return settings.TryGetValue(key, out var val) ? val : "";
+        }
     }
 
     public static void SaveSetting(string key, string value)
     {
-        var settings = LoadSettings();
-        settings[key] = value;
-        try
+        lock (_settingsLock)
         {
-            Directory.CreateDirectory(SettingsDir);
-            File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings));
+            var settings = LoadSettings();
+            settings[key] = value;
+            try
+            {
+                Directory.CreateDirectory(SettingsDir);
+                File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings));
+            }
+            catch { }
         }
-        catch { }
     }
 }

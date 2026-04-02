@@ -19,6 +19,7 @@ public sealed class AuraCoreDbContext : DbContext
     public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
     public DbSet<AppConfig> AppConfigs => Set<AppConfig>();
     public DbSet<IpWhitelist> IpWhitelists => Set<IpWhitelist>();
+    public DbSet<PasswordResetCode> PasswordResetCodes => Set<PasswordResetCode>();
 
     protected override void OnModelCreating(ModelBuilder m)
     {
@@ -148,6 +149,16 @@ public sealed class AuraCoreDbContext : DbContext
             e.HasIndex(i => i.IpAddress).IsUnique();
             e.Property(i => i.Label).HasMaxLength(256);
             e.Property(i => i.CreatedAt).HasDefaultValueSql("now()");
+        });
+
+        m.Entity<PasswordResetCode>(e => {
+            e.ToTable("password_reset_codes");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).UseIdentityAlwaysColumn();
+            e.Property(x => x.Email).HasMaxLength(256).IsRequired();
+            e.Property(x => x.Code).HasMaxLength(6).IsRequired();
+            e.Property(x => x.CreatedAt).HasDefaultValueSql("now()");
+            e.HasIndex(x => x.Email);
         });
 
         m.Entity<AppConfig>(e => {

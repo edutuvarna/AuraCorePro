@@ -976,6 +976,9 @@ public static class LocalizationService
         ["set.account"] = "Account",
         ["set.signOut"] = "Sign Out",
         ["set.notSignedIn"] = "Not signed in",
+        ["set.aiTelemetry"] = "AI Telemetry",
+        ["set.aiTelemetryDesc"] = "Share anonymous AI data",
+        ["set.aiTelemetryNote"] = "CPU/RAM averages, disk trends. No personal data.",
 
         // ── Dashboard ──
         ["dash.welcomeBack"] = "Welcome back",
@@ -1950,6 +1953,9 @@ public static class LocalizationService
         ["set.account"] = "Hesap",
         ["set.signOut"] = "Cikis Yap",
         ["set.notSignedIn"] = "Giris yapilmamis",
+        ["set.aiTelemetry"] = "AI Telemetri",
+        ["set.aiTelemetryDesc"] = "Anonim AI verisi paylas",
+        ["set.aiTelemetryNote"] = "CPU/RAM ortalamalari, disk trendleri. Kisisel veri toplanmaz.",
 
         // ── Dashboard ──
         ["dash.welcomeBack"] = "Tekrar hosgeldiniz",

@@ -6,19 +6,32 @@
 
       <!-- Header -->
       <StackPanel Spacing="4">
-        <TextBlock x:Name="HeaderTitle" Text="Settings" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="HeaderTitle" Text="Settings" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="HeaderSub" Text="Configure AuraCore Pro preferences"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
 
       <!-- Appearance -->
-      <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="13" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
               <TextBlock x:Name="ThemeKeyLabel" Text="Theme" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -48,13 +61,60 @@
         </StackPanel>
       </Border>
 
-      <!-- About -->
-      <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <!-- AI Telemetry -->
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock x:Name="AboutLabel" Text="About" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x1F9E0;" FontSize="8" Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="AiTelemetryLabel" Text="AI Telemetry" FontSize="13" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock x:Name="AiTelemetryDescLabel" Text="Share anonymous AI data" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="AiTelemetryNoteLabel" Text="CPU/RAM averages, disk trends. No personal data."
+                         FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+            <ToggleSwitch Grid.Column="1" x:Name="AiTelemetryToggle"
+                          OnContent="On" OffContent="Off"
+                          IsCheckedChanged="AiTelemetryToggle_Changed"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- About -->
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x2139;" FontSize="8" Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="AboutLabel" Text="About" FontSize="13" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
           <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
             <TextBlock Text="Version" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                        Margin="0,0,24,8"/>
@@ -77,12 +137,25 @@
       </Border>
 
       <!-- Account -->
-      <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
         <StackPanel Spacing="12">
-          <TextBlock x:Name="AccountLabel" Text="Account" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x25CB;" FontSize="8" Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="AccountLabel" Text="Account" FontSize="13" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
               <TextBlock x:Name="AccountEmail" Text="Not signed in" FontSize="12"
@@ -91,7 +164,7 @@
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
             <Button Grid.Column="1" x:Name="LogoutBtn" Click="Logout_Click"
-                    Background="#20EF4444" Foreground="#EF4444"
+                    Background="{DynamicResource ErrorBgBrush}" Foreground="#EF4444"
                     Padding="16,8" CornerRadius="{StaticResource RadiusMd}"
                     FontWeight="SemiBold" FontSize="12" Content="Sign Out"/>
           </Grid>
@@ -100,8 +173,8 @@
 
       <!-- Links -->
       <Border CornerRadius="{StaticResource RadiusLg}"
-              Background="#0D00D4AA" Padding="16,12"
-              BorderBrush="#2000D4AA" BorderThickness="1">
+              Background="{DynamicResource AccentBgBrush}" Padding="16,12"
+              BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1">
         <Grid ColumnDefinitions="Auto,*">
           <TextBlock Text="&#x1F310;" FontSize="16" VerticalAlignment="Center" Margin="0,0,12,0"/>
           <TextBlock Grid.Column="1" Text="auracore.pro - Windows Optimization SaaS"

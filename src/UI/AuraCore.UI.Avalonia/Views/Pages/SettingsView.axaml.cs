@@ -25,7 +25,10 @@ public partial class SettingsView : UserControl
                 : LocalizationService._("set.light");
 
             // Language label
-            LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "Turkce" : "English";
+            LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "T\u00FCrk\u00E7e" : "English";
+
+            // AI Telemetry toggle
+            AiTelemetryToggle.IsChecked = AIConsentSettings.IsConsentGiven();
 
             // Account info
             var email = SessionState.UserEmail;
@@ -48,6 +51,9 @@ public partial class SettingsView : UserControl
         ThemeDescLabel.Text = LocalizationService._("set.themeDesc");
         LangKeyLabel.Text = LocalizationService._("set.language");
         LangDescLabel.Text = LocalizationService._("set.langDesc");
+        AiTelemetryLabel.Text = LocalizationService._("set.aiTelemetry");
+        AiTelemetryDescLabel.Text = LocalizationService._("set.aiTelemetryDesc");
+        AiTelemetryNoteLabel.Text = LocalizationService._("set.aiTelemetryNote");
         AboutLabel.Text = LocalizationService._("set.about");
         AccountLabel.Text = LocalizationService._("set.account");
         LogoutBtn.Content = LocalizationService._("set.signOut");
@@ -55,7 +61,7 @@ public partial class SettingsView : UserControl
         ThemeLabel.Text = ThemeService.IsDarkMode
             ? LocalizationService._("set.dark")
             : LocalizationService._("set.light");
-        LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "Turkce" : "English";
+        LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "T\u00FCrk\u00E7e" : "English";
 
         var email = SessionState.UserEmail;
         AccountEmail.Text = string.IsNullOrEmpty(email) ? LocalizationService._("set.notSignedIn") : email;
@@ -74,6 +80,12 @@ public partial class SettingsView : UserControl
         var newLang = LocalizationService.CurrentLanguage == "en" ? "tr" : "en";
         LocalizationService.SetLanguage(newLang);
         // LanguageChanged event will trigger ApplyLocalization
+    }
+
+    private void AiTelemetryToggle_Changed(object? sender, RoutedEventArgs e)
+    {
+        if (AiTelemetryToggle.IsChecked is bool isOn)
+            AIConsentSettings.Save(isOn);
     }
 
     private void Logout_Click(object? sender, RoutedEventArgs e)

@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Dialogs.AIConsentDialog">
+
+  <!-- Semi-transparent dark backdrop overlay -->
+  <Grid>
+    <Border Background="#CC000000" />
+
+    <!-- Centered glassmorphic card -->
+    <Border MaxWidth="420" MaxHeight="520"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            CornerRadius="16" Padding="28" BorderThickness="1">
+      <Border.Background>
+        <SolidColorBrush Color="#1A1A2E" Opacity="0.97"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.08"/>
+      </Border.BorderBrush>
+      <Border.BoxShadow>0 8 32 0 #40000000</Border.BoxShadow>
+
+      <StackPanel Spacing="16" HorizontalAlignment="Center">
+
+        <!-- Brain / AI icon -->
+        <Border Width="48" Height="48" CornerRadius="12"
+                HorizontalAlignment="Center">
+          <Border.Background>
+            <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+          </Border.Background>
+          <TextBlock Text="&#x1F9E0;" FontSize="22"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Title -->
+        <TextBlock x:Name="TitleLabel" Text="Help AuraCore Learn"
+                   FontSize="18" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <!-- Description -->
+        <TextBlock x:Name="DescriptionLabel"
+                   Text="AuraCore Pro uses local AI to analyze your system. To improve AI accuracy, we can collect anonymous usage statistics (CPU/RAM averages, disk trends). No personal data is collected. All AI analysis runs locally on your device."
+                   FontSize="13" TextWrapping="Wrap" LineHeight="20"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   TextAlignment="Center"/>
+
+        <!-- Buttons -->
+        <StackPanel Spacing="10" Margin="0,8,0,0">
+          <Button x:Name="AllowBtn" Click="Allow_Click"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                  Background="#2014B8A6" Foreground="#14B8A6"
+                  Padding="16,12" CornerRadius="10"
+                  FontWeight="SemiBold" FontSize="14" Cursor="Hand">
+            <TextBlock x:Name="AllowBtnText" Text="&#x2713; Allow"/>
+          </Button>
+          <Button x:Name="DeclineBtn" Click="Decline_Click"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                  Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
+                  Padding="16,12" CornerRadius="10"
+                  FontWeight="SemiBold" FontSize="14" Cursor="Hand">
+            <TextBlock x:Name="DeclineBtnText" Text="&#x2717; Decline"/>
+          </Button>
+        </StackPanel>
+
+        <!-- Bottom note -->
+        <TextBlock x:Name="NoteLabel"
+                   Text="You can change this later in Settings."
+                   FontSize="11" TextWrapping="Wrap"
+                   Foreground="{DynamicResource TextMutedBrush}"
+                   HorizontalAlignment="Center" TextAlignment="Center"
+                   Opacity="0.7"/>
+
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

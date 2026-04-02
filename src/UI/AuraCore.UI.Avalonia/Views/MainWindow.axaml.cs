@@ -4,6 +4,7 @@ using global::Avalonia.Media;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using AuraCore.UI.Avalonia.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -80,7 +81,19 @@ public sealed partial class MainWindow : Window
             var onboarding = new OnboardingView();
             onboarding.OnboardingCompleted += (s, e) =>
             {
-                ContentArea.Content = new DashboardView();
+                if (!AIConsentSettings.HasBeenShown())
+                {
+                    var consent = new AIConsentDialog();
+                    consent.ConsentCompleted += (_, _) =>
+                    {
+                        ContentArea.Content = new DashboardView();
+                    };
+                    ContentArea.Content = consent;
+                }
+                else
+                {
+                    ContentArea.Content = new DashboardView();
+                }
             };
             ContentArea.Content = onboarding;
         }

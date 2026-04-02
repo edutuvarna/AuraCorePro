@@ -1,30 +1,66 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.CategoryCleanView">
-  <Grid RowDefinitions="Auto,Auto,*,Auto">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
 
     <!-- Header -->
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
       <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Cleanup" FontSize="22" FontWeight="Bold"
+        <TextBlock x:Name="PageTitle" Text="Cleanup" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
         <TextBlock x:Name="PageSubtitle" Text="Scan and clean system files"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
       </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click"
-              VerticalAlignment="Center" Padding="14,8">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F50D;" FontSize="12"/>
-          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <Button x:Name="ExcludeListBtn" Classes="action-btn" Click="ExcludeList_Click"
+                Padding="10,8" IsVisible="False" ToolTip.Tip="Manage exclude list">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="&#x1F6AB;" FontSize="11"/>
+            <TextBlock Text="Excludes" FontSize="10" FontWeight="SemiBold"/>
+          </StackPanel>
+        </Button>
+        <Button Classes="action-btn" Click="Scan_Click" Padding="14,8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="&#x1F50D;" FontSize="12"/>
+            <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
+          </StackPanel>
+        </Button>
+      </StackPanel>
     </Grid>
 
+    <!-- AI Recommendation Badge (only visible when disk pressure > 85%) -->
+    <Border x:Name="AiBadge" Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+            Padding="12,8" Margin="0,0,0,10" IsVisible="False">
+      <Border.Background>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.08"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.25"/>
+      </Border.BorderBrush>
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Border CornerRadius="10" Background="#30F59E0B" Padding="6,3" VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="&#x1F916;" FontSize="11"/>
+            <TextBlock Text="AI" FontSize="10" FontWeight="Bold" Foreground="#F59E0B"/>
+          </StackPanel>
+        </Border>
+        <TextBlock Grid.Column="1" x:Name="AiBadgeText" FontSize="11" Margin="10,0,0,0"
+                   Foreground="#F5C563" VerticalAlignment="Center" TextWrapping="Wrap"
+                   Text="Disk pressure is high. Running a cleanup is recommended."/>
+        <TextBlock Grid.Column="2" x:Name="AiBadgeSavings" FontSize="12" FontWeight="Bold"
+                   Foreground="#F59E0B" VerticalAlignment="Center" Margin="10,0,0,0"/>
+      </Grid>
+    </Border>
+
     <!-- Stats -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
             Padding="16,10" Margin="0,0,0,12">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <Grid ColumnDefinitions="*,*,*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="8">
           <TextBlock Text="Categories:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
@@ -48,16 +84,36 @@
     </Border>
 
     <!-- Category List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="8">
+    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="8">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
       <ScrollViewer>
         <StackPanel x:Name="CategoryPanel" Spacing="6"/>
       </ScrollViewer>
     </Border>
 
+    <!-- History Section (collapsible, junk-cleaner only) -->
+    <Border x:Name="HistorySection" Grid.Row="4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+            Padding="0" Margin="0,10,0,0" IsVisible="False">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+      </Border.BorderBrush>
+      <Expander Header="Cleanup History" Padding="10,4" IsExpanded="False">
+        <ScrollViewer MaxHeight="140">
+          <StackPanel x:Name="HistoryPanel" Spacing="3"/>
+        </ScrollViewer>
+      </Expander>
+    </Border>
+
     <!-- Clean Button -->
-    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
+    <Grid Grid.Row="5" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
       <TextBlock x:Name="StatusText" Text="" FontSize="11"
                  Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
       <Button Grid.Column="1" x:Name="CleanBtn" Click="Clean_Click"

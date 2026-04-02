@@ -153,6 +153,14 @@ public sealed class JunkCleanerModule : IOptimizationModule
         int total = LastReport.TotalFiles;
         int processed = 0;
 
+        // Support category-level selection
+        var selectedCategories = plan.SelectedItemIds?.Count > 0 && !plan.SelectedItemIds.Contains("all")
+            ? new HashSet<string>(plan.SelectedItemIds)
+            : null; // null = all categories
+
+        // Load exclude list for filtering
+        var excludes = JunkCleanerService.LoadExcludeList();
+
         await Task.Run(() =>
         {
             foreach (var category in LastReport.Categories)
@@ -160,9 +168,21 @@ public sealed class JunkCleanerModule : IOptimizationModule
                 // Skip Recycle Bin — don't delete $Recycle.Bin directly
                 if (category.Name == "Recycle Bin") continue;
 
+                // Skip if not in selected categories
+                if (selectedCategories is not null && !selectedCategories.Contains(category.Name))
+                    continue;
+
                 foreach (var file in category.Files)
                 {
                     ct.ThrowIfCancellationRequested();
+
+                    // Skip excluded files
+                    if (JunkCleanerService.IsExcluded(file.FullPath, excludes))
+                    {
+                        processed++;
+                        continue;
+                    }
+
                     try
                     {
                         if (File.Exists(file.FullPath))

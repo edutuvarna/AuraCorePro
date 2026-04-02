@@ -87,6 +87,25 @@ public partial class App : global::Avalonia.Application
         // Start update checker (background, non-blocking)
         UpdateChecker.Instance.Start();
 
+        // Background AI metric sync (consent-controlled, daily)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var dbPath = System.IO.Path.Combine(appData, "AuraCorePro", "ai", "metrics.db");
+                if (System.IO.File.Exists(dbPath))
+                {
+                    using var db = new AuraCore.Engine.AIAnalyzer.LocalMetricDb(dbPath);
+                    await AuraCore.Engine.AIAnalyzer.Sync.MetricSyncService.TrySyncAsync(db);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AI sync startup error: {ex.Message}");
+            }
+        });
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new Views.LoginWindow();

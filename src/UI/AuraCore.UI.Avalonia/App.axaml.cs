@@ -70,6 +70,9 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
         }
 
+        // ── AI Analyzer Engine ──
+        AuraCore.Engine.AIAnalyzer.AIAnalyzerRegistration.AddAIAnalyzer(sc);
+
         _services = sc.BuildServiceProvider();
 
         // Initialize theme (loads saved preference)

@@ -2,7 +2,10 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
+using global::Avalonia.Media;
 using global::Avalonia.Threading;
+using AuraCore.Application.Interfaces.Engines;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -12,12 +15,36 @@ public partial class DashboardView : UserControl
     private TimeSpan _prevCpuTime;
     private DateTime _prevSampleTime;
     private bool _firstSample = true;
+    private bool _initialized;
+
+    // AI Engine integration
+    private IAIAnalyzerEngine? _aiEngine;
+    private int _aiTickCounter;
+    private float _lastCpuPct;
+    private float _lastRamPct;
+    private float _lastDiskUsedPct;
 
     public DashboardView()
     {
         InitializeComponent();
-        Loaded += (s, e) => { LoadData(); StartLiveMonitoring(); ApplyLocalization(); };
-        Unloaded += (s, e) => StopLiveMonitoring();
+        Loaded += (s, e) =>
+        {
+            if (_initialized) return;
+            _initialized = true;
+
+            // Initialize AI engine
+            try { _aiEngine = App.Services.GetService<IAIAnalyzerEngine>(); } catch { }
+            if (_aiEngine != null)
+                _aiEngine.AnalysisCompleted += OnAIAnalysisCompleted;
+
+            LoadData(); StartLiveMonitoring(); ApplyLocalization();
+        };
+        Unloaded += (s, e) =>
+        {
+            StopLiveMonitoring();
+            if (_aiEngine != null)
+                _aiEngine.AnalysisCompleted -= OnAIAnalysisCompleted;
+        };
         LocalizationService.LanguageChanged += () =>
             Dispatcher.UIThread.Post(ApplyLocalization);
     }
@@ -41,11 +68,17 @@ public partial class DashboardView : UserControl
         try
         {
             var allProcs = Process.GetProcesses();
-            _prevCpuTime = TimeSpan.Zero;
-            foreach (var p in allProcs)
+            try
             {
-                try { _prevCpuTime += p.TotalProcessorTime; } catch { }
-                p.Dispose();
+                _prevCpuTime = TimeSpan.Zero;
+                foreach (var p in allProcs)
+                {
+                    try { _prevCpuTime += p.TotalProcessorTime; } catch { }
+                }
+            }
+            finally
+            {
+                foreach (var p in allProcs) try { p.Dispose(); } catch { }
             }
         }
         catch { }
@@ -58,8 +91,11 @@ public partial class DashboardView : UserControl
 
     private void StopLiveMonitoring()
     {
-        _timer?.Stop();
-        _timer = null;
+        if (_timer is not null)
+        {
+            _timer.Stop();
+            _timer = null;
+        }
     }
 
     private void UpdateLiveStats()
@@ -69,10 +105,16 @@ public partial class DashboardView : UserControl
             // CPU: delta-based measurement across all processes
             var totalCpu = TimeSpan.Zero;
             var allProcs = Process.GetProcesses();
-            foreach (var p in allProcs)
+            try
             {
-                try { totalCpu += p.TotalProcessorTime; } catch { }
-                p.Dispose();
+                foreach (var p in allProcs)
+                {
+                    try { totalCpu += p.TotalProcessorTime; } catch { }
+                }
+            }
+            finally
+            {
+                foreach (var p in allProcs) try { p.Dispose(); } catch { }
             }
             var now = DateTime.UtcNow;
             var elapsed = (now - _prevSampleTime).TotalMilliseconds;
@@ -81,6 +123,7 @@ public partial class DashboardView : UserControl
                 var cpuDelta = (totalCpu - _prevCpuTime).TotalMilliseconds;
                 var cpuPct = cpuDelta / elapsed / Environment.ProcessorCount * 100.0;
                 cpuPct = Math.Clamp(cpuPct, 0, 100);
+                _lastCpuPct = (float)cpuPct;
                 CpuValue.Text = $"{cpuPct:F0}";
                 if (CpuBar.Parent is Border cpuParent && cpuParent.Bounds.Width > 0)
                     CpuBar.Width = cpuParent.Bounds.Width * cpuPct / 100.0;
@@ -131,6 +174,7 @@ public partial class DashboardView : UserControl
                 usedGb = totalGb * 0.5;
                 ramPct = 50;
             }
+            _lastRamPct = totalGb > 0 ? (float)(usedGb / totalGb * 100.0) : 0f;
             RamValue.Text = $"{usedGb:F1}";
             RamTotal.Text = $"/ {totalGb:F1} GB";
             if (RamBar.Parent is Border ramParent && ramParent.Bounds.Width > 0 && totalGb > 0)
@@ -141,6 +185,62 @@ public partial class DashboardView : UserControl
             UptimeValue.Text = uptime.Days > 0
                 ? $"{uptime.Days}d {uptime.Hours}h"
                 : $"{uptime.Hours}h {uptime.Minutes}m";
+
+            // ── AI Engine: push metrics ──
+            if (_aiEngine != null)
+            {
+                try
+                {
+                    // Collect top 10 processes by working set
+                    var procs = Process.GetProcesses();
+                    var topProcs = new List<AIProcessMetric>();
+                    try
+                    {
+                        topProcs = procs
+                            .Select(p => { try { return new { p.ProcessName, p.WorkingSet64 }; } catch { return null; } })
+                            .Where(x => x != null)
+                            .OrderByDescending(x => x!.WorkingSet64)
+                            .Take(10)
+                            .Select(x => new AIProcessMetric(x!.ProcessName, x.WorkingSet64))
+                            .ToList();
+                    }
+                    finally
+                    {
+                        foreach (var p in procs) try { p.Dispose(); } catch { }
+                    }
+
+                    // Compute disk used percent for the sample
+                    float diskUsedPct = _lastDiskUsedPct;
+                    try
+                    {
+                        var root = OperatingSystem.IsWindows()
+                            ? (DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady)?.Name ?? "C:\\")
+                            : "/";
+                        var drv = new DriveInfo(root);
+                        diskUsedPct = (float)((drv.TotalSize - drv.AvailableFreeSpace) * 100.0 / drv.TotalSize);
+                        _lastDiskUsedPct = diskUsedPct;
+                    }
+                    catch { }
+
+                    var sample = new AIMetricSample(
+                        DateTimeOffset.UtcNow,
+                        _lastCpuPct,
+                        _lastRamPct,
+                        diskUsedPct,
+                        topProcs);
+
+                    _aiEngine.Push(sample);
+
+                    // Every 30 ticks (60 seconds) trigger analysis
+                    _aiTickCounter++;
+                    if (_aiTickCounter >= 30)
+                    {
+                        _aiTickCounter = 0;
+                        _ = _aiEngine.AnalyzeAsync();
+                    }
+                }
+                catch { }
+            }
         }
         catch { }
     }
@@ -212,7 +312,9 @@ public partial class DashboardView : UserControl
         // Disk info
         try
         {
-            var root = OperatingSystem.IsWindows() ? "C:\\" : "/";
+            var root = OperatingSystem.IsWindows()
+                ? (DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady)?.Name ?? "C:\\")
+                : "/";
             var drive = new DriveInfo(root);
             var freeGb = drive.AvailableFreeSpace / (1024.0 * 1024 * 1024);
             var totalDiskGb = drive.TotalSize / (1024.0 * 1024 * 1024);
@@ -285,6 +387,58 @@ public partial class DashboardView : UserControl
     private void ScanAll_Click(object? sender, RoutedEventArgs e)
     {
         // TODO: trigger full scan across all modules
+    }
+
+    // ── AI Analysis event handler (fires on background thread) ──
+    private void OnAIAnalysisCompleted(AIAnalysisResult result)
+    {
+        Dispatcher.UIThread.Post(() => UpdateAIBadges(result));
+    }
+
+    private void UpdateAIBadges(AIAnalysisResult result)
+    {
+        // CPU anomaly badge
+        CpuAnomalyBadge.IsVisible = result.CpuAnomaly;
+
+        // RAM anomaly badge
+        RamAnomalyBadge.IsVisible = result.RamAnomaly;
+
+        // Memory leak badge
+        if (result.MemoryLeaks.Count > 0)
+        {
+            var leak = result.MemoryLeaks[0];
+            RamLeakBadge.IsVisible = true;
+            RamLeakText.Text = $"\U0001F50D {leak.ProcessName} \u2014 sizinti suphesi";
+        }
+        else
+        {
+            RamLeakBadge.IsVisible = false;
+        }
+
+        // Disk prediction badge
+        if (result.DiskPrediction is { } dp)
+        {
+            DiskPredictionBadge.IsVisible = true;
+            DiskPredictionText.Text = $"\U0001F4C8 Tahmini dolum: {dp.DaysUntilFull} gun";
+
+            // Color based on days remaining
+            string color;
+            if (dp.DaysUntilFull > 90)
+                color = "#22C55E"; // green
+            else if (dp.DaysUntilFull > 30)
+                color = "#F59E0B"; // yellow
+            else
+                color = "#EF4444"; // red
+
+            var parsedColor = Color.Parse(color);
+            DiskPredictionText.Foreground = new SolidColorBrush(parsedColor);
+            DiskPredictionBadge.Background = new SolidColorBrush(parsedColor) { Opacity = 0.15 };
+            DiskPredictionBadge.BorderBrush = new SolidColorBrush(parsedColor) { Opacity = 0.3 };
+        }
+        else
+        {
+            DiskPredictionBadge.IsVisible = false;
+        }
     }
 
     private static long ParseMemKb(string line)

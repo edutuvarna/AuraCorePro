@@ -1,0 +1,244 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.AIInsightsView">
+
+  <ScrollViewer>
+    <StackPanel Spacing="10" MaxWidth="760">
+
+      <!-- HERO -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="1">
+          <TextBlock x:Name="HeroTitle" Text="AI Insights"
+                     FontSize="18" FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock x:Name="HeroSubtitle" Text="ML-powered system analysis dashboard"
+                     FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+        <Border Grid.Column="1" CornerRadius="14"
+                Padding="8,4" VerticalAlignment="Center" BorderThickness="1">
+          <Border.Background>
+            <SolidColorBrush Color="#3B82F6" Opacity="0.06"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
+          </Border.BorderBrush>
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <Border Width="5" Height="5" CornerRadius="3" Background="#3B82F6"/>
+            <TextBlock x:Name="EngineStatusLabel" Text="AI ENGINE"
+                       FontSize="9" FontWeight="Bold" Foreground="#3B82F6"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- SECTION 1: AI Health Score -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#22C55E14">
+              <TextBlock Text="&#9829;" FontSize="8" Foreground="#22C55E"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="AI Saglik Skoru" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,*">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock x:Name="HealthScoreValue" Text="--" FontSize="36" FontWeight="ExtraBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock Text="/100" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+            </StackPanel>
+            <Border x:Name="HealthBadge" Grid.Column="1" CornerRadius="10"
+                    Padding="10,4" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    BorderThickness="1">
+              <Border.Background>
+                <SolidColorBrush Color="#22C55E" Opacity="0.15"/>
+              </Border.Background>
+              <Border.BorderBrush>
+                <SolidColorBrush Color="#22C55E" Opacity="0.3"/>
+              </Border.BorderBrush>
+              <TextBlock x:Name="HealthBadgeText" Text="Analiz bekleniyor..."
+                         FontSize="10" FontWeight="SemiBold" Foreground="#22C55E"/>
+            </Border>
+          </Grid>
+          <TextBlock x:Name="HealthDetails" Text="Ilk analiz sonucu bekleniyor..."
+                     FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- SECTION 2: Active Alerts -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#F59E0B14">
+              <TextBlock Text="&#9888;" FontSize="8" Foreground="#F59E0B"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Aktif Uyarilar" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <StackPanel x:Name="AlertsPanel" Spacing="6">
+            <TextBlock Text="Analiz bekleniyor..." FontSize="10"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- SECTION 3: Disk Prediction -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#3B82F614">
+              <TextBlock Text="&#9681;" FontSize="8" Foreground="#3B82F6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Disk Tahmini" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,*">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock x:Name="DiskDaysValue" Text="--" FontSize="28" FontWeight="ExtraBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="DiskDaysUnit" Text="gun" FontSize="12"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+            </StackPanel>
+            <TextBlock x:Name="DiskTrendText" Grid.Column="1" Text="Veri toplaniyor..."
+                       FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
+                       HorizontalAlignment="Right" VerticalAlignment="Center"/>
+          </Grid>
+          <Border x:Name="DiskConfidenceBar" Height="3" CornerRadius="2" Background="#FFFFFF0A">
+            <Border x:Name="DiskConfidenceFill" Height="3" CornerRadius="2"
+                    HorizontalAlignment="Left" Width="0" Background="#3B82F6"/>
+          </Border>
+          <TextBlock x:Name="DiskConfidenceText" Text="" FontSize="8"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- SECTION 4: Memory Analysis -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#8B5CF614">
+              <TextBlock Text="&#9783;" FontSize="8" Foreground="#8B5CF6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Bellek Analizi" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <StackPanel x:Name="MemoryProcessPanel" Spacing="3">
+            <TextBlock Text="Analiz bekleniyor..." FontSize="10"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- SECTION 5: User Profile -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#EC489914">
+              <TextBlock Text="&#9733;" FontSize="8" Foreground="#EC4899"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Kullanici Profili" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <TextBlock x:Name="ProfileStatusText" Text="Profil verisi toplaniyor..."
+                     FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel x:Name="ProfilePanel" Spacing="4" IsVisible="False">
+            <!-- Populated from code-behind when profile data is available -->
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- SECTION 6: AI Status -->
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,12">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="#00D4AA14">
+              <TextBlock Text="&#9432;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="AI Durumu" FontSize="11" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Anomali Dedektoru" FontSize="10" Foreground="#4A4A66"/>
+              <TextBlock x:Name="AnomalyDetectorStatus" Grid.Column="1" Text="--" FontSize="10"
+                         Foreground="#A0A0C0" FontWeight="Medium" HorizontalAlignment="Right"/>
+            </Grid>
+            <Border Height="1" Background="#FFFFFF08"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Disk Tahmin Modeli" FontSize="10" Foreground="#4A4A66"/>
+              <TextBlock x:Name="DiskModelStatus" Grid.Column="1" Text="--" FontSize="10"
+                         Foreground="#A0A0C0" FontWeight="Medium" HorizontalAlignment="Right"/>
+            </Grid>
+            <Border Height="1" Background="#FFFFFF08"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Profil Olgunlugu" FontSize="10" Foreground="#4A4A66"/>
+              <TextBlock x:Name="ProfileMaturityStatus" Grid.Column="1" Text="--" FontSize="10"
+                         Foreground="#A0A0C0" FontWeight="Medium" HorizontalAlignment="Right"/>
+            </Grid>
+            <Border Height="1" Background="#FFFFFF08"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Telemetri Izni" FontSize="10" Foreground="#4A4A66"/>
+              <TextBlock x:Name="TelemetryStatus" Grid.Column="1" Text="--" FontSize="10"
+                         Foreground="#A0A0C0" FontWeight="Medium" HorizontalAlignment="Right"/>
+            </Grid>
+            <Border Height="1" Background="#FFFFFF08"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Son Analiz" FontSize="10" Foreground="#4A4A66"/>
+              <TextBlock x:Name="LastAnalysisTime" Grid.Column="1" Text="--" FontSize="10"
+                         Foreground="#A0A0C0" FontWeight="Medium" HorizontalAlignment="Right"/>
+            </Grid>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Footer -->
+      <TextBlock Text="Analiz sonuclari her 60 saniyede otomatik guncellenir"
+                 FontSize="9" Foreground="{DynamicResource TextMutedBrush}"
+                 HorizontalAlignment="Center" Opacity="0.3"/>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

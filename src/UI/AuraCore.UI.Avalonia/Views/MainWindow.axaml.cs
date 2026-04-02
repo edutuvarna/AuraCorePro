@@ -45,20 +45,20 @@ public sealed partial class MainWindow : Window
     // Segoe Fluent Icons (Windows) / fallback ASCII symbols
     private static string CatIcon(OptimizationCategory c) => c switch
     {
-        OptimizationCategory.SystemHealth        => "\u2665",  // heart
-        OptimizationCategory.DiskCleanup         => "\u2702",  // scissors (clean)
-        OptimizationCategory.MemoryOptimization  => "\u25A0",  // square (chip)
-        OptimizationCategory.RegistryOptimization=> "\u2692",  // hammer & pick
-        OptimizationCategory.StorageCompression  => "\u25CB",  // circle
-        OptimizationCategory.BloatwareRemoval    => "\u2716",  // heavy X
-        OptimizationCategory.NetworkOptimization => "\u2B24",  // black circle
-        OptimizationCategory.GamingPerformance   => "\u2B50",  // star
-        OptimizationCategory.ShellCustomization  => "\u2699",  // gear
-        OptimizationCategory.ApplicationManagement=> "\u2B07", // down arrow
-        OptimizationCategory.Privacy             => "\u2BD1",  // shield (fallback to lock below if missing)
-        OptimizationCategory.AutorunManagement   => "\u26A1",  // lightning
-        OptimizationCategory.ProcessManagement   => "\u2630",  // trigram (list)
-        OptimizationCategory.NetworkTools        => "\u260E",  // telephone
+        OptimizationCategory.SystemHealth        => "\u2661",  // ♡ heart outline
+        OptimizationCategory.DiskCleanup         => "\u2737",  // ✷ star burst (clean)
+        OptimizationCategory.MemoryOptimization  => "\u2B1A",  // ⬚ dotted square
+        OptimizationCategory.RegistryOptimization=> "\u2692",  // ⚒ hammer & pick
+        OptimizationCategory.StorageCompression  => "\u2B21",  // ⬡ hexagon
+        OptimizationCategory.BloatwareRemoval    => "\u2716",  // ✖ heavy X
+        OptimizationCategory.NetworkOptimization => "\u25C9",  // ◉ fisheye
+        OptimizationCategory.GamingPerformance   => "\u2B50",  // ⭐ star
+        OptimizationCategory.ShellCustomization  => "\u2699",  // ⚙ gear
+        OptimizationCategory.ApplicationManagement=> "\u25A3", // ▣ white square with small black square
+        OptimizationCategory.Privacy             => "\u2616",  // ☖ white shogi piece (shield-like)
+        OptimizationCategory.AutorunManagement   => "\u26A1",  // ⚡ lightning
+        OptimizationCategory.ProcessManagement   => "\u2630",  // ☰ trigram (list)
+        OptimizationCategory.NetworkTools        => "\u2301",  // ⌁ electric arrow
         _ => "\u2699"
     };
 
@@ -114,7 +114,7 @@ public sealed partial class MainWindow : Window
         foreach (var m in modules) _moduleMap[m.Id] = m;
 
         // Dashboard button (always first)
-        var dashBtn = MakeNavButton("dashboard", "\u2302", LocalizationService._("nav.dashboard"));
+        var dashBtn = MakeNavButton("dashboard", "\u25C6", LocalizationService._("nav.dashboard"));
         dashBtn.Classes.Add("active");
         _activeNav = dashBtn;
         NavPanel.Children.Add(dashBtn);
@@ -131,9 +131,10 @@ public sealed partial class MainWindow : Window
             // Section header
             NavPanel.Children.Add(new TextBlock
             {
-                Text = LocalizationService._(labelKey), FontSize = 9, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
-                Foreground = new SolidColorBrush(Color.Parse("#555570")),
-                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+                Text = LocalizationService._(labelKey).ToUpper(), FontSize = 8,
+                FontWeight = global::Avalonia.Media.FontWeight.Bold,
+                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
+                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
             });
 
             foreach (var m in sectionModules)
@@ -150,9 +151,10 @@ public sealed partial class MainWindow : Window
         {
             NavPanel.Children.Add(new TextBlock
             {
-                Text = LocalizationService._("nav.other"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
-                Foreground = new SolidColorBrush(Color.Parse("#555570")),
-                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+                Text = LocalizationService._("nav.other").ToUpper(), FontSize = 8,
+                FontWeight = global::Avalonia.Media.FontWeight.Bold,
+                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
+                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
             });
             foreach (var m in remaining)
                 NavPanel.Children.Add(MakeNavButton(m.Id, "\u2699", m.DisplayName));
@@ -161,16 +163,18 @@ public sealed partial class MainWindow : Window
         // Standalone pages (not DI modules)
         NavPanel.Children.Add(new TextBlock
         {
-            Text = LocalizationService._("nav.tools"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
-            Foreground = new SolidColorBrush(Color.Parse("#555570")),
-            Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+            Text = LocalizationService._("nav.tools").ToUpper(), FontSize = 8,
+            FontWeight = global::Avalonia.Media.FontWeight.Bold,
+            Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
+            Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
         });
-        NavPanel.Children.Add(MakeNavButton("disk-health", "\u2764", LocalizationService._("nav.diskHealth")));
-        NavPanel.Children.Add(MakeNavButton("space-analyzer", "\u25CE", LocalizationService._("nav.spaceAnalyzer")));
+        NavPanel.Children.Add(MakeNavButton("disk-health", "\u2661", LocalizationService._("nav.diskHealth")));
+        NavPanel.Children.Add(MakeNavButton("space-analyzer", "\u25C9", LocalizationService._("nav.spaceAnalyzer")));
         NavPanel.Children.Add(MakeNavButton("startup-optimizer", "\u26A1", LocalizationService._("nav.startupOptimizer")));
         NavPanel.Children.Add(MakeNavButton("service-manager", "\u2699", LocalizationService._("nav.serviceManager")));
-        NavPanel.Children.Add(MakeNavButton("scheduler", "\u23F0", LocalizationService._("nav.autoSchedule")));
-        NavPanel.Children.Add(MakeNavButton("recommendations", "\u2605", LocalizationService._("nav.aiRecommendations")));
+        NavPanel.Children.Add(MakeNavButton("scheduler", "\u25F4", LocalizationService._("nav.autoSchedule")));
+        NavPanel.Children.Add(MakeNavButton("recommendations", "\u2726", LocalizationService._("nav.aiRecommendations")));
+        NavPanel.Children.Add(MakeNavButton("ai-insights", "\u25C8", LocalizationService._("nav.aiInsights")));
 
         // ISO Builder (Windows-only)
         if (OperatingSystem.IsWindows())
@@ -183,9 +187,10 @@ public sealed partial class MainWindow : Window
         {
             NavPanel.Children.Add(new TextBlock
             {
-                Text = LocalizationService._("nav.linuxTools"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
-                Foreground = new SolidColorBrush(Color.Parse("#555570")),
-                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+                Text = LocalizationService._("nav.linuxTools").ToUpper(), FontSize = 8,
+                FontWeight = global::Avalonia.Media.FontWeight.Bold,
+                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
+                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
             });
             NavPanel.Children.Add(MakeNavButton("systemd-manager", "\u2699", LocalizationService._("nav.systemdManager")));
             NavPanel.Children.Add(MakeNavButton("package-cleaner", "\u267B", LocalizationService._("nav.packageCleaner")));
@@ -198,9 +203,10 @@ public sealed partial class MainWindow : Window
         {
             NavPanel.Children.Add(new TextBlock
             {
-                Text = LocalizationService._("nav.macosTools"), FontSize = 10, FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
-                Foreground = new SolidColorBrush(Color.Parse("#555570")),
-                Margin = new global::Avalonia.Thickness(12, 16, 0, 6)
+                Text = LocalizationService._("nav.macosTools").ToUpper(), FontSize = 8,
+                FontWeight = global::Avalonia.Media.FontWeight.Bold,
+                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
+                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
             });
             NavPanel.Children.Add(MakeNavButton("defaults-optimizer", "\u2699", LocalizationService._("nav.defaultsOptimizer")));
             NavPanel.Children.Add(MakeNavButton("launchagent-manager", "\u26A1", LocalizationService._("nav.launchAgentManager")));
@@ -221,15 +227,17 @@ public sealed partial class MainWindow : Window
         btn.Classes.Add("nav-item");
         btn.Click += Nav_Click;
 
-        var stack = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 10 };
+        var stack = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 8 };
         stack.Children.Add(new TextBlock
         {
-            Text = icon, FontSize = 14,
-            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center
+            Text = icon, FontSize = 12, Width = 16,
+            TextAlignment = global::Avalonia.Media.TextAlignment.Center,
+            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+            Opacity = 0.6
         });
         stack.Children.Add(new TextBlock
         {
-            Text = label,
+            Text = label, FontSize = 11,
             VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center
         });
         btn.Content = stack;
@@ -268,6 +276,7 @@ public sealed partial class MainWindow : Window
             case "service-manager":    ContentArea.Content = new ServiceManagerView(); return;
             case "scheduler":          ContentArea.Content = new SchedulerView(); return;
             case "recommendations":    ContentArea.Content = new RecommendationsView(); return;
+            case "ai-insights":        ContentArea.Content = new AIInsightsView(); return;
             case "iso-builder":        ContentArea.Content = new IsoBuilderView(); return;
             case "admin-panel":        ContentArea.Content = new AdminPanelView(); return;
         }
@@ -316,6 +325,8 @@ public sealed partial class MainWindow : Window
                 // New Windows modules
                 "font-manager"       => new FontManagerView(),
                 "wake-on-lan"        => new WakeOnLanView(),
+                // App Installer (dedicated view)
+                "app-installer"      => new AppInstallerView(),
                 // Tweak toggle list (shared view)
                 "context-menu"       => new TweakListView(module),
                 "taskbar-tweaks"     => new TweakListView(module),
@@ -339,6 +350,21 @@ public sealed partial class MainWindow : Window
         var isAdmin = SessionState.IsAdmin;
 
         UserEmailLabel.Text = string.IsNullOrEmpty(email) ? "Guest" : email;
+
+        // Update avatar initials
+        if (!string.IsNullOrEmpty(email) && email.Length > 0)
+        {
+            var parts = email.Split('@')[0].Split('.');
+            var initials = parts.Length >= 2
+                ? $"{char.ToUpper(parts[0][0])}{char.ToUpper(parts[1][0])}"
+                : $"{char.ToUpper(parts[0][0])}";
+            UserAvatarInitials.Text = initials;
+        }
+        else
+        {
+            UserAvatarInitials.Text = "G";
+        }
+
         UserStatusLabel.Text = SessionState.IsAuthenticated ? "Signed in" : "Not signed in";
 
         var tierText = isAdmin ? "ADMIN" : tier;
@@ -369,7 +395,7 @@ public sealed partial class MainWindow : Window
                 btn.Opacity = 0.5;
                 // Add lock icon to label
                 if (btn.Content is StackPanel sp && sp.Children.Count >= 2
-                    && sp.Children[1] is TextBlock tb && !tb.Text!.EndsWith(" \u1F512"))
+                    && sp.Children[1] is TextBlock tb && !tb.Text!.EndsWith(" \u26BF"))
                 {
                     tb.Text += " \u26BF"; // lock symbol
                 }

@@ -64,6 +64,10 @@ public partial class DashboardView : UserControl
         DiskLabel.Text = OperatingSystem.IsWindows() ? "Disk (C:)" : "Disk (/)";
         UptimeLabel.Text = "Uptime";
         QuickActionsLabel.Text = "Quick Actions";
+
+        // AI badges
+        CpuAnomalyText.Text = "\u26A0 " + LocalizationService._("ai.badge.cpuAnomaly");
+        RamAnomalyText.Text = "\u26A0 " + LocalizationService._("ai.badge.ramAnomaly");
     }
 
     private void StartLiveMonitoring()
@@ -428,7 +432,7 @@ public partial class DashboardView : UserControl
         {
             var leak = result.MemoryLeaks[0];
             RamLeakBadge.IsVisible = true;
-            RamLeakText.Text = $"\U0001F50D {leak.ProcessName} \u2014 sızıntı şüphesi";
+            RamLeakText.Text = "\U0001F50D " + string.Format(LocalizationService._("ai.badge.memoryLeak"), leak.ProcessName);
         }
         else
         {
@@ -439,7 +443,7 @@ public partial class DashboardView : UserControl
         if (result.DiskPrediction is { } dp)
         {
             DiskPredictionBadge.IsVisible = true;
-            DiskPredictionText.Text = $"\U0001F4C8 Tahmini dolum: {dp.DaysUntilFull} gün";
+            DiskPredictionText.Text = "\U0001F4C8 " + string.Format(LocalizationService._("ai.badge.diskPrediction"), dp.DaysUntilFull);
 
             // Color based on days remaining
             string color;

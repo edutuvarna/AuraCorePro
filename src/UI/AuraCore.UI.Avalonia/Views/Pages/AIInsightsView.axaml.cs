@@ -17,6 +17,8 @@ public partial class AIInsightsView : UserControl
         InitializeComponent();
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        LocalizationService.LanguageChanged += () =>
+            Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void OnLoaded(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
@@ -35,7 +37,52 @@ public partial class AIInsightsView : UserControl
                 UpdateAllSections(latest);
         }
 
+        ApplyLocalization();
         UpdateAIStatus();
+    }
+
+    private void ApplyLocalization()
+    {
+        // Hero
+        HeroTitle.Text = LocalizationService._("ai.title");
+        HeroSubtitle.Text = LocalizationService._("ai.subtitle");
+        EngineStatusLabel.Text = LocalizationService._("ai.engine");
+
+        // Section titles
+        HealthSectionTitle.Text = LocalizationService._("ai.health.title");
+        AlertsSectionTitle.Text = LocalizationService._("ai.alerts.title");
+        DiskSectionTitle.Text = LocalizationService._("ai.disk.title");
+        MemorySectionTitle.Text = LocalizationService._("ai.memory.title");
+        ProfileSectionTitle.Text = LocalizationService._("ai.profile.title");
+        StatusSectionTitle.Text = LocalizationService._("ai.status.title");
+
+        // Status labels
+        AnomalyDetectorLabel.Text = LocalizationService._("ai.status.anomalyDetector");
+        DiskModelLabel.Text = LocalizationService._("ai.status.diskModel");
+        ProfileMaturityLabel.Text = LocalizationService._("ai.status.profileMaturity");
+        TelemetryLabel.Text = LocalizationService._("ai.status.telemetryPermission");
+        LastAnalysisLabel.Text = LocalizationService._("ai.status.lastAnalysis");
+
+        // Footer
+        AutoRefreshText.Text = LocalizationService._("ai.status.autoRefresh");
+
+        // Defaults for waiting states (if no result yet)
+        if (HealthBadgeText.Text == "" || HealthBadgeText.Text == null)
+            HealthBadgeText.Text = LocalizationService._("ai.health.waiting");
+        if (HealthDetails.Text == "" || HealthDetails.Text == null)
+            HealthDetails.Text = LocalizationService._("ai.health.firstWaiting");
+        if (ProfileStatusText.Text == "" || ProfileStatusText.Text == null)
+            ProfileStatusText.Text = LocalizationService._("ai.profile.collecting");
+        if (DiskTrendText.Text == "" || DiskTrendText.Text == null)
+            DiskTrendText.Text = LocalizationService._("ai.disk.collecting");
+        if (DiskDaysUnit.Text == "" || DiskDaysUnit.Text == null)
+            DiskDaysUnit.Text = LocalizationService._("ai.disk.days");
+
+        // Re-apply dynamic data if engine has a result
+        if (_aiEngine?.LatestResult is { } result)
+            UpdateAllSections(result);
+        else
+            UpdateAIStatus();
     }
 
     private void OnUnloaded(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
@@ -68,19 +115,19 @@ public partial class AIInsightsView : UserControl
         if (result.CpuAnomaly)
         {
             score -= 15;
-            penalties.Add("CPU anomali (-15)");
+            penalties.Add(LocalizationService._("ai.penalty.cpu"));
         }
 
         if (result.RamAnomaly)
         {
             score -= 15;
-            penalties.Add("RAM anomali (-15)");
+            penalties.Add(LocalizationService._("ai.penalty.ram"));
         }
 
         foreach (var leak in result.MemoryLeaks)
         {
             score -= 10;
-            penalties.Add($"Bellek sizintisi: {leak.ProcessName} (-10)");
+            penalties.Add(string.Format(LocalizationService._("ai.penalty.leak"), leak.ProcessName));
         }
 
         if (result.DiskPrediction is { } dp)
@@ -102,10 +149,10 @@ public partial class AIInsightsView : UserControl
 
         // Badge
         string label, color;
-        if (score >= 85) { label = "Excellent"; color = "#22C55E"; }
-        else if (score >= 70) { label = "Good"; color = "#3B82F6"; }
-        else if (score >= 50) { label = "Fair"; color = "#F59E0B"; }
-        else { label = "Poor"; color = "#EF4444"; }
+        if (score >= 85) { label = LocalizationService._("ai.health.excellent"); color = "#22C55E"; }
+        else if (score >= 70) { label = LocalizationService._("ai.health.good"); color = "#3B82F6"; }
+        else if (score >= 50) { label = LocalizationService._("ai.health.fair"); color = "#F59E0B"; }
+        else { label = LocalizationService._("ai.health.poor"); color = "#EF4444"; }
 
         HealthBadgeText.Text = label;
         var parsed = Color.Parse(color);
@@ -114,7 +161,7 @@ public partial class AIInsightsView : UserControl
         HealthBadge.BorderBrush = new SolidColorBrush(parsed) { Opacity = 0.3 };
 
         HealthDetails.Text = penalties.Count == 0
-            ? "Tum sistemler normal calisiyor."
+            ? LocalizationService._("ai.health.allNormal")
             : string.Join(" | ", penalties);
     }
 
@@ -130,8 +177,8 @@ public partial class AIInsightsView : UserControl
         {
             hasAlerts = true;
             AlertsPanel.Children.Add(MakeAlertCard(
-                "\u26A0 CPU Anomali",
-                $"Anormal CPU yukselme tespit edildi (skor: {result.CpuAnomalyScore:F2})",
+                LocalizationService._("ai.alerts.cpuAnomaly"),
+                string.Format(LocalizationService._("ai.alerts.cpuAnomalyDesc"), result.CpuAnomalyScore.ToString("F2")),
                 "#F59E0B"));
         }
 
@@ -139,8 +186,8 @@ public partial class AIInsightsView : UserControl
         {
             hasAlerts = true;
             AlertsPanel.Children.Add(MakeAlertCard(
-                "\u26A0 RAM Anomali",
-                $"Anormal RAM kullanimi tespit edildi (skor: {result.RamAnomalyScore:F2})",
+                LocalizationService._("ai.alerts.ramAnomaly"),
+                string.Format(LocalizationService._("ai.alerts.ramAnomalyDesc"), result.RamAnomalyScore.ToString("F2")),
                 "#F59E0B"));
         }
 
@@ -148,8 +195,8 @@ public partial class AIInsightsView : UserControl
         {
             hasAlerts = true;
             AlertsPanel.Children.Add(MakeAlertCard(
-                $"\U0001F50D Bellek Sizintisi: {leak.ProcessName}",
-                $"Buyume hizi: {leak.GrowthRateMbPerMin:F2} MB/dk | Skor: {leak.ChangePointScore:F2}",
+                string.Format(LocalizationService._("ai.alerts.memoryLeak"), leak.ProcessName),
+                string.Format(LocalizationService._("ai.alerts.memoryLeakDesc"), leak.GrowthRateMbPerMin.ToString("F2"), leak.ChangePointScore.ToString("F2")),
                 "#EF4444"));
         }
 
@@ -157,7 +204,7 @@ public partial class AIInsightsView : UserControl
         {
             AlertsPanel.Children.Add(new TextBlock
             {
-                Text = "Anomali yok \u2713",
+                Text = LocalizationService._("ai.alerts.noAnomalies"),
                 FontSize = 11,
                 Foreground = new SolidColorBrush(Color.Parse("#22C55E")),
                 FontWeight = FontWeight.SemiBold
@@ -203,14 +250,14 @@ public partial class AIInsightsView : UserControl
         {
             DiskDaysValue.Text = "--";
             DiskDaysUnit.Text = "";
-            DiskTrendText.Text = "Veri toplaniyor...";
+            DiskTrendText.Text = LocalizationService._("ai.disk.collecting");
             DiskConfidenceText.Text = "";
             DiskConfidenceFill.Width = 0;
             return;
         }
 
         DiskDaysValue.Text = dp.DaysUntilFull.ToString();
-        DiskDaysUnit.Text = "gun";
+        DiskDaysUnit.Text = LocalizationService._("ai.disk.days");
         DiskTrendText.Text = $"Trend: {dp.Trend}";
 
         // Color by urgency
@@ -222,7 +269,7 @@ public partial class AIInsightsView : UserControl
         DiskDaysValue.Foreground = new SolidColorBrush(Color.Parse(color));
 
         // Confidence bar
-        DiskConfidenceText.Text = $"Guven: %{dp.Confidence * 100:F0}";
+        DiskConfidenceText.Text = string.Format(LocalizationService._("ai.disk.confidence"), (dp.Confidence * 100).ToString("F0"));
         DiskConfidenceFill.Background = new SolidColorBrush(Color.Parse(color));
         if (DiskConfidenceBar.Bounds.Width > 0)
             DiskConfidenceFill.Width = DiskConfidenceBar.Bounds.Width * dp.Confidence;
@@ -260,7 +307,7 @@ public partial class AIInsightsView : UserControl
             {
                 MemoryProcessPanel.Children.Add(new TextBlock
                 {
-                    Text = "Proses verisi alinamadi",
+                    Text = LocalizationService._("ai.memory.unavailable"),
                     FontSize = 10,
                     Foreground = new SolidColorBrush(Color.Parse("#666680"))
                 });
@@ -271,14 +318,14 @@ public partial class AIInsightsView : UserControl
             var header = new Grid { ColumnDefinitions = global::Avalonia.Controls.ColumnDefinitions.Parse("*,Auto") };
             header.Children.Add(new TextBlock
             {
-                Text = "Proses",
+                Text = LocalizationService._("ai.memory.process"),
                 FontSize = 9,
                 FontWeight = FontWeight.SemiBold,
                 Foreground = new SolidColorBrush(Color.Parse("#666680"))
             });
             var hdrMem = new TextBlock
             {
-                Text = "Bellek",
+                Text = LocalizationService._("ai.memory.memoryCol"),
                 FontSize = 9,
                 FontWeight = FontWeight.SemiBold,
                 Foreground = new SolidColorBrush(Color.Parse("#666680")),
@@ -338,19 +385,23 @@ public partial class AIInsightsView : UserControl
     {
         bool engineActive = _aiEngine != null;
 
-        AnomalyDetectorStatus.Text = engineActive ? "Aktif" : "Inaktif";
+        AnomalyDetectorStatus.Text = engineActive
+            ? LocalizationService._("ai.status.active")
+            : LocalizationService._("ai.status.inactive");
         AnomalyDetectorStatus.Foreground = new SolidColorBrush(
             Color.Parse(engineActive ? "#22C55E" : "#EF4444"));
 
         bool hasDiskData = result?.DiskPrediction != null;
-        DiskModelStatus.Text = hasDiskData ? "Aktif" : "Veri bekleniyor";
+        DiskModelStatus.Text = hasDiskData
+            ? LocalizationService._("ai.status.active")
+            : LocalizationService._("ai.status.waitingData");
         DiskModelStatus.Foreground = new SolidColorBrush(
             Color.Parse(hasDiskData ? "#22C55E" : "#F59E0B"));
 
-        ProfileMaturityStatus.Text = "Olusturuluyor";
+        ProfileMaturityStatus.Text = LocalizationService._("ai.status.creating");
         ProfileMaturityStatus.Foreground = new SolidColorBrush(Color.Parse("#F59E0B"));
 
-        TelemetryStatus.Text = "Izin verildi";
+        TelemetryStatus.Text = LocalizationService._("ai.status.granted");
         TelemetryStatus.Foreground = new SolidColorBrush(Color.Parse("#22C55E"));
 
         if (result != null)
@@ -361,7 +412,7 @@ public partial class AIInsightsView : UserControl
         }
         else
         {
-            LastAnalysisTime.Text = "Henuz analiz yapilmadi";
+            LastAnalysisTime.Text = LocalizationService._("ai.status.noAnalysis");
             LastAnalysisTime.Foreground = new SolidColorBrush(Color.Parse("#666680"));
         }
     }

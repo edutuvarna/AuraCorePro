@@ -118,7 +118,7 @@
           <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
             <TextBlock Text="Version" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                        Margin="0,0,24,8"/>
-            <TextBlock Grid.Column="1" Text="1.6.0 (Avalonia Cross-Platform)" FontSize="12"
+            <TextBlock Grid.Column="1" Text="1.7.0 (Avalonia Cross-Platform)" FontSize="12"
                        Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
             <TextBlock Grid.Row="1" Text="Runtime" FontSize="12"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,24,8"/>

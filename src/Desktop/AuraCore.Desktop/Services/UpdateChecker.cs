@@ -18,7 +18,7 @@ public sealed class UpdateChecker
     private readonly DispatcherTimer _timer;
     private static UpdateChecker? _instance;
 
-    public const string CurrentVersion = "1.6.0";
+    public const string CurrentVersion = "1.7.0";
     private const int CheckIntervalMinutes = 5;
     private const int MaxRetries = 3;
 

@@ -67,6 +67,17 @@
                 </Border.Background>
               </Border>
             </Border>
+            <!-- Mini Sparkline -->
+            <Canvas x:Name="CpuSparkCanvas" Height="20" Margin="0,2,0,0" ClipToBounds="True">
+              <Polyline x:Name="CpuSparkLine" StrokeThickness="1.5" Opacity="0.5">
+                <Polyline.Stroke>
+                  <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                    <GradientStop Offset="0" Color="#3B82F6"/>
+                    <GradientStop Offset="1" Color="#60A5FA"/>
+                  </LinearGradientBrush>
+                </Polyline.Stroke>
+              </Polyline>
+            </Canvas>
             <!-- AI Badge: CPU Anomaly -->
             <Border x:Name="CpuAnomalyBadge" IsVisible="False"
                     CornerRadius="6" Padding="6,2" Margin="0,2,0,0"
@@ -78,7 +89,7 @@
               <Border.BorderBrush>
                 <SolidColorBrush Color="#F59E0B" Opacity="0.3"/>
               </Border.BorderBrush>
-              <TextBlock x:Name="CpuAnomalyText" Text="&#9888; Anormal yukselme"
+              <TextBlock x:Name="CpuAnomalyText" Text="&#9888; Anormal yükselme"
                          FontSize="8" Foreground="#F59E0B" FontWeight="SemiBold"/>
             </Border>
           </StackPanel>
@@ -118,6 +129,17 @@
                 </Border.Background>
               </Border>
             </Border>
+            <!-- Mini Sparkline -->
+            <Canvas x:Name="RamSparkCanvas" Height="20" Margin="0,2,0,0" ClipToBounds="True">
+              <Polyline x:Name="RamSparkLine" StrokeThickness="1.5" Opacity="0.5">
+                <Polyline.Stroke>
+                  <LinearGradientBrush StartPoint="0%,50%" EndPoint="100%,50%">
+                    <GradientStop Offset="0" Color="#8B5CF6"/>
+                    <GradientStop Offset="1" Color="#A78BFA"/>
+                  </LinearGradientBrush>
+                </Polyline.Stroke>
+              </Polyline>
+            </Canvas>
             <!-- AI Badge: RAM Anomaly -->
             <Border x:Name="RamAnomalyBadge" IsVisible="False"
                     CornerRadius="6" Padding="6,2" Margin="0,2,0,0"
@@ -129,7 +151,7 @@
               <Border.BorderBrush>
                 <SolidColorBrush Color="#F59E0B" Opacity="0.3"/>
               </Border.BorderBrush>
-              <TextBlock x:Name="RamAnomalyText" Text="&#9888; Anormal kullanim"
+              <TextBlock x:Name="RamAnomalyText" Text="&#9888; Anormal kullanım"
                          FontSize="8" Foreground="#F59E0B" FontWeight="SemiBold"/>
             </Border>
             <!-- AI Badge: Memory Leak -->

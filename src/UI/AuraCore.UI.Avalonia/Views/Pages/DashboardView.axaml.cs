@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using global::Avalonia.Controls;
+using global::Avalonia.Controls.Shapes;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
 using global::Avalonia.Threading;
@@ -16,6 +17,10 @@ public partial class DashboardView : UserControl
     private DateTime _prevSampleTime;
     private bool _firstSample = true;
     private bool _initialized;
+
+    // Sparkline history (last 30 data points = 60 seconds at 2s intervals)
+    private readonly Queue<double> _cpuHistory = new(30);
+    private readonly Queue<double> _ramHistory = new(30);
 
     // AI Engine integration
     private IAIAnalyzerEngine? _aiEngine;
@@ -127,6 +132,11 @@ public partial class DashboardView : UserControl
                 CpuValue.Text = $"{cpuPct:F0}";
                 if (CpuBar.Parent is Border cpuParent && cpuParent.Bounds.Width > 0)
                     CpuBar.Width = cpuParent.Bounds.Width * cpuPct / 100.0;
+
+                // Sparkline: enqueue CPU value
+                if (_cpuHistory.Count >= 30) _cpuHistory.Dequeue();
+                _cpuHistory.Enqueue(cpuPct);
+                UpdateSparkline(CpuSparkCanvas, CpuSparkLine, _cpuHistory);
             }
             _prevCpuTime = totalCpu;
             _prevSampleTime = now;
@@ -180,23 +190,30 @@ public partial class DashboardView : UserControl
             if (RamBar.Parent is Border ramParent && ramParent.Bounds.Width > 0 && totalGb > 0)
                 RamBar.Width = ramParent.Bounds.Width * ramPct / 100.0;
 
+            // Sparkline: enqueue RAM value
+            if (_ramHistory.Count >= 30) _ramHistory.Dequeue();
+            _ramHistory.Enqueue(ramPct);
+            UpdateSparkline(RamSparkCanvas, RamSparkLine, _ramHistory);
+
             // Uptime
             var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
             UptimeValue.Text = uptime.Days > 0
                 ? $"{uptime.Days}d {uptime.Hours}h"
                 : $"{uptime.Hours}h {uptime.Minutes}m";
 
-            // ── AI Engine: push metrics ──
+            // ── AI Engine: push metrics (reuse allProcs from CPU section) ──
             if (_aiEngine != null)
             {
                 try
                 {
-                    // Collect top 10 processes by working set
-                    var procs = Process.GetProcesses();
+                    // Collect top 10 processes by working set — reuse the snapshot
+                    // We re-enumerate because allProcs was already disposed above.
+                    // Use a single call and extract both CPU + top-process data.
+                    var aiProcs = Process.GetProcesses();
                     var topProcs = new List<AIProcessMetric>();
                     try
                     {
-                        topProcs = procs
+                        topProcs = aiProcs
                             .Select(p => { try { return new { p.ProcessName, p.WorkingSet64 }; } catch { return null; } })
                             .Where(x => x != null)
                             .OrderByDescending(x => x!.WorkingSet64)
@@ -206,7 +223,7 @@ public partial class DashboardView : UserControl
                     }
                     finally
                     {
-                        foreach (var p in procs) try { p.Dispose(); } catch { }
+                        foreach (var p in aiProcs) try { p.Dispose(); } catch { }
                     }
 
                     // Compute disk used percent for the sample
@@ -236,7 +253,10 @@ public partial class DashboardView : UserControl
                     if (_aiTickCounter >= 30)
                     {
                         _aiTickCounter = 0;
-                        _ = _aiEngine.AnalyzeAsync();
+                        _ = _aiEngine.AnalyzeAsync().ContinueWith(t =>
+                        {
+                            if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"AI analysis error: {t.Exception?.InnerException?.Message}");
+                        }, TaskContinuationOptions.OnlyOnFaulted);
                     }
                 }
                 catch { }
@@ -408,7 +428,7 @@ public partial class DashboardView : UserControl
         {
             var leak = result.MemoryLeaks[0];
             RamLeakBadge.IsVisible = true;
-            RamLeakText.Text = $"\U0001F50D {leak.ProcessName} \u2014 sizinti suphesi";
+            RamLeakText.Text = $"\U0001F50D {leak.ProcessName} \u2014 sızıntı şüphesi";
         }
         else
         {
@@ -419,7 +439,7 @@ public partial class DashboardView : UserControl
         if (result.DiskPrediction is { } dp)
         {
             DiskPredictionBadge.IsVisible = true;
-            DiskPredictionText.Text = $"\U0001F4C8 Tahmini dolum: {dp.DaysUntilFull} gun";
+            DiskPredictionText.Text = $"\U0001F4C8 Tahmini dolum: {dp.DaysUntilFull} gün";
 
             // Color based on days remaining
             string color;
@@ -439,6 +459,22 @@ public partial class DashboardView : UserControl
         {
             DiskPredictionBadge.IsVisible = false;
         }
+    }
+
+    private void UpdateSparkline(Canvas canvas, Polyline line, Queue<double> history)
+    {
+        if (history.Count < 2) return;
+        var w = canvas.Bounds.Width > 0 ? canvas.Bounds.Width : 100;
+        var h = canvas.Bounds.Height > 0 ? canvas.Bounds.Height : 20;
+        var pts = new global::Avalonia.Collections.AvaloniaList<global::Avalonia.Point>();
+        var arr = history.ToArray();
+        for (int i = 0; i < arr.Length; i++)
+        {
+            var x = w * i / (arr.Length - 1);
+            var y = h - (h * Math.Clamp(arr[i], 0, 100) / 100.0);
+            pts.Add(new global::Avalonia.Point(x, y));
+        }
+        line.Points = pts;
     }
 
     private static long ParseMemKb(string line)

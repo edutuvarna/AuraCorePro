@@ -21,6 +21,7 @@ public sealed class AIAnalyzerEngine : IAIAnalyzerEngine, IDisposable
     public AIAnalyzerEngine(string dbPath, string profileDbPath)
     {
         _db = new LocalMetricDb(dbPath);
+        try { _db.SeedIfEmpty(); } catch { }
         _profile = new UserProfileStore(profileDbPath);
         _learner = new ProfileLearner(_profile, _buffer);
         _store.Updated += r => AnalysisCompleted?.Invoke(r);
@@ -47,6 +48,8 @@ public sealed class AIAnalyzerEngine : IAIAnalyzerEngine, IDisposable
         double cpuScore = cpuAnomalies.Where(a => a.IsAnomaly).Select(a => a.Score).DefaultIfEmpty(0).Max();
         bool ramAnomaly = ramAnomalies.Any(a => a.IsAnomaly);
         double ramScore = ramAnomalies.Where(a => a.IsAnomaly).Select(a => a.Score).DefaultIfEmpty(0).Max();
+
+        try { _db.CleanupSynthetic(); } catch { }
 
         DiskPrediction? diskPrediction = null;
         var dailyMetrics = _db.GetDailyMetricsRange(

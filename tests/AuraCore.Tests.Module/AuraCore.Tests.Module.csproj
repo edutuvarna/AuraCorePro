@@ -16,5 +16,6 @@
     <ProjectReference Include="../../src/Modules/AuraCore.Module.JunkCleaner/AuraCore.Module.JunkCleaner.csproj" />
     <ProjectReference Include="../../src/Modules/AuraCore.Module.WakeOnLan/AuraCore.Module.WakeOnLan.csproj" />
     <ProjectReference Include="../../src/Modules/AuraCore.Module.FontManager/AuraCore.Module.FontManager.csproj" />
+    <ProjectReference Include="../../src/Modules/AuraCore.Module.SystemHealth/AuraCore.Module.SystemHealth.csproj" />
   </ItemGroup>
 </Project>

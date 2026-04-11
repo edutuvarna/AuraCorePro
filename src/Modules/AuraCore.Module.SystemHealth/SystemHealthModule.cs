@@ -14,7 +14,7 @@ public sealed class SystemHealthModule : IOptimizationModule
     public string Id => "system-health";
     public string DisplayName => "System health analyzer";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
-    public RiskLevel Risk => RiskLevel.None;
+    public RiskLevel Risk => RiskLevel.Low;
     public SupportedPlatform Platform => SupportedPlatform.All;
 
     public SystemHealthReport? LastReport { get; private set; }
@@ -28,11 +28,173 @@ public sealed class SystemHealthModule : IOptimizationModule
         return new ScanResult(Id, true, itemsFound, 0);
     }
 
-    public Task<OptimizationResult> OptimizeAsync(
-        OptimizationPlan plan, IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
+    public async Task<OptimizationResult> OptimizeAsync(
+        OptimizationPlan plan,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
     {
-        // System Health is read-only — nothing to optimize
-        return Task.FromResult(new OptimizationResult(Id, Guid.NewGuid().ToString(), true, 0, 0, TimeSpan.Zero));
+        var start = DateTime.UtcNow;
+        var operationId = Guid.NewGuid().ToString("N")[..8];
+        int totalProcessed = 0;
+        long totalFreed = 0;
+
+        try
+        {
+            var items = plan.SelectedItemIds?.ToList() ?? new List<string>();
+            int totalSteps = Math.Max(items.Count, 1);
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+                var itemId = items[i];
+                double pct = (double)i / totalSteps * 100;
+                progress?.Report(new TaskProgress(Id, pct, $"Processing {itemId}"));
+
+                switch (itemId)
+                {
+                    case "clean-temp":
+                        var (tempCount, tempBytes) = await CleanTempFilesAsync(ct);
+                        totalProcessed += tempCount;
+                        totalFreed += tempBytes;
+                        break;
+
+                    case "trim-logs":
+                        var (logCount, logBytes) = await TrimLargeLogsAsync(ct);
+                        totalProcessed += logCount;
+                        totalFreed += logBytes;
+                        break;
+
+                    default:
+                        // Unknown item ID — skip silently
+                        break;
+                }
+            }
+
+            progress?.Report(new TaskProgress(Id, 100, "Complete"));
+            return new OptimizationResult(Id, operationId, true, totalProcessed, totalFreed, DateTime.UtcNow - start);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[{Id}] Optimize error: {ex.Message}");
+            return new OptimizationResult(Id, operationId, false, totalProcessed, totalFreed, DateTime.UtcNow - start);
+        }
+    }
+
+    private static async Task<(int processed, long freed)> CleanTempFilesAsync(CancellationToken ct)
+    {
+        var tempPath = Path.GetTempPath();
+        var cutoff = DateTime.UtcNow.AddDays(-7);
+        int count = 0;
+        long bytes = 0;
+
+        try
+        {
+            var files = Directory.EnumerateFiles(tempPath, "*", new System.IO.EnumerationOptions
+            {
+                RecurseSubdirectories = true,
+                IgnoreInaccessible = true,
+                AttributesToSkip = FileAttributes.ReparsePoint
+            });
+
+            foreach (var f in files)
+            {
+                ct.ThrowIfCancellationRequested();
+                try
+                {
+                    var info = new FileInfo(f);
+                    if (info.LastWriteTimeUtc < cutoff && (info.Attributes & FileAttributes.ReadOnly) == 0)
+                    {
+                        long size = info.Length;
+                        File.Delete(f);
+                        count++;
+                        bytes += size;
+                    }
+                }
+                catch
+                {
+                    // Skip files that can't be accessed or deleted
+                }
+            }
+        }
+        catch (OperationCanceledException) { throw; }
+        catch
+        {
+            // Swallow top-level enumeration errors
+        }
+
+        return await Task.FromResult((count, bytes));
+    }
+
+    private static async Task<(int processed, long freed)> TrimLargeLogsAsync(CancellationToken ct)
+    {
+        var logDirs = new List<string>();
+
+        if (OperatingSystem.IsLinux())
+        {
+            logDirs.Add("/var/log");
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            logDirs.Add("/var/log");
+            logDirs.Add("/Library/Logs");
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            var systemRoot = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            logDirs.Add(Path.Combine(systemRoot, "Logs"));
+        }
+
+        int count = 0;
+        long bytes = 0;
+        const long maxSize = 100L * 1024 * 1024; // 100 MB
+
+        foreach (var dir in logDirs)
+        {
+            if (!Directory.Exists(dir)) continue;
+
+            try
+            {
+                var files = Directory.EnumerateFiles(dir, "*.log", new System.IO.EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    IgnoreInaccessible = true,
+                    AttributesToSkip = FileAttributes.ReparsePoint
+                });
+
+                foreach (var f in files)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        var info = new FileInfo(f);
+                        if (info.Length > maxSize)
+                        {
+                            long originalSize = info.Length;
+                            var archivePath = f + ".old";
+                            // Delete old archive if exists
+                            if (File.Exists(archivePath)) File.Delete(archivePath);
+                            // Rename current to .old
+                            File.Move(f, archivePath);
+                            // Create empty replacement
+                            File.Create(f).Dispose();
+                            count++;
+                            bytes += originalSize;
+                        }
+                    }
+                    catch
+                    {
+                        // Skip files we can't process
+                    }
+                }
+            }
+            catch
+            {
+                // Skip directories we can't enumerate
+            }
+        }
+
+        return await Task.FromResult((count, bytes));
     }
 
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default)

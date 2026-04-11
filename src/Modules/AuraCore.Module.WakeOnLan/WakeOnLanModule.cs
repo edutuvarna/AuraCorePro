@@ -13,6 +13,7 @@ public class WakeOnLanModule : IOptimizationModule
     public OptimizationCategory Category => OptimizationCategory.NetworkTools;
     public RiskLevel Risk => RiskLevel.Low;
     public SupportedPlatform Platform => SupportedPlatform.Windows;
+    public bool IsAdvanced => true;
 
     public Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
         => Task.FromResult(new ScanResult(Id, true, 0, 0));

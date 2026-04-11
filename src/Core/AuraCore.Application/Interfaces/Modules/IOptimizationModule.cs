@@ -16,6 +16,13 @@ public interface IOptimizationModule
     /// </summary>
     SupportedPlatform Platform => SupportedPlatform.Windows;
 
+    /// <summary>
+    /// Whether the module should be hidden from default UI views.
+    /// Advanced modules are shown only in the "Advanced" category/filter.
+    /// Default: false (module is visible).
+    /// </summary>
+    bool IsAdvanced => false;
+
     Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default);
     Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan,

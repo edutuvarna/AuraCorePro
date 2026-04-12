@@ -27,5 +27,6 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.PurgeableSpaceManager\AuraCore.Module.PurgeableSpaceManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.SystemdManager\AuraCore.Module.SystemdManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.LaunchAgentManager\AuraCore.Module.LaunchAgentManager.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DefaultsOptimizer\AuraCore.Module.DefaultsOptimizer.csproj" />
   </ItemGroup>
 </Project>

@@ -15,5 +15,6 @@ public enum OptimizationCategory
     Privacy,
     AutorunManagement,
     ProcessManagement,
-    NetworkTools
+    NetworkTools,
+    SystemCleaning
 }

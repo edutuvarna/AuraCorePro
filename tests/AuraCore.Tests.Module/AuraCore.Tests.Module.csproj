@@ -23,5 +23,6 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DockerCleaner\AuraCore.Module.DockerCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.BrewManager\AuraCore.Module.BrewManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.XcodeCleaner\AuraCore.Module.XcodeCleaner.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DnsFlusher\AuraCore.Module.DnsFlusher.csproj" />
   </ItemGroup>
 </Project>

@@ -29,5 +29,6 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.LaunchAgentManager\AuraCore.Module.LaunchAgentManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DefaultsOptimizer\AuraCore.Module.DefaultsOptimizer.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.CronManager\AuraCore.Module.CronManager.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.SwapOptimizer\AuraCore.Module.SwapOptimizer.csproj" />
   </ItemGroup>
 </Project>

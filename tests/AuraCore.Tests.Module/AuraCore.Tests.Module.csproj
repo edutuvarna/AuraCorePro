@@ -20,5 +20,6 @@
     <ProjectReference Include="../../src/Modules/AuraCore.Module.PackageCleaner/AuraCore.Module.PackageCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.JournalCleaner\AuraCore.Module.JournalCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.KernelCleaner\AuraCore.Module.KernelCleaner.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DockerCleaner\AuraCore.Module.DockerCleaner.csproj" />
   </ItemGroup>
 </Project>

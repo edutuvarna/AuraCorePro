@@ -161,6 +161,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.KernelClean
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.DockerCleaner", "src\Modules\AuraCore.Module.DockerCleaner\AuraCore.Module.DockerCleaner.csproj", "{4758ACC6-C70D-4171-8CA6-7B432003551A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.XcodeCleaner", "src\Modules\AuraCore.Module.XcodeCleaner\AuraCore.Module.XcodeCleaner.csproj", "{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1083,6 +1085,18 @@ Global
 		{4758ACC6-C70D-4171-8CA6-7B432003551A}.Release|x64.Build.0 = Release|Any CPU
 		{4758ACC6-C70D-4171-8CA6-7B432003551A}.Release|x86.ActiveCfg = Release|Any CPU
 		{4758ACC6-C70D-4171-8CA6-7B432003551A}.Release|x86.Build.0 = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|x64.Build.0 = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Debug|x86.Build.0 = Debug|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|x64.ActiveCfg = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|x64.Build.0 = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1109,5 +1123,6 @@ Global
 		{AB057FF5-9ECD-4675-858A-E9946F5D6D77} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{4758ACC6-C70D-4171-8CA6-7B432003551A} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
+		{CCBCEE01-EEFF-46D9-98C8-89D5558CF402} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 	EndGlobalSection
 EndGlobal

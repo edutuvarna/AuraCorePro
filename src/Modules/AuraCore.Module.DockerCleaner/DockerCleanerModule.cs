@@ -147,7 +147,7 @@ public sealed class DockerCleanerModule : IOptimizationModule
                     "prune-containers"     => "container prune -f",
                     "prune-dangling-images"=> "image prune -f",
                     "prune-all-images"     => "image prune -a -f",
-                    "prune-volumes"        => "volume prune -f",
+                    "prune-volumes"        => "volume prune -a -f",
                     "prune-build-cache"    => "builder prune -f",
                     "prune-all-build-cache"=> "builder prune -a -f",
                     "prune-system"         => "system prune -f",

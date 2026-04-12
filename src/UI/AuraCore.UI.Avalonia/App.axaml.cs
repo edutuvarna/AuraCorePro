@@ -59,6 +59,9 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.PackageCleaner.PackageCleanerRegistration.AddPackageCleanerModule(sc);
             AuraCore.Module.SwapOptimizer.SwapOptimizerRegistration.AddSwapOptimizerModule(sc);
             AuraCore.Module.CronManager.CronManagerRegistration.AddCronManagerModule(sc);
+            AuraCore.Module.JournalCleaner.JournalCleanerRegistration.AddJournalCleanerModule(sc);
+            AuraCore.Module.KernelCleaner.KernelCleanerRegistration.AddKernelCleanerModule(sc);
+            AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
         }
 
         // ── macOS-only modules (Faz 3) ──
@@ -68,6 +71,17 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.LaunchAgentManager.LaunchAgentManagerRegistration.AddLaunchAgentManagerModule(sc);
             AuraCore.Module.BrewManager.BrewManagerRegistration.AddBrewManagerModule(sc);
             AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
+            AuraCore.Module.XcodeCleaner.XcodeCleanerRegistration.AddXcodeCleanerModule(sc);
+            AuraCore.Module.DnsFlusher.DnsFlusherRegistration.AddDnsFlusherModule(sc);
+            AuraCore.Module.PurgeableSpaceManager.PurgeableSpaceManagerRegistration.AddPurgeableSpaceManagerModule(sc);
+            AuraCore.Module.SpotlightManager.SpotlightManagerRegistration.AddSpotlightManagerModule(sc);
+            AuraCore.Module.MacAppInstaller.MacAppInstallerRegistration.AddMacAppInstallerModule(sc);
+        }
+
+        // ── Linux + macOS shared modules ──
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        {
+            AuraCore.Module.DockerCleaner.DockerCleanerRegistration.AddDockerCleanerModule(sc);
         }
 
         // ── AI Analyzer Engine ──

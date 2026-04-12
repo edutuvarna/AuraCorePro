@@ -71,5 +71,14 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.DnsBenchmark\AuraCore.Module.DnsBenchmark.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.FontManager\AuraCore.Module.FontManager.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.WakeOnLan\AuraCore.Module.WakeOnLan.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.JournalCleaner\AuraCore.Module.JournalCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.KernelCleaner\AuraCore.Module.KernelCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DockerCleaner\AuraCore.Module.DockerCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.XcodeCleaner\AuraCore.Module.XcodeCleaner.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.DnsFlusher\AuraCore.Module.DnsFlusher.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.PurgeableSpaceManager\AuraCore.Module.PurgeableSpaceManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.SpotlightManager\AuraCore.Module.SpotlightManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.LinuxAppInstaller\AuraCore.Module.LinuxAppInstaller.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.MacAppInstaller\AuraCore.Module.MacAppInstaller.csproj" />
   </ItemGroup>
 </Project>

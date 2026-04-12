@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AuraCore.Module.TimeMachineManager</RootNamespace>
+    <AssemblyName>AuraCore.Module.TimeMachineManager</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../Core/AuraCore.Application/AuraCore.Application.csproj" />

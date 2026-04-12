@@ -157,6 +157,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.AIEngine", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.JournalCleaner", "src\Modules\AuraCore.Module.JournalCleaner\AuraCore.Module.JournalCleaner.csproj", "{AB057FF5-9ECD-4675-858A-E9946F5D6D77}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.KernelCleaner", "src\Modules\AuraCore.Module.KernelCleaner\AuraCore.Module.KernelCleaner.csproj", "{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1055,6 +1057,18 @@ Global
 		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x64.Build.0 = Release|Any CPU
 		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x86.Build.0 = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|x64.Build.0 = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Debug|x86.Build.0 = Debug|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|x64.ActiveCfg = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|x64.Build.0 = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|x86.ActiveCfg = Release|Any CPU
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1079,5 +1093,6 @@ Global
 		{F944001C-6C08-4B6D-8AE6-05CFE2EEF6BC} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{CF1C7390-33BD-4588-9F26-0044B7E78D9D} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{AB057FF5-9ECD-4675-858A-E9946F5D6D77} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
+		{F205F6CA-FC42-49DC-8F48-3BA713C1AFF4} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 	EndGlobalSection
 EndGlobal

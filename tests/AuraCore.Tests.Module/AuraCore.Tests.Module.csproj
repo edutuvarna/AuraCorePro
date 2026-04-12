@@ -19,5 +19,6 @@
     <ProjectReference Include="../../src/Modules/AuraCore.Module.SystemHealth/AuraCore.Module.SystemHealth.csproj" />
     <ProjectReference Include="../../src/Modules/AuraCore.Module.PackageCleaner/AuraCore.Module.PackageCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.JournalCleaner\AuraCore.Module.JournalCleaner.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.KernelCleaner\AuraCore.Module.KernelCleaner.csproj" />
   </ItemGroup>
 </Project>

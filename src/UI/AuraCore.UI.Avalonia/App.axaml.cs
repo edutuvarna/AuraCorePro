@@ -62,6 +62,8 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.JournalCleaner.JournalCleanerRegistration.AddJournalCleanerModule(sc);
             AuraCore.Module.KernelCleaner.KernelCleanerRegistration.AddKernelCleanerModule(sc);
             AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
+            AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerRegistration.AddSnapFlatpakCleanerModule(sc);
+            AuraCore.Module.GrubManager.GrubManagerRegistration.AddGrubManagerModule(sc);
         }
 
         // ── macOS-only modules (Faz 3) ──

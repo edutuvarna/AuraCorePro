@@ -1,117 +1,117 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11612.150
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Application", "src/Backend/AuraCore.API.Application/AuraCore.API.Application.csproj", "{9B4A0C0C-8569-DF8C-BB38-3D8860EA78AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Application", "src\Backend\AuraCore.API.Application\AuraCore.API.Application.csproj", "{9B4A0C0C-8569-DF8C-BB38-3D8860EA78AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Domain", "src/Backend/AuraCore.API.Domain/AuraCore.API.Domain.csproj", "{DBB60D88-BB53-4282-A394-7168D1595F33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Domain", "src\Backend\AuraCore.API.Domain\AuraCore.API.Domain.csproj", "{DBB60D88-BB53-4282-A394-7168D1595F33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Infrastructure", "src/Backend/AuraCore.API.Infrastructure/AuraCore.API.Infrastructure.csproj", "{D9FC6908-4694-62E8-7676-FC0EF8D420AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API.Infrastructure", "src\Backend\AuraCore.API.Infrastructure\AuraCore.API.Infrastructure.csproj", "{D9FC6908-4694-62E8-7676-FC0EF8D420AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API", "src/Backend/AuraCore.API/AuraCore.API.csproj", "{8C4D9C54-7CB3-0FC8-D041-14278059D272}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.API", "src\Backend\AuraCore.API\AuraCore.API.csproj", "{8C4D9C54-7CB3-0FC8-D041-14278059D272}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Application", "src/Core/AuraCore.Application/AuraCore.Application.csproj", "{572C67C5-098A-A3E1-E413-6089849BE97D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Application", "src\Core\AuraCore.Application\AuraCore.Application.csproj", "{572C67C5-098A-A3E1-E413-6089849BE97D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Domain", "src/Core/AuraCore.Domain/AuraCore.Domain.csproj", "{7D96057A-E77B-F281-BDA1-DA0399B2D8B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Domain", "src\Core\AuraCore.Domain\AuraCore.Domain.csproj", "{7D96057A-E77B-F281-BDA1-DA0399B2D8B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.SharedKernel", "src/Core/AuraCore.SharedKernel/AuraCore.SharedKernel.csproj", "{DEB5118E-481C-F1CE-23A3-A8AD1FCB7DDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.SharedKernel", "src\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj", "{DEB5118E-481C-F1CE-23A3-A8AD1FCB7DDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop.Services", "src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj", "{D8A6704C-C977-40A1-8670-18415B04EB04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop.Services", "src\Desktop\AuraCore.Desktop.Services\AuraCore.Desktop.Services.csproj", "{D8A6704C-C977-40A1-8670-18415B04EB04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop.ViewModels", "src/Desktop/AuraCore.Desktop.ViewModels/AuraCore.Desktop.ViewModels.csproj", "{75E30643-DEC3-47AE-2B46-3BBAE2AC70C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop.ViewModels", "src\Desktop\AuraCore.Desktop.ViewModels\AuraCore.Desktop.ViewModels.csproj", "{75E30643-DEC3-47AE-2B46-3BBAE2AC70C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop", "src/Desktop/AuraCore.Desktop/AuraCore.Desktop.csproj", "{4B4E9045-D712-177E-F0A7-D2856375618C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Desktop", "src\Desktop\AuraCore.Desktop\AuraCore.Desktop.csproj", "{4B4E9045-D712-177E-F0A7-D2856375618C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.AIRecommender", "src/Engines/AuraCore.Engine.AIRecommender/AuraCore.Engine.AIRecommender.csproj", "{76DE1F22-2DEF-3E57-A60C-D5729990C0EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.AIRecommender", "src\Engines\AuraCore.Engine.AIRecommender\AuraCore.Engine.AIRecommender.csproj", "{76DE1F22-2DEF-3E57-A60C-D5729990C0EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Optimization", "src/Engines/AuraCore.Engine.Optimization/AuraCore.Engine.Optimization.csproj", "{D6D64EF2-C1D2-1F60-0299-D9823AA29DD0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Optimization", "src\Engines\AuraCore.Engine.Optimization\AuraCore.Engine.Optimization.csproj", "{D6D64EF2-C1D2-1F60-0299-D9823AA29DD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Plugin", "src/Engines/AuraCore.Engine.Plugin/AuraCore.Engine.Plugin.csproj", "{E4F2D87F-D54C-ACC2-25E5-E484B0AE13CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Plugin", "src\Engines\AuraCore.Engine.Plugin\AuraCore.Engine.Plugin.csproj", "{E4F2D87F-D54C-ACC2-25E5-E484B0AE13CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Safety", "src/Engines/AuraCore.Engine.Safety/AuraCore.Engine.Safety.csproj", "{4BF8CD8D-9A12-FA8E-928B-AD6E057FF552}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Safety", "src\Engines\AuraCore.Engine.Safety\AuraCore.Engine.Safety.csproj", "{4BF8CD8D-9A12-FA8E-928B-AD6E057FF552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Scheduler", "src/Engines/AuraCore.Engine.Scheduler/AuraCore.Engine.Scheduler.csproj", "{1C6FC6CB-56FC-6449-D1F5-383A41586D66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.Scheduler", "src\Engines\AuraCore.Engine.Scheduler\AuraCore.Engine.Scheduler.csproj", "{1C6FC6CB-56FC-6449-D1F5-383A41586D66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.SystemMonitor", "src/Engines/AuraCore.Engine.SystemMonitor/AuraCore.Engine.SystemMonitor.csproj", "{F5A609DD-9E6A-C18E-3B7C-1B1CF75EE2E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.SystemMonitor", "src\Engines\AuraCore.Engine.SystemMonitor\AuraCore.Engine.SystemMonitor.csproj", "{F5A609DD-9E6A-C18E-3B7C-1B1CF75EE2E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.FeatureFlags", "src/Guards/AuraCore.Guard.FeatureFlags/AuraCore.Guard.FeatureFlags.csproj", "{B2C0B02C-B462-F757-7612-8BEF21D8F8B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.FeatureFlags", "src\Guards\AuraCore.Guard.FeatureFlags\AuraCore.Guard.FeatureFlags.csproj", "{B2C0B02C-B462-F757-7612-8BEF21D8F8B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.Licensing", "src/Guards/AuraCore.Guard.Licensing/AuraCore.Guard.Licensing.csproj", "{D45F7124-03CA-48FA-9EB0-09928EF1109B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.Licensing", "src\Guards\AuraCore.Guard.Licensing\AuraCore.Guard.Licensing.csproj", "{D45F7124-03CA-48FA-9EB0-09928EF1109B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.Security", "src/Guards/AuraCore.Guard.Security/AuraCore.Guard.Security.csproj", "{F01D5839-86CB-4F9F-B849-FA0F733025A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Guard.Security", "src\Guards\AuraCore.Guard.Security\AuraCore.Guard.Security.csproj", "{F01D5839-86CB-4F9F-B849-FA0F733025A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.IPC.Contracts", "src/IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj", "{E0C5A28D-7AA3-F200-5961-A60586CE8111}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.IPC.Contracts", "src\IPC\AuraCore.IPC.Contracts\AuraCore.IPC.Contracts.csproj", "{E0C5A28D-7AA3-F200-5961-A60586CE8111}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Http", "src/Infrastructure/AuraCore.Infrastructure.Http/AuraCore.Infrastructure.Http.csproj", "{6104DA66-99F6-81D3-DADE-CAF216A494EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Http", "src\Infrastructure\AuraCore.Infrastructure.Http\AuraCore.Infrastructure.Http.csproj", "{6104DA66-99F6-81D3-DADE-CAF216A494EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Logging", "src/Infrastructure/AuraCore.Infrastructure.Logging/AuraCore.Infrastructure.Logging.csproj", "{13C7E3B4-F368-5D10-FDC4-71B0B6F12BC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Logging", "src\Infrastructure\AuraCore.Infrastructure.Logging\AuraCore.Infrastructure.Logging.csproj", "{13C7E3B4-F368-5D10-FDC4-71B0B6F12BC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Storage", "src/Infrastructure/AuraCore.Infrastructure.Storage/AuraCore.Infrastructure.Storage.csproj", "{A349799C-D13C-EC13-430A-2F304882A8D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Storage", "src\Infrastructure\AuraCore.Infrastructure.Storage\AuraCore.Infrastructure.Storage.csproj", "{A349799C-D13C-EC13-430A-2F304882A8D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Windows", "src/Infrastructure/AuraCore.Infrastructure.Windows/AuraCore.Infrastructure.Windows.csproj", "{634549B6-8906-32CD-1951-F6F4468E200B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Infrastructure.Windows", "src\Infrastructure\AuraCore.Infrastructure.Windows\AuraCore.Infrastructure.Windows.csproj", "{634549B6-8906-32CD-1951-F6F4468E200B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.AppInstaller", "src/Modules/AuraCore.Module.AppInstaller/AuraCore.Module.AppInstaller.csproj", "{46ECBB48-49F0-D552-0BDA-2FF944CECA1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.AppInstaller", "src\Modules\AuraCore.Module.AppInstaller\AuraCore.Module.AppInstaller.csproj", "{46ECBB48-49F0-D552-0BDA-2FF944CECA1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.BloatwareRemoval", "src/Modules/AuraCore.Module.BloatwareRemoval/AuraCore.Module.BloatwareRemoval.csproj", "{4F697BF6-DB43-2594-5B9E-0DF07F69AD85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.BloatwareRemoval", "src\Modules\AuraCore.Module.BloatwareRemoval\AuraCore.Module.BloatwareRemoval.csproj", "{4F697BF6-DB43-2594-5B9E-0DF07F69AD85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ContextMenu", "src/Modules/AuraCore.Module.ContextMenu/AuraCore.Module.ContextMenu.csproj", "{AEA9A5F5-DE1B-3C49-8817-2E54469E7486}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ContextMenu", "src\Modules\AuraCore.Module.ContextMenu\AuraCore.Module.ContextMenu.csproj", "{AEA9A5F5-DE1B-3C49-8817-2E54469E7486}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ExplorerTweaks", "src/Modules/AuraCore.Module.ExplorerTweaks/AuraCore.Module.ExplorerTweaks.csproj", "{EAA61AD2-718B-CEA6-CF81-BB5A224535F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ExplorerTweaks", "src\Modules\AuraCore.Module.ExplorerTweaks\AuraCore.Module.ExplorerTweaks.csproj", "{EAA61AD2-718B-CEA6-CF81-BB5A224535F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.GamingMode", "src/Modules/AuraCore.Module.GamingMode/AuraCore.Module.GamingMode.csproj", "{2A509C0A-C7D5-DA10-22DF-DB17AAE54C5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.GamingMode", "src\Modules\AuraCore.Module.GamingMode\AuraCore.Module.GamingMode.csproj", "{2A509C0A-C7D5-DA10-22DF-DB17AAE54C5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.JunkCleaner", "src/Modules/AuraCore.Module.JunkCleaner/AuraCore.Module.JunkCleaner.csproj", "{C220B69A-786C-2746-4C98-81B3F9CAF7EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.JunkCleaner", "src\Modules\AuraCore.Module.JunkCleaner\AuraCore.Module.JunkCleaner.csproj", "{C220B69A-786C-2746-4C98-81B3F9CAF7EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.NetworkOptimizer", "src/Modules/AuraCore.Module.NetworkOptimizer/AuraCore.Module.NetworkOptimizer.csproj", "{6C70C59C-FA83-A75C-55C1-8405AD4A43EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.NetworkOptimizer", "src\Modules\AuraCore.Module.NetworkOptimizer\AuraCore.Module.NetworkOptimizer.csproj", "{6C70C59C-FA83-A75C-55C1-8405AD4A43EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.RamOptimizer", "src/Modules/AuraCore.Module.RamOptimizer/AuraCore.Module.RamOptimizer.csproj", "{560B5609-9A9A-2D22-F012-3000997A5257}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.RamOptimizer", "src\Modules\AuraCore.Module.RamOptimizer\AuraCore.Module.RamOptimizer.csproj", "{560B5609-9A9A-2D22-F012-3000997A5257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.RegistryOptimizer", "src/Modules/AuraCore.Module.RegistryOptimizer/AuraCore.Module.RegistryOptimizer.csproj", "{D2FB338B-84D5-B0D9-3892-828C75632F7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.RegistryOptimizer", "src\Modules\AuraCore.Module.RegistryOptimizer\AuraCore.Module.RegistryOptimizer.csproj", "{D2FB338B-84D5-B0D9-3892-828C75632F7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.StorageCompression", "src/Modules/AuraCore.Module.StorageCompression/AuraCore.Module.StorageCompression.csproj", "{CD5CDA5E-3D99-13AE-9018-D07157725D96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.StorageCompression", "src\Modules\AuraCore.Module.StorageCompression\AuraCore.Module.StorageCompression.csproj", "{CD5CDA5E-3D99-13AE-9018-D07157725D96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.SystemHealth", "src/Modules/AuraCore.Module.SystemHealth/AuraCore.Module.SystemHealth.csproj", "{E1D10204-323B-090F-086C-53C29DFB9970}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.SystemHealth", "src\Modules\AuraCore.Module.SystemHealth\AuraCore.Module.SystemHealth.csproj", "{E1D10204-323B-090F-086C-53C29DFB9970}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.TaskbarTweaks", "src/Modules/AuraCore.Module.TaskbarTweaks/AuraCore.Module.TaskbarTweaks.csproj", "{1B61B041-ADD3-056B-0E9B-EC3BA25227D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.TaskbarTweaks", "src\Modules\AuraCore.Module.TaskbarTweaks\AuraCore.Module.TaskbarTweaks.csproj", "{1B61B041-ADD3-056B-0E9B-EC3BA25227D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Configuration", "src/Platform/AuraCore.Platform.Configuration/AuraCore.Platform.Configuration.csproj", "{42DDB170-D7EA-22A6-7790-AB28B2781F37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Configuration", "src\Platform\AuraCore.Platform.Configuration\AuraCore.Platform.Configuration.csproj", "{42DDB170-D7EA-22A6-7790-AB28B2781F37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Diagnostics", "src/Platform/AuraCore.Platform.Diagnostics/AuraCore.Platform.Diagnostics.csproj", "{9B88B2FC-27C0-B753-BC8B-450871F83CF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Diagnostics", "src\Platform\AuraCore.Platform.Diagnostics\AuraCore.Platform.Diagnostics.csproj", "{9B88B2FC-27C0-B753-BC8B-450871F83CF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Telemetry", "src/Platform/AuraCore.Platform.Telemetry/AuraCore.Platform.Telemetry.csproj", "{99FFA9E5-1266-E5D5-9517-1F91A79B703A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Telemetry", "src\Platform\AuraCore.Platform.Telemetry\AuraCore.Platform.Telemetry.csproj", "{99FFA9E5-1266-E5D5-9517-1F91A79B703A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Update", "src/Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj", "{95780850-E2B0-767D-0A39-2BD45E31359D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Platform.Update", "src\Platform\AuraCore.Platform.Update\AuraCore.Platform.Update.csproj", "{95780850-E2B0-767D-0A39-2BD45E31359D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Plugin.SDK", "src/Plugins/AuraCore.Plugin.SDK/AuraCore.Plugin.SDK.csproj", "{A4E5A327-C48D-DA63-3E1E-868DA8E33885}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Plugin.SDK", "src\Plugins\AuraCore.Plugin.SDK\AuraCore.Plugin.SDK.csproj", "{A4E5A327-C48D-DA63-3E1E-868DA8E33885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService.IPC", "src/Service/AuraCore.PrivilegedService.IPC/AuraCore.PrivilegedService.IPC.csproj", "{9F47DA2A-B9D4-11D2-40DE-FB11C1975594}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService.IPC", "src\Service\AuraCore.PrivilegedService.IPC\AuraCore.PrivilegedService.IPC.csproj", "{9F47DA2A-B9D4-11D2-40DE-FB11C1975594}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService.Ops", "src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj", "{30375D13-4ADB-E4F5-A017-978F2D1870A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService.Ops", "src\Service\AuraCore.PrivilegedService.Ops\AuraCore.PrivilegedService.Ops.csproj", "{30375D13-4ADB-E4F5-A017-978F2D1870A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService", "src/Service/AuraCore.PrivilegedService/AuraCore.PrivilegedService.csproj", "{9BCE599B-AB46-E550-28BF-2A41BBEAA302}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivilegedService", "src\Service\AuraCore.PrivilegedService\AuraCore.PrivilegedService.csproj", "{9BCE599B-AB46-E550-28BF-2A41BBEAA302}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Simulation", "src/Simulation/AuraCore.Simulation/AuraCore.Simulation.csproj", "{F7148E7A-6C38-6B66-640D-53F9FDDB688D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Simulation", "src\Simulation\AuraCore.Simulation\AuraCore.Simulation.csproj", "{F7148E7A-6C38-6B66-640D-53F9FDDB688D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.API", "tests/AuraCore.Tests.API/AuraCore.Tests.API.csproj", "{E0842C45-C8BD-823F-CE5F-F1DB7666041D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.API", "tests\AuraCore.Tests.API\AuraCore.Tests.API.csproj", "{E0842C45-C8BD-823F-CE5F-F1DB7666041D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Integration", "tests/AuraCore.Tests.Integration/AuraCore.Tests.Integration.csproj", "{7D58DC87-B9CE-2D1F-25D8-6DD2FFA5616A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Integration", "tests\AuraCore.Tests.Integration\AuraCore.Tests.Integration.csproj", "{7D58DC87-B9CE-2D1F-25D8-6DD2FFA5616A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Module", "tests/AuraCore.Tests.Module/AuraCore.Tests.Module.csproj", "{5363015E-135E-1158-9C1A-51C50D4F5531}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Module", "tests\AuraCore.Tests.Module\AuraCore.Tests.Module.csproj", "{5363015E-135E-1158-9C1A-51C50D4F5531}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Platform", "tests/AuraCore.Tests.Platform/AuraCore.Tests.Platform.csproj", "{EA36602A-3033-D3BE-6028-A217ACFB1710}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Platform", "tests\AuraCore.Tests.Platform\AuraCore.Tests.Platform.csproj", "{EA36602A-3033-D3BE-6028-A217ACFB1710}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Simulation", "tests/AuraCore.Tests.Simulation/AuraCore.Tests.Simulation.csproj", "{18D7437C-52CC-FA1F-F54E-AF97135C674E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Simulation", "tests\AuraCore.Tests.Simulation\AuraCore.Tests.Simulation.csproj", "{18D7437C-52CC-FA1F-F54E-AF97135C674E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Unit", "tests/AuraCore.Tests.Unit/AuraCore.Tests.Unit.csproj", "{C19D564B-AA2C-BDDB-ADE5-8EDCC8C77A37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.Unit", "tests\AuraCore.Tests.Unit\AuraCore.Tests.Unit.csproj", "{C19D564B-AA2C-BDDB-ADE5-8EDCC8C77A37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.AutorunManager", "src/Modules/AuraCore.Module.AutorunManager/AuraCore.Module.AutorunManager.csproj", "{A5201103-B945-41F0-BAD7-5E686CE262AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.AutorunManager", "src\Modules\AuraCore.Module.AutorunManager\AuraCore.Module.AutorunManager.csproj", "{A5201103-B945-41F0-BAD7-5E686CE262AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ProcessMonitor", "src/Modules/AuraCore.Module.ProcessMonitor/AuraCore.Module.ProcessMonitor.csproj", "{A47DB59A-E017-4132-B4EC-F2294BEF6B60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.ProcessMonitor", "src\Modules\AuraCore.Module.ProcessMonitor\AuraCore.Module.ProcessMonitor.csproj", "{A47DB59A-E017-4132-B4EC-F2294BEF6B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.HostsEditor", "src/Modules/AuraCore.Module.HostsEditor/AuraCore.Module.HostsEditor.csproj", "{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.HostsEditor", "src\Modules\AuraCore.Module.HostsEditor\AuraCore.Module.HostsEditor.csproj", "{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.UI.Avalonia", "src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj", "{4A998ECF-142F-46C8-826C-12EF567F057A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.UI.Avalonia", "src\UI\AuraCore.UI.Avalonia\AuraCore.UI.Avalonia.csproj", "{4A998ECF-142F-46C8-826C-12EF567F057A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
@@ -120,12 +120,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.EnvironmentVariables", "src\Modules\AuraCore.Module.EnvironmentVariables\AuraCore.Module.EnvironmentVariables.csproj", "{E846CF01-AF7B-441C-8160-02FDC6A162C3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8D626EA8-CB54-BC41-363A-217881BEBA6E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Application", "src\Core\AuraCore.Application\AuraCore.Application.csproj", "{753E7CB5-FA57-4579-AA0F-F8BE9B674816}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Domain", "src\Core\AuraCore.Domain\AuraCore.Domain.csproj", "{4DEDD7D3-9732-4539-A77C-047BE6256432}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.SharedKernel", "src\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj", "{0E48D9EF-C41E-4506-94AF-200455417DB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.FirewallRules", "src\Modules\AuraCore.Module.FirewallRules\AuraCore.Module.FirewallRules.csproj", "{A0E10801-0FAE-4045-9BDD-E02D265A04E2}"
 EndProject
@@ -157,9 +151,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.FontManager
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.WakeOnLan", "src\Modules\AuraCore.Module.WakeOnLan\AuraCore.Module.WakeOnLan.csproj", "{CF1C7390-33BD-4588-9F26-0044B7E78D9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.AIAnalyzer", "src/Engines/AuraCore.Engine.AIAnalyzer/AuraCore.Engine.AIAnalyzer.csproj", "{0D6512C3-E6FE-445F-885A-295548A752A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Engine.AIAnalyzer", "src\Engines\AuraCore.Engine.AIAnalyzer\AuraCore.Engine.AIAnalyzer.csproj", "{0D6512C3-E6FE-445F-885A-295548A752A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.AIEngine", "tests/AuraCore.Tests.AIEngine/AuraCore.Tests.AIEngine.csproj", "{BFB4C407-46A3-43FE-A44C-F1F8CBA8A4E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Tests.AIEngine", "tests\AuraCore.Tests.AIEngine\AuraCore.Tests.AIEngine.csproj", "{BFB4C407-46A3-43FE-A44C-F1F8CBA8A4E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.Module.JournalCleaner", "src\Modules\AuraCore.Module.JournalCleaner\AuraCore.Module.JournalCleaner.csproj", "{AB057FF5-9ECD-4675-858A-E9946F5D6D77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -783,20 +779,52 @@ Global
 		{C19D564B-AA2C-BDDB-ADE5-8EDCC8C77A37}.Release|x64.Build.0 = Release|Any CPU
 		{C19D564B-AA2C-BDDB-ADE5-8EDCC8C77A37}.Release|x86.ActiveCfg = Release|Any CPU
 		{C19D564B-AA2C-BDDB-ADE5-8EDCC8C77A37}.Release|x86.Build.0 = Release|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|x64.Build.0 = Debug|Any CPU
 		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Debug|x86.Build.0 = Debug|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|x64.Build.0 = Release|Any CPU
 		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|x86.ActiveCfg = Release|Any CPU
 		{A5201103-B945-41F0-BAD7-5E686CE262AD}.Release|x86.Build.0 = Release|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|x64.Build.0 = Debug|Any CPU
 		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Debug|x86.Build.0 = Debug|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|x64.ActiveCfg = Release|Any CPU
+		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|x64.Build.0 = Release|Any CPU
 		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|x86.ActiveCfg = Release|Any CPU
 		{A47DB59A-E017-4132-B4EC-F2294BEF6B60}.Release|x86.Build.0 = Release|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|x64.Build.0 = Debug|Any CPU
 		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Debug|x86.Build.0 = Debug|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|x64.ActiveCfg = Release|Any CPU
+		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|x64.Build.0 = Release|Any CPU
 		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|x86.ActiveCfg = Release|Any CPU
 		{54E3BE49-B116-40AB-AC3E-7DD4B95E15A5}.Release|x86.Build.0 = Release|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|x64.Build.0 = Debug|Any CPU
 		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{4A998ECF-142F-46C8-826C-12EF567F057A}.Debug|x86.Build.0 = Debug|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|x64.Build.0 = Release|Any CPU
 		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A998ECF-142F-46C8-826C-12EF567F057A}.Release|x86.Build.0 = Release|Any CPU
 		{E846CF01-AF7B-441C-8160-02FDC6A162C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -811,42 +839,6 @@ Global
 		{E846CF01-AF7B-441C-8160-02FDC6A162C3}.Release|x64.Build.0 = Release|Any CPU
 		{E846CF01-AF7B-441C-8160-02FDC6A162C3}.Release|x86.ActiveCfg = Release|Any CPU
 		{E846CF01-AF7B-441C-8160-02FDC6A162C3}.Release|x86.Build.0 = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|x64.Build.0 = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Debug|x86.Build.0 = Debug|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|Any CPU.Build.0 = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|x64.ActiveCfg = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|x64.Build.0 = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|x86.ActiveCfg = Release|Any CPU
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816}.Release|x86.Build.0 = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|x64.Build.0 = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Debug|x86.Build.0 = Debug|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|x64.ActiveCfg = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|x64.Build.0 = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|x86.ActiveCfg = Release|Any CPU
-		{4DEDD7D3-9732-4539-A77C-047BE6256432}.Release|x86.Build.0 = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|x64.Build.0 = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Debug|x86.Build.0 = Debug|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|x64.ActiveCfg = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|x64.Build.0 = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|x86.ActiveCfg = Release|Any CPU
-		{0E48D9EF-C41E-4506-94AF-200455417DB2}.Release|x86.Build.0 = Release|Any CPU
 		{A0E10801-0FAE-4045-9BDD-E02D265A04E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A0E10801-0FAE-4045-9BDD-E02D265A04E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0E10801-0FAE-4045-9BDD-E02D265A04E2}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -1051,6 +1043,18 @@ Global
 		{BFB4C407-46A3-43FE-A44C-F1F8CBA8A4E0}.Release|x64.Build.0 = Release|Any CPU
 		{BFB4C407-46A3-43FE-A44C-F1F8CBA8A4E0}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFB4C407-46A3-43FE-A44C-F1F8CBA8A4E0}.Release|x86.Build.0 = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x64.Build.0 = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1059,9 +1063,6 @@ Global
 		{EC447DCF-ABFA-6E24-52A5-D7FD48A5C558} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{E846CF01-AF7B-441C-8160-02FDC6A162C3} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{8D626EA8-CB54-BC41-363A-217881BEBA6E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{753E7CB5-FA57-4579-AA0F-F8BE9B674816} = {8D626EA8-CB54-BC41-363A-217881BEBA6E}
-		{4DEDD7D3-9732-4539-A77C-047BE6256432} = {8D626EA8-CB54-BC41-363A-217881BEBA6E}
-		{0E48D9EF-C41E-4506-94AF-200455417DB2} = {8D626EA8-CB54-BC41-363A-217881BEBA6E}
 		{A0E10801-0FAE-4045-9BDD-E02D265A04E2} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{EE149CA3-01C0-47DC-A2BB-F8B79593E96B} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{1BA49988-C100-41B3-8911-D5980B79076A} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
@@ -1077,5 +1078,6 @@ Global
 		{337EF555-1543-4C50-A6A2-7F8DF4D1EF4A} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{F944001C-6C08-4B6D-8AE6-05CFE2EEF6BC} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 		{CF1C7390-33BD-4588-9F26-0044B7E78D9D} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
+		{AB057FF5-9ECD-4675-858A-E9946F5D6D77} = {EC447DCF-ABFA-6E24-52A5-D7FD48A5C558}
 	EndGlobalSection
 EndGlobal

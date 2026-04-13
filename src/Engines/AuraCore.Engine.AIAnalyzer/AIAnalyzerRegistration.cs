@@ -38,21 +38,7 @@ public static class AIAnalyzerRegistration
             }
             catch { }
         }
-        var modelFileName = selectedModel switch
-        {
-            "tinyllama" => "auracore-tinyllama.gguf",
-            "phi2" => "auracore-phi2.gguf",
-            "phi3-mini" => "auracore-phi3-mini.gguf",
-            "mistral-7b" => "auracore-mistral-7b.gguf",
-            "llama31-8b" => "auracore-llama31-8b.gguf",
-            "llama33-70b" => "auracore-llama33-70b.gguf",
-            "phi3-medium" => "auracore-phi3-medium.gguf",
-            // Legacy names for backward compatibility
-            "phi3" => "auracore-phi3-mini.gguf",
-            "llama3-8b" => "auracore-llama31-8b.gguf",
-            "llama2-13b" => "auracore-phi3-medium.gguf",
-            _ => "auracore-phi3-mini.gguf",
-        };
+        var modelFileName = ResolveModelFileName(selectedModel);
         var llmModelPath = Path.Combine(modelsDir, modelFileName);
         var configPath = Path.Combine(aiDir, "optimal_params.json");
 
@@ -69,5 +55,26 @@ public static class AIAnalyzerRegistration
         services.AddSingleton(sp => AIConfigProvider.LoadFromFile(configPath));
 
         return services;
+    }
+
+    /// <summary>
+    /// Resolves a user-friendly model name to its GGUF filename.
+    /// </summary>
+    public static string ResolveModelFileName(string selectedModel)
+    {
+        return selectedModel switch
+        {
+            "tinyllama" => "auracore-tinyllama.gguf",
+            "phi2" => "auracore-phi2.gguf",
+            "phi3-mini" => "auracore-phi3-mini.gguf",
+            "mistral-7b" => "auracore-mistral-7b.gguf",
+            "llama31-8b" => "auracore-llama31-8b.gguf",
+            "phi3-medium" => "auracore-phi3-medium.gguf",
+            "qwen25-32b" => "auracore-qwen25-32b.gguf",
+            // Legacy aliases
+            "phi3" => "auracore-phi3-mini.gguf",
+            "llama3-8b" => "auracore-llama31-8b.gguf",
+            _ => "auracore-phi3-mini.gguf",
+        };
     }
 }

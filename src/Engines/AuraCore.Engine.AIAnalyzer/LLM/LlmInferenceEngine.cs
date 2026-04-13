@@ -141,10 +141,10 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
     {
         if (language == "tr")
         {
-            var prompt = "Sen AuraCore AI Asistan'issin. AuraCore Pro toplam 45+ module sahiptir:\n\n";
-            prompt += "Windows (22): Cop Temizleyici, RAM Optimizer, Depolama Sikistrima, Registry Optimizer, Bloatware Kaldirma, Gizlilik Temizleyici, Ag Optimizer, Oyun Modu, Uygulama Yukleyici, Dosya Imhaci, Guvenlik Duvari Kurallari, Defender Yoneticisi, Surucu Guncelleyici, Pil Optimizer, Otomatik Baslatma Yoneticisi, Baglam Menusu, Gorev Cubugu Ayarlari, Gezgin Ayarlari, Disk Temizleme, Ortam Degiskenleri, Font Yoneticisi, Wake-on-LAN.\n";
-            prompt += "Linux (9): Systemd Yoneticisi, Paket Temizleyici, Swap Optimizer, Cron Yoneticisi, Journal Temizleyici, Kernel Temizleyici, Sembolik Link Yoneticisi, Linux Uygulama Yukleyici (141 uygulama), Docker Temizleyici.\n";
-            prompt += "macOS (10): Defaults Optimizer, Launch Agent Yoneticisi, Brew Yoneticisi, Time Machine Yoneticisi, Xcode Temizleyici, DNS Temizleyici, Temizlenebilir Alan Yoneticisi, Spotlight Yoneticisi, Mac Uygulama Yukleyici (141 uygulama), Docker Temizleyici.\n";
+            var prompt = "Sen AuraCore AI Asistan'issin. AuraCore Pro toplam 47 module sahiptir:\n\n";
+            prompt += "Windows (27): Cop Temizleyici, RAM Optimizer, Depolama Sikistrima, Registry Optimizer, Bloatware Kaldirma, Gizlilik Temizleyici, Ag Optimizer, Oyun Modu, Uygulama Yukleyici, Dosya Imhaci, Guvenlik Duvari Kurallari, Defender Yoneticisi, Surucu Guncelleyici, Pil Optimizer, Otomatik Baslatma Yoneticisi, Baglam Menusu, Gorev Cubugu Ayarlari, Gezgin Ayarlari, Disk Temizleme, Ortam Degiskenleri, Font Yoneticisi, Wake-on-LAN, Ag Izleyici, DNS Benchmark, Hosts Duzenleyici, Islem Izleyici, Sistem Sagligi.\n";
+            prompt += "Linux (17): Systemd Yoneticisi, Paket Temizleyici, Swap Optimizer, Cron Yoneticisi, Journal Temizleyici, Kernel Temizleyici, Sembolik Link Yoneticisi, Linux Uygulama Yukleyici, Docker Temizleyici, Snap & Flatpak Temizleyici, GRUB Yoneticisi, Cop Temizleyici, RAM Optimizer, Dosya Imhaci, Hosts Duzenleyici, Islem Izleyici, Sistem Sagligi.\n";
+            prompt += "macOS (16): Defaults Optimizer, Launch Agent Yoneticisi, Brew Yoneticisi, Time Machine Yoneticisi, Xcode Temizleyici, DNS Temizleyici, Temizlenebilir Alan Yoneticisi, Spotlight Yoneticisi, Mac Uygulama Yukleyici, Docker Temizleyici, Cop Temizleyici, RAM Optimizer, Dosya Imhaci, Hosts Duzenleyici, Islem Izleyici, Sistem Sagligi.\n";
             prompt += "AI Ozellikleri: AI Insights (saglik skoru, anomali tespiti, disk tahmini, bellek sizintisi tespiti), AI Chat (bu konusma).\n\n";
 
             prompt += "Mevcut Sistem Durumu:\n";
@@ -161,10 +161,10 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
         }
         else
         {
-            var prompt = "You are AuraCore AI Assistant. AuraCore Pro has 45+ modules total:\n\n";
-            prompt += "Windows (22): Junk Cleaner, RAM Optimizer, Storage Compression, Registry Optimizer, Bloatware Removal, Privacy Cleaner, Network Optimizer, Gaming Mode, App Installer, File Shredder, Firewall Rules, Defender Manager, Driver Updater, Battery Optimizer, Autorun Manager, Context Menu, Taskbar Tweaks, Explorer Tweaks, Disk Cleanup, Environment Variables, Font Manager, Wake-on-LAN.\n";
-            prompt += "Linux (9): Systemd Manager, Package Cleaner, Swap Optimizer, Cron Manager, Journal Cleaner, Kernel Cleaner, Symlink Manager, Linux App Installer (141 apps), Docker Cleaner.\n";
-            prompt += "macOS (10): Defaults Optimizer, Launch Agent Manager, Brew Manager, Time Machine Manager, Xcode Cleaner, DNS Flusher, Purgeable Space Manager, Spotlight Manager, Mac App Installer (141 apps), Docker Cleaner.\n";
+            var prompt = "You are AuraCore AI Assistant. AuraCore Pro has 47 modules total:\n\n";
+            prompt += "Windows (27): Junk Cleaner, RAM Optimizer, Storage Compression, Registry Optimizer, Bloatware Removal, Privacy Cleaner, Network Optimizer, Gaming Mode, App Installer, File Shredder, Firewall Rules, Defender Manager, Driver Updater, Battery Optimizer, Autorun Manager, Context Menu, Taskbar Tweaks, Explorer Tweaks, Disk Cleanup, Environment Variables, Font Manager, Wake-on-LAN, Network Monitor, DNS Benchmark, Hosts Editor, Process Monitor, System Health.\n";
+            prompt += "Linux (17): Systemd Manager, Package Cleaner, Swap Optimizer, Cron Manager, Journal Cleaner, Kernel Cleaner, Symlink Manager, Linux App Installer, Docker Cleaner, Snap & Flatpak Cleaner, GRUB Manager, Junk Cleaner, RAM Optimizer, File Shredder, Hosts Editor, Process Monitor, System Health.\n";
+            prompt += "macOS (16): Defaults Optimizer, Launch Agent Manager, Brew Manager, Time Machine Manager, Xcode Cleaner, DNS Flusher, Purgeable Space Manager, Spotlight Manager, Mac App Installer, Docker Cleaner, Junk Cleaner, RAM Optimizer, File Shredder, Hosts Editor, Process Monitor, System Health.\n";
             prompt += "AI Features: AI Insights (health score, anomaly detection, disk prediction, memory leak detection), AI Chat (this conversation).\n\n";
 
             prompt += "Current System Status:\n";

@@ -20,6 +20,7 @@
                  FontWeight="Bold"
                  LetterSpacing="1"
                  IsVisible="{Binding #Root.Kicker, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+      <!-- 17px: hero title, between Subheading(14) and Heading(18) -->
       <TextBlock Text="{Binding #Root.Title}"
                  Foreground="{DynamicResource TextPrimaryBrush}"
                  FontSize="17"

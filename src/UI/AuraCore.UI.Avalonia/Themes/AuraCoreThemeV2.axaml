@@ -70,6 +70,11 @@
       <x:Double x:Key="FontSizeLabel">10</x:Double>
       <x:Double x:Key="FontSizeCaption">9</x:Double>
 
+      <!-- Smaller typography for micro-UI elements -->
+      <x:Double x:Key="FontSizeMicro">8</x:Double>
+      <x:Double x:Key="FontSizeTiny">7</x:Double>
+      <x:Double x:Key="FontSizeLarge">14</x:Double>
+
       <!-- Radius scale -->
       <CornerRadius x:Key="RadiusXs">4</CornerRadius>
       <CornerRadius x:Key="RadiusSm">6</CornerRadius>
@@ -93,4 +98,18 @@
       <BoxShadows x:Key="GlowHero">0 0 32 0 #1A00D4AA</BoxShadows>
     </ResourceDictionary>
   </Styles.Resources>
+
+  <!-- Apply Inter font globally via FluentTheme-aware selectors -->
+  <Style Selector="Window">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="TextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="TextBox">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="Button">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
 </Styles>

@@ -64,6 +64,9 @@ public class ThemeTokenTests
     [InlineData("FontSizeBodySmall", 11.0)]
     [InlineData("FontSizeLabel", 10.0)]
     [InlineData("FontSizeCaption", 9.0)]
+    [InlineData("FontSizeMicro", 8.0)]
+    [InlineData("FontSizeTiny", 7.0)]
+    [InlineData("FontSizeLarge", 14.0)]
     public void FontSizeToken_Resolves_WithExpectedValue(string key, double expected)
     {
         var styles = LoadThemeV2();

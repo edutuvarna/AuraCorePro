@@ -47,6 +47,7 @@
             </MultiBinding>
           </TextBlock.Foreground>
         </TextBlock>
+        <!-- 3px: sub-chip corner, intentional -->
         <Border Grid.Column="2"
                 Padding="5,1"
                 CornerRadius="3"
@@ -56,7 +57,7 @@
             <SolidColorBrush Color="{Binding #Root.AccentBrush.Color, FallbackValue=#00D4AA}" Opacity="0.2"/>
           </Border.Background>
           <TextBlock Text="{Binding #Root.TrailingChipText}"
-                     FontSize="7"
+                     FontSize="{DynamicResource FontSizeTiny}"
                      FontWeight="Bold"
                      Foreground="{Binding #Root.AccentBrush}"/>
         </Border>

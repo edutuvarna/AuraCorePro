@@ -7,7 +7,7 @@
           BorderBrush="{DynamicResource AccentPurpleDimBrush}"
           BorderThickness="1"
           Background="{DynamicResource AccentPurpleDimBrush}"
-          Padding="14">
+          Padding="{DynamicResource SpacingCardPadding}">
     <StackPanel Spacing="10">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="{Binding #Root.Title}"

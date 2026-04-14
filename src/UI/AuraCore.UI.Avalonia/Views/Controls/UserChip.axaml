@@ -4,6 +4,7 @@
              x:Class="AuraCore.UI.Avalonia.Views.Controls.UserChip"
              x:Name="Root">
   <Grid ColumnDefinitions="Auto,*,Auto" Margin="8,6,8,6">
+    <!-- 13px: half of 26×26 width for perfect circle -->
     <Border Width="26" Height="26" CornerRadius="13">
       <Border.Background>
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
@@ -25,7 +26,7 @@
                  TextTrimming="CharacterEllipsis"/>
       <TextBlock Text="{Binding #Root.StatusText}"
                  Foreground="{DynamicResource AccentTealLightBrush}"
-                 FontSize="8"/>
+                 FontSize="{DynamicResource FontSizeMicro}"/>
     </StackPanel>
     <local:AccentBadge Grid.Column="2" Label="{Binding #Root.Role}" VerticalAlignment="Center"
                        IsVisible="{Binding #Root.Role, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>

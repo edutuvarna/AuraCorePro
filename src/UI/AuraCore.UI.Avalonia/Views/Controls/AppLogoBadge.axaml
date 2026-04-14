@@ -3,6 +3,7 @@
              x:Class="AuraCore.UI.Avalonia.Views.Controls.AppLogoBadge"
              x:Name="Root">
   <Grid ColumnDefinitions="Auto,*" Margin="8,6,8,16">
+    <!-- 7px: brand logo radius, intentional -->
     <Border Width="28" Height="28" CornerRadius="7" BoxShadow="{DynamicResource GlowTeal}">
       <Border.Background>
         <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
@@ -18,12 +19,13 @@
                  FontSize="13"/>
     </Border>
     <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+      <!-- 13px: brand display size, intentionally between Body and Subheading -->
       <TextBlock Text="{Binding #Root.ProductName}"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  FontSize="13" FontWeight="SemiBold"/>
       <TextBlock Text="{Binding #Root.Tagline}"
                  Foreground="{DynamicResource AccentTealBrush}"
-                 FontSize="8" FontWeight="Bold"
+                 FontSize="{DynamicResource FontSizeMicro}" FontWeight="Bold"
                  LetterSpacing="1.5"/>
     </StackPanel>
   </Grid>

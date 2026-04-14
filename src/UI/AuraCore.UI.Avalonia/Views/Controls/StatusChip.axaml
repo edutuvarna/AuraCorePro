@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Controls.StatusChip"
              x:Name="Root">
-  <Border CornerRadius="12" Padding="10,4" BorderThickness="1">
+  <Border CornerRadius="{DynamicResource RadiusLg}" Padding="10,4" BorderThickness="1">
     <Border.Background>
       <SolidColorBrush Color="{Binding #Root.AccentBrush.Color, FallbackValue=#00D4AA}" Opacity="0.15"/>
     </Border.Background>

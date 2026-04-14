@@ -36,11 +36,11 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
           <TextBlock Text="{Binding #Root.Value, StringFormat={}{0:0}}"
                      Foreground="{DynamicResource TextPrimaryBrush}"
-                     FontSize="14" FontWeight="Bold"
+                     FontSize="{DynamicResource FontSizeLarge}" FontWeight="Bold"
                      HorizontalAlignment="Center"/>
           <TextBlock Text="{Binding #Root.SubLabel}"
                      Foreground="{DynamicResource TextMutedBrush}"
-                     FontSize="7"
+                     FontSize="{DynamicResource FontSizeTiny}"
                      HorizontalAlignment="Center"
                      IsVisible="{Binding #Root.SubLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
         </StackPanel>
@@ -51,7 +51,7 @@
                  Margin="0,8,0,0"
                  Text="{Binding #Root.Insight}"
                  Foreground="{Binding #Root.InsightBrush}"
-                 FontSize="9"
+                 FontSize="{DynamicResource FontSizeCaption}"
                  HorizontalAlignment="Center"
                  IsVisible="{Binding #Root.Insight, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
     </Grid>

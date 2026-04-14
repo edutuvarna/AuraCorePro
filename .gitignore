@@ -10,6 +10,10 @@
 x64/
 x86/
 publish/
+publish-linux/
+
+# Superpowers brainstorm session data
+.superpowers/
 
 # Visual Studio
 .vs/

@@ -27,6 +27,7 @@
                     Stroke="{Binding IconBrush}"
                     StrokeThickness="2"
                     Width="13" Height="13"
+                    Stretch="Uniform"
                     VerticalAlignment="Top"
                     Margin="0,2,8,0"/>
               <StackPanel Grid.Column="1">

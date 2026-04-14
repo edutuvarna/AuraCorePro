@@ -23,6 +23,7 @@
                 Stroke="{Binding #Root.TintBrush}"
                 StrokeThickness="2"
                 Width="11" Height="11"
+                Stretch="Uniform"
                 Margin="0,0,6,0"/>
           <TextBlock Grid.Column="1"
                      Text="{Binding #Root.Title}"

@@ -21,7 +21,8 @@
               Data="{Binding #Root.Icon}"
               Stroke="{Binding #Root.RingBrush}"
               StrokeThickness="2"
-              Width="14" Height="14"/>
+              Width="14" Height="14"
+              Stretch="Uniform"/>
       </Grid>
 
       <!-- Center: circular ring with value -->

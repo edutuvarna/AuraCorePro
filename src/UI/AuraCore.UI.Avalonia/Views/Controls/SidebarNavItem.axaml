@@ -27,6 +27,7 @@
         <Path Data="{Binding #Root.Icon}"
               Width="14" Height="14"
               StrokeThickness="2"
+              Stretch="Uniform"
               VerticalAlignment="Center">
           <Path.Stroke>
             <MultiBinding Converter="{x:Static local:ActiveForegroundConverter.Instance}">

@@ -16,6 +16,7 @@
       <Path Data="{Binding #Root.Icon}"
             Fill="{Binding #Root.AccentBrush}"
             Width="11" Height="11"
+            Stretch="Uniform"
             IsVisible="{Binding #Root.Icon, Converter={x:Static ObjectConverters.IsNotNull}}"/>
       <TextBlock Text="{Binding #Root.Label}"
                  Foreground="{Binding #Root.AccentBrush}"

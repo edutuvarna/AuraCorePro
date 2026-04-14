@@ -17,7 +17,7 @@
       <TextBlock Text="Sidebar header primitives" FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}"/>
       <StackPanel Orientation="Horizontal" Spacing="20">
-        <Border Width="240" Background="{DynamicResource BgSidebarBrush}">
+        <Border Width="240" HorizontalAlignment="Left" Background="{DynamicResource BgSidebarBrush}">
           <StackPanel>
             <controls:AppLogoBadge/>
             <controls:UserChip Email="admin@aura.pro" Role="ADMIN" AvatarInitial="A"/>
@@ -27,7 +27,7 @@
 
       <!-- Sidebar items -->
       <TextBlock Text="Sidebar navigation" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-      <Border Width="240" Background="{DynamicResource BgSidebarBrush}" Padding="10">
+      <Border Width="240" HorizontalAlignment="Left" Background="{DynamicResource BgSidebarBrush}" Padding="10">
         <StackPanel Spacing="2">
           <controls:SidebarNavItem Label="Dashboard" IsActive="True" Icon="{StaticResource IconDashboard}"/>
           <controls:SidebarNavItem Label="Optimize" Icon="{StaticResource IconZap}"/>

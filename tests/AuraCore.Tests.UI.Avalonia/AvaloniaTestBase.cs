@@ -1,6 +1,8 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
+using Avalonia.Layout;
 
 namespace AuraCore.Tests.UI.Avalonia;
 
@@ -40,7 +42,10 @@ public static class AvaloniaTestBase
             Content = control
         };
         window.Show();
-        HeadlessWindowExtensions.GetLastRenderedFrame(window); // force render
+        // Force layout pass (measure + arrange) so IsMeasureValid becomes true.
+        // Avoid GetLastRenderedFrame — it requires Skia + UseHeadlessDrawing=false.
+        window.Measure(new Size(width, height));
+        window.Arrange(new Rect(0, 0, width, height));
         return new TestWindowHandle(window);
     }
 }

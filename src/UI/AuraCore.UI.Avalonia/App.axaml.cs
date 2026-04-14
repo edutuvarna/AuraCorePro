@@ -127,13 +127,19 @@ public partial class App : global::Avalonia.Application
             desktop.MainWindow = new Views.LoginWindow();
 
 #if DEBUG
-            desktop.MainWindow.KeyDown += (s, e) =>
-            {
-                if (e.Key == global::Avalonia.Input.Key.F12 && e.KeyModifiers.HasFlag(global::Avalonia.Input.KeyModifiers.Control))
+            // Register Ctrl+F12 as a class-level handler on Window so it works on
+            // any window (LoginWindow, MainWindow, and any future window) — not
+            // just the one assigned at startup.
+            global::Avalonia.Controls.Window.KeyDownEvent.AddClassHandler<global::Avalonia.Controls.Window>(
+                (window, e) =>
                 {
-                    new Views.Dev.ComponentGalleryWindow().Show();
-                }
-            };
+                    if (e.Key == global::Avalonia.Input.Key.F12 &&
+                        e.KeyModifiers.HasFlag(global::Avalonia.Input.KeyModifiers.Control))
+                    {
+                        new Views.Dev.ComponentGalleryWindow().Show();
+                        e.Handled = true;
+                    }
+                });
 #endif
         }
 

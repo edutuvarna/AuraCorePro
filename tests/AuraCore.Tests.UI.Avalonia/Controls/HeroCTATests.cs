@@ -1,5 +1,8 @@
+using System.Linq;
 using System.Windows.Input;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.LogicalTree;
 using AuraCore.UI.Avalonia.Views.Controls;
 using Xunit;
 
@@ -39,6 +42,31 @@ public class HeroCTATests
         };
         using var window = AvaloniaTestBase.RenderInWindow(hero, 400, 200);
         Assert.True(hero.IsMeasureValid);
+    }
+
+    [AvaloniaFact]
+    public void HeroCTA_ClickingPrimaryButton_InvokesBoundCommand()
+    {
+        var invoked = false;
+        var hero = new HeroCTA
+        {
+            PrimaryButtonText = "Go",
+            PrimaryCommand = new TestCommand(() => invoked = true)
+        };
+        using var window = AvaloniaTestBase.RenderInWindow(hero, 400, 200);
+
+        // Find the primary Button inside the control
+        var buttons = hero.GetLogicalDescendants()
+            .OfType<Button>()
+            .Where(b => b.Content?.ToString() == "Go")
+            .ToList();
+        Assert.NotEmpty(buttons);
+
+        // Execute the Button's resolved Command (proves the binding wired it)
+        var button = buttons.First();
+        Assert.NotNull(button.Command);
+        button.Command.Execute(null);
+        Assert.True(invoked);
     }
 
     private sealed class TestCommand : ICommand

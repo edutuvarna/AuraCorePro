@@ -9,7 +9,30 @@
       "AuraCore.Tests.Module/1.0.0": {
         "dependencies": {
           "AuraCore.Application": "1.0.0",
+          "AuraCore.Module.BrewManager": "1.0.0",
+          "AuraCore.Module.CronManager": "1.0.0",
+          "AuraCore.Module.DefaultsOptimizer": "1.0.0",
+          "AuraCore.Module.DnsFlusher": "1.0.0",
+          "AuraCore.Module.DockerCleaner": "1.0.0",
+          "AuraCore.Module.FontManager": "1.0.0",
+          "AuraCore.Module.GrubManager": "1.0.0",
+          "AuraCore.Module.JournalCleaner": "1.0.0",
           "AuraCore.Module.JunkCleaner": "1.0.0",
+          "AuraCore.Module.KernelCleaner": "1.0.0",
+          "AuraCore.Module.LaunchAgentManager": "1.0.0",
+          "AuraCore.Module.LinuxAppInstaller": "1.0.0",
+          "AuraCore.Module.MacAppInstaller": "1.0.0",
+          "AuraCore.Module.PackageCleaner": "1.0.0",
+          "AuraCore.Module.PurgeableSpaceManager": "1.0.0",
+          "AuraCore.Module.SnapFlatpakCleaner": "1.0.0",
+          "AuraCore.Module.SpotlightManager": "1.0.0",
+          "AuraCore.Module.SwapOptimizer": "1.0.0",
+          "AuraCore.Module.SymlinkManager": "1.0.0",
+          "AuraCore.Module.SystemHealth": "1.0.0",
+          "AuraCore.Module.SystemdManager": "1.0.0",
+          "AuraCore.Module.TimeMachineManager": "1.0.0",
+          "AuraCore.Module.WakeOnLan": "1.0.0",
+          "AuraCore.Module.XcodeCleaner": "1.0.0",
           "AuraCore.SharedKernel": "1.0.0",
           "Microsoft.NET.Test.Sdk": "17.11.1",
           "xunit": "2.9.2"
@@ -291,6 +314,33 @@
           }
         }
       },
+      "System.CodeDom/8.0.0": {
+        "runtime": {
+          "lib/net8.0/System.CodeDom.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
+      "System.Management/8.0.0": {
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        },
+        "runtime": {
+          "lib/net8.0/System.Management.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net8.0/System.Management.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
+          }
+        }
+      },
       "xunit/2.9.2": {
         "dependencies": {
           "xunit.assert": "2.9.2",
@@ -361,6 +411,110 @@
           }
         }
       },
+      "AuraCore.Module.BrewManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.BrewManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.CronManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.CronManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.DefaultsOptimizer/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.DefaultsOptimizer.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.DnsFlusher/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.DnsFlusher.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.DockerCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.DockerCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.FontManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.FontManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.GrubManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.GrubManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.JournalCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.JournalCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "AuraCore.Module.JunkCleaner/1.0.0": {
         "dependencies": {
           "AuraCore.Application": "1.0.0",
@@ -369,6 +523,202 @@
         },
         "runtime": {
           "AuraCore.Module.JunkCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.KernelCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.KernelCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.LaunchAgentManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.LaunchAgentManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.LinuxAppInstaller/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.LinuxAppInstaller.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.MacAppInstaller/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.MacAppInstaller.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.PackageCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.PackageCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.PurgeableSpaceManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.PurgeableSpaceManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SnapFlatpakCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.SnapFlatpakCleaner.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SpotlightManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.SpotlightManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SwapOptimizer/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.SwapOptimizer.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SymlinkManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.SymlinkManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SystemdManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.SystemdManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.SystemHealth/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
+          "System.Management": "8.0.0"
+        },
+        "runtime": {
+          "AuraCore.Module.SystemHealth.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.TimeMachineManager/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.TimeMachineManager.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.WakeOnLan/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.WakeOnLan.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "AuraCore.Module.XcodeCleaner/1.0.0": {
+        "dependencies": {
+          "AuraCore.Application": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        },
+        "runtime": {
+          "AuraCore.Module.XcodeCleaner.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -432,6 +782,20 @@
       "path": "newtonsoft.json/13.0.1",
       "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
     },
+    "System.CodeDom/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q==",
+      "path": "system.codedom/8.0.0",
+      "hashPath": "system.codedom.8.0.0.nupkg.sha512"
+    },
+    "System.Management/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+      "path": "system.management/8.0.0",
+      "hashPath": "system.management.8.0.0.nupkg.sha512"
+    },
     "xunit/2.9.2": {
       "type": "package",
       "serviceable": true,
@@ -484,7 +848,122 @@
       "serviceable": false,
       "sha512": ""
     },
+    "AuraCore.Module.BrewManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.CronManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.DefaultsOptimizer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.DnsFlusher/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.DockerCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.FontManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.GrubManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.JournalCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
     "AuraCore.Module.JunkCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.KernelCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.LaunchAgentManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.LinuxAppInstaller/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.MacAppInstaller/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.PackageCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.PurgeableSpaceManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SnapFlatpakCleaner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SpotlightManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SwapOptimizer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SymlinkManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SystemdManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.SystemHealth/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.TimeMachineManager/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.WakeOnLan/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AuraCore.Module.XcodeCleaner/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

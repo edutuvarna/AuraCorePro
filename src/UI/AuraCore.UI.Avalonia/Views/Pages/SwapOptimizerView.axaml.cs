@@ -6,19 +6,34 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class SwapOptimizerView : UserControl
 {
+    private bool _scanning;
+
     public SwapOptimizerView()
     {
         InitializeComponent();
         Loaded += (s, e) => { RunScan(); ApplyLocalization(); };
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e) => RunScan();
 
     private async void RunScan()
     {
+        try
+        {
+        if (_scanning) return;
         if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
+        _scanning = true;
+        ScanBtn.IsEnabled = false;
         SubText.Text = "Reading swap info...";
 
         var (swaps, swappiness, totalKb, usedKb) = await Task.Run(() =>
@@ -110,6 +125,15 @@ public partial class SwapOptimizerView : UserControl
         if (totalKb == 0)
             rec = "No swap detected! Consider adding a swap file for stability: 'sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile'";
         RecommendationText.Text = rec;
+        _scanning = false;
+        ScanBtn.IsEnabled = true;
+        }
+        catch (Exception ex)
+        {
+            _scanning = false;
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                SubText.Text = $"Error scanning swap: {ex.Message}");
+        }
     }
 
     private static string FormatKb(long kb) => kb switch

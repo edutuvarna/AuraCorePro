@@ -95,6 +95,43 @@
         </StackPanel>
       </Border>
 
+      <!-- AI Model -->
+      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+        </Border.BorderBrush>
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4">
+              <Border.Background>
+                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
+              </Border.Background>
+              <TextBlock Text="&#x2B50;" FontSize="8" Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="AiModelLabel" Text="AI Model" FontSize="13" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel>
+              <TextBlock x:Name="AiModelDescLabel" Text="Select AI model" FontSize="12"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="AiModelRamLabel" Text="" FontSize="11"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+            <ComboBox Grid.Column="1" x:Name="AiModelCombo" Width="280"
+                      SelectionChanged="AiModelCombo_Changed"
+                      Background="#12FFFFFF" Foreground="{DynamicResource TextPrimaryBrush}"
+                      CornerRadius="{StaticResource RadiusMd}"/>
+          </Grid>
+          <TextBlock x:Name="AiModelRestartLabel" Text="Restart required for model change"
+                     FontSize="11" Foreground="#F59E0B" IsVisible="False"/>
+        </StackPanel>
+      </Border>
+
       <!-- About -->
       <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
         <Border.Background>

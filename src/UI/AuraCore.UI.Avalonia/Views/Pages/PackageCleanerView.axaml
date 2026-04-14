@@ -64,7 +64,7 @@
               <TextBlock Text="Cache Categories" FontSize="11" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
+            <Button x:Name="ScanBtn" Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
           <TextBlock x:Name="SubText" Text="Click Scan to analyze package caches (Linux only)" FontSize="12"
                      Foreground="{DynamicResource TextMutedBrush}"/>

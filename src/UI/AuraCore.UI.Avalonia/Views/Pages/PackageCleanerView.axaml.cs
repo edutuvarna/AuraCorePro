@@ -10,13 +10,22 @@ public partial class PackageCleanerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
         if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
+        ScanBtn.IsEnabled = false;
         SubText.Text = "Scanning package caches...";
 
         var categories = await Task.Run(() =>
@@ -58,6 +67,7 @@ public partial class PackageCleanerView : UserControl
         var totalSize = categories.Sum(c => c.Size);
         SubText.Text = $"Found {categories.Count} categories, {FormatSize(totalSize)} reclaimable";
 
+        ScanBtn.IsEnabled = true;
         CacheList.ItemsSource = categories.Where(c => c.Size > 0).OrderByDescending(c => c.Size).Select(c =>
         {
             var sizeStr = FormatSize(c.Size);

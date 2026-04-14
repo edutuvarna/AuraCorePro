@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.8.0] — 2026-04-04
+
+### Session 23 (April 4, 2026) — ML Training Pipeline + LLM Integration
+
+#### ML Training Pipeline (ml-training/ directory)
+- Real data collection: 1000 telemetry samples from LocalMetricDb (SQLite)
+- Synthetic data augmentation: 10,000 samples with realistic distributions
+- Parameter optimization: grid search across 3 ML.NET models (threshold/sensitivity tuning, false positive reduction)
+- ONNX autoencoder: PyTorch custom anomaly detection model (F1=0.876, 78KB), exported to ONNX format
+- 6 LLM models fine-tuned with LoRA adapters:
+  - TinyLlama 1.1B, Phi-2 2.7B, Phi-3 Mini 3.8B
+  - Mistral 7B, Llama 3 8B, Llama 2 13B, Phi-3 Medium 14B
+- Cloud GPU training on DigitalOcean H200 droplet (6 models trained in 32 minutes)
+- GGUF Q4 quantized exports for all 7 models (optimized for local inference)
+- LLM dataset: 964 bilingual examples (EN/TR) covering AuraCore modules and system optimization
+
+#### C# AI Integration
+- OnnxAnomalyDetector: ONNX Runtime inference integrated into ML.NET pipeline
+- LlmInferenceEngine: LLamaSharp 0.26.0 for local LLM inference (CPU + GPU support)
+- AIConfigProvider: model path resolution and configuration management
+- AI Chat UI: conversational interface with chat history persistence
+- Settings model selector: 7 models listed with real RAM usage measurements
+
+#### Platform Bug Fixes (17 bugs)
+- 8 Linux/macOS platform module bug fixes across multiple modules
+- Platform-specific guards and fallbacks improved
+
+#### Testing
+- 44 C# unit tests passing
+
+#### Known Issues
+- LLM dataset accuracy needs improvement (hallucination on module details)
+- Next session: enrich dataset with real module UI data + re-fine-tune
+
+---
+
 ## [1.7.0] — 2026-04-02
 
 ### Session 20 (April 1, 2026) — UI/UX Premium Overhaul

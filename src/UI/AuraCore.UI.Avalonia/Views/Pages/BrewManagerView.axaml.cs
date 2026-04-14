@@ -11,8 +11,16 @@ public partial class BrewManagerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
@@ -50,9 +58,13 @@ public partial class BrewManagerView : UserControl
     private async void Cleanup_Click(object? sender, RoutedEventArgs e)
     {
         if (!OperatingSystem.IsMacOS()) return;
-        SubText.Text = "Running brew cleanup...";
+        SubText.Text = "Checking cached downloads...";
+        // First show the user what will be cleaned
+        var dryRun = await Task.Run(() => RunBrew("cleanup --dry-run"));
+        var lineCount = dryRun.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
+        SubText.Text = $"Cleaning {lineCount} cached item(s)...";
         var result = await Task.Run(() => RunBrew("cleanup --prune=all"));
-        SubText.Text = $"Cleanup done: {result.Trim()}";
+        SubText.Text = $"Cleanup done — removed {lineCount} cached item(s). {result.Trim()}";
     }
 
     private static Border MakePkgItem(string name, string type, bool outdated)
@@ -73,7 +85,7 @@ public partial class BrewManagerView : UserControl
                         Foreground = new SolidColorBrush(Color.Parse(outdated ? "#F59E0B" : "#E8E8F0")),
                         VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center },
                     new Border { [Grid.ColumnProperty] = 1, CornerRadius = new global::Avalonia.CornerRadius(4),
-                        Background = new SolidColorBrush(Color.Parse($"20{typeColor[1..]}")),
+                        Background = new SolidColorBrush(Color.Parse($"#20{typeColor[1..]}")),
                         Padding = new global::Avalonia.Thickness(6, 2), Margin = new global::Avalonia.Thickness(8, 0),
                         VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                         Child = new TextBlock { Text = type, FontSize = 9, FontWeight = FontWeight.SemiBold,
@@ -83,16 +95,27 @@ public partial class BrewManagerView : UserControl
         };
     }
 
+    private static string FindBrewPath()
+    {
+        // Apple Silicon
+        if (File.Exists("/opt/homebrew/bin/brew")) return "/opt/homebrew/bin/brew";
+        // Intel Mac
+        if (File.Exists("/usr/local/bin/brew")) return "/usr/local/bin/brew";
+        // Fallback to PATH
+        return "brew";
+    }
+
     private static string RunBrew(string args)
     {
         try
         {
-            var psi = new ProcessStartInfo("/opt/homebrew/bin/brew", args)
-            { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+            var psi = new ProcessStartInfo(FindBrewPath(), args)
+            { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
             using var proc = Process.Start(psi);
             var output = proc?.StandardOutput.ReadToEnd() ?? "";
+            var error = proc?.StandardError.ReadToEnd() ?? "";
             proc?.WaitForExit(30000);
-            return output;
+            return string.IsNullOrEmpty(error) ? output : $"{output}\n[stderr] {error}";
         }
         catch { return ""; }
     }

@@ -979,6 +979,9 @@ public static class LocalizationService
         ["set.aiTelemetry"] = "AI Telemetry",
         ["set.aiTelemetryDesc"] = "Share anonymous AI data",
         ["set.aiTelemetryNote"] = "CPU/RAM averages, disk trends. No personal data.",
+        ["set.aiModel"] = "AI Model",
+        ["set.aiModelRestart"] = "Restart required for model change",
+        ["set.aiModelRam"] = "Your system: {0} GB RAM",
 
         // ── Dashboard ──
         ["dash.welcomeBack"] = "Welcome back",
@@ -1009,8 +1012,17 @@ public static class LocalizationService
         ["nav.autoSchedule"] = "Auto-Schedule",
         ["nav.aiRecommendations"] = "AI Recommendations",
         ["nav.aiInsights"] = "AI Insights",
+        ["nav.aiChat"] = "AI Chat",
         ["nav.isoBuilder"] = "ISO Builder",
         ["nav.adminPanel"] = "Admin Panel",
+
+        // ── AI Chat ──
+        ["aiChat.title"] = "AI Assistant",
+        ["aiChat.ready"] = "AI Assistant Ready",
+        ["aiChat.thinking"] = "Thinking...",
+        ["aiChat.welcome"] = "Hello! I'm AuraCore AI Assistant. I can help you understand your system's performance, suggest optimizations, and answer questions about your computer. How can I help you today?",
+        ["aiChat.modelNotFound"] = "AI model not found. Place a GGUF model file in the models directory to enable AI chat. You can still browse AI Insights for ML-based analysis.",
+        ["aiChat.inputHint"] = "Type a message...",
 
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Environment Variables",
@@ -2010,6 +2022,9 @@ public static class LocalizationService
         ["set.aiTelemetry"] = "AI Telemetri",
         ["set.aiTelemetryDesc"] = "Anonim AI verisi paylas",
         ["set.aiTelemetryNote"] = "CPU/RAM ortalamalari, disk trendleri. Kisisel veri toplanmaz.",
+        ["set.aiModel"] = "AI Modeli",
+        ["set.aiModelRestart"] = "Model degisikligi icin yeniden baslatma gerekli",
+        ["set.aiModelRam"] = "Sisteminiz: {0} GB RAM",
 
         // ── Dashboard ──
         ["dash.welcomeBack"] = "Tekrar hosgeldiniz",
@@ -2040,8 +2055,17 @@ public static class LocalizationService
         ["nav.autoSchedule"] = "Otomatik Zamanlama",
         ["nav.aiRecommendations"] = "Yapay Zeka Onerileri",
         ["nav.aiInsights"] = "AI Analiz",
+        ["nav.aiChat"] = "AI Sohbet",
         ["nav.isoBuilder"] = "ISO Olusturucu",
         ["nav.adminPanel"] = "Yonetici Paneli",
+
+        // ── AI Chat ──
+        ["aiChat.title"] = "AI Asistan",
+        ["aiChat.ready"] = "AI Asistan Hazir",
+        ["aiChat.thinking"] = "Dusunuyor...",
+        ["aiChat.welcome"] = "Merhaba! Ben AuraCore AI Asistan. Sisteminizin performansini anlamaniza, optimizasyonlar onermenize ve bilgisayariniz hakkindaki sorularinizi cevaplamamiza yardimci olabilirim. Size nasil yardimci olabilirim?",
+        ["aiChat.modelNotFound"] = "AI modeli bulunamadi. AI sohbeti etkinlestirmek icin modeller dizinine bir GGUF model dosyasi yerlestirin. ML tabanli analiz icin AI Analiz sayfasini kullanabilirsiniz.",
+        ["aiChat.inputHint"] = "Bir mesaj yazin...",
 
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Ortam Degiskenleri",

@@ -15,8 +15,16 @@ public partial class SystemdManagerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
@@ -59,7 +67,7 @@ public partial class SystemdManagerView : UserControl
         TotalSvc.Text = _allItems.Count.ToString();
         RunningSvc.Text = _allItems.Count(s => s.SubState == "running").ToString();
         FailedSvc.Text = _allItems.Count(s => s.ActiveState == "failed").ToString();
-        EnabledSvc.Text = _allItems.Count(s => s.LoadState == "loaded").ToString();
+        EnabledSvc.Text = _allItems.Count(s => s.ActiveState == "active").ToString();
         SubText.Text = $"Found {_allItems.Count} services";
         ScanBtn.IsEnabled = true;
         ApplyFilter();

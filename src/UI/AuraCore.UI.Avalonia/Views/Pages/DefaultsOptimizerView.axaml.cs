@@ -25,8 +25,16 @@ public partial class DefaultsOptimizerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => { LoadTweaks(); ApplyLocalization(); };
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private void LoadTweaks()
@@ -60,26 +68,52 @@ public partial class DefaultsOptimizerView : UserControl
     private async void Apply_Click(object? sender, RoutedEventArgs e)
     {
         if (!OperatingSystem.IsMacOS()) { SubText.Text = "macOS only"; return; }
-        int applied = 0;
-        foreach (var t in _tweaks)
+
+        // Collect indices of checked tweaks from the UI
+        var checkedIndices = new List<int>();
+        var items = TweakList.ItemsSource as System.Collections.IList;
+        if (items != null)
         {
-            try
+            for (int i = 0; i < items.Count; i++)
             {
-                var psi = new ProcessStartInfo("defaults", $"write {t.Domain} {t.Key} -{t.Type} {t.Value}")
-                { UseShellExecute = false, CreateNoWindow = true };
-                Process.Start(psi)?.WaitForExit(5000);
-                applied++;
+                if (items[i] is Border border && border.Child is Grid grid)
+                {
+                    var cb = grid.Children.OfType<CheckBox>().FirstOrDefault();
+                    if (cb?.IsChecked == true)
+                        checkedIndices.Add(i);
+                }
             }
-            catch { }
         }
-        SubText.Text = $"Applied {applied} tweaks. Some may require logout/restart.";
+
+        if (checkedIndices.Count == 0) { SubText.Text = "No tweaks selected."; return; }
+
+        int applied = 0;
+        foreach (var idx in checkedIndices)
+        {
+            if (idx < _tweaks.Count)
+            {
+                var t = _tweaks[idx];
+                try
+                {
+                    var psi = new ProcessStartInfo("defaults", $"write {t.Domain} {t.Key} -{t.Type} {t.Value}")
+                    { UseShellExecute = false, CreateNoWindow = true };
+                    await Task.Run(() =>
+                    {
+                        Process.Start(psi)?.WaitForExit(5000);
+                    });
+                    applied++;
+                }
+                catch { }
+            }
+        }
+        SubText.Text = $"Applied {applied}/{checkedIndices.Count} selected tweaks. Some may require logout/restart.";
     }
 
     private async void ReadDefault_Click(object? sender, RoutedEventArgs e)
     {
         if (!OperatingSystem.IsMacOS()) { ReadResult.Text = "macOS only"; return; }
-        var domain = DomainBox.Text?.Trim() ?? "";
-        var key = KeyBox.Text?.Trim() ?? "";
+        var domain = DomainBox.Text?.Trim()?.Replace(";", "").Replace("&", "").Replace("|", "").Replace("`", "").Replace("$", "").Replace("(", "").Replace(")", "").Replace("\n", "").Replace("\r", "").Replace(">", "").Replace("<", "") ?? "";
+        var key = KeyBox.Text?.Trim()?.Replace(";", "").Replace("&", "").Replace("|", "").Replace("`", "").Replace("$", "").Replace("(", "").Replace(")", "").Replace("\n", "").Replace("\r", "").Replace(">", "").Replace("<", "") ?? "";
         if (string.IsNullOrEmpty(domain)) { ReadResult.Text = "Enter a domain"; return; }
         try
         {

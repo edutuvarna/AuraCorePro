@@ -234,6 +234,7 @@ public sealed partial class MainWindow : Window
         NavPanel.Children.Add(MakeNavButton("scheduler", "\u25F4", LocalizationService._("nav.autoSchedule")));
         NavPanel.Children.Add(MakeNavButton("recommendations", "\u2726", LocalizationService._("nav.aiRecommendations")));
         NavPanel.Children.Add(MakeNavButton("ai-insights", "\u25C8", LocalizationService._("nav.aiInsights")));
+        NavPanel.Children.Add(MakeNavButton("ai-chat", "\u2756", LocalizationService._("nav.aiChat")));
 
         // ISO Builder (Windows-only)
         if (OperatingSystem.IsWindows())
@@ -336,6 +337,7 @@ public sealed partial class MainWindow : Window
             case "scheduler":          ContentArea.Content = new SchedulerView(); return;
             case "recommendations":    ContentArea.Content = new RecommendationsView(); return;
             case "ai-insights":        ContentArea.Content = new AIInsightsView(); return;
+            case "ai-chat":            ContentArea.Content = new AIChatView(); return;
             case "iso-builder":        ContentArea.Content = new IsoBuilderView(); return;
             case "admin-panel":        ContentArea.Content = new AdminPanelView(); return;
         }

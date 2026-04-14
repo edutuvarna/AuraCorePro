@@ -36,10 +36,42 @@ public partial class SettingsView : UserControl
             AccountTier.Text = (SessionState.UserTier ?? "free").ToUpper();
             LogoutBtn.IsVisible = SessionState.IsAuthenticated;
 
+            // AI Model selector
+            AIModelSettings.Load();
+            PopulateAiModelCombo();
+
             ApplyLocalization();
             LocalizationService.LanguageChanged += () =>
                 Dispatcher.UIThread.Post(ApplyLocalization);
         };
+    }
+
+    private void PopulateAiModelCombo()
+    {
+        AiModelCombo.Items.Clear();
+        int selectedIndex = 0;
+        for (int i = 0; i < AIModelSettings.AvailableModels.Length; i++)
+        {
+            var m = AIModelSettings.AvailableModels[i];
+            AiModelCombo.Items.Add($"{m.DisplayName} \u2014 {m.RamUsage} ({m.Recommended})");
+            if (m.Key == AIModelSettings.SelectedModel)
+                selectedIndex = i;
+        }
+        AiModelCombo.SelectedIndex = selectedIndex;
+
+        // Show system RAM
+        try
+        {
+            var info = GC.GetGCMemoryInfo();
+            var totalGb = info.TotalAvailableMemoryBytes / (1024.0 * 1024.0 * 1024.0);
+            AiModelRamLabel.Text = string.Format(
+                LocalizationService._("set.aiModelRam"),
+                totalGb.ToString("F1"));
+        }
+        catch
+        {
+            AiModelRamLabel.Text = "";
+        }
     }
 
     private void ApplyLocalization()
@@ -57,6 +89,8 @@ public partial class SettingsView : UserControl
         AboutLabel.Text = LocalizationService._("set.about");
         AccountLabel.Text = LocalizationService._("set.account");
         LogoutBtn.Content = LocalizationService._("set.signOut");
+        AiModelLabel.Text = LocalizationService._("set.aiModel");
+        AiModelRestartLabel.Text = LocalizationService._("set.aiModelRestart");
 
         ThemeLabel.Text = ThemeService.IsDarkMode
             ? LocalizationService._("set.dark")
@@ -86,6 +120,20 @@ public partial class SettingsView : UserControl
     {
         if (AiTelemetryToggle.IsChecked is bool isOn)
             AIConsentSettings.Save(isOn);
+    }
+
+    private void AiModelCombo_Changed(object? sender, SelectionChangedEventArgs e)
+    {
+        var idx = AiModelCombo.SelectedIndex;
+        if (idx >= 0 && idx < AIModelSettings.AvailableModels.Length)
+        {
+            var model = AIModelSettings.AvailableModels[idx];
+            if (model.Key != AIModelSettings.SelectedModel)
+            {
+                AIModelSettings.Save(model.Key);
+                AiModelRestartLabel.IsVisible = true;
+            }
+        }
     }
 
     private void Logout_Click(object? sender, RoutedEventArgs e)

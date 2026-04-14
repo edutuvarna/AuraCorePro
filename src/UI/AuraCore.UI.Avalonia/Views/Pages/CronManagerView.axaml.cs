@@ -11,14 +11,24 @@ public partial class CronManagerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => { RunScan(); ApplyLocalization(); };
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e) => RunScan();
 
     private async void RunScan()
     {
+        try
+        {
         if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
         SubText.Text = "Reading crontab...";
 
@@ -44,6 +54,14 @@ public partial class CronManagerView : UserControl
                         if (trimmed.StartsWith("#"))
                         {
                             jobs.Add(("", trimmed, true));
+                        }
+                        else if (trimmed.StartsWith("@"))
+                        {
+                            // Special schedule entries (@reboot, @daily, etc.)
+                            var spaceIdx = trimmed.IndexOf(' ');
+                            var schedule = spaceIdx > 0 ? trimmed[..spaceIdx] : trimmed;
+                            var command = spaceIdx > 0 ? trimmed[(spaceIdx + 1)..].Trim() : "";
+                            jobs.Add((schedule, command, false));
                         }
                         else
                         {
@@ -145,15 +163,29 @@ public partial class CronManagerView : UserControl
                 }
             }
         }).ToList();
+        }
+        catch (Exception ex)
+        {
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                SubText.Text = $"Error scanning cron: {ex.Message}");
+        }
     }
 
     private static string DescribeSchedule(string schedule)
     {
-        var parts = schedule.Split(' ');
+        var s = schedule.Trim();
+        // Check special schedules first (before splitting)
+        if (s.StartsWith("@reboot")) return "At startup";
+        if (s.StartsWith("@daily") || s.StartsWith("@midnight")) return "Daily at midnight";
+        if (s.StartsWith("@hourly")) return "Every hour";
+        if (s.StartsWith("@weekly")) return "Weekly";
+        if (s.StartsWith("@monthly")) return "Monthly";
+        if (s.StartsWith("@yearly") || s.StartsWith("@annually")) return "Yearly";
+
+        var parts = s.Split(' ');
         if (parts.Length < 5) return "";
         return (parts[0], parts[1], parts[2], parts[3], parts[4]) switch
         {
-            ("@reboot", _, _, _, _) => "At startup",
             ("*/5", "*", "*", "*", "*") => "Every 5 minutes",
             ("*/15", "*", "*", "*", "*") => "Every 15 minutes",
             ("0", "*", "*", "*", "*") => "Every hour",

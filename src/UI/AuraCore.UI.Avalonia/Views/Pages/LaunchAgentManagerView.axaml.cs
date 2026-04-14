@@ -10,8 +10,16 @@ public partial class LaunchAgentManagerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
@@ -67,7 +75,7 @@ public partial class LaunchAgentManagerView : UserControl
                             new TextBlock { Text = i.Path, FontSize = 9, Foreground = new SolidColorBrush(Color.Parse("#555570")) }
                         }},
                         new Border { [Grid.ColumnProperty] = 1, CornerRadius = new global::Avalonia.CornerRadius(4),
-                            Background = new SolidColorBrush(Color.Parse($"20{color[1..]}")),
+                            Background = new SolidColorBrush(Color.Parse($"#20{color[1..]}")),
                             Padding = new global::Avalonia.Thickness(8, 3),
                             VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                             Child = new TextBlock { Text = i.Source, FontSize = 10, FontWeight = FontWeight.SemiBold,

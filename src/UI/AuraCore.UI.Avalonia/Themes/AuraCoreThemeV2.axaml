@@ -55,6 +55,42 @@
 
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
+
+      <!-- ── SHARED (theme-independent) TOKENS ────── -->
+
+      <!-- Typography: font family stack -->
+      <FontFamily x:Key="PrimaryFontFamily">Inter, Segoe UI Variable, Segoe UI, sans-serif</FontFamily>
+
+      <!-- Typography: sizes (double) -->
+      <x:Double x:Key="FontSizeDisplay">24</x:Double>
+      <x:Double x:Key="FontSizeHeading">18</x:Double>
+      <x:Double x:Key="FontSizeSubheading">14</x:Double>
+      <x:Double x:Key="FontSizeBody">12</x:Double>
+      <x:Double x:Key="FontSizeBodySmall">11</x:Double>
+      <x:Double x:Key="FontSizeLabel">10</x:Double>
+      <x:Double x:Key="FontSizeCaption">9</x:Double>
+
+      <!-- Radius scale -->
+      <CornerRadius x:Key="RadiusXs">4</CornerRadius>
+      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+      <CornerRadius x:Key="RadiusXl">14</CornerRadius>
+
+      <!-- Spacing (Thickness) -->
+      <Thickness x:Key="SpacingCardPadding">14</Thickness>
+      <Thickness x:Key="SpacingPagePadding">22,18</Thickness>
+      <Thickness x:Key="SpacingGapSm">0,6</Thickness>
+      <Thickness x:Key="SpacingGapMd">0,10</Thickness>
+      <Thickness x:Key="SpacingGapLg">0,14</Thickness>
+
+      <!-- Glow shadows (BoxShadow "offsetX offsetY blur spread color") -->
+      <BoxShadows x:Key="GlowTeal">0 0 20 0 #3300D4AA</BoxShadows>
+      <BoxShadows x:Key="GlowPurple">0 0 20 0 #33B088FF</BoxShadows>
+      <BoxShadows x:Key="GlowAmber">0 0 20 0 #2EF59E0B</BoxShadows>
+      <BoxShadows x:Key="GlowPink">0 0 20 0 #33EC4899</BoxShadows>
+      <BoxShadows x:Key="GlowHealth">0 0 28 0 #6600D4AA</BoxShadows>
+      <BoxShadows x:Key="GlowHero">0 0 32 0 #1A00D4AA</BoxShadows>
     </ResourceDictionary>
   </Styles.Resources>
 </Styles>

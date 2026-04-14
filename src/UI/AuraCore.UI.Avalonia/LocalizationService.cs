@@ -1016,6 +1016,15 @@ public static class LocalizationService
         ["nav.isoBuilder"] = "ISO Builder",
         ["nav.adminPanel"] = "Admin Panel",
 
+        // Phase 2: New sidebar category names (job-based)
+        ["nav.categoryOptimize"] = "Optimize",
+        ["nav.categoryCleanDebloat"] = "Clean & Debloat",
+        ["nav.categoryGaming"] = "Gaming",
+        ["nav.categorySecurity"] = "Security",
+        ["nav.categoryAppsTools"] = "Apps & Tools",
+        ["nav.categoryAiFeatures"] = "AI Features",
+        ["nav.categoryAdvanced"] = "ADVANCED",
+
         // ── AI Chat ──
         ["aiChat.title"] = "AI Assistant",
         ["aiChat.ready"] = "AI Assistant Ready",
@@ -2060,6 +2069,15 @@ public static class LocalizationService
         ["nav.aiChat"] = "AI Sohbet [Deneysel]",
         ["nav.isoBuilder"] = "ISO Olusturucu",
         ["nav.adminPanel"] = "Yonetici Paneli",
+
+        // Phase 2: New sidebar category names (job-based)
+        ["nav.categoryOptimize"] = "Optimize",
+        ["nav.categoryCleanDebloat"] = "Temizle & Debloat",
+        ["nav.categoryGaming"] = "Oyun",
+        ["nav.categorySecurity"] = "Guvenlik",
+        ["nav.categoryAppsTools"] = "Uygulamalar & Araclar",
+        ["nav.categoryAiFeatures"] = "AI Ozellikleri",
+        ["nav.categoryAdvanced"] = "GELISMIS",
 
         // ── AI Chat ──
         ["aiChat.title"] = "AI Asistan",

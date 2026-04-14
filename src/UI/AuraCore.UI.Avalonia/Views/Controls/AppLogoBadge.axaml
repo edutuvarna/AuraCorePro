@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.AppLogoBadge"
+             x:Name="Root">
+  <Grid ColumnDefinitions="Auto,*" Margin="8,6,8,16">
+    <Border Width="28" Height="28" CornerRadius="7" BoxShadow="{DynamicResource GlowTeal}">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Offset="0" Color="#00D4AA"/>
+          <GradientStop Offset="1" Color="#8B5CF6"/>
+        </LinearGradientBrush>
+      </Border.Background>
+      <TextBlock Text="A"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Foreground="White"
+                 FontWeight="ExtraBold"
+                 FontSize="13"/>
+    </Border>
+    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+      <TextBlock Text="{Binding #Root.ProductName}"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 FontSize="13" FontWeight="SemiBold"/>
+      <TextBlock Text="{Binding #Root.Tagline}"
+                 Foreground="{DynamicResource AccentTealBrush}"
+                 FontSize="8" FontWeight="Bold"
+                 LetterSpacing="1.5"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

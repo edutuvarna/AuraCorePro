@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.SidebarSectionDivider"
+             x:Name="Root">
+  <Grid ColumnDefinitions="*,Auto,*" Margin="8,14,8,6">
+    <Rectangle Grid.Column="0" Height="1" Fill="{DynamicResource BorderSubtleBrush}"/>
+    <TextBlock Grid.Column="1"
+               Text="{Binding #Root.Label}"
+               Foreground="{DynamicResource TextDisabledBrush}"
+               FontSize="8"
+               FontWeight="Bold"
+               LetterSpacing="1.5"
+               Margin="8,0"/>
+    <Rectangle Grid.Column="2" Height="1" Fill="{DynamicResource BorderSubtleBrush}"/>
+  </Grid>
+</UserControl>

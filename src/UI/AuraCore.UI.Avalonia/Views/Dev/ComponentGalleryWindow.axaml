@@ -1,0 +1,119 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+        x:Class="AuraCore.UI.Avalonia.Views.Dev.ComponentGalleryWindow"
+        Title="AuraCore Design System — Gallery"
+        Width="1100" Height="800"
+        Background="{DynamicResource BgDeepBrush}">
+  <ScrollViewer Padding="24">
+    <StackPanel Spacing="20">
+
+      <TextBlock Text="Design System Gallery" FontSize="22" FontWeight="Bold"
+                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <TextBlock Text="All 12 primitives rendered with sample data." FontSize="12"
+                 Foreground="{DynamicResource TextMutedBrush}"/>
+
+      <!-- AppLogoBadge + UserChip -->
+      <TextBlock Text="Sidebar header primitives" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <Border Width="240" Background="{DynamicResource BgSidebarBrush}">
+          <StackPanel>
+            <controls:AppLogoBadge/>
+            <controls:UserChip Email="admin@aura.pro" Role="ADMIN" AvatarInitial="A"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Sidebar items -->
+      <TextBlock Text="Sidebar navigation" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <Border Width="240" Background="{DynamicResource BgSidebarBrush}" Padding="10">
+        <StackPanel Spacing="2">
+          <controls:SidebarNavItem Label="Dashboard" IsActive="True" Icon="{StaticResource IconDashboard}"/>
+          <controls:SidebarNavItem Label="Optimize" Icon="{StaticResource IconZap}"/>
+          <controls:SidebarNavItem Label="AI Features" TrailingChipText="CORTEX" Icon="{StaticResource IconStar}"
+                                   AccentBrush="{DynamicResource AccentPurpleBrush}"/>
+          <controls:SidebarSectionDivider Label="ADVANCED"/>
+          <controls:SidebarNavItem Label="Registry (deep)" Icon="{StaticResource IconSettings}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Gauges -->
+      <TextBlock Text="Gauges" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <UniformGrid Columns="5" Rows="1" HorizontalAlignment="Left" Width="900">
+        <controls:Gauge Label="CPU" Value="14" SubLabel="%" Insight="Spike detected"
+                        RingBrush="{DynamicResource AccentTealBrush}"
+                        InsightBrush="{DynamicResource AccentAmberBrush}"
+                        Icon="{StaticResource IconCpu}"/>
+        <controls:Gauge Label="RAM" Value="41" SubLabel="/ 31.3 GB" Insight="Healthy"
+                        RingBrush="{DynamicResource AccentPurpleBrush}"
+                        InsightBrush="{DynamicResource AccentTealBrush}"
+                        Icon="{StaticResource IconRam}"/>
+        <controls:Gauge Label="GPU" Value="28" SubLabel="68°C" Insight="Radeon 780M"
+                        RingBrush="{DynamicResource AccentPinkBrush}"
+                        InsightBrush="{DynamicResource TextSecondaryBrush}"
+                        Icon="{StaticResource IconGpu}"/>
+        <controls:Gauge Label="DISK C:" Value="88" SubLabel="105 GB free" Insight="127 days"
+                        RingBrush="{DynamicResource AccentAmberBrush}"
+                        InsightBrush="{DynamicResource AccentPurpleBrush}"
+                        Icon="{StaticResource IconHardDrive}"/>
+        <controls:Gauge Label="HEALTH" Value="90" SubLabel="" Insight="Excellent"
+                        RingBrush="{DynamicResource AccentTealBrush}"
+                        InsightBrush="{DynamicResource AccentTealBrush}"
+                        Icon="{StaticResource IconHeart}"/>
+      </UniformGrid>
+
+      <!-- Hero -->
+      <TextBlock Text="Hero CTA" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <controls:HeroCTA Width="500"
+                        Kicker="CORTEX RECOMMENDS"
+                        Title="Smart Optimize Now"
+                        Body="RAM cleanup + 3 bloatware apps + gaming mode profile."
+                        PrimaryButtonText="Optimize"
+                        SecondaryButtonText="Review"/>
+
+      <!-- GlassCard + InsightCard -->
+      <TextBlock Text="Cards" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <controls:GlassCard Width="260">
+          <controls:GlassCard.CardContent>
+            <TextBlock Text="This is a GlassCard with any content inside."
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+          </controls:GlassCard.CardContent>
+        </controls:GlassCard>
+        <controls:InsightCard Title="Cortex Insights" UpdatedAt="2m ago" Width="280"/>
+      </StackPanel>
+
+      <!-- Quick Actions -->
+      <TextBlock Text="Quick Actions" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <UniformGrid Columns="4" Rows="1" Width="700">
+        <controls:QuickActionTile Title="Clean Junk" SubLabel="Temp, cache, logs"
+                                  Icon="{StaticResource IconSparkles}"
+                                  TintBrush="{DynamicResource AccentTealBrush}"/>
+        <controls:QuickActionTile Title="Optimize RAM" SubLabel="Free memory"
+                                  Icon="{StaticResource IconRotateCcw}"
+                                  TintBrush="{DynamicResource AccentPurpleBrush}"/>
+        <controls:QuickActionTile Title="Gaming Mode" SubLabel="Ready to game"
+                                  Icon="{StaticResource IconGamepad}"
+                                  TintBrush="{DynamicResource AccentAmberBrush}"/>
+        <controls:QuickActionTile Title="Security Scan" SubLabel="Defender + firewall"
+                                  Icon="{StaticResource IconShieldCheck}"
+                                  TintBrush="{DynamicResource AccentTealBrush}"/>
+      </UniformGrid>
+
+      <!-- Chips + Badges + Toggle -->
+      <TextBlock Text="Chips, Badges, Toggle" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <controls:StatusChip Label="LIVE" AccentBrush="{DynamicResource AccentTealBrush}"/>
+        <controls:StatusChip Label="Cortex AI · ON" AccentBrush="{DynamicResource AccentPurpleBrush}"
+                             ShowDot="False" Icon="{StaticResource IconStar}"/>
+        <controls:AccentBadge Label="CORTEX" AccentBrush="{DynamicResource AccentPurpleBrush}"/>
+        <controls:AccentBadge Label="ADMIN" AccentBrush="{DynamicResource AccentPurpleBrush}"/>
+        <controls:AccentBadge Label="DENEYSEL" AccentBrush="{DynamicResource AccentAmberBrush}"/>
+        <controls:AuraToggle IsOn="True"/>
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
+</Window>

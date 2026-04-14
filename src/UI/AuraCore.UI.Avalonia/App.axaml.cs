@@ -125,6 +125,16 @@ public partial class App : global::Avalonia.Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new Views.LoginWindow();
+
+#if DEBUG
+            desktop.MainWindow.KeyDown += (s, e) =>
+            {
+                if (e.Key == global::Avalonia.Input.Key.F12 && e.KeyModifiers.HasFlag(global::Avalonia.Input.KeyModifiers.Control))
+                {
+                    new Views.Dev.ComponentGalleryWindow().Show();
+                }
+            };
+#endif
         }
 
         base.OnFrameworkInitializationCompleted();

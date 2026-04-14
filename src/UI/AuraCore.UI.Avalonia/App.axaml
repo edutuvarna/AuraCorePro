@@ -6,5 +6,7 @@
   <Application.Styles>
     <FluentTheme />
     <StyleInclude Source="avares://AuraCore.Pro/Themes/AuraCoreTheme.axaml" />
+    <StyleInclude Source="avares://AuraCore.Pro/Themes/AuraCoreThemeV2.axaml"/>
+    <StyleInclude Source="avares://AuraCore.Pro/Themes/Icons.axaml"/>
   </Application.Styles>
 </Application>

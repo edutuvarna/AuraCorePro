@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.StatusChip"
+             x:Name="Root">
+  <Border CornerRadius="12" Padding="10,4" BorderThickness="1">
+    <Border.Background>
+      <SolidColorBrush Color="{Binding #Root.AccentBrush.Color, FallbackValue=#00D4AA}" Opacity="0.15"/>
+    </Border.Background>
+    <Border.BorderBrush>
+      <SolidColorBrush Color="{Binding #Root.AccentBrush.Color, FallbackValue=#00D4AA}" Opacity="0.2"/>
+    </Border.BorderBrush>
+    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+      <Ellipse Width="6" Height="6"
+               Fill="{Binding #Root.AccentBrush}"
+               IsVisible="{Binding #Root.ShowDot}"/>
+      <Path Data="{Binding #Root.Icon}"
+            Fill="{Binding #Root.AccentBrush}"
+            Width="11" Height="11"
+            IsVisible="{Binding #Root.Icon, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+      <TextBlock Text="{Binding #Root.Label}"
+                 Foreground="{Binding #Root.AccentBrush}"
+                 FontSize="{DynamicResource FontSizeLabel}"
+                 FontWeight="SemiBold"/>
+    </StackPanel>
+  </Border>
+</UserControl>

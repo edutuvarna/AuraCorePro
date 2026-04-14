@@ -1012,7 +1012,7 @@ public static class LocalizationService
         ["nav.autoSchedule"] = "Auto-Schedule",
         ["nav.aiRecommendations"] = "AI Recommendations",
         ["nav.aiInsights"] = "AI Insights",
-        ["nav.aiChat"] = "AI Chat",
+        ["nav.aiChat"] = "AI Chat [Experimental]",
         ["nav.isoBuilder"] = "ISO Builder",
         ["nav.adminPanel"] = "Admin Panel",
 
@@ -1023,6 +1023,8 @@ public static class LocalizationService
         ["aiChat.welcome"] = "Hello! I'm AuraCore AI Assistant. I can help you understand your system's performance, suggest optimizations, and answer questions about your computer. How can I help you today?",
         ["aiChat.modelNotFound"] = "AI model not found. Place a GGUF model file in the models directory to enable AI chat. You can still browse AI Insights for ML-based analysis.",
         ["aiChat.inputHint"] = "Type a message...",
+        ["aiChat.experimentalBadge"] = "EXPERIMENTAL",
+        ["aiChat.experimentalWarning"] = "This feature is experimental. Responses may be inaccurate. For reliable AI-powered analysis, use the AI Insights page.",
 
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Environment Variables",
@@ -2055,7 +2057,7 @@ public static class LocalizationService
         ["nav.autoSchedule"] = "Otomatik Zamanlama",
         ["nav.aiRecommendations"] = "Yapay Zeka Onerileri",
         ["nav.aiInsights"] = "AI Analiz",
-        ["nav.aiChat"] = "AI Sohbet",
+        ["nav.aiChat"] = "AI Sohbet [Deneysel]",
         ["nav.isoBuilder"] = "ISO Olusturucu",
         ["nav.adminPanel"] = "Yonetici Paneli",
 
@@ -2066,6 +2068,8 @@ public static class LocalizationService
         ["aiChat.welcome"] = "Merhaba! Ben AuraCore AI Asistan. Sisteminizin performansini anlamaniza, optimizasyonlar onermenize ve bilgisayariniz hakkindaki sorularinizi cevaplamamiza yardimci olabilirim. Size nasil yardimci olabilirim?",
         ["aiChat.modelNotFound"] = "AI modeli bulunamadi. AI sohbeti etkinlestirmek icin modeller dizinine bir GGUF model dosyasi yerlestirin. ML tabanli analiz icin AI Analiz sayfasini kullanabilirsiniz.",
         ["aiChat.inputHint"] = "Bir mesaj yazin...",
+        ["aiChat.experimentalBadge"] = "DENEYSEL",
+        ["aiChat.experimentalWarning"] = "Bu ozellik deneyseldir. Yanitlar hatali olabilir. Guvenilir AI destekli analiz icin AI Analiz sayfasini kullanin.",
 
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Ortam Degiskenleri",

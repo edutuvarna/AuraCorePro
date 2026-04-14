@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.AIChatView">
 
-  <Grid RowDefinitions="Auto,*,Auto" MaxWidth="760">
+  <Grid RowDefinitions="Auto,Auto,*,Auto" MaxWidth="760">
 
     <!-- HEADER -->
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
@@ -16,21 +16,41 @@
       <Border Grid.Column="1" CornerRadius="14"
               Padding="8,4" VerticalAlignment="Center" BorderThickness="1">
         <Border.Background>
-          <SolidColorBrush Color="#8B5CF6" Opacity="0.06"/>
+          <SolidColorBrush Color="#F59E0B" Opacity="0.08"/>
         </Border.Background>
         <Border.BorderBrush>
-          <SolidColorBrush Color="#8B5CF6" Opacity="0.12"/>
+          <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
         </Border.BorderBrush>
         <StackPanel Orientation="Horizontal" Spacing="5">
-          <Border Width="5" Height="5" CornerRadius="3" Background="#8B5CF6"/>
-          <TextBlock x:Name="ModelBadgeText" Text="AI CHAT"
-                     FontSize="9" FontWeight="Bold" Foreground="#8B5CF6"/>
+          <TextBlock Text="&#x26A0;" FontSize="9" Foreground="#F59E0B"
+                     VerticalAlignment="Center"/>
+          <TextBlock x:Name="BadgeText" Text="EXPERIMENTAL"
+                     FontSize="9" FontWeight="Bold" Foreground="#F59E0B"/>
         </StackPanel>
       </Border>
     </Grid>
 
+    <!-- EXPERIMENTAL WARNING BANNER -->
+    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
+            Padding="10" Margin="0,0,0,10" BorderThickness="1">
+      <Border.Background>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.08"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
+      </Border.BorderBrush>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="&#x26A0;" FontSize="13" Foreground="#F59E0B"
+                   VerticalAlignment="Top" Margin="0,1,0,0"/>
+        <TextBlock x:Name="WarningText"
+                   Text="This feature is experimental. Responses may be inaccurate."
+                   FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap"
+                   Opacity="0.9"/>
+      </StackPanel>
+    </Border>
+
     <!-- CHAT MESSAGES -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
             Padding="10" Margin="0,0,0,10">
       <Border.Background>
         <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
@@ -44,7 +64,7 @@
     </Border>
 
     <!-- INPUT AREA -->
-    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
       <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="4">
         <Border.Background>
           <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>

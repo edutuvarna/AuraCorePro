@@ -45,6 +45,8 @@ public partial class AIChatView : UserControl
         HeaderTitle.Text = LocalizationService._("aiChat.title");
         StatusText.Text = LocalizationService._("aiChat.ready");
         InputBox.Watermark = LocalizationService._("aiChat.inputHint");
+        BadgeText.Text = LocalizationService._("aiChat.experimentalBadge");
+        WarningText.Text = LocalizationService._("aiChat.experimentalWarning");
     }
 
     private void RestoreOrWelcome()

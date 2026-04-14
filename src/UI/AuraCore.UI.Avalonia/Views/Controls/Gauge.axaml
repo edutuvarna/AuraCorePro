@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AuraCore.UI.Avalonia.Views.Controls"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.Gauge"
+             x:Name="Root">
+  <Border CornerRadius="{DynamicResource RadiusLg}"
+          BorderBrush="{DynamicResource BorderSubtleBrush}"
+          BorderThickness="1"
+          Background="{DynamicResource BgCardBrush}"
+          Padding="12">
+    <Grid RowDefinitions="Auto,*,Auto">
+
+      <!-- Header: label + icon -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+        <TextBlock Text="{Binding #Root.Label}"
+                   Foreground="{DynamicResource TextMutedBrush}"
+                   FontSize="{DynamicResource FontSizeCaption}"
+                   FontWeight="SemiBold"
+                   LetterSpacing="1"/>
+        <Path Grid.Column="1"
+              Data="{Binding #Root.Icon}"
+              Stroke="{Binding #Root.RingBrush}"
+              StrokeThickness="2"
+              Width="14" Height="14"/>
+      </Grid>
+
+      <!-- Center: circular ring with value -->
+      <Grid Grid.Row="1" HorizontalAlignment="Center">
+        <Ellipse Width="56" Height="56"
+                 Stroke="{DynamicResource BorderSubtleBrush}"
+                 StrokeThickness="6"/>
+        <Ellipse Width="56" Height="56"
+                 Stroke="{Binding #Root.RingBrush}"
+                 StrokeThickness="6"
+                 StrokeDashArray="{Binding #Root.Value, Converter={x:Static local:GaugeDashConverter.Instance}}"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+          <TextBlock Text="{Binding #Root.Value, StringFormat={}{0:0}}"
+                     Foreground="{DynamicResource TextPrimaryBrush}"
+                     FontSize="14" FontWeight="Bold"
+                     HorizontalAlignment="Center"/>
+          <TextBlock Text="{Binding #Root.SubLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"
+                     FontSize="7"
+                     HorizontalAlignment="Center"
+                     IsVisible="{Binding #Root.SubLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- Footer: AI insight -->
+      <TextBlock Grid.Row="2"
+                 Margin="0,8,0,0"
+                 Text="{Binding #Root.Insight}"
+                 Foreground="{Binding #Root.InsightBrush}"
+                 FontSize="9"
+                 HorizontalAlignment="Center"
+                 IsVisible="{Binding #Root.Insight, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+    </Grid>
+  </Border>
+</UserControl>

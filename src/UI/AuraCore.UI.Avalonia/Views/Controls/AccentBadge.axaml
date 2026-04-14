@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.AccentBadge"
+             x:Name="Root">
+  <Border CornerRadius="4" Padding="6,2">
+    <Border.Background>
+      <SolidColorBrush Color="{Binding #Root.AccentBrush.Color, FallbackValue=#8B5CF6}" Opacity="0.15"/>
+    </Border.Background>
+    <TextBlock Text="{Binding #Root.Label}"
+               Foreground="{Binding #Root.AccentBrush}"
+               FontSize="8"
+               FontWeight="Bold"
+               LetterSpacing="0.5"/>
+  </Border>
+</UserControl>

@@ -1,0 +1,60 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ══════════════════════════════════════════════════════
+       AuraCore Pro V2 Design System
+       Source: docs/superpowers/specs/2026-04-14-ui-rebuild-vision-document.md
+       Dark-only in v1. Modern glassmorphism, cross-platform.
+       ══════════════════════════════════════════════════════ -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+
+          <!-- ── Backgrounds ──────────────────────────── -->
+          <SolidColorBrush x:Key="BgDeepBrush" Color="#0A0A10"/>
+          <SolidColorBrush x:Key="BgSurfaceBrush" Color="#0E0E14"/>
+          <SolidColorBrush x:Key="BgSidebarBrush" Color="#0B0B11"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#06FFFFFF"/><!-- ~2.5% alpha white -->
+          <SolidColorBrush x:Key="BgCardElevatedBrush" Color="#0AFFFFFF"/><!-- ~4% -->
+
+          <!-- ── Borders ─────────────────────────────── -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#0FFFFFFF"/><!-- ~6% -->
+          <SolidColorBrush x:Key="BorderEmphasisBrush" Color="#14FFFFFF"/><!-- ~8% -->
+
+          <!-- ── Text ─────────────────────────────────── -->
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F0F0F5"/>
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#E8E8F0"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#888899"/>
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#555570"/>
+
+          <!-- ── Accent: Teal ─────────────────────────── -->
+          <SolidColorBrush x:Key="AccentTealBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="AccentTealLightBrush" Color="#6CE0C0"/>
+          <SolidColorBrush x:Key="AccentTealDimBrush" Color="#1400D4AA"/><!-- ~8% -->
+
+          <!-- ── Accent: Purple ───────────────────────── -->
+          <SolidColorBrush x:Key="AccentPurpleBrush" Color="#B088FF"/>
+          <SolidColorBrush x:Key="AccentPurpleDeepBrush" Color="#8B5CF6"/>
+          <SolidColorBrush x:Key="AccentPurpleDimBrush" Color="#0F8B5CF6"/><!-- ~6% -->
+
+          <!-- ── Accent: Amber ────────────────────────── -->
+          <SolidColorBrush x:Key="AccentAmberBrush" Color="#F59E0B"/>
+          <SolidColorBrush x:Key="AccentAmberDimBrush" Color="#14F59E0B"/><!-- ~8% -->
+
+          <!-- ── Accent: Pink ─────────────────────────── -->
+          <SolidColorBrush x:Key="AccentPinkBrush" Color="#EC4899"/>
+          <SolidColorBrush x:Key="AccentPinkDimBrush" Color="#14EC4899"/><!-- ~8% -->
+
+          <!-- ── Semantic ─────────────────────────────── -->
+          <SolidColorBrush x:Key="StatusSuccessBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="StatusWarningBrush" Color="#F59E0B"/>
+          <SolidColorBrush x:Key="StatusErrorBrush" Color="#EF4444"/>
+          <SolidColorBrush x:Key="StatusInfoBrush" Color="#B088FF"/>
+
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

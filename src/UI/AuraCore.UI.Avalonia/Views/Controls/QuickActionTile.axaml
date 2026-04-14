@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.QuickActionTile"
+             x:Name="Root">
+  <Button Command="{Binding #Root.Command}"
+          Padding="0"
+          Background="Transparent"
+          BorderThickness="0"
+          Cursor="Hand"
+          HorizontalContentAlignment="Stretch">
+    <Border Padding="10"
+            CornerRadius="{DynamicResource RadiusMd}"
+            BorderThickness="1">
+      <Border.Background>
+        <SolidColorBrush Color="{Binding #Root.TintBrush.Color, FallbackValue=#00D4AA}" Opacity="0.08"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="{Binding #Root.TintBrush.Color, FallbackValue=#00D4AA}" Opacity="0.15"/>
+      </Border.BorderBrush>
+      <StackPanel>
+        <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+          <Path Data="{Binding #Root.Icon}"
+                Stroke="{Binding #Root.TintBrush}"
+                StrokeThickness="2"
+                Width="11" Height="11"
+                Margin="0,0,6,0"/>
+          <TextBlock Grid.Column="1"
+                     Text="{Binding #Root.Title}"
+                     Foreground="{Binding #Root.TintBrush}"
+                     FontSize="{DynamicResource FontSizeBody}"/>
+        </Grid>
+        <TextBlock Text="{Binding #Root.SubLabel}"
+                   Foreground="{DynamicResource TextMutedBrush}"
+                   FontSize="{DynamicResource FontSizeCaption}"/>
+      </StackPanel>
+    </Border>
+  </Button>
+</UserControl>

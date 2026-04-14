@@ -158,7 +158,7 @@ app.MapGet("/health", async (AuraCoreDbContext db) =>
     {
         return Results.Ok(new { status = "healthy", database = dbStatus });
     }
-    return Results.Ok(new { status = "healthy", database = dbStatus, timestamp = DateTimeOffset.UtcNow, version = "1.0.0" });
+    return Results.Ok(new { status = "healthy", database = dbStatus, timestamp = DateTimeOffset.UtcNow, version = "1.7.0" });
 });
 
 app.Run();

@@ -12,4 +12,9 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Stripe.net" Version="45.15.0" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Never overwrite production secrets on deploy.
+         The production server keeps its own appsettings.Production.json with real DB credentials. -->
+    <Content Update="appsettings.Production.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>

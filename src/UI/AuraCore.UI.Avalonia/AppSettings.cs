@@ -5,6 +5,10 @@ namespace AuraCore.UI.Avalonia;
 /// <summary>
 /// Application-level user preferences persisted to disk.
 /// Phase 3 extensions: AI feature toggles, chat opt-in state, active model tracking, learning-day anchor.
+///
+/// <para><b>Thread safety:</b> Instance members are NOT thread-safe. Callers holding the DI singleton
+/// (registered in Task 10) must serialize <see cref="Save"/> calls. INotifyPropertyChanged will be
+/// added in Task 13 for ViewModel binding; see spec §5.2 for CortexAmbientService subscription.</para>
 /// </summary>
 public class AppSettings
 {
@@ -49,7 +53,12 @@ public class AppSettings
             var dir = Path.GetDirectoryName(FilePath);
             if (dir != null) Directory.CreateDirectory(dir);
             var json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(FilePath, json);
+
+            // Crash-safe write: temp file + atomic rename. Prevents torn/empty file on process kill
+            // mid-write, which would otherwise silently reset user's chat opt-in state on next Load.
+            var tempPath = FilePath + ".tmp";
+            File.WriteAllText(tempPath, json);
+            File.Move(tempPath, FilePath, overwrite: true);
         }
         catch
         {

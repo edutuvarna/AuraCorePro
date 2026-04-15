@@ -46,6 +46,13 @@ public class IconsTests
     [InlineData("IconClock")]
     [InlineData("IconDatabase")]
     [InlineData("IconWifi")]
+    [InlineData("IconSparklesFilled")]
+    [InlineData("IconLightbulb")]
+    [InlineData("IconCalendarClock")]
+    [InlineData("IconMessageSquare")]
+    [InlineData("IconDownload")]
+    [InlineData("IconWarningTriangleFilled")]
+    [InlineData("IconLock")]
     public void Icon_Resolves_AsGeometry(string key)
     {
         var styles = LoadIcons();

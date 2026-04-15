@@ -2,6 +2,7 @@ using AuraCore.UI.Avalonia.Services.AI;
 using global::Avalonia.Controls;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
@@ -157,14 +158,30 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
                 _ambient.Refresh();
             }
         };
-        ChatCard.PropertyChanged += (_, e) =>
+        ChatCard.PropertyChanged += async (_, e) =>
         {
-            if (e.PropertyName == nameof(AIFeatureCardVM.IsEnabled))
+            if (e.PropertyName != nameof(AIFeatureCardVM.IsEnabled)) return;
+
+            if (ChatCard.IsEnabled)
             {
-                _settings.ChatEnabled = ChatCard.IsEnabled;
-                _settings.Save();
-                _ambient.Refresh();
+                // User is trying to enable chat. Check if opt-in flow is required.
+                if (_settings.ActiveChatModelId is null || !_settings.ChatOptInAcknowledged)
+                {
+                    // Revert toggle until opt-in completes
+                    ChatCard.IsEnabled = false;
+                    var opened = await OpenChatOptInDialogAsync();
+                    if (opened)
+                    {
+                        // Opt-in flow already set ChatEnabled = true via CompleteFromStep2
+                        ChatCard.IsEnabled = true;
+                    }
+                    return;
+                }
             }
+
+            _settings.ChatEnabled = ChatCard.IsEnabled;
+            _settings.Save();
+            _ambient.Refresh();
         };
     }
 
@@ -201,6 +218,12 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
         var view = SectionViewFactory(section);
         _sectionViewCache[section] = view;
         return view;
+    }
+
+    private async Task<bool> OpenChatOptInDialogAsync()
+    {
+        if (ChatOptInOpener is null) return false;
+        return await ChatOptInOpener();
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -1,6 +1,8 @@
 using global::Avalonia.Controls;
 using global::Avalonia.Markup.Xaml;
+using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.ViewModels;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
@@ -33,6 +35,20 @@ public partial class AIFeaturesView : UserControl
 
         // Wire the section-view factory. Later tasks (20-24) will replace placeholders with real sections.
         vm.SectionViewFactory = CreateSectionView;
+
+        // Wire chat toggle -> opt-in dialog when first enabling chat.
+        vm.ChatOptInOpener = async () =>
+        {
+            var ownerWindow = global::Avalonia.VisualTree.VisualExtensions.FindAncestorOfType<Window>(this);
+            if (ownerWindow is null) return false;
+
+            var optInVm = new ChatOptInDialogViewModel(App.Services.GetRequiredService<AppSettings>());
+            var dialog = new ChatOptInDialog(optInVm);
+            await dialog.ShowDialog(ownerWindow);
+
+            // On completion, ChatOptInDialogViewModel.CompleteFromStep2 has already set ChatEnabled
+            return App.Services.GetRequiredService<AppSettings>().ChatEnabled;
+        };
 
         // Wire card click -> navigate
         foreach (var card in new[] { vm.InsightsCard, vm.RecommendationsCard, vm.ScheduleCard, vm.ChatCard })

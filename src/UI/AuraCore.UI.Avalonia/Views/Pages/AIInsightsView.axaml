@@ -234,6 +234,27 @@
         </StackPanel>
       </Border>
 
+      <!-- Recent Activity (migrated from Dashboard, Phase 2) -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}"
+              Margin="0,16,0,0">
+        <StackPanel Spacing="8">
+          <TextBlock Text="RECENT ACTIVITY"
+                     Foreground="{DynamicResource TextMutedBrush}"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     FontWeight="Bold"
+                     LetterSpacing="1"/>
+          <TextBlock x:Name="RecentActivityText"
+                     Text="No recent optimizations. Run Smart Optimize or Clean Junk to see activity here."
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+
       <!-- Footer -->
       <TextBlock x:Name="AutoRefreshText" Text=""
                  FontSize="9" Foreground="{DynamicResource TextMutedBrush}"

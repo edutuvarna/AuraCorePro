@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Dialogs.ModelManagerDialog"
+             x:DataType="vm:ModelManagerDialogViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="Border.model-row">
+      <Setter Property="Padding" Value="10" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="#0AFFFFFF" />
+      <Setter Property="BorderBrush" Value="#10FFFFFF" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Margin" Value="0,2" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*,Auto,Auto">
+    <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,12">
+      <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+      <TextBlock Text="{Binding Subtitle}" FontSize="11"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 TextWrapping="Wrap" />
+    </StackPanel>
+
+    <ScrollViewer Grid.Row="1" MaxHeight="400">
+      <ItemsControl ItemsSource="{Binding Models}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="vm:ModelListItemVM">
+            <Border Classes="model-row" Tapped="OnRowTapped" Tag="{Binding}">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <StackPanel Grid.Column="0" Spacing="2">
+                  <TextBlock Text="{Binding Model.DisplayName}" FontSize="11" FontWeight="SemiBold"
+                             Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <TextBlock Text="{Binding DisabledReason, FallbackValue=''}"
+                             FontSize="9" Foreground="{DynamicResource AccentAmberBrush}"
+                             IsVisible="{Binding DisabledReason, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}"
+                           FontSize="10" MinWidth="55" TextAlignment="Right" Margin="10,0"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <TextBlock Grid.Column="2" Text="{Binding RamDisplay}"
+                           FontSize="10" MinWidth="55" TextAlignment="Right" Margin="0,0,10,0"
+                           Foreground="{DynamicResource AccentPurpleBrush}" />
+                <Border Grid.Column="3" Padding="6,2" CornerRadius="3" Background="#14FFFFFF">
+                  <TextBlock Text="{Binding SpeedDisplay}" FontSize="8" FontWeight="Bold"
+                             Foreground="{DynamicResource TextSecondaryBrush}" />
+                </Border>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <StackPanel Grid.Row="2" Margin="0,12,0,0" Spacing="4"
+                IsVisible="{Binding IsDownloading}">
+      <TextBlock Text="Downloading..." FontSize="10" />
+      <ProgressBar Minimum="0" Maximum="100" Value="50" />
+    </StackPanel>
+
+    <TextBlock Grid.Row="2" Text="{Binding ErrorMessage}"
+               FontSize="10" Foreground="{DynamicResource StatusErrorBrush}"
+               TextWrapping="Wrap" Margin="0,8,0,0"
+               IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right"
+                Spacing="8" Margin="0,12,0,0">
+      <Button Content="Cancel" Command="{Binding CancelDialogCommand}" Padding="14,8" />
+      <Button Content="Download &amp; use" Command="{Binding DownloadCommand}"
+              Classes="primary" Padding="14,8" />
+    </StackPanel>
+  </Grid>
+</UserControl>

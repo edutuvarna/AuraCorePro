@@ -5,14 +5,14 @@ using global::Avalonia.Threading;
 using AuraCore.Application.Interfaces.Engines;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AuraCore.UI.Avalonia.Views.Pages;
+namespace AuraCore.UI.Avalonia.Views.Pages.AI;
 
-public partial class AIInsightsView : UserControl
+public partial class InsightsSection : UserControl
 {
     private IAIAnalyzerEngine? _aiEngine;
     private bool _initialized;
 
-    public AIInsightsView()
+    public InsightsSection()
     {
         InitializeComponent();
         Loaded += OnLoaded;
@@ -44,7 +44,7 @@ public partial class AIInsightsView : UserControl
     private void ApplyLocalization()
     {
         // Hero
-        HeroTitle.Text = LocalizationService._("ai.title");
+        PageTitle.Text = LocalizationService._("ai.title");
         HeroSubtitle.Text = LocalizationService._("ai.subtitle");
         EngineStatusLabel.Text = LocalizationService._("ai.engine");
 

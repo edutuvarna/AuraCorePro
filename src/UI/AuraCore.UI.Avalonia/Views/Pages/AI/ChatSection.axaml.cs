@@ -7,16 +7,16 @@ using global::Avalonia.Threading;
 using AuraCore.Application.Interfaces.Engines;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AuraCore.UI.Avalonia.Views.Pages;
+namespace AuraCore.UI.Avalonia.Views.Pages.AI;
 
-public partial class AIChatView : UserControl
+public partial class ChatSection : UserControl
 {
     private IAuraCoreLLM? _llm;
     private IAIAnalyzerEngine? _aiEngine;
     private bool _initialized;
     private bool _isSending;
 
-    public AIChatView()
+    public ChatSection()
     {
         InitializeComponent();
         Loaded += OnLoaded;
@@ -42,10 +42,7 @@ public partial class AIChatView : UserControl
 
     private void ApplyLocalization()
     {
-        HeaderTitle.Text = LocalizationService._("aiChat.title");
-        StatusText.Text = LocalizationService._("aiChat.ready");
         InputBox.Watermark = LocalizationService._("aiChat.inputHint");
-        BadgeText.Text = LocalizationService._("aiChat.experimentalBadge");
         WarningText.Text = LocalizationService._("aiChat.experimentalWarning");
     }
 
@@ -98,7 +95,6 @@ public partial class AIChatView : UserControl
 
         _isSending = true;
         SendButton.IsEnabled = false;
-        StatusText.Text = LocalizationService._("aiChat.thinking");
 
         try
         {
@@ -133,7 +129,6 @@ public partial class AIChatView : UserControl
             {
                 _isSending = false;
                 SendButton.IsEnabled = true;
-                StatusText.Text = LocalizationService._("aiChat.ready");
             });
         }
     }

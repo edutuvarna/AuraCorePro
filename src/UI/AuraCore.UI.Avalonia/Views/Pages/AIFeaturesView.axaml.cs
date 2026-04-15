@@ -57,6 +57,7 @@ public partial class AIFeaturesView : UserControl
             "insights" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.InsightsSection>(),
             "recommendations" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.RecommendationsSection>(),
             "schedule" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.ScheduleSection>(),
+            "chat" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.ChatSection>(),
             _ => new UserControl { Content = new TextBlock { Text = $"[{section}] placeholder — wired in Task 20+" } },
         };
     }

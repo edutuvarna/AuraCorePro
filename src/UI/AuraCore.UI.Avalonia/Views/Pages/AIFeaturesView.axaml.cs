@@ -54,6 +54,7 @@ public partial class AIFeaturesView : UserControl
         //   "chat" => App.Services.GetRequiredService<Views.Pages.AI.ChatSection>(),
         return section switch
         {
+            "schedule" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.ScheduleSection>(),
             _ => new UserControl { Content = new TextBlock { Text = $"[{section}] placeholder — wired in Task 20+" } },
         };
     }

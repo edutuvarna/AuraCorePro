@@ -4,9 +4,9 @@ using global::Avalonia.Layout;
 using global::Avalonia.Media;
 using global::Avalonia.Threading;
 
-namespace AuraCore.UI.Avalonia.Views.Pages;
+namespace AuraCore.UI.Avalonia.Views.Pages.AI;
 
-public partial class SchedulerView : UserControl
+public partial class ScheduleSection : UserControl
 {
     private readonly Dictionary<string, ScheduleInfo> _schedules = new();
 
@@ -26,7 +26,7 @@ public partial class SchedulerView : UserControl
     private static readonly string[] IntervalKeys =
         { "disabled", "1h", "6h", "12h", "daily", "weekly" };
 
-    public SchedulerView()
+    public ScheduleSection()
     {
         InitializeComponent();
         Loaded += (_, _) => { BuildCards(); ApplyLocalization(); };

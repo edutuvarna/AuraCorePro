@@ -8,6 +8,7 @@ using global::Avalonia.Threading;
 using global::Avalonia.VisualTree;
 using AuraCore.Application.Interfaces.Engines;
 using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
 using AuraCore.UI.Avalonia.Views.Controls;
 using AuraCore.UI.Avalonia.Views.Dialogs;
@@ -17,7 +18,30 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class DashboardView : UserControl
 {
-    private readonly DashboardViewModel _vm = new();
+    // Resolve ambient + settings from DI so DashboardViewModel receives the
+    // same singletons that AIFeaturesViewModel mutates — ripple properties
+    // (ShowCortexInsightsCard, CortexChipLabel, SmartOptimizeEnabled) react
+    // when the user toggles a feature from AI Features page. Falls back to
+    // parameterless ctor in design-time / early-lifecycle paths where
+    // App.Services isn't available yet (throws NullRef in xaml designer).
+    private readonly DashboardViewModel _vm = CreateVM();
+
+    private static DashboardViewModel CreateVM()
+    {
+        try
+        {
+            var provider = App.Services;
+            if (provider is null) return new DashboardViewModel();
+            var ambient = provider.GetService<ICortexAmbientService>();
+            var settings = provider.GetService<AppSettings>();
+            return new DashboardViewModel(ambient, settings);
+        }
+        catch
+        {
+            return new DashboardViewModel();
+        }
+    }
+
     private DispatcherTimer? _timer;
     private IAIAnalyzerEngine? _aiEngine;
     private bool _initialized;

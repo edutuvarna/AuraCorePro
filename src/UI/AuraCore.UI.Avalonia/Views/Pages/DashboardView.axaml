@@ -15,6 +15,7 @@
                      FontWeight="SemiBold"/>
           <TextBlock x:Name="MonitoringText"
                      Text="Cortex is monitoring"
+                     IsVisible="{Binding ShowCortexSubtitle}"
                      Foreground="{DynamicResource TextMutedBrush}"
                      FontSize="{DynamicResource FontSizeBodySmall}"/>
         </StackPanel>
@@ -22,7 +23,7 @@
           <controls:StatusChip Label="LIVE"
                                AccentBrush="{DynamicResource AccentTealBrush}"/>
           <controls:StatusChip x:Name="CortexChip"
-                               Label="Cortex AI · ON"
+                               Label="{Binding CortexChipLabel}"
                                AccentBrush="{DynamicResource AccentPurpleBrush}"
                                ShowDot="False"/>
         </StackPanel>
@@ -63,13 +64,35 @@
                           Title="Smart Optimize Now"
                           Body="Personalized optimization is a click away."
                           PrimaryButtonText="Optimize"
-                          SecondaryButtonText="Review"/>
-        <controls:InsightCard Grid.Column="1"
-                              x:Name="InsightCard"
-                              Title="Cortex Insights"
-                              UpdatedAt="Updated 2m ago"
-                              Rows="{Binding Insights}"
-                              Margin="8,0,0,0"/>
+                          SecondaryButtonText="Review"
+                          IsEnabled="{Binding SmartOptimizeEnabled}"/>
+        <!-- Cortex Insights swaps with a "paused" placeholder when InsightsEnabled is false -->
+        <Panel Grid.Column="1" Margin="8,0,0,0">
+          <controls:InsightCard x:Name="InsightCard"
+                                IsVisible="{Binding ShowCortexInsightsCard}"
+                                Title="Cortex Insights"
+                                UpdatedAt="Updated 2m ago"
+                                Rows="{Binding Insights}"/>
+          <Border x:Name="InsightsPausedPlaceholder"
+                  IsVisible="{Binding !ShowCortexInsightsCard}"
+                  Background="{DynamicResource BgCardBrush}"
+                  BorderBrush="{DynamicResource BorderSubtleBrush}"
+                  BorderThickness="1"
+                  CornerRadius="{DynamicResource RadiusLg}"
+                  Padding="{DynamicResource SpacingCardPadding}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
+              <TextBlock Text="AI Insights paused"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         HorizontalAlignment="Center"/>
+              <TextBlock Text="Enable Insights in AI Features"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         TextWrapping="Wrap"
+                         TextAlignment="Center"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+            </StackPanel>
+          </Border>
+        </Panel>
       </Grid>
 
       <!-- Row 3: System Info + Quick Actions -->

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.Views.Controls;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
@@ -19,7 +20,41 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     private int _cortexDaysActive = 0;
     private bool _cortexOn = true;
 
+    // Phase 3 Task 32: ripple state driven by ambient + settings
+    private readonly ICortexAmbientService? _ambient;
+    private readonly AppSettings? _settings;
+
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Primary ctor. Both parameters optional so existing call sites
+    /// (<c>new DashboardViewModel()</c> in DashboardView field init + tests)
+    /// keep working without ambient wiring. When both are supplied, the VM
+    /// subscribes to ambient events and fires PropertyChanged on ripple
+    /// properties whenever a feature toggle flips.
+    /// </summary>
+    public DashboardViewModel(ICortexAmbientService? ambient = null, AppSettings? settings = null)
+    {
+        _ambient = ambient;
+        _settings = settings;
+        if (_ambient is not null)
+        {
+            _ambient.PropertyChanged += OnAmbientPropertyChanged;
+        }
+    }
+
+    private void OnAmbientPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Fire all ripple-dependent properties. Bindings dedupe by value so
+        // firing unconditionally is cheap and avoids missing transitive changes
+        // (e.g., ambient only fires AnyFeatureEnabled but UI also needs
+        // InsightsEnabled → ShowCortexInsightsCard).
+        OnChanged(nameof(ShowCortexInsightsCard));
+        OnChanged(nameof(ShowCortexSubtitle));
+        OnChanged(nameof(CortexChipState));
+        OnChanged(nameof(CortexChipLabel));
+        OnChanged(nameof(SmartOptimizeEnabled));
+    }
 
     public ObservableCollection<InsightRow> Insights { get; } = new()
     {
@@ -54,6 +89,37 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
 
     public string CortexStatusText =>
         $"Cortex · Learning your patterns (day {CortexDaysActive})";
+
+    // ───────── Phase 3 Task 32: ripple properties ─────────
+
+    /// <summary>
+    /// Whether the Cortex Insights card renders on Dashboard. Tied specifically
+    /// to AppSettings.InsightsEnabled — not AnyFeatureEnabled — so disabling
+    /// Insights alone hides the card regardless of other features.
+    /// Defaults to true when no settings wired (design time / legacy ctor).
+    /// </summary>
+    public bool ShowCortexInsightsCard => _settings?.InsightsEnabled ?? true;
+
+    /// <summary>
+    /// Whether the "Cortex is monitoring" subtitle renders. Same gate as
+    /// ShowCortexInsightsCard for now; spec §5.3 may diverge in Phase 5.
+    /// </summary>
+    public bool ShowCortexSubtitle => _settings?.InsightsEnabled ?? true;
+
+    /// <summary>
+    /// Header chip short state — "ON" when any AI feature is enabled, else "OFF".
+    /// When no ambient wired, defaults to "OFF" (safer signal than stale ON).
+    /// </summary>
+    public string CortexChipState => _ambient?.AnyFeatureEnabled == true ? "ON" : "OFF";
+
+    /// <summary>Full chip label, e.g. "Cortex AI · ON". Convenience for binding.</summary>
+    public string CortexChipLabel => $"Cortex AI · {CortexChipState}";
+
+    /// <summary>
+    /// Whether the Smart Optimize hero CTA is actionable. Disabled when
+    /// Recommendations are off — the CTA depends on that engine's output.
+    /// </summary>
+    public bool SmartOptimizeEnabled => _settings?.RecommendationsEnabled ?? true;
 
     public void SetGpuInfo(GpuInfo? info) => GpuInfo = info;
 

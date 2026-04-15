@@ -68,6 +68,7 @@
                               x:Name="InsightCard"
                               Title="Cortex Insights"
                               UpdatedAt="Updated 2m ago"
+                              Rows="{Binding Insights}"
                               Margin="8,0,0,0"/>
       </Grid>
 
@@ -105,16 +106,16 @@
                        FontWeight="Bold"
                        LetterSpacing="1"/>
             <Grid x:Name="QuickActionsGrid" ColumnDefinitions="*,*" RowDefinitions="*,*">
-              <controls:QuickActionTile Grid.Row="0" Grid.Column="0"
+              <controls:QuickActionTile Grid.Row="0" Grid.Column="0" MinHeight="58"
                                          Title="Clean Junk" SubLabel="Temp, cache, logs"
                                          TintBrush="{DynamicResource AccentTealBrush}"/>
-              <controls:QuickActionTile Grid.Row="0" Grid.Column="1" Margin="6,0,0,0"
+              <controls:QuickActionTile Grid.Row="0" Grid.Column="1" Margin="6,0,0,0" MinHeight="58"
                                          Title="Optimize RAM" SubLabel="Free memory"
                                          TintBrush="{DynamicResource AccentPurpleBrush}"/>
-              <controls:QuickActionTile Grid.Row="1" Grid.Column="0" Margin="0,6,0,0"
+              <controls:QuickActionTile Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" MinHeight="58"
                                          Title="Gaming Mode" SubLabel="Ready to game"
                                          TintBrush="{DynamicResource AccentAmberBrush}"/>
-              <controls:QuickActionTile Grid.Row="1" Grid.Column="1" Margin="6,6,0,0"
+              <controls:QuickActionTile Grid.Row="1" Grid.Column="1" Margin="6,6,0,0" MinHeight="58"
                                          Title="Security Scan" SubLabel="Defender + firewall"
                                          TintBrush="{DynamicResource AccentTealBrush}"/>
             </Grid>

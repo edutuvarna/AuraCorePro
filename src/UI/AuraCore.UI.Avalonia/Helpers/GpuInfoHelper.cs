@@ -36,8 +36,28 @@ public static class GpuInfoHelper
         return 0.0;
     }
 
+    [global::System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private static GpuInfo? DetectWindows()
     {
+        // Primary path: WMI via System.Management (works on Windows 11 26200 where wmic is removed).
+        try
+        {
+            using var searcher = new global::System.Management.ManagementObjectSearcher(
+                "SELECT Name, AdapterRAM FROM Win32_VideoController");
+            foreach (var obj in searcher.Get())
+            {
+                var name = obj["Name"]?.ToString()?.Trim();
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    obj.Dispose();
+                    return new GpuInfo(name, GetUsageWindows(), null);
+                }
+                obj.Dispose();
+            }
+        }
+        catch { }
+
+        // Fallback: legacy wmic (still present on older Windows builds)
         try
         {
             using var p = Process.Start(new ProcessStartInfo

@@ -45,8 +45,19 @@ public partial class DashboardView : UserControl
     {
         var info = GpuInfoHelper.Detect();
         _vm.SetGpuInfo(info);
-        GpuGauge.IsVisible = _vm.GpuVisible;
-        if (info is not null) GpuGauge.SubLabel = info.Name;
+        if (info is not null)
+        {
+            GpuGauge.IsVisible = true;
+            GpuGauge.SubLabel = info.Name;
+        }
+        else
+        {
+            // No GPU detected: hide the GpuGauge AND collapse its column
+            // so remaining gauges evenly fill the row (no awkward empty slot).
+            GpuGauge.IsVisible = false;
+            if (GaugeRow.ColumnDefinitions.Count >= 3)
+                GaugeRow.ColumnDefinitions[2].Width = new global::Avalonia.Controls.GridLength(0);
+        }
     }
 
     private void LoadStaticSystemInfo()
@@ -89,6 +100,21 @@ public partial class DashboardView : UserControl
 
         SystemInfoCard.IsVisible = !narrow;
         MonitoringText.Text = narrow ? "Cortex monitoring" : "Cortex is monitoring · Auto-detected";
+
+        // In narrow mode, Quick Actions card expands to fill the full bottom row
+        // (since SystemInfoCard is hidden, we avoid a lonely Quick Actions on the right).
+        var quickActionsCard = SystemInfoCard.GetVisualParent() is global::Avalonia.Controls.Grid bottomRow
+            && bottomRow.Children.Count > 1
+                ? bottomRow.Children[1] as global::Avalonia.Controls.Border
+                : null;
+        if (quickActionsCard is not null)
+        {
+            global::Avalonia.Controls.Grid.SetColumnSpan(quickActionsCard, narrow ? 2 : 1);
+            global::Avalonia.Controls.Grid.SetColumn(quickActionsCard, narrow ? 0 : 1);
+            quickActionsCard.Margin = narrow
+                ? new global::Avalonia.Thickness(0)
+                : new global::Avalonia.Thickness(8, 0, 0, 0);
+        }
     }
 
     private void StartPolling()

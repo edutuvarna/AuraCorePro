@@ -45,6 +45,6 @@ public sealed class ActiveForegroundConverter : IMultiValueConverter
     {
         var isActive = values.Count > 0 && values[0] is bool b && b;
         var accent = values.Count > 1 && values[1] is IBrush br ? br : Brushes.White;
-        return isActive ? accent : new SolidColorBrush(Color.Parse("#D0D0DC"));
+        return isActive ? accent : new SolidColorBrush(Color.Parse("#E8E8F0"));
     }
 }

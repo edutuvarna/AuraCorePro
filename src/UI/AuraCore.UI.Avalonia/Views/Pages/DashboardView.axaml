@@ -85,11 +85,50 @@
                        Foreground="{DynamicResource TextMutedBrush}"
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold"
-                       LetterSpacing="1"/>
-            <TextBlock x:Name="SystemSummaryText"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       FontSize="{DynamicResource FontSizeBody}"
-                       TextWrapping="Wrap"/>
+                       LetterSpacing="1"
+                       Margin="0,0,0,4"/>
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="OS"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,12,2"/>
+              <TextBlock Grid.Row="0" Grid.Column="1" x:Name="OsText"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         TextWrapping="Wrap" Margin="0,2,0,2"/>
+              <TextBlock Grid.Row="1" Grid.Column="0" Text="CPU"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,12,2"/>
+              <TextBlock Grid.Row="1" Grid.Column="1" x:Name="CpuText"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         TextWrapping="Wrap" Margin="0,2,0,2"/>
+              <TextBlock Grid.Row="2" Grid.Column="0" Text="GPU"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,12,2"/>
+              <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GpuText"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         TextWrapping="Wrap" Margin="0,2,0,2"/>
+              <TextBlock Grid.Row="3" Grid.Column="0" Text="RAM"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,12,2"/>
+              <TextBlock Grid.Row="3" Grid.Column="1" x:Name="RamText"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,0,2"/>
+              <TextBlock Grid.Row="4" Grid.Column="0" Text="Uptime"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,12,2"/>
+              <TextBlock Grid.Row="4" Grid.Column="1" x:Name="UptimeText"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         Margin="0,2,0,2"/>
+            </Grid>
           </StackPanel>
         </Border>
 

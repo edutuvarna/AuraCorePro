@@ -48,7 +48,10 @@ public partial class DashboardView : UserControl
         if (info is not null)
         {
             GpuGauge.IsVisible = true;
-            GpuGauge.SubLabel = info.Name;
+            // Name goes in the footer Insight slot so it doesn't overflow the gauge ring center.
+            // Keep SubLabel empty to avoid cluttering the center.
+            GpuGauge.SubLabel = "%";
+            GpuGauge.Insight = TruncateForDisplay(info.Name, 22);
         }
         else
         {
@@ -58,6 +61,10 @@ public partial class DashboardView : UserControl
             if (GaugeRow.ColumnDefinitions.Count >= 3)
                 GaugeRow.ColumnDefinitions[2].Width = new global::Avalonia.Controls.GridLength(0);
         }
+
+        // Update SystemInfo GPU row (may have been called before LoadStaticSystemInfo)
+        if (GpuText is not null)
+            GpuText.Text = _vm.GpuInfo is not null ? _vm.GpuInfo.Name : "—";
     }
 
     private void LoadStaticSystemInfo()
@@ -65,7 +72,31 @@ public partial class DashboardView : UserControl
         _vm.OsName = GetOsName();
         _vm.CpuName = GetCpuName();
         _vm.RamTotalGb = GetTotalRamGb();
-        SystemSummaryText.Text = _vm.SystemSummary;
+
+        // Populate the multi-row SYSTEM card
+        OsText.Text = _vm.OsName;
+        CpuText.Text = _vm.CpuName;
+        GpuText.Text = _vm.GpuInfo is not null ? _vm.GpuInfo.Name : "—";
+        RamText.Text = $"{_vm.RamTotalGb:0.#} GB";
+        UpdateUptime();
+    }
+
+    private void UpdateUptime()
+    {
+        try
+        {
+            var ts = TimeSpan.FromMilliseconds(Environment.TickCount64);
+            UptimeText.Text = ts.TotalHours >= 1
+                ? $"{(int)ts.TotalHours}h {ts.Minutes}m"
+                : $"{ts.Minutes}m";
+        }
+        catch { UptimeText.Text = "—"; }
+    }
+
+    private static string TruncateForDisplay(string s, int max)
+    {
+        if (string.IsNullOrEmpty(s) || s.Length <= max) return s;
+        return s.Substring(0, max - 1) + "…";
     }
 
     private void HookHeroButton()
@@ -152,7 +183,7 @@ public partial class DashboardView : UserControl
             DiskGauge.Value = _vm.DiskPercent;
             HealthGauge.Value = _vm.HealthScore;
             HealthGauge.Insight = _vm.HealthLabel;
-            SystemSummaryText.Text = _vm.SystemSummary;
+            UpdateUptime();
         }
         catch { }
     }

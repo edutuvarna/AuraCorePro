@@ -8,27 +8,32 @@
           BorderThickness="0"
           Cursor="Hand"
           HorizontalContentAlignment="Stretch">
-    <Border Padding="10"
+    <Border Padding="12,10"
             CornerRadius="{DynamicResource RadiusMd}"
-            BorderThickness="1">
+            BorderThickness="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
       <Border.Background>
         <SolidColorBrush Color="{Binding #Root.TintBrush.Color, FallbackValue=#00D4AA}" Opacity="0.08"/>
       </Border.Background>
       <Border.BorderBrush>
         <SolidColorBrush Color="{Binding #Root.TintBrush.Color, FallbackValue=#00D4AA}" Opacity="0.15"/>
       </Border.BorderBrush>
-      <StackPanel>
-        <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+      <StackPanel VerticalAlignment="Center" Spacing="3">
+        <Grid ColumnDefinitions="Auto,*">
           <Path Data="{Binding #Root.Icon}"
                 Stroke="{Binding #Root.TintBrush}"
                 StrokeThickness="2"
-                Width="11" Height="11"
+                Width="12" Height="12"
                 Stretch="Uniform"
+                VerticalAlignment="Center"
                 Margin="0,0,6,0"/>
           <TextBlock Grid.Column="1"
                      Text="{Binding #Root.Title}"
                      Foreground="{Binding #Root.TintBrush}"
-                     FontSize="{DynamicResource FontSizeBody}"/>
+                     FontSize="{DynamicResource FontSizeBody}"
+                     FontWeight="SemiBold"
+                     VerticalAlignment="Center"/>
         </Grid>
         <TextBlock Text="{Binding #Root.SubLabel}"
                    Foreground="{DynamicResource TextMutedBrush}"

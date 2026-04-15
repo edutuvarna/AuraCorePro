@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace AuraCore.UI.Avalonia.Helpers;
@@ -36,23 +37,75 @@ public static class GpuInfoHelper
         return 0.0;
     }
 
+    /// <summary>
+    /// Rank a GPU name to prefer discrete over integrated. Higher = preferred.
+    /// 30+ : clearly discrete (GeForce RTX/GTX/Quadro, Radeon RX/Pro, Arc)
+    /// 10  : ambiguous (just "NVIDIA" or "AMD" with no series)
+    /// 0   : clearly integrated ("Graphics", "HD Graphics", "Iris", "UHD")
+    /// </summary>
+    private static int RankGpuName(string name)
+    {
+        var n = name.ToLowerInvariant();
+
+        // Strong discrete signals
+        if (n.Contains("rtx") || n.Contains("gtx") || n.Contains("quadro") || n.Contains("tesla")) return 40;
+        if (n.Contains("radeon rx") || n.Contains("radeon pro") || n.Contains("radeon vii")) return 35;
+        if (n.Contains("geforce")) return 30;
+        if (n.Contains("arc a") && !n.Contains("graphics")) return 25; // Intel Arc discrete
+
+        // Strong integrated signals
+        if (n.Contains("radeon(tm) graphics") || n.Contains("radeon graphics") ||
+            n.Contains("hd graphics") || n.Contains("iris") || n.Contains("uhd graphics") ||
+            n.Contains("vega 3") || n.Contains("vega 7") || n.Contains("vega 8") || n.Contains("vega 11"))
+            return 0;
+
+        // Generic fallback
+        if (n.Contains("nvidia") || n.Contains("amd")) return 10;
+        return 5;
+    }
+
     [global::System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private static GpuInfo? DetectWindows()
     {
         // Primary path: WMI via System.Management (works on Windows 11 26200 where wmic is removed).
+        // Prefer DISCRETE GPU over integrated: rank by explicit name keywords first,
+        // then by AdapterRAM (uint32 field — may underflow for >=4GB discrete cards;
+        // both integrated AMD Graphics and Intel iGPU typically report low/shared values).
         try
         {
             using var searcher = new global::System.Management.ManagementObjectSearcher(
                 "SELECT Name, AdapterRAM FROM Win32_VideoController");
+            var candidates = new System.Collections.Generic.List<(string Name, long Ram, int Priority)>();
+
             foreach (var obj in searcher.Get())
             {
-                var name = obj["Name"]?.ToString()?.Trim();
-                if (!string.IsNullOrWhiteSpace(name))
+                try
                 {
-                    obj.Dispose();
-                    return new GpuInfo(name, GetUsageWindows(), null);
+                    var name = obj["Name"]?.ToString()?.Trim();
+                    if (string.IsNullOrWhiteSpace(name)) continue;
+                    long ram = 0;
+                    try
+                    {
+                        if (obj["AdapterRAM"] is not null)
+                            long.TryParse(obj["AdapterRAM"].ToString(), out ram);
+                    }
+                    catch { }
+
+                    // Priority: higher = preferred (discrete GPU)
+                    var priority = RankGpuName(name);
+                    candidates.Add((name, ram, priority));
                 }
-                obj.Dispose();
+                finally { obj.Dispose(); }
+            }
+
+            if (candidates.Count > 0)
+            {
+                // Pick highest priority; tiebreak by AdapterRAM; tiebreak by first encountered
+                var best = candidates
+                    .OrderByDescending(c => c.Priority)
+                    .ThenByDescending(c => c.Ram)
+                    .First();
+                return new GpuInfo(best.Name, GetUsageWindows(), null);
             }
         }
         catch { }

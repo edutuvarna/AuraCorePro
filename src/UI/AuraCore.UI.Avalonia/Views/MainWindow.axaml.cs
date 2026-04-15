@@ -235,10 +235,7 @@ public sealed partial class MainWindow : Window
         ContentArea.Content = moduleId switch
         {
             "dashboard" => new Pages.DashboardView(),
-            "ai-insights" => new Pages.AIInsightsView(),
-            "ai-recommendations" => new Pages.RecommendationsView(),
-            "ai-chat" => new Pages.AIChatView(),
-            "auto-schedule" => new Pages.SchedulerView(),
+            "ai-features" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView>(),
             _ => CreateModuleView(moduleId),
         };
     }

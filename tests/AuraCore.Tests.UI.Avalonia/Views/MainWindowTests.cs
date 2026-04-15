@@ -18,8 +18,8 @@ public class MainWindowTests
     public void NavigateTo_SetsActiveModule_AndExpandsCategory()
     {
         var vm = new SidebarViewModel();
-        vm.NavigateTo("ai-insights");
-        Assert.Equal("ai-insights", vm.ActiveModuleId);
+        vm.NavigateTo("ai-features");
+        Assert.Equal("ai-features", vm.ActiveModuleId);
         Assert.Equal("ai-features", vm.ExpandedCategoryId);
     }
 }

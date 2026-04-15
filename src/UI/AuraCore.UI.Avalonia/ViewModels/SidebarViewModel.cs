@@ -12,7 +12,8 @@ public sealed record SidebarCategoryVM(
     string LocalizationKey,
     string Icon,
     IReadOnlyList<SidebarModuleVM> Modules,
-    bool IsAccent = false
+    bool IsAccent = false,
+    string? Badge = null
 );
 
 /// <summary>A single navigable module under a category.</summary>
@@ -109,13 +110,10 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             new("disk-health", "nav.diskHealth"),
             new("space-analyzer", "nav.spaceAnalyzer"),
         }),
-        new SidebarCategoryVM("ai-features", "nav.categoryAiFeatures", "IconStar", new SidebarModuleVM[]
+        new SidebarCategoryVM("ai-features", "nav.categoryAiFeatures", "IconSparklesFilled", new SidebarModuleVM[]
         {
-            new("ai-insights", "nav.aiInsights"),
-            new("ai-recommendations", "nav.aiRecommendations"),
-            new("auto-schedule", "nav.autoSchedule"),
-            new("ai-chat", "nav.aiChat"),
-        }, IsAccent: true),
+            new("ai-features", "nav.categoryAiFeatures"),
+        }, IsAccent: true, Badge: "CORTEX"),
     };
 
     private static IReadOnlyList<SidebarModuleVM> BuildAdvancedItems() => new SidebarModuleVM[]

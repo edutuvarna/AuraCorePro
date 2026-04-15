@@ -95,40 +95,22 @@
         </StackPanel>
       </Border>
 
-      <!-- AI Model -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
-        <StackPanel Spacing="12">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <Border Width="16" Height="16" CornerRadius="4">
-              <Border.Background>
-                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
-              </Border.Background>
-              <TextBlock Text="&#x2B50;" FontSize="8" Foreground="#14B8A6"
-                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-            <TextBlock x:Name="AiModelLabel" Text="AI Model" FontSize="13" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel>
-              <TextBlock x:Name="AiModelDescLabel" Text="Select AI model" FontSize="12"
-                         Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="AiModelRamLabel" Text="" FontSize="11"
-                         Foreground="{DynamicResource TextMutedBrush}"/>
-            </StackPanel>
-            <ComboBox Grid.Column="1" x:Name="AiModelCombo" Width="280"
-                      SelectionChanged="AiModelCombo_Changed"
-                      Background="#12FFFFFF" Foreground="{DynamicResource TextPrimaryBrush}"
-                      CornerRadius="{StaticResource RadiusMd}"/>
-          </Grid>
-          <TextBlock x:Name="AiModelRestartLabel" Text="Restart required for model change"
-                     FontSize="11" Foreground="#F59E0B" IsVisible="False"/>
+      <!-- Replaces the removed AI model picker. Task 14+ will add the AI Features page icon. -->
+      <Border Classes="info-card" Margin="0,12,0,0"
+              Background="#14B088FF"
+              BorderBrush="#33B088FF"
+              BorderThickness="1"
+              CornerRadius="6"
+              Padding="12,10">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <TextBlock Text="&#x2756;"
+                     FontSize="14"
+                     Foreground="{DynamicResource AccentPurpleBrush}"
+                     VerticalAlignment="Center" />
+          <TextBlock VerticalAlignment="Center"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     Text="AI models are managed in AI Features &#x2192; Chat. Open Chat to download or switch models." />
         </StackPanel>
       </Border>
 

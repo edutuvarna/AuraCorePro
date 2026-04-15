@@ -1,105 +1,54 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ctrl="clr-namespace:AuraCore.UI.Avalonia.Views.Controls"
+        xmlns:controls="clr-namespace:AuraCore.UI.Avalonia.Views.Controls"
         x:Class="AuraCore.UI.Avalonia.Views.MainWindow"
         Title="AuraCore Pro"
-        Width="900" Height="600"
-        MinWidth="780" MinHeight="520"
+        Width="1000" Height="640"
+        MinWidth="900" MinHeight="580"
         Background="{DynamicResource BgDeepBrush}"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="40">
 
-  <Grid ColumnDefinitions="190,*">
+  <Grid ColumnDefinitions="200,*">
 
-    <!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+    <!-- SIDEBAR -->
     <Border Grid.Column="0"
-            Background="{DynamicResource SidebarBgBrush}"
+            Background="{DynamicResource BgSidebarBrush}"
             BorderBrush="{DynamicResource BorderSubtleBrush}"
             BorderThickness="0,0,1,0">
-      <Grid RowDefinitions="Auto,*,Auto">
-
-        <!-- Logo + Title -->
-        <StackPanel Grid.Row="0" Margin="12,10,12,10" Spacing="4">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <ctrl:OrbitalLogo Width="26" Height="26"/>
-            <StackPanel VerticalAlignment="Center">
-              <TextBlock Text="AuraCore" FontSize="13" FontWeight="Bold"
-                         Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock Text="PRO v1.7" FontSize="8"
-                         Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold"/>
-            </StackPanel>
-          </StackPanel>
-          <!-- User + Tier Badge -->
-          <Border CornerRadius="8" Padding="8,7" Margin="0,6,0,0"
-                  BorderThickness="1">
-            <Border.Background>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.024"/>
-            </Border.Background>
-            <Border.BorderBrush>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-            </Border.BorderBrush>
-            <Grid ColumnDefinitions="Auto,*,Auto">
-              <Border Width="26" Height="26" CornerRadius="6">
-                <Border.Background>
-                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                    <GradientStop Offset="0" Color="#8B5CF6"/>
-                    <GradientStop Offset="1" Color="#EC4899"/>
-                  </LinearGradientBrush>
-                </Border.Background>
-                <TextBlock x:Name="UserAvatarInitials" Text="G" FontSize="10" FontWeight="Bold"
-                           Foreground="White" HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
-              </Border>
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1" Margin="8,0,0,0">
-                <TextBlock x:Name="UserEmailLabel" Text="Guest" FontSize="10.5" FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
-                <TextBlock x:Name="UserStatusLabel" Text="Not signed in" FontSize="8"
-                           FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              </StackPanel>
-              <Border Grid.Column="2" x:Name="TierBadge" CornerRadius="6"
-                      Padding="6,2" VerticalAlignment="Center" Background="#2000D4AA">
-                <TextBlock x:Name="TierBadgeText" Text="FREE" FontSize="8" FontWeight="Bold"
-                           Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              </Border>
-            </Grid>
-          </Border>
+      <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Top" Spacing="2">
+          <controls:AppLogoBadge/>
+          <controls:UserChip x:Name="UserChipHost"
+                             Email="user@example.com"
+                             Role=""
+                             AvatarInitial="?"/>
         </StackPanel>
 
-        <!-- Dynamic Navigation (built from code-behind) -->
-        <ScrollViewer Grid.Row="1" Margin="5,0">
-          <StackPanel x:Name="NavPanel" Spacing="1"/>
+        <Button x:Name="SettingsBtn" DockPanel.Dock="Bottom"
+                Content="&#x2699;  Settings"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="Transparent"
+                BorderThickness="0"
+                Padding="14,8"
+                Foreground="{DynamicResource TextMutedBrush}"
+                Click="Settings_Click"/>
+
+        <ScrollViewer>
+          <StackPanel x:Name="NavPanel" Margin="0,8,0,8"/>
         </ScrollViewer>
-
-        <!-- Bottom: Platform + Settings -->
-        <StackPanel Grid.Row="2" Margin="8,0,8,10" Spacing="4">
-          <Border Background="{DynamicResource BgCardBrush}"
-                  CornerRadius="{StaticResource RadiusSm}"
-                  Padding="10,6" Margin="0,0,0,6">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <Border Width="8" Height="8" CornerRadius="4"
-                      Background="{DynamicResource SuccessBrush}"/>
-              <TextBlock x:Name="PlatformLabel" Text="Windows"
-                         FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-            </StackPanel>
-          </Border>
-          <Button Tag="settings" Classes="nav-item" Click="Nav_Click">
-            <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="&#x2699;" FontSize="14" VerticalAlignment="Center"/>
-              <TextBlock x:Name="SettingsNavLabel" Text="Settings" VerticalAlignment="Center"/>
-            </StackPanel>
-          </Button>
-        </StackPanel>
-
-      </Grid>
+      </DockPanel>
     </Border>
 
-    <!-- ══ CONTENT AREA ═════════════════════════════════════ -->
+    <!-- CONTENT AREA -->
     <Border Grid.Column="1" Background="{DynamicResource BgDeepBrush}">
       <Grid RowDefinitions="*,Auto">
         <ContentControl x:Name="ContentArea" Margin="20"/>
 
-        <!-- ── Global Status Bar ─────────────────────────── -->
+        <!-- Global Status Bar -->
         <Border Grid.Row="1" Padding="12,5" BorderThickness="0,1,0,0">
           <Border.Background>
             <SolidColorBrush Color="#0A0A14" Opacity="0.95"/>

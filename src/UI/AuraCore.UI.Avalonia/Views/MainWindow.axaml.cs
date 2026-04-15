@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
@@ -14,68 +15,23 @@ namespace AuraCore.UI.Avalonia.Views;
 
 public sealed partial class MainWindow : Window
 {
-    private Button? _activeNav;
     private readonly Dictionary<string, IOptimizationModule> _moduleMap = new();
-
-    // Category display order + labels (localization keys)
-    private static readonly (string LabelKey, OptimizationCategory[] Cats)[] Sections = new[]
-    {
-        ("nav.overview", new[] { OptimizationCategory.SystemHealth }),
-        ("nav.optimization", new[] {
-            OptimizationCategory.DiskCleanup,
-            OptimizationCategory.MemoryOptimization,
-            OptimizationCategory.StorageCompression,
-            OptimizationCategory.RegistryOptimization,
-            OptimizationCategory.BloatwareRemoval,
-            OptimizationCategory.Privacy
-        }),
-        ("nav.performance", new[] {
-            OptimizationCategory.NetworkOptimization,
-            OptimizationCategory.GamingPerformance
-        }),
-        ("nav.customization", new[] {
-            OptimizationCategory.ShellCustomization,
-            OptimizationCategory.ApplicationManagement
-        }),
-        ("nav.advancedTools", new[] {
-            OptimizationCategory.AutorunManagement,
-            OptimizationCategory.ProcessManagement,
-            OptimizationCategory.NetworkTools
-        }),
-    };
-
-    // Category -> icon mapping
-    // Segoe Fluent Icons (Windows) / fallback ASCII symbols
-    private static string CatIcon(OptimizationCategory c) => c switch
-    {
-        OptimizationCategory.SystemHealth        => "\u2661",  // ♡ heart outline
-        OptimizationCategory.DiskCleanup         => "\u2737",  // ✷ star burst (clean)
-        OptimizationCategory.MemoryOptimization  => "\u2B1A",  // ⬚ dotted square
-        OptimizationCategory.RegistryOptimization=> "\u2692",  // ⚒ hammer & pick
-        OptimizationCategory.StorageCompression  => "\u2B21",  // ⬡ hexagon
-        OptimizationCategory.BloatwareRemoval    => "\u2716",  // ✖ heavy X
-        OptimizationCategory.NetworkOptimization => "\u25C9",  // ◉ fisheye
-        OptimizationCategory.GamingPerformance   => "\u2B50",  // ⭐ star
-        OptimizationCategory.ShellCustomization  => "\u2699",  // ⚙ gear
-        OptimizationCategory.ApplicationManagement=> "\u25A3", // ▣ white square with small black square
-        OptimizationCategory.Privacy             => "\u2616",  // ☖ white shogi piece (shield-like)
-        OptimizationCategory.AutorunManagement   => "\u26A1",  // ⚡ lightning
-        OptimizationCategory.ProcessManagement   => "\u2630",  // ☰ trigram (list)
-        OptimizationCategory.NetworkTools        => "\u2301",  // ⌁ electric arrow
-        _ => "\u2699"
-    };
+    private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm = new();
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // Platform label
-        PlatformLabel.Text = OperatingSystem.IsLinux() ? "Linux"
-                           : OperatingSystem.IsMacOS() ? "macOS" : "Windows";
+        // Populate module map for view resolution (TweakListView / CategoryCleanView need IOptimizationModule)
+        try
+        {
+            foreach (var m in App.Services.GetServices<IOptimizationModule>())
+                _moduleMap[m.Id] = m;
+        }
+        catch { /* DI not available during design time */ }
 
         BuildNavigation();
-        UpdateTierBadge();
-        ApplyTierLocking();
+        RefreshUserChip();
 
         // Show onboarding on first run, otherwise Dashboard
         if (!OnboardingView.IsCompleted)
@@ -104,22 +60,15 @@ public sealed partial class MainWindow : Window
             ContentArea.Content = new DashboardView();
         }
 
-        // Localize settings button
-        SettingsNavLabel.Text = LocalizationService._("nav.settings");
-
         // Rebuild sidebar on language change
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
-                NavPanel.Children.Clear();
-                _activeNav = null;
-                BuildNavigation();
-                UpdateTierBadge();
-                ApplyTierLocking();
-                SettingsNavLabel.Text = LocalizationService._("nav.settings");
+                RebuildSidebar();
+                RefreshUserChip();
             });
 
-        // ── Status bar wiring ────────────────────────────
+        // Status bar wiring
         StatusBarService.StatusChanged += text =>
             Dispatcher.UIThread.Post(() => GlobalStatusText.Text = text);
 
@@ -164,307 +113,185 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void BuildNavigation()
+    // ─── NAVIGATION (SidebarViewModel-driven) ────────────────────────
+
+    /// <summary>Public entry so other components (e.g., Dashboard) can navigate.</summary>
+    public void NavigateToModule(string moduleId)
     {
-        // Modules merged into other views (hide from sidebar)
-        var hiddenModules = new HashSet<string> { "network-monitor", "dns-benchmark" };
-        var modules = App.Services.GetServices<IOptimizationModule>()
-            .Where(m => !hiddenModules.Contains(m.Id)).ToList();
-        foreach (var m in modules) _moduleMap[m.Id] = m;
+        _sidebarVm.NavigateTo(moduleId);
+        SetActiveContent(moduleId);
+        RebuildSidebar();
+    }
 
-        // Dashboard button (always first)
-        var dashBtn = MakeNavButton("dashboard", "\u25C6", LocalizationService._("nav.dashboard"));
-        dashBtn.Classes.Add("active");
-        _activeNav = dashBtn;
-        NavPanel.Children.Add(dashBtn);
+    private void BuildNavigation() => RebuildSidebar();
 
-        // Group modules by section
-        var placed = new HashSet<string>();
-        foreach (var (labelKey, cats) in Sections)
+    private void RebuildSidebar()
+    {
+        NavPanel.Children.Clear();
+
+        // Dashboard pinned at top
+        NavPanel.Children.Add(CreateNavItem("nav.dashboard", "IconDashboard", null,
+            isActive: _sidebarVm.ActiveModuleId == "dashboard",
+            trailingChipText: null,
+            onClick: () => { _sidebarVm.NavigateTo("dashboard"); SetActiveContent("dashboard"); RebuildSidebar(); }));
+
+        foreach (var cat in _sidebarVm.VisibleCategories())
         {
-            var sectionModules = modules
-                .Where(m => cats.Contains(m.Category) && !placed.Contains(m.Id))
-                .ToList();
-            if (sectionModules.Count == 0) continue;
+            var catIdCapture = cat.Id;
+            var isExpanded = _sidebarVm.ExpandedCategoryId == cat.Id;
+            var accent = cat.IsAccent
+                ? (global::Avalonia.Media.IBrush)this.FindResource("AccentPurpleBrush")!
+                : (global::Avalonia.Media.IBrush)this.FindResource("AccentTealBrush")!;
 
-            // Section header
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._(labelKey).ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
+            NavPanel.Children.Add(CreateNavItem(cat.LocalizationKey, cat.Icon, accent,
+                isActive: false,
+                trailingChipText: cat.IsAccent ? "CORTEX" : null,
+                onClick: () => { _sidebarVm.ToggleCategory(catIdCapture); RebuildSidebar(); }));
 
-            foreach (var m in sectionModules)
+            if (isExpanded)
             {
-                var icon = CatIcon(m.Category);
-                NavPanel.Children.Add(MakeNavButton(m.Id, icon, m.DisplayName));
-                placed.Add(m.Id);
+                foreach (var module in cat.Modules)
+                {
+                    var moduleIdCapture = module.Id;
+                    NavPanel.Children.Add(CreateNavItem("  " + LocalizationService._(module.LocalizationKey), null, accent,
+                        isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
+                        trailingChipText: null,
+                        onClick: () => { _sidebarVm.NavigateTo(moduleIdCapture); SetActiveContent(moduleIdCapture); RebuildSidebar(); },
+                        isLiteralLabel: true));
+                }
             }
         }
 
-        // Any uncategorized modules
-        var remaining = modules.Where(m => !placed.Contains(m.Id)).ToList();
-        if (remaining.Count > 0)
+        NavPanel.Children.Add(new Controls.SidebarSectionDivider { Label = LocalizationService._("nav.categoryAdvanced") });
+        foreach (var item in _sidebarVm.VisibleAdvancedItems())
         {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.other").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            foreach (var m in remaining)
-                NavPanel.Children.Add(MakeNavButton(m.Id, "\u2699", m.DisplayName));
-        }
-
-        // Standalone pages (not DI modules)
-        NavPanel.Children.Add(new TextBlock
-        {
-            Text = LocalizationService._("nav.tools").ToUpper(), FontSize = 8,
-            FontWeight = global::Avalonia.Media.FontWeight.Bold,
-            Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-            Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-        });
-        NavPanel.Children.Add(MakeNavButton("disk-health", "\u2661", LocalizationService._("nav.diskHealth")));
-        NavPanel.Children.Add(MakeNavButton("space-analyzer", "\u25C9", LocalizationService._("nav.spaceAnalyzer")));
-        NavPanel.Children.Add(MakeNavButton("startup-optimizer", "\u26A1", LocalizationService._("nav.startupOptimizer")));
-        NavPanel.Children.Add(MakeNavButton("service-manager", "\u2699", LocalizationService._("nav.serviceManager")));
-        NavPanel.Children.Add(MakeNavButton("scheduler", "\u25F4", LocalizationService._("nav.autoSchedule")));
-        NavPanel.Children.Add(MakeNavButton("recommendations", "\u2726", LocalizationService._("nav.aiRecommendations")));
-        NavPanel.Children.Add(MakeNavButton("ai-insights", "\u25C8", LocalizationService._("nav.aiInsights")));
-        NavPanel.Children.Add(MakeNavButton("ai-chat", "\u2756", LocalizationService._("nav.aiChat")));
-
-        // ISO Builder (Windows-only)
-        if (OperatingSystem.IsWindows())
-        {
-            NavPanel.Children.Add(MakeNavButton("iso-builder", "\u25CE", LocalizationService._("nav.isoBuilder")));
-        }
-
-        // Linux-only tools
-        if (OperatingSystem.IsLinux())
-        {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.linuxTools").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            NavPanel.Children.Add(MakeNavButton("systemd-manager", "\u2699", LocalizationService._("nav.systemdManager")));
-            NavPanel.Children.Add(MakeNavButton("package-cleaner", "\u267B", LocalizationService._("nav.packageCleaner")));
-            NavPanel.Children.Add(MakeNavButton("swap-optimizer", "\u26A1", LocalizationService._("nav.swapOptimizer")));
-            NavPanel.Children.Add(MakeNavButton("cron-manager", "\u23F0", LocalizationService._("nav.cronManager")));
-        }
-
-        // macOS-only tools
-        if (OperatingSystem.IsMacOS())
-        {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.macosTools").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            NavPanel.Children.Add(MakeNavButton("defaults-optimizer", "\u2699", LocalizationService._("nav.defaultsOptimizer")));
-            NavPanel.Children.Add(MakeNavButton("launchagent-manager", "\u26A1", LocalizationService._("nav.launchAgentManager")));
-            NavPanel.Children.Add(MakeNavButton("brew-manager", "\u267B", LocalizationService._("nav.brewManager")));
-            NavPanel.Children.Add(MakeNavButton("timemachine-manager", "\u23F0", LocalizationService._("nav.timeMachineManager")));
-        }
-
-        // Admin Panel (admin only)
-        if (SessionState.IsAdmin)
-        {
-            NavPanel.Children.Add(MakeNavButton("admin-panel", "\u2692", LocalizationService._("nav.adminPanel")));
+            var moduleIdCapture = item.Id;
+            NavPanel.Children.Add(CreateNavItem(item.LocalizationKey, null,
+                (global::Avalonia.Media.IBrush)this.FindResource("TextMutedBrush")!,
+                isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
+                trailingChipText: null,
+                onClick: () => { _sidebarVm.NavigateTo(moduleIdCapture); SetActiveContent(moduleIdCapture); RebuildSidebar(); }));
         }
     }
 
-    private Button MakeNavButton(string tag, string icon, string label)
+    private Controls.SidebarNavItem CreateNavItem(
+        string labelOrKey,
+        string? iconResourceKey,
+        global::Avalonia.Media.IBrush? accent,
+        bool isActive,
+        string? trailingChipText,
+        Action onClick,
+        bool isLiteralLabel = false)
     {
-        var btn = new Button { Tag = tag };
-        btn.Classes.Add("nav-item");
-        btn.Click += Nav_Click;
-
-        var stack = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 8 };
-        stack.Children.Add(new TextBlock
+        var item = new Controls.SidebarNavItem
         {
-            Text = icon, FontSize = 12, Width = 16,
-            TextAlignment = global::Avalonia.Media.TextAlignment.Center,
-            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
-            Opacity = 0.6
-        });
-        stack.Children.Add(new TextBlock
-        {
-            Text = label, FontSize = 11,
-            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center
-        });
-        btn.Content = stack;
-        return btn;
+            Label = isLiteralLabel ? labelOrKey : LocalizationService._(labelOrKey),
+            IsActive = isActive,
+            TrailingChipText = trailingChipText ?? string.Empty,
+            Command = new RelayCommand(onClick),
+        };
+        if (iconResourceKey is not null)
+            item.Icon = (global::Avalonia.Media.Geometry)this.FindResource(iconResourceKey)!;
+        if (accent is not null)
+            item.AccentBrush = accent;
+        return item;
     }
 
-    private void Nav_Click(object? sender, RoutedEventArgs e)
+    private void SetActiveContent(string moduleId)
     {
-        if (sender is not Button btn) return;
-        var tag = btn.Tag?.ToString();
-
-        // Update active state
-        if (_activeNav is not null) _activeNav.Classes.Remove("active");
-        btn.Classes.Add("active");
-        _activeNav = btn;
-
-        // Navigate to appropriate view
-        if (tag == "dashboard")
+        ContentArea.Content = moduleId switch
         {
-            ContentArea.Content = new DashboardView();
-            return;
-        }
-
-        if (tag == "settings")
-        {
-            ContentArea.Content = new SettingsView();
-            return;
-        }
-
-        // Standalone pages (not DI modules)
-        switch (tag)
-        {
-            case "disk-health":        ContentArea.Content = new DiskHealthView(); return;
-            case "space-analyzer":     ContentArea.Content = new SpaceAnalyzerView(); return;
-            case "startup-optimizer":  ContentArea.Content = new StartupOptimizerView(); return;
-            case "service-manager":    ContentArea.Content = new ServiceManagerView(); return;
-            case "scheduler":          ContentArea.Content = new SchedulerView(); return;
-            case "recommendations":    ContentArea.Content = new RecommendationsView(); return;
-            case "ai-insights":        ContentArea.Content = new AIInsightsView(); return;
-            case "ai-chat":            ContentArea.Content = new AIChatView(); return;
-            case "iso-builder":        ContentArea.Content = new IsoBuilderView(); return;
-            case "admin-panel":        ContentArea.Content = new AdminPanelView(); return;
-        }
-
-        // Module views
-        if (_moduleMap.TryGetValue(tag!, out var module))
-        {
-            // Tier check — redirect to upgrade if locked
-            var userTier = GetCurrentTier();
-            if (tag != null && !TierFeatures.IsModuleAllowed(tag, userTier))
-            {
-                ContentArea.Content = new UpgradeView(tag, module.DisplayName);
-                return;
-            }
-
-            ContentArea.Content = tag switch
-            {
-                // Dedicated views
-                "system-health"      => new SystemHealthView(),
-                "process-monitor"    => new ProcessMonitorView(),
-                "hosts-editor"       => new HostsEditorView(),
-                "autorun-manager"    => new AutorunManagerView(),
-                "gaming-mode"        => new GamingModeView(),
-                "driver-updater"     => new DriverUpdaterView(),
-                "bloatware-removal"  => new BloatwareRemovalView(),
-                "ram-optimizer"      => new RamOptimizerView(),
-                "defender-manager"   => new DefenderManagerView(),
-                "network-optimizer"  => new NetworkOptimizerView(),
-                "registry-optimizer" => new RegistryOptimizerView(),
-                "battery-optimizer"  => new BatteryOptimizerView(),
-                // New modules (Session 18)
-                "environment-variables" => new EnvironmentVariablesView(),
-                "firewall-rules"     => new FirewallRulesView(),
-                "symlink-manager"    => new SymlinkManagerView(),
-                "file-shredder"      => new FileShredderView(),
-                // Linux-only modules
-                "systemd-manager"    => new SystemdManagerView(),
-                "package-cleaner"    => new PackageCleanerView(),
-                "swap-optimizer"     => new SwapOptimizerView(),
-                "cron-manager"       => new CronManagerView(),
-                // macOS-only modules
-                "defaults-optimizer" => new DefaultsOptimizerView(),
-                "launchagent-manager"=> new LaunchAgentManagerView(),
-                "brew-manager"       => new BrewManagerView(),
-                "timemachine-manager"=> new TimeMachineManagerView(),
-                // New Windows modules
-                "font-manager"       => new FontManagerView(),
-                "wake-on-lan"        => new WakeOnLanView(),
-                // App Installer (dedicated view)
-                "app-installer"      => new AppInstallerView(),
-                // Tweak toggle list (shared view)
-                "context-menu"       => new TweakListView(module),
-                "taskbar-tweaks"     => new TweakListView(module),
-                "explorer-tweaks"    => new TweakListView(module),
-                // Category cleanup (shared view)
-                "junk-cleaner"       => new CategoryCleanView(module),
-                "disk-cleanup"       => new CategoryCleanView(module),
-                "privacy-cleaner"    => new CategoryCleanView(module),
-                // Smart generic (StorageCompression, AppInstaller, etc)
-                _ => new ScanOptimizeView(module)
-            };
-        }
+            "dashboard" => new Pages.DashboardView(),
+            "ai-insights" => new Pages.AIInsightsView(),
+            "ai-recommendations" => new Pages.RecommendationsView(),
+            "ai-chat" => new Pages.AIChatView(),
+            "auto-schedule" => new Pages.SchedulerView(),
+            _ => CreateModuleView(moduleId),
+        };
     }
 
-    // ── TIER BADGE + LOCKING ──────────────────────────────
+    private UserControl CreateModuleView(string moduleId)
+    {
+        return moduleId switch
+        {
+            "ram-optimizer" => new Pages.RamOptimizerView(),
+            "startup-optimizer" => new Pages.StartupOptimizerView(),
+            "network-optimizer" => new Pages.NetworkOptimizerView(),
+            "battery-optimizer" => new Pages.BatteryOptimizerView(),
+            "junk-cleaner" => CreateCategoryCleanView("junk-cleaner"),
+            "disk-cleanup" => CreateCategoryCleanView("disk-cleanup"),
+            "privacy-cleaner" => CreateCategoryCleanView("privacy-cleaner"),
+            "registry-cleaner" => new Pages.RegistryOptimizerView(),
+            "bloatware-removal" => new Pages.BloatwareRemovalView(),
+            "app-installer" => new Pages.AppInstallerView(),
+            "gaming-mode" => new Pages.GamingModeView(),
+            "defender-manager" => new Pages.DefenderManagerView(),
+            "firewall-rules" => new Pages.FirewallRulesView(),
+            "file-shredder" => new Pages.FileShredderView(),
+            "hosts-editor" => new Pages.HostsEditorView(),
+            "driver-updater" => new Pages.DriverUpdaterView(),
+            "service-manager" => new Pages.ServiceManagerView(),
+            "iso-builder" => new Pages.IsoBuilderView(),
+            "disk-health" => new Pages.DiskHealthView(),
+            "space-analyzer" => new Pages.SpaceAnalyzerView(),
+            "registry-deep" => new Pages.RegistryOptimizerView(),
+            "environment-variables" => new Pages.EnvironmentVariablesView(),
+            "symlink-manager" => new Pages.SymlinkManagerView(),
+            "process-monitor" => new Pages.ProcessMonitorView(),
+            "font-manager" => new Pages.FontManagerView(),
+            "context-menu" => CreateTweakListView("context-menu"),
+            "taskbar-tweaks" => CreateTweakListView("taskbar-tweaks"),
+            "explorer-tweaks" => CreateTweakListView("explorer-tweaks"),
+            "autorun-manager" => new Pages.AutorunManagerView(),
+            "wake-on-lan" => new Pages.WakeOnLanView(),
+            _ => new Pages.DashboardView(),
+        };
+    }
 
-    private void UpdateTierBadge()
+    private UserControl CreateCategoryCleanView(string moduleId)
+    {
+        _moduleMap.TryGetValue(moduleId, out var module);
+        return new Pages.CategoryCleanView(module);
+    }
+
+    private UserControl CreateTweakListView(string moduleId)
+    {
+        return _moduleMap.TryGetValue(moduleId, out var module)
+            ? new Pages.TweakListView(module)
+            : new Pages.TweakListView();
+    }
+
+    private void Settings_Click(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _sidebarVm.NavigateTo("settings");
+        ContentArea.Content = new Pages.SettingsView();
+        RebuildSidebar();
+    }
+
+    // ─── USER CHIP / SESSION REFRESH ─────────────────────────────────
+
+    private void RefreshUserChip()
     {
         var email = SessionState.UserEmail;
         var tier = (SessionState.UserTier ?? "free").ToUpper();
         var isAdmin = SessionState.IsAdmin;
+        var tierText = isAdmin ? "ADMIN" : tier;
 
-        UserEmailLabel.Text = string.IsNullOrEmpty(email) ? "Guest" : email;
+        UserChipHost.Email = string.IsNullOrEmpty(email) ? "Guest" : email;
+        UserChipHost.Role = tierText;
+        UserChipHost.StatusText = SessionState.IsAuthenticated ? "Signed in" : "Not signed in";
 
-        // Update avatar initials
-        if (!string.IsNullOrEmpty(email) && email.Length > 0)
+        if (!string.IsNullOrEmpty(email))
         {
             var parts = email.Split('@')[0].Split('.');
             var initials = parts.Length >= 2
                 ? $"{char.ToUpper(parts[0][0])}{char.ToUpper(parts[1][0])}"
                 : $"{char.ToUpper(parts[0][0])}";
-            UserAvatarInitials.Text = initials;
+            UserChipHost.AvatarInitial = initials;
         }
         else
         {
-            UserAvatarInitials.Text = "G";
-        }
-
-        UserStatusLabel.Text = SessionState.IsAuthenticated ? "Signed in" : "Not signed in";
-
-        var tierText = isAdmin ? "ADMIN" : tier;
-        TierBadgeText.Text = tierText;
-
-        var (color, bg) = tierText switch
-        {
-            "ADMIN"      => ("#F59E0B", "#20F59E0B"),
-            "ENTERPRISE" => ("#8B5CF6", "#208B5CF6"),
-            "PRO"        => ("#00D4AA", "#2000D4AA"),
-            _            => ("#8888A0", "#208888A0")
-        };
-        TierBadgeText.Foreground = new SolidColorBrush(Color.Parse(color));
-        TierBadge.Background = new SolidColorBrush(Color.Parse(bg));
-    }
-
-    private void ApplyTierLocking()
-    {
-        var userTier = GetCurrentTier();
-        foreach (var child in NavPanel.Children)
-        {
-            if (child is not Button btn) continue;
-            var tag = btn.Tag?.ToString();
-            if (string.IsNullOrEmpty(tag) || tag == "dashboard") continue;
-
-            if (!TierFeatures.IsModuleAllowed(tag, userTier))
-            {
-                btn.Opacity = 0.5;
-                // Add lock icon to label
-                if (btn.Content is StackPanel sp && sp.Children.Count >= 2
-                    && sp.Children[1] is TextBlock tb && !tb.Text!.EndsWith(" \u26BF"))
-                {
-                    tb.Text += " \u26BF"; // lock symbol
-                }
-            }
-            else
-            {
-                btn.Opacity = 1.0;
-            }
+            UserChipHost.AvatarInitial = "G";
         }
     }
 
@@ -472,10 +299,19 @@ public sealed partial class MainWindow : Window
         => Enum.TryParse<SubscriptionTier>(SessionState.UserTier, true, out var t)
             ? t : SubscriptionTier.Free;
 
-    /// <summary>Called after login/upgrade to refresh UI</summary>
+    /// <summary>Called after login/upgrade to refresh UI.</summary>
     public void RefreshSession()
     {
-        UpdateTierBadge();
-        ApplyTierLocking();
+        RefreshUserChip();
+        RebuildSidebar();
+    }
+
+    private sealed class RelayCommand : System.Windows.Input.ICommand
+    {
+        private readonly Action _action;
+        public RelayCommand(Action action) => _action = action;
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _action();
     }
 }

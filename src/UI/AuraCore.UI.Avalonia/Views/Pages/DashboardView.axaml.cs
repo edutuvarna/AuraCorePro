@@ -67,9 +67,8 @@ public partial class DashboardView : UserControl
         var dlg = new SmartOptimizePlaceholderDialog();
         dlg.GoToRecommendationsRequested += (_, _) =>
         {
-            // TODO (Task 10): restore navigation once MainWindow.NavigateToModule is added.
-            // if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
-            //     main.NavigateToModule("ai-recommendations");
+            if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
+                main.NavigateToModule("ai-recommendations");
         };
         if (this.GetVisualRoot() is Window owner)
             dlg.ShowDialog(owner);

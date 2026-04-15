@@ -140,6 +140,7 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.ChatSection>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.ChatOptInDialogViewModel>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.ChatOptInDialog>();
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.ModelManagerDialogViewModel>();
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

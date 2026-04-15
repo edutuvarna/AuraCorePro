@@ -142,6 +142,13 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.ChatOptInDialog>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.ModelManagerDialogViewModel>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.ModelManagerDialog>();
+        sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.TierUpgradePlaceholderDialog>();
+
+        // SidebarViewModel with tier service (Phase 3: defaults to Free tier; Phase 5 wires real UserSession)
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.ViewModels.SidebarViewModel>(sp =>
+            new global::AuraCore.UI.Avalonia.ViewModels.SidebarViewModel(
+                sp.GetRequiredService<global::AuraCore.UI.Avalonia.Services.AI.ITierService>(),
+                currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Free));
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

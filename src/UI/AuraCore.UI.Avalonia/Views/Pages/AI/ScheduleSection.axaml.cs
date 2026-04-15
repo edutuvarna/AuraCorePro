@@ -79,19 +79,19 @@ public partial class ScheduleSection : UserControl
             var nameBlock = new TextBlock
             {
                 Text = name, FontSize = 14, FontWeight = FontWeight.SemiBold,
-                Foreground = (IBrush)this.FindResource("TextPrimaryBrush")!
+                Foreground = FindBrush("TextPrimaryBrush", global::Avalonia.Media.Brushes.White)
             };
             var descBlock = new TextBlock
             {
                 Text = desc, FontSize = 11,
-                Foreground = (IBrush)this.FindResource("TextMutedBrush")!
+                Foreground = FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray)
             };
 
             // ── Timing labels ──
             var lastRunLabel = new TextBlock
             {
                 Text = "Last run: Never", FontSize = 10, Tag = id + "_last",
-                Foreground = (IBrush)this.FindResource("TextMutedBrush")!
+                Foreground = FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray)
             };
             var nextRunLabel = new TextBlock
             {
@@ -266,6 +266,23 @@ public partial class ScheduleSection : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.autoSchedule");
+    }
+
+    // ───────────────────────── Theme-variant-aware brush lookup ─────────────────────────
+    // Phase 2 hotfix pattern (see MainWindow.FindBrush, commit 442518f).
+    // AuraCoreThemeV2 brushes live under ThemeDictionaries.Dark; the default
+    // FindResource uses ThemeVariant.Default and throws UnsetValue → IBrush cast.
+    private global::Avalonia.Media.IBrush FindBrush(string key, global::Avalonia.Media.IBrush fallback)
+    {
+        var variant = this.ActualThemeVariant ?? global::Avalonia.Styling.ThemeVariant.Dark;
+        if (this.TryFindResource(key, variant, out var v) && v is global::Avalonia.Media.IBrush b)
+            return b;
+        if (this.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v2) && v2 is global::Avalonia.Media.IBrush b2)
+            return b2;
+        if (global::Avalonia.Application.Current is { } app &&
+            app.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v3) && v3 is global::Avalonia.Media.IBrush b3)
+            return b3;
+        return fallback;
     }
 
     // ───────────────────────── Inner Types ─────────────────────────

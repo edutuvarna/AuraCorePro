@@ -27,15 +27,21 @@
     <Grid ColumnDefinitions="*,Auto,Auto" DockPanel.Dock="Top" Margin="0,4,0,12">
       <TextBlock Grid.Column="0" Text="✦ CORTEX Chat" FontSize="14" FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
-      <Button Grid.Column="1"
-              x:Name="ModelChip"
-              Content="⚙ No model selected ▾"
-              FontSize="10"
-              Background="Transparent"
-              BorderBrush="{DynamicResource BorderSubtleBrush}"
-              BorderThickness="1"
-              Padding="8,4"
-              Margin="0,0,8,0" />
+      <SplitButton Grid.Column="1"
+                   x:Name="ModelChip"
+                   Content="⚙ No model selected ▾"
+                   FontSize="10"
+                   Background="Transparent"
+                   BorderBrush="{DynamicResource BorderSubtleBrush}"
+                   BorderThickness="1"
+                   Padding="8,4"
+                   Margin="0,0,8,0">
+        <SplitButton.Flyout>
+          <MenuFlyout>
+            <!-- Items populated at runtime in BuildModelMenu() via chip.Flyout -->
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
       <!-- Future: Chat section toggle will go here in column 2 -->
     </Grid>
 

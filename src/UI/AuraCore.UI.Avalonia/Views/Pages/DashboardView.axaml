@@ -147,15 +147,19 @@
             <Grid x:Name="QuickActionsGrid" ColumnDefinitions="*,*" RowDefinitions="*,*">
               <controls:QuickActionTile Grid.Row="0" Grid.Column="0" MinHeight="58"
                                          Title="Clean Junk" SubLabel="Temp, cache, logs"
+                                         Icon="{StaticResource IconSparkles}"
                                          TintBrush="{DynamicResource AccentTealBrush}"/>
               <controls:QuickActionTile Grid.Row="0" Grid.Column="1" Margin="6,0,0,0" MinHeight="58"
                                          Title="Optimize RAM" SubLabel="Free memory"
+                                         Icon="{StaticResource IconRotateCcw}"
                                          TintBrush="{DynamicResource AccentPurpleBrush}"/>
               <controls:QuickActionTile Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" MinHeight="58"
                                          Title="Gaming Mode" SubLabel="Ready to game"
+                                         Icon="{StaticResource IconGamepad}"
                                          TintBrush="{DynamicResource AccentAmberBrush}"/>
               <controls:QuickActionTile Grid.Row="1" Grid.Column="1" Margin="6,6,0,0" MinHeight="58"
                                          Title="Security Scan" SubLabel="Defender + firewall"
+                                         Icon="{StaticResource IconShieldCheck}"
                                          TintBrush="{DynamicResource AccentTealBrush}"/>
             </Grid>
           </StackPanel>

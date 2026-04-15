@@ -23,6 +23,18 @@ public partial class DashboardView : UserControl
     private bool _initialized;
     private bool _narrow;
 
+    // GPU polling runs on background thread to avoid blocking UI with typeperf process spawn.
+    // Cached value is read synchronously per tick; fresh sample kicked off periodically.
+    private double _cachedGpuUsage = 0;
+    private DateTime _lastGpuSampleUtc = DateTime.MinValue;
+    private int _gpuSampleInFlight = 0; // 0 = free, 1 = busy (Interlocked)
+    private static readonly TimeSpan GpuSampleInterval = TimeSpan.FromSeconds(2);
+
+    // CPU polling via Windows PerformanceCounter (fast, ~microseconds per NextValue).
+    // Linux uses /proc/stat delta; both give real system CPU% not per-process time.
+    private global::System.Diagnostics.PerformanceCounter? _cpuCounter;
+    private (ulong Total, ulong Idle)? _lastProcStatSnapshot;
+
     public DashboardView()
     {
         InitializeComponent();
@@ -150,7 +162,7 @@ public partial class DashboardView : UserControl
 
     private void StartPolling()
     {
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _timer.Tick += (_, _) => TickOnce();
         _timer.Start();
         TickOnce();
@@ -172,8 +184,10 @@ public partial class DashboardView : UserControl
             _vm.DiskPercent = SampleDiskPercent();
             if (_vm.GpuVisible)
             {
-                _vm.GpuPercent = GpuInfoHelper.GetCurrentUsage();
-                GpuGauge.Value = _vm.GpuPercent;
+                // Read cached GPU value (instant) and trigger background refresh if stale.
+                _vm.GpuPercent = _cachedGpuUsage;
+                GpuGauge.Value = _cachedGpuUsage;
+                MaybeRefreshGpuInBackground();
             }
             _vm.HealthScore = ComputeHealth(_vm.CpuPercent, _vm.RamPercent, _vm.DiskPercent);
             _vm.HealthLabel = _vm.HealthScore >= 85 ? "Excellent" : _vm.HealthScore >= 60 ? "Good" : "Needs attention";
@@ -188,11 +202,96 @@ public partial class DashboardView : UserControl
         catch { }
     }
 
+    /// <summary>
+    /// Kicks off a background GPU usage sample if the cached value is stale and no sample is in flight.
+    /// GpuInfoHelper.GetCurrentUsage spawns `typeperf` on Windows which can block 100-2000ms — MUST NOT
+    /// run on the UI thread. Caller (TickOnce) keeps rendering at full 500ms cadence without hitching.
+    /// </summary>
+    private void MaybeRefreshGpuInBackground()
+    {
+        if (DateTime.UtcNow - _lastGpuSampleUtc < GpuSampleInterval) return;
+        // Interlocked guard: single in-flight sample at a time
+        if (global::System.Threading.Interlocked.Exchange(ref _gpuSampleInFlight, 1) == 1) return;
+
+        _ = global::System.Threading.Tasks.Task.Run(() =>
+        {
+            double usage = 0;
+            try { usage = GpuInfoHelper.GetCurrentUsage(); } catch { }
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                _cachedGpuUsage = usage;
+                _lastGpuSampleUtc = DateTime.UtcNow;
+                global::System.Threading.Interlocked.Exchange(ref _gpuSampleInFlight, 0);
+            });
+        });
+    }
+
     private double SampleCpu()
     {
-        return Math.Clamp(Environment.ProcessorCount > 0
-            ? (Process.GetCurrentProcess().TotalProcessorTime.TotalSeconds * 0.5) % 100
-            : 0, 0, 100);
+        if (OperatingSystem.IsWindows()) return SampleCpuWindows();
+        if (OperatingSystem.IsLinux()) return SampleCpuLinux();
+        return 0;
+    }
+
+    [global::System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private double SampleCpuWindows()
+    {
+        try
+        {
+            if (_cpuCounter is null)
+            {
+                _cpuCounter = new global::System.Diagnostics.PerformanceCounter(
+                    "Processor", "% Processor Time", "_Total", readOnly: true);
+                _cpuCounter.NextValue(); // first call always returns 0 — prime it
+                return 0;
+            }
+            return Math.Clamp(_cpuCounter.NextValue(), 0, 100);
+        }
+        catch
+        {
+            _cpuCounter = null; // reset; retry on next tick
+            return 0;
+        }
+    }
+
+    [global::System.Runtime.Versioning.SupportedOSPlatform("linux")]
+    private double SampleCpuLinux()
+    {
+        try
+        {
+            // /proc/stat line "cpu  user nice system idle iowait irq softirq steal ..."
+            // CPU% = 100 * (delta_total - delta_idle) / delta_total between two samples.
+            var firstLine = File.ReadLines("/proc/stat").First();
+            var parts = firstLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 5 || parts[0] != "cpu") return 0;
+
+            ulong user = ulong.Parse(parts[1]);
+            ulong nice = ulong.Parse(parts[2]);
+            ulong system = ulong.Parse(parts[3]);
+            ulong idle = ulong.Parse(parts[4]);
+            ulong iowait = parts.Length > 5 ? ulong.Parse(parts[5]) : 0;
+            ulong irq = parts.Length > 6 ? ulong.Parse(parts[6]) : 0;
+            ulong softirq = parts.Length > 7 ? ulong.Parse(parts[7]) : 0;
+            ulong steal = parts.Length > 8 ? ulong.Parse(parts[8]) : 0;
+
+            ulong total = user + nice + system + idle + iowait + irq + softirq + steal;
+            ulong totalIdle = idle + iowait;
+
+            if (_lastProcStatSnapshot is null)
+            {
+                _lastProcStatSnapshot = (total, totalIdle);
+                return 0;
+            }
+
+            var (prevTotal, prevIdle) = _lastProcStatSnapshot.Value;
+            ulong dTotal = total - prevTotal;
+            ulong dIdle = totalIdle - prevIdle;
+            _lastProcStatSnapshot = (total, totalIdle);
+
+            if (dTotal == 0) return 0;
+            return Math.Clamp(100.0 * (dTotal - dIdle) / dTotal, 0, 100);
+        }
+        catch { return 0; }
     }
 
     private double SampleRamPercent()

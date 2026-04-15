@@ -89,6 +89,50 @@ public partial class App : global::Avalonia.Application
         // ── AI Analyzer Engine ──
         AuraCore.Engine.AIAnalyzer.AIAnalyzerRegistration.AddAIAnalyzer(sc);
 
+        // ── Phase 3: AI Features services ──
+        // Model catalog + installed models (singletons — read-only / cross-session state)
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.IModelCatalog,
+                        global::AuraCore.UI.Avalonia.Services.AI.ModelCatalog>();
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.IInstalledModelStore>(
+            sp => new global::AuraCore.UI.Avalonia.Services.AI.InstalledModelStore(
+                sp.GetRequiredService<global::AuraCore.UI.Avalonia.Services.AI.IModelCatalog>()));
+
+        // App settings (single instance — loaded from disk at startup)
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.AppSettings>(
+            _ => global::AuraCore.UI.Avalonia.AppSettings.Load());
+
+        // Ambient CORTEX state aggregator
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService,
+                        global::AuraCore.UI.Avalonia.Services.AI.CortexAmbientService>();
+
+        // Tier service for sidebar IsLocked
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.ITierService,
+                        global::AuraCore.UI.Avalonia.Services.AI.TierService>();
+
+        // HttpClient for model downloads — configured with User-Agent to bypass Bot Fight Mode
+        sc.AddSingleton<global::System.Net.Http.HttpClient>(_ =>
+        {
+            var client = new global::System.Net.Http.HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(30),
+            };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("AuraCorePro/1.0 (+https://auracore.pro)");
+            return client;
+        });
+
+        // Download settings (consumed by ModelDownloadService)
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.ModelDownloadSettings>(_ =>
+            new global::AuraCore.UI.Avalonia.Services.AI.ModelDownloadSettings(
+                BaseUrl: "https://models.auracore.pro",
+                InstallDirectory: global::AuraCore.UI.Avalonia.Services.AI.InstalledModelStore.DefaultInstallDir(),
+                TimeoutMinutes: 30,
+                BufferKb: 256,
+                UserAgent: "AuraCorePro/1.0 (+https://auracore.pro)"));
+
+        sc.AddTransient<global::AuraCore.UI.Avalonia.Services.AI.IModelDownloadService,
+                        global::AuraCore.UI.Avalonia.Services.AI.ModelDownloadService>();
+        // ── end Phase 3 ──
+
         _services = sc.BuildServiceProvider();
 
         // Initialize theme (loads saved preference)

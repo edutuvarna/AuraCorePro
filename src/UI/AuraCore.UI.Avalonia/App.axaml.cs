@@ -131,6 +131,9 @@ public partial class App : global::Avalonia.Application
 
         sc.AddTransient<global::AuraCore.UI.Avalonia.Services.AI.IModelDownloadService,
                         global::AuraCore.UI.Avalonia.Services.AI.ModelDownloadService>();
+
+        sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView>();
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.AIFeaturesViewModel>();
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

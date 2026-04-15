@@ -112,4 +112,19 @@
   <Style Selector="Button">
     <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
   </Style>
+
+  <!-- AIFeaturesView section navigation buttons -->
+  <Style Selector="Button.section-nav-item">
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.section-nav-item:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#10FFFFFF" />
+  </Style>
 </Styles>

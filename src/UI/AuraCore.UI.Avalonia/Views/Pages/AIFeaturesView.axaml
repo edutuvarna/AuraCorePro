@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView"
+             x:DataType="vm:AIFeaturesViewModel">
+
+  <UserControl.Styles>
+    <!-- Hero gradient background -->
+    <Style Selector="Border.cortex-hero">
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="22,18" />
+      <Setter Property="Margin" Value="0,0,0,16" />
+      <Setter Property="Background">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Offset="0" Color="#26B088FF" />
+          <GradientStop Offset="0.6" Color="#1400D4AA" />
+          <GradientStop Offset="1" Color="#00000000" />
+        </LinearGradientBrush>
+      </Setter>
+      <Setter Property="BorderBrush" Value="#38B088FF" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="20,16">
+
+    <!-- CORTEX Hero -->
+    <Border DockPanel.Dock="Top" Classes="cortex-hero">
+      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="✦ CORTEX"
+                   FontSize="10"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentPurpleBrush}" />
+
+        <controls:StatusChip Grid.Row="0" Grid.Column="1"
+                             x:Name="PART_HeroStatusChip"
+                             Label="{Binding HeroStatusText}" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                   x:Name="PART_HeroTitle"
+                   Text="AI Features"
+                   FontSize="22"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   Margin="0,6,0,0" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                   Text="Intelligent monitoring, predictions, and automation"
+                   FontSize="11"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Margin="0,4,0,0" />
+      </Grid>
+    </Border>
+
+    <!-- Overview / Detail swap -->
+    <Panel>
+
+      <!-- Overview mode: 2x2 grid of AIFeatureCards -->
+      <UniformGrid Rows="2" Columns="2"
+                   x:Name="PART_OverviewGrid"
+                   IsVisible="{Binding IsOverview}">
+        <controls:AIFeatureCard DataContext="{Binding InsightsCard}" />
+        <controls:AIFeatureCard DataContext="{Binding RecommendationsCard}" />
+        <controls:AIFeatureCard DataContext="{Binding ScheduleCard}" />
+        <controls:AIFeatureCard DataContext="{Binding ChatCard}" />
+      </UniformGrid>
+
+      <!-- Detail mode: sidebar + content -->
+      <Grid ColumnDefinitions="120,*"
+            x:Name="PART_DetailRoot"
+            IsVisible="{Binding IsDetail}">
+
+        <StackPanel Grid.Column="0" x:Name="PART_SectionNav" Spacing="2" Margin="0,8,8,0">
+          <Button Content="Overview" Classes="section-nav-item"
+                  Command="{Binding NavigateToOverview}" />
+          <Button Content="Insights" Classes="section-nav-item"
+                  Command="{Binding NavigateToSection}"
+                  CommandParameter="insights" />
+          <Button Content="Recommendations" Classes="section-nav-item"
+                  Command="{Binding NavigateToSection}"
+                  CommandParameter="recommendations" />
+          <Button Content="Schedule" Classes="section-nav-item"
+                  Command="{Binding NavigateToSection}"
+                  CommandParameter="schedule" />
+          <Button Content="Chat ⚠" Classes="section-nav-item"
+                  Command="{Binding NavigateToSection}"
+                  CommandParameter="chat" />
+        </StackPanel>
+
+        <ContentControl Grid.Column="1"
+                        x:Name="PART_SectionContent"
+                        Content="{Binding ActiveSectionView}" />
+      </Grid>
+    </Panel>
+
+  </DockPanel>
+</UserControl>

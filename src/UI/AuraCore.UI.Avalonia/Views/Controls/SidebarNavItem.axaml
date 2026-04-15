@@ -3,6 +3,15 @@
              xmlns:local="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Controls.SidebarNavItem"
              x:Name="Root">
+  <UserControl.Styles>
+    <Style Selector="local|SidebarNavItem:locked">
+      <Setter Property="Opacity" Value="0.5" />
+      <Setter Property="Cursor" Value="No" />
+    </Style>
+    <Style Selector="local|SidebarNavItem:locked PathIcon#PART_LockIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </UserControl.Styles>
   <Button Command="{Binding #Root.Command}"
           Background="Transparent"
           BorderThickness="0"
@@ -23,7 +32,7 @@
           <Binding Path="AccentBrush" ElementName="Root"/>
         </MultiBinding>
       </Border.BorderBrush>
-      <Grid ColumnDefinitions="Auto,*,Auto">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
         <Path Data="{Binding #Root.Icon}"
               Width="14" Height="14"
               StrokeThickness="2"
@@ -62,6 +71,15 @@
                      FontWeight="Bold"
                      Foreground="{Binding #Root.AccentBrush}"/>
         </Border>
+        <PathIcon x:Name="PART_LockIcon"
+                  Grid.Column="3"
+                  Data="{DynamicResource IconLock}"
+                  Width="12" Height="12"
+                  Margin="0,0,6,0"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Right"
+                  Foreground="{DynamicResource TextDisabledBrush}"
+                  IsVisible="False" />
       </Grid>
     </Border>
   </Button>

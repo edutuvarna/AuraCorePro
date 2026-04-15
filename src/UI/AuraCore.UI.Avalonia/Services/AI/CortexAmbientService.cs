@@ -27,6 +27,7 @@ public sealed class CortexAmbientService : ICortexAmbientService
     public int LearningDay => _learningDay;
     public CortexActiveness Activeness => _activeness;
     public string AggregatedStatusText => _aggregatedStatusText;
+    public string FormattedStatusText => $"\u2728 Cortex \u00B7 {_aggregatedStatusText}";
 
     public void Refresh()
     {

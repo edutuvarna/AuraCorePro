@@ -81,9 +81,28 @@ public sealed partial class MainWindow : Window
                 RefreshUserChip();
             });
 
-        // Status bar wiring
+        // Status bar wiring — transient status from StatusBarService overrides
+        // the CORTEX baseline; when the transient clears we fall back to
+        // ambient state ("✦ Cortex · Active · Learning day N" / "Paused" / "Ready to start").
         StatusBarService.StatusChanged += text =>
-            Dispatcher.UIThread.Post(() => GlobalStatusText.Text = text);
+            Dispatcher.UIThread.Post(() =>
+            {
+                GlobalStatusText.Text = string.IsNullOrEmpty(text)
+                    ? FormatCortexStatus()
+                    : text;
+            });
+
+        // Phase 3 Task 33: bind status bar baseline to CortexAmbientService
+        try
+        {
+            if (App.Services.GetService<AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService>() is { } ambient)
+            {
+                GlobalStatusText.Text = ambient.FormattedStatusText;
+                ambient.PropertyChanged += (_, _) =>
+                    Dispatcher.UIThread.Post(() => GlobalStatusText.Text = ambient.FormattedStatusText);
+            }
+        }
+        catch { /* DI / design-time fallback — leaves hardcoded "Ready" */ }
 
         StatusBarService.ProgressChanged += (op, fraction) =>
             Dispatcher.UIThread.Post(() =>
@@ -236,6 +255,21 @@ public sealed partial class MainWindow : Window
             app.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v3) && v3 is global::Avalonia.Media.IBrush b3)
             return b3;
         return fallback;
+    }
+
+    /// <summary>
+    /// CORTEX status bar baseline string. Re-resolves the ambient each call
+    /// (cheap — singleton) so MainWindow doesn't need to cache a field.
+    /// Used by StatusBarService.StatusChanged fallback when the transient clears.
+    /// </summary>
+    private string FormatCortexStatus()
+    {
+        try
+        {
+            var ambient = App.Services.GetService<AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService>();
+            return ambient?.FormattedStatusText ?? "Ready";
+        }
+        catch { return "Ready"; }
     }
 
     /// <summary>Resolves a Geometry resource (icons are theme-independent, in shared resources).</summary>

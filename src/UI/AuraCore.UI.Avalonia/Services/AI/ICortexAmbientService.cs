@@ -29,6 +29,13 @@ public interface ICortexAmbientService : INotifyPropertyChanged
     string AggregatedStatusText { get; }
 
     /// <summary>
+    /// Display-ready status string with the "✦ Cortex · " prefix. Used by the
+    /// global status bar (Task 33). Kept on the interface so consumers don't
+    /// duplicate the prefix literal across the codebase.
+    /// </summary>
+    string FormattedStatusText { get; }
+
+    /// <summary>
     /// Recomputes state from current settings and fires PropertyChanged.
     /// Call after any feature toggle change.
     /// </summary>

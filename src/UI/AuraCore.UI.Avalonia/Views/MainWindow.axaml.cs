@@ -140,8 +140,8 @@ public sealed partial class MainWindow : Window
             var catIdCapture = cat.Id;
             var isExpanded = _sidebarVm.ExpandedCategoryId == cat.Id;
             var accent = cat.IsAccent
-                ? (global::Avalonia.Media.IBrush)this.FindResource("AccentPurpleBrush")!
-                : (global::Avalonia.Media.IBrush)this.FindResource("AccentTealBrush")!;
+                ? FindBrush("AccentPurpleBrush", global::Avalonia.Media.Brushes.MediumPurple)
+                : FindBrush("AccentTealBrush", global::Avalonia.Media.Brushes.Teal);
 
             NavPanel.Children.Add(CreateNavItem(cat.LocalizationKey, cat.Icon, accent,
                 isActive: false,
@@ -167,7 +167,7 @@ public sealed partial class MainWindow : Window
         {
             var moduleIdCapture = item.Id;
             NavPanel.Children.Add(CreateNavItem(item.LocalizationKey, null,
-                (global::Avalonia.Media.IBrush)this.FindResource("TextMutedBrush")!,
+                FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray),
                 isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
                 trailingChipText: null,
                 onClick: () => { _sidebarVm.NavigateTo(moduleIdCapture); SetActiveContent(moduleIdCapture); RebuildSidebar(); }));
@@ -191,10 +191,43 @@ public sealed partial class MainWindow : Window
             Command = new RelayCommand(onClick),
         };
         if (iconResourceKey is not null)
-            item.Icon = (global::Avalonia.Media.Geometry)this.FindResource(iconResourceKey)!;
+        {
+            var iconGeo = FindGeometry(iconResourceKey);
+            if (iconGeo is not null) item.Icon = iconGeo;
+        }
         if (accent is not null)
             item.AccentBrush = accent;
         return item;
+    }
+
+    /// <summary>
+    /// Resolves a brush resource across theme variants + style dictionaries.
+    /// Theme-scoped brushes (under ThemeDictionaries.Dark) aren't found by the default
+    /// FindResource which assumes ThemeVariant.Default. Falls back to a safe brush.
+    /// </summary>
+    private global::Avalonia.Media.IBrush FindBrush(string key, global::Avalonia.Media.IBrush fallback)
+    {
+        // Prefer this window's actual theme variant; fall back to Dark (the app is dark-only in v1)
+        var variant = this.ActualThemeVariant ?? global::Avalonia.Styling.ThemeVariant.Dark;
+        if (this.TryFindResource(key, variant, out var v) && v is global::Avalonia.Media.IBrush b)
+            return b;
+        if (this.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v2) && v2 is global::Avalonia.Media.IBrush b2)
+            return b2;
+        if (global::Avalonia.Application.Current is { } app &&
+            app.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v3) && v3 is global::Avalonia.Media.IBrush b3)
+            return b3;
+        return fallback;
+    }
+
+    /// <summary>Resolves a Geometry resource (icons are theme-independent, in shared resources).</summary>
+    private global::Avalonia.Media.Geometry? FindGeometry(string key)
+    {
+        if (this.TryFindResource(key, null, out var v) && v is global::Avalonia.Media.Geometry g)
+            return g;
+        if (global::Avalonia.Application.Current is { } app &&
+            app.TryFindResource(key, null, out var v2) && v2 is global::Avalonia.Media.Geometry g2)
+            return g2;
+        return null;
     }
 
     private void SetActiveContent(string moduleId)

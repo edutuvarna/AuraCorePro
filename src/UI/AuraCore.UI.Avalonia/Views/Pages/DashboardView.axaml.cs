@@ -113,19 +113,16 @@ public partial class DashboardView : UserControl
 
     private void HookHeroButton()
     {
-        HeroCta.PrimaryCommand = new RelayCommand(ShowSmartOptimizeDialog);
+        HeroCta.PrimaryCommand = new RelayCommand(NavigateToAIFeatures);
     }
 
-    private void ShowSmartOptimizeDialog()
+    private void NavigateToAIFeatures()
     {
-        var dlg = new SmartOptimizePlaceholderDialog();
-        dlg.GoToRecommendationsRequested += (_, _) =>
-        {
-            if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
-                main.NavigateToModule("ai-recommendations");
-        };
-        if (this.GetVisualRoot() is Window owner)
-            dlg.ShowDialog(owner);
+        // Phase 3: Smart Optimize CTA routes to the unified AIFeaturesView (overview).
+        // Task 32 will refine this with conditional logic based on RecommendationsEnabled
+        // and may deep-link into the Recommendations section.
+        if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
+            main.NavigateToModule("ai-features");
     }
 
     private void HookResponsiveBreakpoint()

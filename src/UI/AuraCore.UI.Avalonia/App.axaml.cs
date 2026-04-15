@@ -138,6 +138,7 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.InsightsSection>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.RecommendationsSection>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.ChatSection>();
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.ChatOptInDialogViewModel>();
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

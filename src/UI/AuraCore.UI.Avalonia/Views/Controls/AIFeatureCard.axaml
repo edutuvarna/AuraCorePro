@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.AIFeatureCard"
+             x:DataType="vm:AIFeatureCardVM"
+             Margin="6">
+
+  <controls:GlassCard Padding="14">
+    <controls:GlassCard.CardContent>
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+
+        <!-- Accent kicker (uppercase title) -->
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   x:Name="PART_Kicker"
+                   Text="{Binding Title}"
+                   FontSize="9"
+                   Foreground="{DynamicResource AccentPurpleBrush}"
+                   FontWeight="Bold" />
+
+        <!-- Toggle switch (top-right) -->
+        <controls:AuraToggle Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                             x:Name="PART_Toggle"
+                             IsOn="{Binding IsEnabled, Mode=TwoWay}"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Top" />
+
+        <!-- Experimental badge (chat only) -->
+        <controls:AccentBadge Grid.Row="1" Grid.Column="0"
+                              x:Name="PART_ExperimentalBadge"
+                              Label="EXPERIMENTAL"
+                              Margin="0,4,0,0"
+                              HorizontalAlignment="Left"
+                              IsVisible="{Binding IsChatExperimental}" />
+
+        <!-- Title -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                   x:Name="PART_Title"
+                   Text="{Binding Title}"
+                   FontSize="15"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   Margin="0,8,0,0" />
+
+        <!-- Preview summary -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                   x:Name="PART_Preview"
+                   Text="{Binding PreviewSummary}"
+                   FontSize="11"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Margin="0,3,0,0"
+                   TextWrapping="Wrap" />
+
+      </Grid>
+    </controls:GlassCard.CardContent>
+  </controls:GlassCard>
+</UserControl>

@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+        x:Class="AuraCore.UI.Avalonia.Views.Dialogs.ChatOptInDialog"
+        x:DataType="vm:ChatOptInDialogViewModel"
+        Title="CORTEX Chat — Experimental"
+        Width="540" Height="420"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+  <Border Background="{DynamicResource BgSurfaceBrush}"
+          BorderBrush="{DynamicResource BorderEmphasisBrush}"
+          BorderThickness="1"
+          CornerRadius="12">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+      <StackPanel Grid.Row="0" Spacing="4">
+        <TextBlock Text="✦ CORTEX CHAT — STEP 1 of 2"
+                   FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentPurpleBrush}" />
+        <TextBlock Text="⚠ Experimental Feature"
+                   FontSize="18" FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentAmberBrush}" />
+      </StackPanel>
+
+      <ScrollViewer Grid.Row="1" Margin="0,16"
+                    IsVisible="{Binding IsStep1}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system."
+                     FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="This feature is under active development."
+                     FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
+        </StackPanel>
+      </ScrollViewer>
+
+      <ContentControl Grid.Row="1" x:Name="PART_Step2Host"
+                      Margin="0,16" IsVisible="{Binding IsStep2}" />
+
+      <StackPanel Grid.Row="2" Orientation="Horizontal"
+                  HorizontalAlignment="Right" Spacing="10"
+                  IsVisible="{Binding IsStep1}">
+        <Button Content="Cancel" Command="{Binding CancelFromStep1}" Padding="16,8" />
+        <Button Content="I understand, continue" Command="{Binding ContinueFromStep1}"
+                Classes="primary" Padding="16,8" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

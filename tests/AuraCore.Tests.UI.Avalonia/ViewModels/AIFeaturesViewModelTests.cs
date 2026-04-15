@@ -1,6 +1,7 @@
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
+using global::Avalonia.Headless.XUnit;
 using System.ComponentModel;
 using Xunit;
 
@@ -117,7 +118,9 @@ public class AIFeaturesViewModelTests
         Assert.Contains(nameof(AIFeaturesViewModel.ActiveSection), fired);
     }
 
-    [Fact]
+    // AvaloniaFact because ActiveSectionView getter constructs a placeholder UserControl,
+    // which requires an active Avalonia app context (headless dispatcher).
+    [AvaloniaFact]
     public void ActiveSectionView_CachedAcrossNavigation()
     {
         var vm = CreateVM();

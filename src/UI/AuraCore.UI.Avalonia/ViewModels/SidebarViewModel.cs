@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using AuraCore.UI.Avalonia.Services.AI;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
 
@@ -20,7 +21,8 @@ public sealed record SidebarCategoryVM(
 public sealed record SidebarModuleVM(
     string Id,
     string LocalizationKey,
-    string Platform = "all"
+    string Platform = "all",
+    bool IsLocked = false
 );
 
 /// <summary>
@@ -29,14 +31,29 @@ public sealed record SidebarModuleVM(
 /// </summary>
 public sealed class SidebarViewModel : INotifyPropertyChanged
 {
+    private readonly ITierService _tierService;
+    private readonly UserTier _currentTier;
+
     private string? _expandedCategoryId;
     private string _activeModuleId = "dashboard";
     private bool _advancedExpanded = true;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public IReadOnlyList<SidebarCategoryVM> Categories { get; } = BuildCategories();
-    public IReadOnlyList<SidebarModuleVM> AdvancedItems { get; } = BuildAdvancedItems();
+    public IReadOnlyList<SidebarCategoryVM> Categories { get; }
+    public IReadOnlyList<SidebarModuleVM> AdvancedItems { get; }
+
+    /// <summary>
+    /// Primary constructor. tierService and currentTier default to a Free-tier TierService
+    /// so existing callers (tests, design time) that do <c>new SidebarViewModel()</c> continue to work.
+    /// </summary>
+    public SidebarViewModel(ITierService? tierService = null, UserTier currentTier = UserTier.Free)
+    {
+        _tierService = tierService ?? new TierService();
+        _currentTier = currentTier;
+        Categories = BuildCategories();
+        AdvancedItems = BuildAdvancedItems();
+    }
 
     public string? ExpandedCategoryId
     {
@@ -72,63 +89,138 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
     private void OnChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    private static IReadOnlyList<SidebarCategoryVM> BuildCategories() => new[]
+    // ─── helper: build a module and compute its lock state ───────────
+
+    private SidebarModuleVM Module(string id, string locKey, string platform = "all")
+        => new(id, locKey, platform, IsLocked: _tierService.IsModuleLocked(id, _currentTier));
+
+    // ─── Categories ──────────────────────────────────────────────────
+
+    private IReadOnlyList<SidebarCategoryVM> BuildCategories()
     {
-        new SidebarCategoryVM("optimize", "nav.categoryOptimize", "IconZap", new SidebarModuleVM[]
+        var list = new List<SidebarCategoryVM>
         {
-            new("ram-optimizer", "nav.ramOptimizer"),
-            new("startup-optimizer", "nav.startupOptimizer"),
-            new("network-optimizer", "nav.network"),
-            new("battery-optimizer", "nav.batteryOptimizer"),
-            new("storage-compression", "nav.storage", Platform: "windows"),
-        }),
-        new SidebarCategoryVM("clean-debloat", "nav.categoryCleanDebloat", "IconSparkles", new SidebarModuleVM[]
+            new("optimize", "nav.categoryOptimize", "IconZap", BuildOptimize()),
+            new("clean-debloat", "nav.categoryCleanDebloat", "IconSparkles", BuildCleanDebloat()),
+            new("gaming", "nav.categoryGaming", "IconGamepad", BuildGaming()),
+            new("security", "nav.categorySecurity", "IconShield", BuildSecurity()),
+            new("apps-tools", "nav.categoryAppsTools", "IconPackage", BuildAppsTools()),
+            new("ai-features", "nav.categoryAiFeatures", "IconSparklesFilled",
+                new SidebarModuleVM[] { Module("ai-features", "nav.categoryAiFeatures") },
+                IsAccent: true, Badge: "CORTEX"),
+        };
+        return list;
+    }
+
+    private IReadOnlyList<SidebarModuleVM> BuildOptimize()
+    {
+        var items = new List<SidebarModuleVM>
         {
-            new("junk-cleaner", "nav.junkCleaner"),
-            new("disk-cleanup", "nav.diskCleanup"),
-            new("privacy-cleaner", "nav.privacyCleaner"),
-            new("registry-cleaner", "nav.registry", Platform: "windows"),
-            new("bloatware-removal", "nav.bloatware", Platform: "windows"),
-            new("app-installer", "nav.appInstaller", Platform: "windows"),
-        }),
-        new SidebarCategoryVM("gaming", "nav.categoryGaming", "IconGamepad", new SidebarModuleVM[]
+            Module("ram-optimizer",       "nav.ramOptimizer"),
+            Module("startup-optimizer",   "nav.startupOptimizer"),
+            Module("network-optimizer",   "nav.network"),
+            Module("battery-optimizer",   "nav.batteryOptimizer"),
+            Module("storage-compression", "nav.storage", "windows"),
+        };
+
+        if (OperatingSystem.IsLinux())
         {
-            new("gaming-mode", "nav.gamingMode", Platform: "windows"),
-        }),
-        new SidebarCategoryVM("security", "nav.categorySecurity", "IconShield", new SidebarModuleVM[]
+            items.Add(Module("systemd-manager", "nav.systemdManager", "linux"));
+            items.Add(Module("swap-optimizer",  "nav.swapOptimizer",  "linux"));
+        }
+
+        return items;
+    }
+
+    private IReadOnlyList<SidebarModuleVM> BuildCleanDebloat()
+    {
+        var items = new List<SidebarModuleVM>
         {
-            new("defender-manager", "nav.defender", Platform: "windows"),
-            new("firewall-rules", "nav.firewallRules", Platform: "windows"),
-            new("file-shredder", "nav.fileShredder"),
-            new("hosts-editor", "nav.hostsEditor"),
-        }),
-        new SidebarCategoryVM("apps-tools", "nav.categoryAppsTools", "IconPackage", new SidebarModuleVM[]
-        {
-            new("driver-updater", "nav.driverUpdater", Platform: "windows"),
-            new("service-manager", "nav.serviceManager", Platform: "windows"),
-            new("iso-builder", "nav.isoBuilder", Platform: "windows"),
-            new("disk-health", "nav.diskHealth"),
-            new("space-analyzer", "nav.spaceAnalyzer"),
-        }),
-        new SidebarCategoryVM("ai-features", "nav.categoryAiFeatures", "IconSparklesFilled", new SidebarModuleVM[]
-        {
-            new("ai-features", "nav.categoryAiFeatures"),
-        }, IsAccent: true, Badge: "CORTEX"),
+            Module("junk-cleaner",      "nav.junkCleaner"),
+            Module("disk-cleanup",      "nav.diskCleanup"),
+            Module("privacy-cleaner",   "nav.privacyCleaner"),
+            Module("registry-cleaner",  "nav.registry",    "windows"),
+            Module("bloatware-removal", "nav.bloatware",   "windows"),
+            Module("app-installer",     "nav.appInstaller","windows"),
+        };
+
+        if (OperatingSystem.IsLinux())
+            items.Add(Module("package-cleaner", "nav.packageCleaner", "linux"));
+
+        return items;
+    }
+
+    private IReadOnlyList<SidebarModuleVM> BuildGaming() => new[]
+    {
+        Module("gaming-mode", "nav.gamingMode", "windows"),
     };
 
-    private static IReadOnlyList<SidebarModuleVM> BuildAdvancedItems() => new SidebarModuleVM[]
+    private IReadOnlyList<SidebarModuleVM> BuildSecurity()
     {
-        new("registry-deep", "nav.registry", Platform: "windows"),
-        new("environment-variables", "nav.environmentVariables"),
-        new("symlink-manager", "nav.symlinkManager"),
-        new("process-monitor", "nav.processMonitor"),
-        new("font-manager", "nav.fontManager"),
-        new("context-menu", "nav.contextMenu", Platform: "windows"),
-        new("taskbar-tweaks", "nav.taskbar", Platform: "windows"),
-        new("explorer-tweaks", "nav.explorer", Platform: "windows"),
-        new("autorun-manager", "nav.autorunManager"),
-        new("wake-on-lan", "nav.wakeOnLan"),
-    };
+        var items = new List<SidebarModuleVM>
+        {
+            Module("defender-manager", "nav.defender",     "windows"),
+            Module("firewall-rules",   "nav.firewallRules","windows"),
+            Module("file-shredder",    "nav.fileShredder"),
+            Module("hosts-editor",     "nav.hostsEditor"),
+        };
+
+        if (OperatingSystem.IsMacOS())
+            items.Add(Module("timemachine-manager", "nav.timeMachineManager", "macos"));
+
+        return items;
+    }
+
+    private IReadOnlyList<SidebarModuleVM> BuildAppsTools()
+    {
+        var items = new List<SidebarModuleVM>
+        {
+            Module("driver-updater",  "nav.driverUpdater", "windows"),
+            Module("service-manager", "nav.serviceManager","windows"),
+            Module("iso-builder",     "nav.isoBuilder",    "windows"),
+            Module("disk-health",     "nav.diskHealth"),
+            Module("space-analyzer",  "nav.spaceAnalyzer"),
+            Module("system-health",   "nav.systemHealth"),
+        };
+
+        if (OperatingSystem.IsMacOS())
+        {
+            items.Add(Module("defaults-optimizer",  "nav.defaultsOptimizer",  "macos"));
+            items.Add(Module("brew-manager",         "nav.brewManager",         "macos"));
+        }
+
+        return items;
+    }
+
+    // ─── Advanced items (flat list below divider) ─────────────────────
+
+    private IReadOnlyList<SidebarModuleVM> BuildAdvancedItems()
+    {
+        var items = new List<SidebarModuleVM>
+        {
+            Module("registry-deep",          "nav.registry",              "windows"),
+            Module("environment-variables",  "nav.environmentVariables"),
+            Module("symlink-manager",        "nav.symlinkManager"),
+            Module("process-monitor",        "nav.processMonitor"),
+            Module("font-manager",           "nav.fontManager"),
+            Module("context-menu",           "nav.contextMenu",           "windows"),
+            Module("taskbar-tweaks",         "nav.taskbar",               "windows"),
+            Module("explorer-tweaks",        "nav.explorer",              "windows"),
+            Module("autorun-manager",        "nav.autorunManager"),
+            Module("wake-on-lan",            "nav.wakeOnLan"),
+            Module("admin-panel",            "nav.adminPanel"),
+        };
+
+        if (OperatingSystem.IsLinux())
+            items.Add(Module("cron-manager", "nav.cronManager", "linux"));
+
+        if (OperatingSystem.IsMacOS())
+            items.Add(Module("launchagent-manager", "nav.launchAgentManager", "macos"));
+
+        return items;
+    }
+
+    // ─── Visible filtering (platform) ────────────────────────────────
 
     public IEnumerable<SidebarCategoryVM> VisibleCategories()
     {

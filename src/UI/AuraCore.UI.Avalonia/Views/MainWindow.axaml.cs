@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -16,11 +18,22 @@ namespace AuraCore.UI.Avalonia.Views;
 public sealed partial class MainWindow : Window
 {
     private readonly Dictionary<string, IOptimizationModule> _moduleMap = new();
-    private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm = new();
+    private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        // Resolve SidebarViewModel from DI (registered in App.axaml.cs Phase 3 block)
+        try
+        {
+            _sidebarVm = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SidebarViewModel>();
+        }
+        catch
+        {
+            // Design-time / test fallback: construct directly with default (Free) tier
+            _sidebarVm = new AuraCore.UI.Avalonia.ViewModels.SidebarViewModel();
+        }
 
         // Populate module map for view resolution (TweakListView / CategoryCleanView need IOptimizationModule)
         try
@@ -153,10 +166,12 @@ public sealed partial class MainWindow : Window
                 foreach (var module in cat.Modules)
                 {
                     var moduleIdCapture = module.Id;
+                    var isLockedCapture = module.IsLocked;
                     NavPanel.Children.Add(CreateNavItem("  " + LocalizationService._(module.LocalizationKey), null, accent,
                         isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
                         trailingChipText: null,
-                        onClick: () => { _sidebarVm.NavigateTo(moduleIdCapture); SetActiveContent(moduleIdCapture); RebuildSidebar(); },
+                        isLocked: isLockedCapture,
+                        onClick: () => OnSidebarItemClick(moduleIdCapture),
                         isLiteralLabel: true));
                 }
             }
@@ -166,11 +181,13 @@ public sealed partial class MainWindow : Window
         foreach (var item in _sidebarVm.VisibleAdvancedItems())
         {
             var moduleIdCapture = item.Id;
+            var isLockedCapture = item.IsLocked;
             NavPanel.Children.Add(CreateNavItem(item.LocalizationKey, null,
                 FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray),
                 isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
                 trailingChipText: null,
-                onClick: () => { _sidebarVm.NavigateTo(moduleIdCapture); SetActiveContent(moduleIdCapture); RebuildSidebar(); }));
+                isLocked: isLockedCapture,
+                onClick: () => OnSidebarItemClick(moduleIdCapture)));
         }
     }
 
@@ -181,12 +198,14 @@ public sealed partial class MainWindow : Window
         bool isActive,
         string? trailingChipText,
         Action onClick,
-        bool isLiteralLabel = false)
+        bool isLiteralLabel = false,
+        bool isLocked = false)
     {
         var item = new Controls.SidebarNavItem
         {
             Label = isLiteralLabel ? labelOrKey : LocalizationService._(labelOrKey),
             IsActive = isActive,
+            IsLocked = isLocked,
             TrailingChipText = trailingChipText ?? string.Empty,
             Command = new RelayCommand(onClick),
         };
@@ -228,6 +247,37 @@ public sealed partial class MainWindow : Window
             app.TryFindResource(key, null, out var v2) && v2 is global::Avalonia.Media.Geometry g2)
             return g2;
         return null;
+    }
+
+    // ─── LOCKED ITEM CLICK HANDLER ───────────────────────────────────
+
+    private async void OnSidebarItemClick(string moduleKey)
+    {
+        // Find the module across both categories and advanced items
+        var module = _sidebarVm.Categories
+            .SelectMany(c => c.Modules)
+            .Concat(_sidebarVm.AdvancedItems)
+            .FirstOrDefault(m => m.Id == moduleKey);
+
+        if (module?.IsLocked == true)
+        {
+            try
+            {
+                var tierService = App.Services.GetRequiredService<AuraCore.UI.Avalonia.Services.AI.ITierService>();
+                var required = tierService.GetRequiredTier(moduleKey);
+                var dialog = new Views.Dialogs.TierUpgradePlaceholderDialog(moduleKey, required);
+                await dialog.ShowDialog(this);
+            }
+            catch
+            {
+                // Silently swallow if DI not available (design time / tests)
+            }
+            return;
+        }
+
+        _sidebarVm.NavigateTo(moduleKey);
+        SetActiveContent(moduleKey);
+        RebuildSidebar();
     }
 
     private void SetActiveContent(string moduleId)

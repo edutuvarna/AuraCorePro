@@ -136,6 +136,7 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.AIFeaturesViewModel>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.ScheduleSection>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.InsightsSection>();
+        sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Pages.AI.RecommendationsSection>();
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

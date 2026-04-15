@@ -2,14 +2,14 @@ using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
 
-namespace AuraCore.UI.Avalonia.Views.Pages;
+namespace AuraCore.UI.Avalonia.Views.Pages.AI;
 
 public record RecommendationItem(string Title, string Description, string Icon, string Module,
     string Priority, string Impact, ISolidColorBrush PriorityFg, ISolidColorBrush PriorityBg);
 
-public partial class RecommendationsView : UserControl
+public partial class RecommendationsSection : UserControl
 {
-    public RecommendationsView()
+    public RecommendationsSection()
     {
         InitializeComponent();
         Loaded += (s, e) => { LoadRecs(); ApplyLocalization(); };
@@ -35,7 +35,7 @@ public partial class RecommendationsView : UserControl
                 "\u26D4", "Privacy Cleaner", "Low", "Privacy", P("#3B82F6"), P("#203B82F6")),
         };
         RecList.ItemsSource = items;
-}
+    }
 
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private void Refresh_Click(object? s, RoutedEventArgs e) => LoadRecs();

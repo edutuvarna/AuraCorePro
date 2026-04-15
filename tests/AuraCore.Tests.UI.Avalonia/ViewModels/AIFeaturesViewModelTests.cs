@@ -44,6 +44,94 @@ public class AIFeaturesViewModelTests
         Assert.Equal("insights", vm.ActiveSection);
     }
 
+    // ───────── Chat bypass regression (user-found 2026-04-16) ─────────
+    // Before this fix, clicking "Chat" in the detail-mode sub-sidebar routed
+    // straight into ChatSection even when ChatEnabled was false — bypassing
+    // the ChatOptInDialog warning + model-picker. Now it triggers ChatOptInOpener.
+
+    [Fact]
+    public void NavigateToChat_WhenEnabled_NavigatesDirectly()
+    {
+        // Set the whole opt-in chain satisfied.
+        var settings = new AppSettings
+        {
+            ChatEnabled = true,
+            ChatOptInAcknowledged = true,
+            ActiveChatModelId = "phi3-mini-q4km",
+        };
+        var ambient = new CortexAmbientService(settings);
+        var vm = new AIFeaturesViewModel(settings, ambient);
+        var openerCalled = false;
+        vm.ChatOptInOpener = () => { openerCalled = true; return System.Threading.Tasks.Task.FromResult(true); };
+
+        vm.NavigateToSection.Execute("chat");
+
+        Assert.Equal(AIFeaturesViewMode.Detail, vm.Mode);
+        Assert.Equal("chat", vm.ActiveSection);
+        Assert.False(openerCalled); // no opt-in needed
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task NavigateToChat_WhenDisabled_TriggersOptInOpener()
+    {
+        var settings = new AppSettings { ChatEnabled = false };
+        var ambient = new CortexAmbientService(settings);
+        var vm = new AIFeaturesViewModel(settings, ambient);
+
+        var openerCalled = false;
+        var openerTcs = new System.Threading.Tasks.TaskCompletionSource<bool>();
+        vm.ChatOptInOpener = () => { openerCalled = true; return openerTcs.Task; };
+
+        vm.NavigateToSection.Execute("chat");
+        // Simulate the dialog completing successfully (user picked a model)
+        settings.ChatEnabled = true;
+        settings.ChatOptInAcknowledged = true;
+        settings.ActiveChatModelId = "phi3-mini-q4km";
+        openerTcs.SetResult(true);
+        await System.Threading.Tasks.Task.Yield();
+        // Give the async OnNavigateToSection continuation a chance to run
+        await System.Threading.Tasks.Task.Delay(50);
+
+        Assert.True(openerCalled);
+        Assert.Equal(AIFeaturesViewMode.Detail, vm.Mode);
+        Assert.Equal("chat", vm.ActiveSection);
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task NavigateToChat_WhenDisabled_UserCancels_StaysInOverview()
+    {
+        var settings = new AppSettings { ChatEnabled = false };
+        var ambient = new CortexAmbientService(settings);
+        var vm = new AIFeaturesViewModel(settings, ambient);
+
+        vm.ChatOptInOpener = () => System.Threading.Tasks.Task.FromResult(false); // user cancelled
+
+        vm.NavigateToSection.Execute("chat");
+        await System.Threading.Tasks.Task.Delay(50);
+
+        Assert.Equal(AIFeaturesViewMode.Overview, vm.Mode);
+        Assert.Equal("overview", vm.ActiveSection);
+    }
+
+    [Fact]
+    public void NavigateToDisabledSection_NonChat_StillNavigates()
+    {
+        // Only Chat has the gate — Insights/Recs/Schedule navigate regardless
+        // of toggle state so users can enable them from within.
+        var settings = new AppSettings
+        {
+            InsightsEnabled = false,
+            RecommendationsEnabled = false,
+            ScheduleEnabled = false,
+        };
+        var ambient = new CortexAmbientService(settings);
+        var vm = new AIFeaturesViewModel(settings, ambient);
+
+        vm.NavigateToSection.Execute("insights");
+        Assert.Equal(AIFeaturesViewMode.Detail, vm.Mode);
+        Assert.Equal("insights", vm.ActiveSection);
+    }
+
     [Fact]
     public void NavigateToOverview_ReturnsToGrid()
     {

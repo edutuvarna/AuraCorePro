@@ -20,6 +20,11 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
     private readonly ICortexAmbientService _ambient;
     private readonly Dictionary<string, UserControl> _sectionViewCache = new();
 
+    // Set to true while SyncChatCardFromSettings is running so the toggle-handler
+    // in WireToggleHandlers doesn't try to re-open the opt-in dialog on a programmatic
+    // IsEnabled flip. Reset immediately after the write.
+    private bool _suppressChatToggleHandler;
+
     public AIFeaturesViewModel(AppSettings settings, ICortexAmbientService ambient)
     {
         _settings = settings;
@@ -161,6 +166,8 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
         ChatCard.PropertyChanged += async (_, e) =>
         {
             if (e.PropertyName != nameof(AIFeatureCardVM.IsEnabled)) return;
+            // Programmatic syncs (SyncChatCardFromSettings) don't go through opt-in.
+            if (_suppressChatToggleHandler) return;
 
             if (ChatCard.IsEnabled)
             {
@@ -168,12 +175,12 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
                 if (_settings.ActiveChatModelId is null || !_settings.ChatOptInAcknowledged)
                 {
                     // Revert toggle until opt-in completes
-                    ChatCard.IsEnabled = false;
+                    SyncChatCardFromSettings(desired: false);
                     var opened = await OpenChatOptInDialogAsync();
                     if (opened)
                     {
                         // Opt-in flow already set ChatEnabled = true via CompleteFromStep2
-                        ChatCard.IsEnabled = true;
+                        SyncChatCardFromSettings(desired: true);
                     }
                     return;
                 }
@@ -185,7 +192,7 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
         };
     }
 
-    private void OnNavigateToSection(string? section)
+    private async void OnNavigateToSection(string? section)
     {
         if (string.IsNullOrEmpty(section)) return;
         if (section == "overview")
@@ -193,7 +200,42 @@ public sealed class AIFeaturesViewModel : INotifyPropertyChanged
             SetMode(AIFeaturesViewMode.Overview, "overview");
             return;
         }
+
+        // Chat requires opt-in acknowledgement + an active model. If either is
+        // missing (or the user toggled Chat off after opting in), route through
+        // the same ChatOptInOpener the card toggle uses. This closes a bypass
+        // where users could reach ChatSection from the detail-mode sidebar
+        // without ever seeing the experimental warning or picking a model.
+        //
+        // Other sections (Insights / Recommendations / Schedule) don't have
+        // prerequisites, so they navigate directly even when their toggle is
+        // OFF — the section content itself can prompt the user to enable it.
+        if (section == "chat" && !_settings.ChatEnabled)
+        {
+            if (ChatOptInOpener is not null)
+            {
+                var opened = await OpenChatOptInDialogAsync();
+                if (!opened) return; // user cancelled — stay in current mode
+                // Opt-in flow set ChatEnabled = true in settings; sync the card.
+                SyncChatCardFromSettings(desired: true);
+            }
+            // If opener isn't wired (design-time / tests that don't mock it),
+            // fall through so the test can still verify nav mechanics.
+        }
+
         SetMode(AIFeaturesViewMode.Detail, section);
+    }
+
+    /// <summary>
+    /// Programmatic flip of ChatCard.IsEnabled that bypasses the toggle handler.
+    /// Used when the opt-in flow has authoritatively set settings.ChatEnabled and
+    /// the UI card needs to catch up without re-triggering a fresh opt-in prompt.
+    /// </summary>
+    private void SyncChatCardFromSettings(bool desired)
+    {
+        _suppressChatToggleHandler = true;
+        try { ChatCard.IsEnabled = desired; }
+        finally { _suppressChatToggleHandler = false; }
     }
 
     private void SetMode(AIFeaturesViewMode mode, string section)

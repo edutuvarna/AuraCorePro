@@ -27,5 +27,8 @@
     <EmbeddedResource Include="assets/pro.auracore.privhelper.service">
       <LogicalName>pro.auracore.privhelper.service</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="install.sh">
+      <LogicalName>install.sh</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

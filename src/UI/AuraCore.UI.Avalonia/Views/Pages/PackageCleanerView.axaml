@@ -1,81 +1,72 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.PackageCleanerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Package Cleaner" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Clean package manager caches, orphaned packages, and old kernels"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <controls:ModuleHeader Title="Package Cleaner"
+                             Subtitle="Clean package manager caches, orphaned packages, and old kernels">
+        <controls:ModuleHeader.Actions>
+          <TextBlock x:Name="PageTitle" IsVisible="False"/>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="AptCacheSize"  Text="--"/>
+        <TextBlock x:Name="SnapCacheSize" Text="--"/>
+        <TextBlock x:Name="PipCacheSize"  Text="--"/>
       </StackPanel>
-      <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="APT Cache" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="AptCacheSize" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Snap Cache" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="SnapCacheSize" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Pip Cache" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="PipCacheSize" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="APT CACHE"
+                           Value="{Binding #AptCacheSize.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="SNAP CACHE"
+                           Value="{Binding #SnapCacheSize.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard Label="PIP CACHE"
+                           Value="{Binding #PipCacheSize.Text}"
+                           ValueBrush="{DynamicResource WarningBrush}"/>
+      </controls:StatRow>
+
+      <!-- Cache categories list -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                <TextBlock Text="&#x25A0;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                <TextBlock Text="&#x25A0;"
+                           FontSize="{DynamicResource FontSizeLabel}"
+                           Foreground="{DynamicResource AccentPrimaryBrush}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Cache Categories" FontSize="11" FontWeight="SemiBold"
+              <TextBlock Text="Cache Categories"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button x:Name="ScanBtn" Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
+            <Button x:Name="ScanBtn" Content="Scan" Click="Scan_Click"
+                    Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
-          <TextBlock x:Name="SubText" Text="Click Scan to analyze package caches (Linux only)" FontSize="12"
+          <TextBlock x:Name="SubText"
+                     Text="Click Scan to analyze package caches (Linux only)"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="CacheList"/>
         </StackPanel>
-      </Border>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}" Padding="16,12"
-              BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
+      </controls:GlassCard>
+
+      <!-- Warning notice -->
+      <controls:GlassCard>
         <TextBlock Text="Cleaning package caches requires sudo privileges. Use 'sudo apt clean' or 'sudo dnf clean all' from terminal for full cleanup."
-                   FontSize="12" Foreground="#F59E0B" TextWrapping="Wrap"/>
-      </Border>
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource WarningBrush}"
+                   TextWrapping="Wrap"/>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

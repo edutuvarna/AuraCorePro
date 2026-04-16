@@ -369,6 +369,7 @@ public sealed partial class MainWindow : Window
             "grub-manager" => CreateGrubManagerView(),
             "dns-flusher" => CreateDnsFlusherView(),
             "purgeable-space-manager" => CreatePurgeableSpaceView(),
+            "spotlight-manager" => CreateSpotlightManagerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -462,6 +463,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.PurgeableSpaceManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateSpotlightManagerView()
+    {
+        var v = new Pages.SpotlightManagerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SpotlightManagerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

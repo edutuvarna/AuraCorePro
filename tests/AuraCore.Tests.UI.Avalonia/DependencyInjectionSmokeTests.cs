@@ -7,6 +7,7 @@ using AuraCore.Module.KernelCleaner;
 using AuraCore.Module.LinuxAppInstaller;
 using AuraCore.Module.PurgeableSpaceManager;
 using AuraCore.Module.SnapFlatpakCleaner;
+using AuraCore.Module.SpotlightManager;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -253,5 +254,34 @@ public class DependencyInjectionSmokeTests
         Assert.Null(vm.Report);
         Assert.Equal(0, vm.TotalCapacityBytes);
         Assert.Equal("1*,0*,0*", vm.ColumnDefinitions);
+    }
+
+    /// <summary>
+    /// Phase 4.4.3: SpotlightManagerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void SpotlightManagerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.4.3 block
+        sc.AddSingleton<SpotlightManagerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SpotlightManagerModule>());
+        sc.AddTransient<SpotlightManagerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<SpotlightManagerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<SpotlightManagerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.False(vm.MdutilAvailable);
+        Assert.Null(vm.PendingRebuildVolume);
+        Assert.False(vm.HasPendingRebuild);
+        Assert.Empty(vm.VolumeItems);
     }
 }

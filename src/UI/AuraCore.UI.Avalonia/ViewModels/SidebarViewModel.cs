@@ -233,7 +233,10 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         }
 
         if (OperatingSystem.IsMacOS())
+        {
             items.Add(Module("launchagent-manager", "nav.launchAgentManager", "macos"));
+            items.Add(Module("spotlight-manager", "nav.spotlightManager", "macos"));
+        }
 
         return items;
     }

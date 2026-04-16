@@ -116,7 +116,14 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.PurgeableSpaceManager.PurgeableSpaceManagerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.PurgeableSpaceManager.PurgeableSpaceManagerModule>());
-            AuraCore.Module.SpotlightManager.SpotlightManagerRegistration.AddSpotlightManagerModule(sc);
+            // Spotlight Manager (Phase 4.4.3): replaces the old single-line
+            // AddSpotlightManagerModule registration — same concrete +
+            // IOptimizationModule alias pattern as 4.3.1-4.4.2 so the VM can
+            // inject the concrete module while keeping the engine-wide _moduleMap
+            // binding intact.
+            sc.AddSingleton<AuraCore.Module.SpotlightManager.SpotlightManagerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.SpotlightManager.SpotlightManagerModule>());
             AuraCore.Module.MacAppInstaller.MacAppInstallerRegistration.AddMacAppInstallerModule(sc);
         }
 
@@ -210,6 +217,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.4.2: Purgeable Space Manager VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.PurgeableSpaceManagerViewModel>();
+
+        // ── Phase 4.4.3: Spotlight Manager VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.SpotlightManagerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

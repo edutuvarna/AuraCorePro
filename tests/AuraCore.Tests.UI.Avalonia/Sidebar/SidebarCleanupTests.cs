@@ -24,4 +24,19 @@ public class SidebarCleanupTests
 
         Assert.DoesNotContain(allItems, item => item.Id == "font-manager");
     }
+
+    [Fact]
+    public void Sidebar_WindowsAppInstaller_IsUnder_AppsAndTools()
+    {
+        var vm = new SidebarViewModel();
+
+        var appsTools = vm.Categories.FirstOrDefault(c => c.Id == "apps-tools");
+        Assert.NotNull(appsTools);
+
+        var cleanDebloat = vm.Categories.FirstOrDefault(c => c.Id == "clean-debloat");
+        Assert.NotNull(cleanDebloat);
+
+        Assert.Contains(appsTools!.Modules, m => m.Id == "app-installer");
+        Assert.DoesNotContain(cleanDebloat!.Modules, m => m.Id == "app-installer");
+    }
 }

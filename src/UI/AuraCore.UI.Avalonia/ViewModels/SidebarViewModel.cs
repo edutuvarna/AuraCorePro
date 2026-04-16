@@ -141,7 +141,6 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             Module("privacy-cleaner",   "nav.privacyCleaner"),
             Module("registry-cleaner",  "nav.registry",    "windows"),
             Module("bloatware-removal", "nav.bloatware",   "windows"),
-            Module("app-installer",     "nav.appInstaller","windows"),
         };
 
         if (OperatingSystem.IsLinux())
@@ -186,6 +185,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
     {
         var items = new List<SidebarModuleVM>
         {
+            Module("app-installer",   "nav.appInstaller",  "windows"),
             Module("driver-updater",  "nav.driverUpdater", "windows"),
             Module("service-manager", "nav.serviceManager","windows"),
             Module("iso-builder",     "nav.isoBuilder",    "windows"),

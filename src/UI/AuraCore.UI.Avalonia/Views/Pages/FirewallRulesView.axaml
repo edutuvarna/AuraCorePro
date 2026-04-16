@@ -1,90 +1,71 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.FirewallRulesView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Firewall Rules" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Manage Windows Firewall inbound and outbound rules"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Firewall Rules"
+                             Subtitle="Manage Windows Firewall inbound and outbound rules">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="ScanBtn" Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="14,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F6E1;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock Text="Scan Rules"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="TotalRules"   Text="--"/>
+        <TextBlock x:Name="EnabledRules" Text="--"/>
+        <TextBlock x:Name="BlockedRules" Text="--"/>
       </StackPanel>
-      <!-- Stats -->
-      <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <Border Width="14" Height="14" CornerRadius="3">
-                <Border.Background>
-                  <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
-                </Border.Background>
-                <TextBlock Text="&#x25A0;" FontSize="6" Foreground="#F59E0B"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
-              <TextBlock Text="Total Rules" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            </StackPanel>
-            <TextBlock x:Name="TotalRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Enabled" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="EnabledRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Blocked" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="BlockedRules" Text="--" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource ErrorBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
+
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="TOTAL"
+                           Value="{Binding #TotalRules.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="ENABLED"
+                           Value="{Binding #EnabledRules.Text}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard Label="BLOCKED"
+                           Value="{Binding #BlockedRules.Text}"
+                           ValueBrush="{DynamicResource StatusErrorBrush}"/>
+      </controls:StatRow>
+
       <!-- Rules list -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4">
                 <Border.Background>
                   <SolidColorBrush Color="#EF4444" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x26D4;" FontSize="8" Foreground="#EF4444"
+                <TextBlock Text="&#x26D4;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#EF4444"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>
             </StackPanel>
-            <Button x:Name="ScanBtn" Content="Scan Rules" Click="Scan_Click" Grid.Column="1"
-                    Classes="action-btn" Padding="16,8"/>
           </Grid>
-          <TextBlock x:Name="SubText" Text="Click Scan to load firewall rules (requires admin)" FontSize="12"
+          <TextBlock x:Name="SubText" Text="Click Scan to load firewall rules (requires admin)"
+                     FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="RulesList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

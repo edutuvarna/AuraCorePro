@@ -1,132 +1,128 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.AutorunManagerView">
-  <Grid RowDefinitions="Auto,Auto,*">
+  <ScrollViewer>
+    <StackPanel Spacing="16">
 
-    <!-- Header -->
-    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Autorun Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubtitleText" Text="Manage programs that start with Windows"
-                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-      </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click"
-              VerticalAlignment="Center" Padding="14,8">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F50D;" FontSize="12"/>
-          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-    </Grid>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Autorun Manager"
+                             Subtitle="Manage programs that start with Windows">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="14,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
 
-    <!-- Stats Bar -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid ColumnDefinitions="*,*,*,*">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
-            <Border.Background>
-              <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
-            </Border.Background>
-            <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#3B82F6"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-          </Border>
-          <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="#3B82F6" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Enabled:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="EnabledCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Disabled:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="DisabledCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-          <TextBlock Text="High Risk:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="HighRiskCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-      </Grid>
-    </Border>
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <TextBlock x:Name="TotalCount"    Text="--" IsVisible="False"/>
+      <TextBlock x:Name="EnabledCount"  Text="--" IsVisible="False"/>
+      <TextBlock x:Name="DisabledCount" Text="--" IsVisible="False"/>
+      <TextBlock x:Name="HighRiskCount" Text="--" IsVisible="False"/>
+      <!-- SubtitleText: code-behind writes "Scan failed" on error -->
+      <TextBlock x:Name="SubtitleText"
+                 Text="Manage programs that start with Windows"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 IsVisible="False"/>
 
-    <!-- Autorun Entry List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            BorderThickness="1" Padding="4">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid RowDefinitions="Auto,*">
-        <Border Padding="12,8" CornerRadius="8,8,0,0">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
-          </Border.Background>
-          <Grid ColumnDefinitions="40,2*,*,100,80,120">
-            <TextBlock Text="" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="TOTAL"
+                           Value="{Binding #TotalCount.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="ENABLED"
+                           Value="{Binding #EnabledCount.Text}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard Label="DISABLED"
+                           Value="{Binding #DisabledCount.Text}"
+                           ValueBrush="{DynamicResource TextMutedBrush}"/>
+        <controls:StatCard Label="HIGH RISK"
+                           Value="{Binding #HighRiskCount.Text}"
+                           ValueBrush="{DynamicResource StatusErrorBrush}"/>
+      </controls:StatRow>
+
+      <!-- Autorun Entry List -->
+      <controls:GlassCard>
+        <StackPanel Spacing="0">
+          <!-- Column Headers -->
+          <Grid ColumnDefinitions="40,2*,*,100,80,120" Margin="0,0,0,4">
+            <TextBlock Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-              <Border Width="16" Height="16" CornerRadius="4">
-                <Border.Background>
-                  <SolidColorBrush Color="#3B82F6" Opacity="0.15"/>
-                </Border.Background>
-                <TextBlock Text="&#x25B6;" FontSize="8" Foreground="#3B82F6"
+              <Border Width="16" Height="16" CornerRadius="4"
+                      Background="{DynamicResource BgCardBrush}">
+                <TextBlock Text="&#x25B6;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#3B82F6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="NAME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock Text="NAME" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
-            <TextBlock Grid.Column="2" Text="LOCATION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="3" Text="RISK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="4" Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="2" Text="LOCATION" FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock Grid.Column="3" Text="RISK" FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="4" Text="STATUS" FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
-        </Border>
-        <ScrollViewer Grid.Row="1">
-          <ItemsControl x:Name="AutorunList">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Padding="12,8" Margin="2,1" CornerRadius="6" Background="Transparent">
-                  <Grid ColumnDefinitions="40,2*,*,100,80,120">
-                    <CheckBox IsChecked="{Binding IsEnabled}" Tag="{Binding ToggleTag}"
-                              Click="Toggle_Click" VerticalAlignment="Center"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
-                                 Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                      <TextBlock Text="{Binding Command}" FontSize="9"
-                                 Foreground="{DynamicResource TextMutedBrush}" TextTrimming="CharacterEllipsis"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding Location}" FontSize="10"
-                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Grid.Column="3" CornerRadius="8" Padding="8,2"
-                            Background="{Binding RiskBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding RiskLevel}" FontSize="10" FontWeight="SemiBold"
-                                 Foreground="{Binding RiskFg}"/>
-                    </Border>
-                    <TextBlock Grid.Column="4" Text="{Binding StatusText}" FontSize="10"
-                               Foreground="{Binding StatusBrush}" VerticalAlignment="Center"
-                               TextAlignment="Center" FontWeight="SemiBold"/>
-                    <Button Grid.Column="5" Tag="{Binding DeleteTag}" Classes="action-btn"
-                            Padding="6,3" Click="Delete_Click" FontSize="10"
-                            Content="Delete" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </ScrollViewer>
-      </Grid>
-    </Border>
-  </Grid>
+          <ScrollViewer>
+            <ItemsControl x:Name="AutorunList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Padding="12,8" Margin="2,1" CornerRadius="6" Background="Transparent">
+                    <Grid ColumnDefinitions="40,2*,*,100,80,120">
+                      <CheckBox IsChecked="{Binding IsEnabled}" Tag="{Binding ToggleTag}"
+                                Click="Toggle_Click" VerticalAlignment="Center"/>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding Command}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding Location}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}"
+                                 VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                      <Border Grid.Column="3" CornerRadius="8" Padding="8,2"
+                              Background="{Binding RiskBg}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding RiskLevel}"
+                                   FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                                   Foreground="{Binding RiskFg}"/>
+                      </Border>
+                      <TextBlock Grid.Column="4" Text="{Binding StatusText}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{Binding StatusBrush}"
+                                 VerticalAlignment="Center" TextAlignment="Center" FontWeight="SemiBold"/>
+                      <Button Grid.Column="5" Tag="{Binding DeleteTag}" Classes="action-btn"
+                              Padding="6,3" Click="Delete_Click"
+                              FontSize="{DynamicResource FontSizeLabel}"
+                              Content="Delete" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </StackPanel>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

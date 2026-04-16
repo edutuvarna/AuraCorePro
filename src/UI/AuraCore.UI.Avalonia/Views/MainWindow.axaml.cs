@@ -358,6 +358,9 @@ public sealed partial class MainWindow : Window
             "explorer-tweaks" => CreateTweakListView("explorer-tweaks"),
             "autorun-manager" => new Pages.AutorunManagerView(),
             "wake-on-lan" => new Pages.WakeOnLanView(),
+            "system-health" => new Pages.SystemHealthView(),
+            "admin-panel" => new Pages.AdminPanelView(),
+            "storage-compression" => new Pages.GenericModuleView(), // placeholder — feature dev deferred
             _ => new Pages.DashboardView(),
         };
     }

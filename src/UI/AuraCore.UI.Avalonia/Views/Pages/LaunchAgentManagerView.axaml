@@ -1,76 +1,65 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.LaunchAgentManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Launch Agent Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Manage macOS LaunchAgents and LaunchDaemons (startup services)"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <controls:ModuleHeader Title="Launch Agent Manager"
+                             Subtitle="Manage macOS LaunchAgents and LaunchDaemons (startup services)">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="16,8"
+                    Content="Scan"/>
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="UserAgents"   Text="--"/>
+        <TextBlock x:Name="SystemAgents" Text="--"/>
+        <TextBlock x:Name="DaemonCount"  Text="--"/>
       </StackPanel>
-      <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="User Agents" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="UserAgents" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="System Agents" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="SystemAgents" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Daemons" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="DaemonCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="USER AGENTS"
+                           Value="{Binding #UserAgents.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="SYSTEM AGENTS"
+                           Value="{Binding #SystemAgents.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard Label="DAEMONS"
+                           Value="{Binding #DaemonCount.Text}"
+                           ValueBrush="{DynamicResource WarningBrush}"/>
+      </controls:StatRow>
+
+      <!-- Launch items list -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
-              <TextBlock Text="Launch Items" FontSize="11" FontWeight="SemiBold"
-                         Foreground="{DynamicResource TextSecondaryBrush}"/>
-            </StackPanel>
-            <Button Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
-          </Grid>
-          <TextBlock x:Name="SubText" Text="Click Scan to list LaunchAgents/Daemons (macOS only)" FontSize="12"
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+              <TextBlock Text="&#x2630;"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Launch Items"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <TextBlock x:Name="SubText"
+                     Text="Click Scan to list LaunchAgents/Daemons (macOS only)"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="AgentList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

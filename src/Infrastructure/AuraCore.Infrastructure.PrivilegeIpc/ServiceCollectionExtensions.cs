@@ -28,7 +28,10 @@ public static class ServiceCollectionExtensions
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             services.AddSingleton<IShellCommandService, WindowsShellCommandService>();
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            services.AddSingleton<IPrivHelperConnectionFactory, DefaultPrivHelperConnectionFactory>();
             services.AddSingleton<IShellCommandService, LinuxShellCommandService>();
+        }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             services.AddSingleton<IShellCommandService, MacOSShellCommandService>();
         else

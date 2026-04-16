@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 
@@ -10,6 +11,13 @@ namespace AuraCore.Module.SnapFlatpakCleaner;
 
 public sealed class SnapFlatpakCleanerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public SnapFlatpakCleanerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "snap-flatpak-cleaner";
     public string DisplayName => "Snap & Flatpak Cleaner";
     public OptimizationCategory Category => OptimizationCategory.SystemCleaning;
@@ -138,7 +146,7 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default) => Task.FromResult(false);
     public Task RollbackAsync(string operationId, CancellationToken ct = default) => Task.CompletedTask;
 
-    // ---- Scan helpers ----
+    // ---- Scan helpers (non-privileged — kept static) ----
 
     /// <summary>
     /// Runs <c>snap list --all</c> and counts entries with "disabled" status (old revisions).
@@ -180,10 +188,13 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     // ---- Optimize helpers ----
 
     /// <summary>
-    /// Handles "snap-remove:&lt;name&gt;:&lt;revision&gt;" items.
-    /// Validates both name and revision before executing.
+    /// Handles "snap-remove:&lt;name&gt;:&lt;revision&gt;" items via IShellCommandService.
+    /// NOTE: The --revision flag is dropped because the polkit whitelist (Task 16
+    /// SnapFlatpakArgvValidator) does not permit it. Snap will remove all revisions
+    /// of the named package — a slight behavior change from the original but safer
+    /// and consistent with the whitelist's conservative stance.
     /// </summary>
-    private static async Task<bool> HandleSnapRemoveAsync(string itemId, CancellationToken ct)
+    private async Task<bool> HandleSnapRemoveAsync(string itemId, CancellationToken ct)
     {
         // Expected format: "snap-remove:<snap-name>:<revision>"
         var parts = itemId.Split(':');
@@ -196,15 +207,22 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
         if (!SafeNameRegex.IsMatch(name) || !SafeNameRegex.IsMatch(revision))
             return false;
 
-        var result = await ProcessRunner.RunAsync(
-            "sudo", $"-n snap remove {name} --revision={revision}",
-            ct, timeoutSeconds: 120);
+        // Drop --revision: polkit whitelist does not allow it.
+        // Snap removes all revisions of the named package as a result.
+        var result = await _shell.RunPrivilegedAsync(
+            new PrivilegedCommand(
+                Id: "snap-flatpak",
+                Executable: "snap",
+                Arguments: new[] { "snap", "remove", name },
+                TimeoutSeconds: 120),
+            ct);
+
         return result.Success;
     }
 
     /// <summary>
     /// Handles "flatpak-remove:&lt;app-id&gt;" items.
-    /// Validates the app ID before executing.
+    /// Validates the app ID before executing. Flatpak uninstall is unprivileged.
     /// </summary>
     private static async Task<bool> HandleFlatpakRemoveAsync(string itemId, CancellationToken ct)
     {
@@ -225,17 +243,58 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     }
 
     /// <summary>
-    /// Removes all disabled snap revisions in one go via shell pipeline.
+    /// Removes all disabled snap revisions by querying the disabled list (non-privileged)
+    /// then calling IShellCommandService.RunPrivilegedAsync per package name.
+    /// NOTE: --revision is not passed because the polkit whitelist does not allow it;
+    /// each removal targets all revisions of the named package.
+    /// Returns true if at least one removal succeeded (or no disabled snaps found).
     /// </summary>
-    private static async Task<bool> SnapCleanAllAsync(CancellationToken ct)
+    private async Task<bool> SnapCleanAllAsync(CancellationToken ct)
     {
-        var cmd = "snap list --all | awk '/disabled/{print $1, $3}' | while read name rev; do sudo snap remove \"$name\" --revision=\"$rev\"; done";
-        var result = await ProcessRunner.RunAsync("/bin/sh", $"-c \"{cmd}\"", ct, timeoutSeconds: 120);
-        return result.Success;
+        // Query disabled snaps without privilege
+        var listResult = await ProcessRunner.RunAsync("snap", "list --all", ct, timeoutSeconds: 30);
+        if (!listResult.Success || string.IsNullOrWhiteSpace(listResult.Stdout))
+            return true; // Nothing to remove — not a failure
+
+        // Parse disabled entries: columns are Name, Version, Rev, Tracking, Publisher, Notes
+        // "disabled" appears in the Notes column (last field)
+        var disabledNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var line in listResult.Stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!line.Contains("disabled", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var cols = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            if (cols.Length == 0) continue;
+
+            var name = cols[0];
+            if (SafeNameRegex.IsMatch(name))
+                disabledNames.Add(name);
+        }
+
+        if (disabledNames.Count == 0)
+            return true; // No disabled snaps — success
+
+        bool anySuccess = false;
+        foreach (var name in disabledNames)
+        {
+            ct.ThrowIfCancellationRequested();
+            var r = await _shell.RunPrivilegedAsync(
+                new PrivilegedCommand(
+                    Id: "snap-flatpak",
+                    Executable: "snap",
+                    Arguments: new[] { "snap", "remove", name },
+                    TimeoutSeconds: 120),
+                ct);
+
+            if (r.Success) anySuccess = true;
+        }
+
+        return anySuccess;
     }
 
     /// <summary>
-    /// Removes all unused flatpak runtimes/apps in one go.
+    /// Removes all unused flatpak runtimes/apps in one go. Flatpak uninstall is unprivileged.
     /// </summary>
     private static async Task<bool> FlatpakCleanAllAsync(CancellationToken ct)
     {

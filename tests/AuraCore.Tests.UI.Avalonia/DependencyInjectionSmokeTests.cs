@@ -1,4 +1,5 @@
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Module.DnsFlusher;
 using AuraCore.Module.DockerCleaner;
 using AuraCore.Module.GrubManager;
@@ -79,7 +80,9 @@ public class DependencyInjectionSmokeTests
     public void SnapFlatpakCleanerViewModel_ResolvesFromContainer()
     {
         var sc = new ServiceCollection();
-        // Mirror App.axaml.cs Phase 4.3.2 block
+        // Mirror App.axaml.cs Phase 4.3.2 block.
+        // IShellCommandService is required since Phase 5.2.1.11a migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
         sc.AddSingleton<SnapFlatpakCleanerModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SnapFlatpakCleanerModule>());
         sc.AddTransient<SnapFlatpakCleanerViewModel>();
@@ -342,4 +345,20 @@ public class DependencyInjectionSmokeTests
         Assert.NotEmpty(vm.AllBundles);
         Assert.False(vm.HasSelection);
     }
+}
+
+/// <summary>
+/// Minimal hand-rolled stub for IShellCommandService used in DI smoke tests.
+/// Returns HelperMissing for every call — sufficient to prove the container
+/// resolves SnapFlatpakCleanerModule without invoking any real privilege path.
+/// </summary>
+file sealed class StubShellCommandService : IShellCommandService
+{
+    public Task<ShellResult> RunPrivilegedAsync(PrivilegedCommand command, CancellationToken ct = default)
+        => Task.FromResult(new ShellResult(
+            Success: false,
+            ExitCode: -1,
+            Stdout: string.Empty,
+            Stderr: string.Empty,
+            AuthResult: PrivilegeAuthResult.HelperMissing));
 }

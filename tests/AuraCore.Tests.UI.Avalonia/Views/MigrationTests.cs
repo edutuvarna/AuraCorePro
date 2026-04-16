@@ -20,4 +20,12 @@ public class MigrationTests
         Assert.NotNull(view);
         Assert.NotNull(view.Content);
     }
+
+    [AvaloniaFact]
+    public void UpgradeView_Renders()
+    {
+        var view = new global::AuraCore.UI.Avalonia.Views.Pages.UpgradeView();
+        Assert.NotNull(view);
+        Assert.NotNull(view.Content);
+    }
 }

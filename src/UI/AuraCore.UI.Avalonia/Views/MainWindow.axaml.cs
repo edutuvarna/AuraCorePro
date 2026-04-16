@@ -367,6 +367,7 @@ public sealed partial class MainWindow : Window
             "kernel-cleaner" => CreateKernelCleanerView(),
             "linux-app-installer" => CreateLinuxAppInstallerView(),
             "grub-manager" => CreateGrubManagerView(),
+            "dns-flusher" => CreateDnsFlusherView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -438,6 +439,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.GrubManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateDnsFlusherView()
+    {
+        var v = new Pages.DnsFlusherView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.DnsFlusherViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

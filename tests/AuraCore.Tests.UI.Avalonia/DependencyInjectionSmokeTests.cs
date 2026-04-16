@@ -1,4 +1,5 @@
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Module.DnsFlusher;
 using AuraCore.Module.DockerCleaner;
 using AuraCore.Module.GrubManager;
 using AuraCore.Module.JournalCleaner;
@@ -197,5 +198,32 @@ public class DependencyInjectionSmokeTests
         Assert.False(vm.HasPendingChanges);
         Assert.False(vm.HasBackup);
         Assert.False(vm.BackupAcknowledged);
+    }
+
+    /// <summary>
+    /// Phase 4.4.1: DnsFlusherViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void DnsFlusherViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.4.1 block
+        sc.AddSingleton<DnsFlusherModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<DnsFlusherModule>());
+        sc.AddTransient<DnsFlusherViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<DnsFlusherModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<DnsFlusherViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.False(vm.DscacheutilAvailable);
+        Assert.Null(vm.LastFlush);
     }
 }

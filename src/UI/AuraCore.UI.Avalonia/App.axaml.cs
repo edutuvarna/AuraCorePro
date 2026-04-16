@@ -101,7 +101,13 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.BrewManager.BrewManagerRegistration.AddBrewManagerModule(sc);
             AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
             AuraCore.Module.XcodeCleaner.XcodeCleanerRegistration.AddXcodeCleanerModule(sc);
-            AuraCore.Module.DnsFlusher.DnsFlusherRegistration.AddDnsFlusherModule(sc);
+            // DNS Flusher (Phase 4.4.1): same concrete + IOptimizationModule alias
+            // pattern as JournalCleaner / SnapFlatpakCleaner / KernelCleaner / LinuxAppInstaller
+            // / GrubManager above — lets the VM inject the concrete module while keeping the
+            // engine-wide _moduleMap binding intact.
+            sc.AddSingleton<AuraCore.Module.DnsFlusher.DnsFlusherModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.DnsFlusher.DnsFlusherModule>());
             AuraCore.Module.PurgeableSpaceManager.PurgeableSpaceManagerRegistration.AddPurgeableSpaceManagerModule(sc);
             AuraCore.Module.SpotlightManager.SpotlightManagerRegistration.AddSpotlightManagerModule(sc);
             AuraCore.Module.MacAppInstaller.MacAppInstallerRegistration.AddMacAppInstallerModule(sc);
@@ -191,6 +197,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.6: GRUB Manager VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.GrubManagerViewModel>();
+
+        // ── Phase 4.4.1: DNS Flusher VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.DnsFlusherViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

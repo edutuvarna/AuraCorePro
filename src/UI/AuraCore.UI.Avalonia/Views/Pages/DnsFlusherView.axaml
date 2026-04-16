@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.DnsFlusherView"
+             x:DataType="vm:DnsFlusherViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header: NO Scan button (auto-scan on Loaded — user-directed hero UX) -->
+      <controls:ModuleHeader x:Name="Header"/>
+
+      <!-- Hero Action card — the primary thing. One button, instant feedback. -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="14">
+            <TextBlock x:Name="HeroDescription"
+                       FontSize="{DynamicResource FontSizeBody}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+
+            <!-- State line: muted "Last flushed: …" or green "✓ Cache flushed just now" -->
+            <TextBlock x:Name="StateLine"
+                       Text="{Binding StatusText}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding !IsSuccess}"/>
+            <TextBlock x:Name="SuccessLine"
+                       Text="{Binding StatusText}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource StatusSuccessBrush}"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding IsSuccess}"/>
+
+            <!-- Additional "Last flushed: …" line — always present, distinct from status so user
+                 sees historical state even while StatusText shows Ready / Flushing / success -->
+            <TextBlock x:Name="LastFlushBlock"
+                       Text="{Binding LastFlushDisplay}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       TextWrapping="Wrap"/>
+
+            <!-- Hero button: large, full-width, success-green -->
+            <Button x:Name="FlushBtn"
+                    Content="Flush DNS Cache"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Padding="20,14"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Background="{DynamicResource StatusSuccessBrush}"
+                    CornerRadius="{DynamicResource RadiusMd}"
+                    Command="{Binding FlushCommand}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- When-to-use educational card (always visible) -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="WhenToUseHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <StackPanel Spacing="6">
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0"
+                           Text="&#x2022;"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Top"/>
+                <TextBlock x:Name="WhenToUseItem1"
+                           Grid.Column="1"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+              </Grid>
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0"
+                           Text="&#x2022;"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Top"/>
+                <TextBlock x:Name="WhenToUseItem2"
+                           Grid.Column="1"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+              </Grid>
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0"
+                           Text="&#x2022;"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Top"/>
+                <TextBlock x:Name="WhenToUseItem3"
+                           Grid.Column="1"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+              </Grid>
+              <Grid ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0"
+                           Text="&#x2022;"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           Margin="0,0,10,0"
+                           VerticalAlignment="Top"/>
+                <TextBlock x:Name="WhenToUseItem4"
+                           Grid.Column="1"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+              </Grid>
+            </StackPanel>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Error banner (visible only when HasError) -->
+      <Border x:Name="ErrorBanner"
+              CornerRadius="{DynamicResource RadiusSm}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusErrorBrush}"
+              BorderThickness="1"
+              Padding="12,10"
+              IsVisible="{Binding HasError}">
+        <TextBlock Text="{Binding ErrorMessage}"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource StatusErrorBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+      <!-- Privilege warning card (always visible, amber border) -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusWarningBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <TextBlock x:Name="PrivilegeWarning"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource StatusWarningBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

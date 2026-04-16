@@ -29,7 +29,7 @@
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
         <controls:StatCard Label="OUTDATED"
                            Value="{Binding #OutdatedCount.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
 
       <!-- Installed packages list -->

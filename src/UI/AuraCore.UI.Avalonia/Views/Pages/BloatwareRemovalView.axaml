@@ -49,7 +49,7 @@
                            ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
         <controls:StatCard Label="REMOVABLE"
                            Value="{Binding #RemovableApps.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
         <controls:StatCard Label="SPACE"
                            Value="{Binding #TotalSize.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>

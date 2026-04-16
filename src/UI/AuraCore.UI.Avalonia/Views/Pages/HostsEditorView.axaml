@@ -67,7 +67,7 @@
           <Border Grid.Column="3" x:Name="UnsavedBadge" IsVisible="False"
                   CornerRadius="8" Background="{DynamicResource BgCardBrush}" Padding="10,4">
             <TextBlock Text="Unsaved Changes" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
-                       Foreground="{DynamicResource WarningBrush}"/>
+                       Foreground="{DynamicResource StatusWarningBrush}"/>
           </Border>
         </Grid>
       </controls:GlassCard>

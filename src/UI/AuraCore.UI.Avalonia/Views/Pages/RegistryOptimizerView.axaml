@@ -45,7 +45,7 @@
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
         <controls:StatCard Label="CAUTION"
                            Value="{Binding #CautionIssues.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
 
       <!-- Hidden stat TextBlocks — code-behind writes .Text directly -->

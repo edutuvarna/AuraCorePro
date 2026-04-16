@@ -32,7 +32,7 @@
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
         <controls:StatCard Label="SWAP USED"
                            Value="{Binding #SwapUsed.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
         <controls:StatCard Label="SWAPPINESS"
                            Value="{Binding #Swappiness.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>

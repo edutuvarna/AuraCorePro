@@ -28,7 +28,7 @@
         <ScrollViewer Grid.Row="1">
           <StackPanel x:Name="StepperPanel" Spacing="2" Margin="8,0,8,8"/>
         </ScrollViewer>
-        <Border Grid.Row="2" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="0,1,0,0" Margin="12" Padding="0">
+        <Border Grid.Row="2" BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Margin="12" Padding="0">
           <StackPanel Spacing="6">
             <TextBlock x:Name="AdminStatusText" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Margin="0,8,0,0"

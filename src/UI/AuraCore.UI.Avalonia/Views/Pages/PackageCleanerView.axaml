@@ -29,7 +29,7 @@
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
         <controls:StatCard Label="PIP CACHE"
                            Value="{Binding #PipCacheSize.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
 
       <!-- Cache categories list -->
@@ -63,7 +63,7 @@
       <controls:GlassCard>
         <TextBlock Text="Cleaning package caches requires sudo privileges. Use 'sudo apt clean' or 'sudo dnf clean all' from terminal for full cleanup."
                    FontSize="{DynamicResource FontSizeBodySmall}"
-                   Foreground="{DynamicResource WarningBrush}"
+                   Foreground="{DynamicResource StatusWarningBrush}"
                    TextWrapping="Wrap"/>
       </controls:GlassCard>
 

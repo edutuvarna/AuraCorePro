@@ -34,7 +34,7 @@
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
         <controls:StatCard Label="DAEMONS"
                            Value="{Binding #DaemonCount.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
 
       <!-- Launch items list -->

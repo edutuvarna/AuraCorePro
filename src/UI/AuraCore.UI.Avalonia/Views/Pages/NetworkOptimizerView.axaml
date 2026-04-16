@@ -96,7 +96,7 @@
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="TotalRecv" Text="--"
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
-                       Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+                       Foreground="{DynamicResource StatusSuccessBrush}" VerticalAlignment="Center"/>
           </StackPanel>
         </Grid>
       </controls:GlassCard>
@@ -243,7 +243,7 @@
                                  Foreground="{DynamicResource AccentBlueBrush}" TextAlignment="Right"/>
                       <TextBlock Text="{Binding Recv}"
                                  FontSize="{DynamicResource FontSizeLabel}"
-                                 Foreground="{DynamicResource SuccessBrush}" TextAlignment="Right"/>
+                                 Foreground="{DynamicResource StatusSuccessBrush}" TextAlignment="Right"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="2">
                       <TextBlock Text="{Binding Ip}"

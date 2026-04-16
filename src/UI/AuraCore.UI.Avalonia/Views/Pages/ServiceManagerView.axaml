@@ -40,7 +40,7 @@
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
         <controls:StatCard Label="STOPPED"
                            Value="{Binding #StoppedSvc.Text}"
-                           ValueBrush="{DynamicResource WarningBrush}"/>
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
         <controls:StatCard Label="AUTO"
                            Value="{Binding #AutoSvc.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
@@ -56,7 +56,7 @@
       <TextBox x:Name="SearchBox" Watermark="Search services..."
                Background="{DynamicResource BgCardBrush}"
                Foreground="{DynamicResource TextPrimaryBrush}"
-               BorderBrush="{DynamicResource BorderCardBrush}"
+               BorderBrush="{DynamicResource BorderSubtleBrush}"
                CornerRadius="8" Padding="12,8"
                TextChanged="Search_Changed"/>
 

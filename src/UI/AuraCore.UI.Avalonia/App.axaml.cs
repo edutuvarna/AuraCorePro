@@ -84,7 +84,13 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerModule>());
-            AuraCore.Module.GrubManager.GrubManagerRegistration.AddGrubManagerModule(sc);
+            // GRUB Manager (Phase 4.3.6): same concrete + IOptimizationModule alias
+            // pattern as JournalCleaner / SnapFlatpakCleaner / KernelCleaner / LinuxAppInstaller
+            // above — lets the VM inject the concrete module while keeping the
+            // engine-wide _moduleMap binding intact.
+            sc.AddSingleton<AuraCore.Module.GrubManager.GrubManagerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.GrubManager.GrubManagerModule>());
         }
 
         // ── macOS-only modules (Faz 3) ──
@@ -182,6 +188,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.5: Linux App Installer VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.LinuxAppInstallerViewModel>();
+
+        // ── Phase 4.3.6: GRUB Manager VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.GrubManagerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

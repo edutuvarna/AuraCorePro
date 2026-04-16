@@ -223,6 +223,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         {
             items.Add(Module("cron-manager", "nav.cronManager", "linux"));
             items.Add(Module("docker-cleaner", "nav.dockerCleaner", "linux"));
+            items.Add(Module("grub-manager", "nav.grubManager", "linux"));
         }
 
         if (OperatingSystem.IsMacOS())

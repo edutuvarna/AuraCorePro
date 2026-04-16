@@ -1,5 +1,6 @@
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.DockerCleaner;
+using AuraCore.Module.GrubManager;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.KernelCleaner;
 using AuraCore.Module.LinuxAppInstaller;
@@ -169,5 +170,32 @@ public class DependencyInjectionSmokeTests
         Assert.NotNull(vm);
         Assert.NotEmpty(vm.AllBundles);
         Assert.False(vm.HasSelection);
+    }
+
+    /// <summary>
+    /// Phase 4.3.6: GrubManagerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void GrubManagerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.3.6 block
+        sc.AddSingleton<GrubManagerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<GrubManagerModule>());
+        sc.AddTransient<GrubManagerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<GrubManagerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<GrubManagerViewModel>();
+        Assert.NotNull(vm);
+        Assert.False(vm.HasPendingChanges);
+        Assert.False(vm.HasBackup);
+        Assert.False(vm.BackupAcknowledged);
     }
 }

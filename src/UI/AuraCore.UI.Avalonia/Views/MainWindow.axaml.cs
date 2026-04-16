@@ -366,6 +366,7 @@ public sealed partial class MainWindow : Window
             "docker-cleaner" => CreateDockerCleanerView(),
             "kernel-cleaner" => CreateKernelCleanerView(),
             "linux-app-installer" => CreateLinuxAppInstallerView(),
+            "grub-manager" => CreateGrubManagerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -426,6 +427,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.LinuxAppInstallerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateGrubManagerView()
+    {
+        var v = new Pages.GrubManagerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.GrubManagerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

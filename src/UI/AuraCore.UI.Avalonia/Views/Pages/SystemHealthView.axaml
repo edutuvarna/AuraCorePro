@@ -1,46 +1,43 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.SystemHealthView">
   <ScrollViewer>
     <StackPanel Spacing="20">
 
-      <!-- ── Header ── -->
-      <Grid ColumnDefinitions="*,Auto,Auto">
-        <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="System Health" FontSize="16" FontWeight="Bold"
-                     Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Real-time system monitoring and diagnostics"
-                     FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-        </StackPanel>
-        <Button Grid.Column="1" Classes="action-btn" Click="ExportPdf_Click"
-                VerticalAlignment="Center" Padding="14,8" Margin="0,0,8,0">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="&#x1F4C4;" FontSize="12"/>
-            <TextBlock Text="Export PDF" FontSize="11" FontWeight="SemiBold"/>
-          </StackPanel>
-        </Button>
-        <Button Grid.Column="2" Classes="action-btn" Click="Scan_Click"
-                VerticalAlignment="Center" Padding="16,10">
+      <!-- Header -->
+      <controls:ModuleHeader Title="System Health"
+                             Subtitle="Real-time system monitoring and diagnostics">
+        <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="&#x1F504;" FontSize="14"/>
-            <TextBlock x:Name="ScanBtnText" Text="Scan Now" FontSize="12" FontWeight="SemiBold"/>
+            <Button Classes="action-btn" Click="ExportPdf_Click"
+                    VerticalAlignment="Center" Padding="14,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F4C4;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock Text="Export PDF"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="16,10">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanBtnText" Text="Scan Now"
+                           FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
-        </Button>
-      </Grid>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
 
-      <!-- ── Health Score + System Info Row ── -->
+      <!-- Health Score + System Info Row -->
       <Grid ColumnDefinitions="Auto,*">
 
         <!-- Health Score Badge -->
-        <Border Grid.Column="0" Margin="0,0,16,0" CornerRadius="{StaticResource RadiusLg}"
-                BorderThickness="1" Padding="32" MinWidth="180" MinHeight="180">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+        <controls:GlassCard Grid.Column="0" Margin="0,0,16,0">
+          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" MinWidth="148" MinHeight="148">
             <!-- Glow backdrop -->
             <Border CornerRadius="40" Width="80" Height="80" HorizontalAlignment="Center">
               <Border.Background>
@@ -53,102 +50,94 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Health Score" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
+            <TextBlock Text="Health Score" FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}"
                        HorizontalAlignment="Center"/>
             <Border x:Name="ScoreBadge" CornerRadius="12" Padding="12,4" HorizontalAlignment="Center"
                     Background="{DynamicResource AccentBgBrush}">
-              <TextBlock x:Name="ScoreLabel" Text="Scanning..." FontSize="11" FontWeight="SemiBold"
+              <TextBlock x:Name="ScoreLabel" Text="Scanning..."
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource AccentPrimaryBrush}"/>
             </Border>
           </StackPanel>
-        </Border>
+        </controls:GlassCard>
 
         <!-- System Info Cards 2x2 -->
         <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*">
 
           <!-- OS Card -->
-          <Border Grid.Row="0" Grid.Column="0" Margin="0,0,8,8" CornerRadius="{StaticResource RadiusMd}"
-                  BorderThickness="1" Padding="16">
-            <Border.Background>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-            </Border.Background>
-            <Border.BorderBrush>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-            </Border.BorderBrush>
+          <controls:GlassCard Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Operating System" FontSize="9" FontWeight="SemiBold"
+                  <TextBlock Text="Operating System"
+                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
-                  <TextBlock x:Name="OsName" Text="--" FontSize="14" FontWeight="SemiBold"
+                  <TextBlock x:Name="OsName" Text="--"
+                             FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                              Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap"
                              Margin="0,4,0,0"/>
-                  <TextBlock x:Name="OsVersion" Text="" FontSize="10"
+                  <TextBlock x:Name="OsVersion" Text=""
+                             FontSize="{DynamicResource FontSizeLabel}"
                              Foreground="#555570" Margin="0,2,0,0"/>
                 </StackPanel>
                 <Border Grid.Column="1" Width="24" Height="24" CornerRadius="6"
                         Background="#3B82F61E" Padding="4" VerticalAlignment="Top">
-                  <TextBlock Text="&#x25A3;" FontSize="11" Foreground="#3B82F6"
+                  <TextBlock Text="&#x25A3;" FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="#3B82F6"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
-          </Border>
+          </controls:GlassCard>
 
           <!-- Processor Card -->
-          <Border Grid.Row="0" Grid.Column="1" Margin="8,0,0,8" CornerRadius="{StaticResource RadiusMd}"
-                  BorderThickness="1" Padding="16">
-            <Border.Background>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-            </Border.Background>
-            <Border.BorderBrush>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-            </Border.BorderBrush>
+          <controls:GlassCard Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Processor" FontSize="9" FontWeight="SemiBold"
+                  <TextBlock Text="Processor"
+                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
-                  <TextBlock x:Name="CpuName" Text="--" FontSize="13" FontWeight="SemiBold"
+                  <TextBlock x:Name="CpuName" Text="--"
+                             FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                              Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap"
                              Margin="0,4,0,0"/>
-                  <TextBlock x:Name="CpuCores" Text="" FontSize="10"
+                  <TextBlock x:Name="CpuCores" Text=""
+                             FontSize="{DynamicResource FontSizeLabel}"
                              Foreground="#555570" Margin="0,2,0,0"/>
                 </StackPanel>
                 <Border Grid.Column="1" Width="24" Height="24" CornerRadius="6"
                         Background="#A855F71E" Padding="4" VerticalAlignment="Top">
-                  <TextBlock Text="&#x25C6;" FontSize="11" Foreground="#A855F7"
+                  <TextBlock Text="&#x25C6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="#A855F7"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
-          </Border>
+          </controls:GlassCard>
 
           <!-- Memory Card -->
-          <Border Grid.Row="1" Grid.Column="0" Margin="0,8,8,0" CornerRadius="{StaticResource RadiusMd}"
-                  BorderThickness="1" Padding="16">
-            <Border.Background>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-            </Border.Background>
-            <Border.BorderBrush>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-            </Border.BorderBrush>
+          <controls:GlassCard Grid.Row="1" Grid.Column="0" Margin="0,8,8,0">
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Memory" FontSize="9" FontWeight="SemiBold"
+                  <TextBlock Text="Memory"
+                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
                     <TextBlock x:Name="RamUsed" Text="--" FontSize="22" FontWeight="Bold"
                                Foreground="{DynamicResource AccentBlueBrush}"/>
-                    <TextBlock x:Name="RamTotal" Text="" FontSize="12"
+                    <TextBlock x:Name="RamTotal" Text=""
+                               FontSize="{DynamicResource FontSizeBody}"
                                Foreground="{DynamicResource TextMutedBrush}"
                                VerticalAlignment="Bottom" Margin="0,0,0,3"/>
                   </StackPanel>
                 </StackPanel>
                 <Border Grid.Column="1" Width="24" Height="24" CornerRadius="6"
                         Background="#14B8A61E" Padding="4" VerticalAlignment="Top">
-                  <TextBlock Text="&#x25CF;" FontSize="11" Foreground="#14B8A6"
+                  <TextBlock Text="&#x25CF;" FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="#14B8A6"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
@@ -165,115 +154,119 @@
                 </Border>
               </Border>
             </StackPanel>
-          </Border>
+          </controls:GlassCard>
 
           <!-- Uptime Card -->
-          <Border Grid.Row="1" Grid.Column="1" Margin="8,8,0,0" CornerRadius="{StaticResource RadiusMd}"
-                  BorderThickness="1" Padding="16">
-            <Border.Background>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-            </Border.Background>
-            <Border.BorderBrush>
-              <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-            </Border.BorderBrush>
+          <controls:GlassCard Grid.Row="1" Grid.Column="1" Margin="8,8,0,0">
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Uptime" FontSize="9" FontWeight="SemiBold"
+                  <TextBlock Text="Uptime"
+                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <TextBlock x:Name="UptimeVal" Text="--" FontSize="22" FontWeight="Bold"
                              Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0"/>
-                  <TextBlock x:Name="ProcessCount" Text="" FontSize="10"
+                  <TextBlock x:Name="ProcessCount" Text=""
+                             FontSize="{DynamicResource FontSizeLabel}"
                              Foreground="#555570" Margin="0,2,0,0"/>
                 </StackPanel>
                 <Border Grid.Column="1" Width="24" Height="24" CornerRadius="6"
                         Background="#F59E0B1E" Padding="4" VerticalAlignment="Top">
-                  <TextBlock Text="&#x25B2;" FontSize="11" Foreground="#F59E0B"
+                  <TextBlock Text="&#x25B2;" FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="#F59E0B"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>
             </StackPanel>
-          </Border>
+          </controls:GlassCard>
 
         </Grid>
       </Grid>
 
-      <!-- ── Storage Drives Section ── -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#14B8A614">
-          <TextBlock Text="&#x25A3;" FontSize="10" Foreground="#14B8A6"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="Storage Drives" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-
-      <ItemsControl x:Name="DriveList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,8" CornerRadius="{StaticResource RadiusMd}"
-                    BorderThickness="1" Padding="16">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid RowDefinitions="Auto,Auto,Auto">
-                <Grid ColumnDefinitions="*,Auto">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <TextBlock Text="{Binding Label}" FontSize="11"
-                               Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-                  </StackPanel>
-                  <TextBlock Grid.Column="1" Text="{Binding SizeText}" FontSize="12"
-                             Foreground="{DynamicResource TextSecondaryBrush}"/>
-                </Grid>
-                <Border Grid.Row="1" Height="5" CornerRadius="3" Background="#FFFFFF0A" Margin="0,10,0,4">
-                  <Border Height="5" CornerRadius="3" Background="{Binding BarBrush}"
-                          HorizontalAlignment="Left" Width="{Binding BarWidth}"/>
-                </Border>
-                <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
-                  <TextBlock Text="{Binding FreeText}" FontSize="11"
-                             Foreground="{DynamicResource TextMutedBrush}"/>
-                  <TextBlock Grid.Column="1" Text="{Binding UsedPct}" FontSize="11" FontWeight="SemiBold"
-                             Foreground="{Binding PctBrush}"/>
-                </Grid>
-              </Grid>
+      <!-- Storage Drives -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#14B8A614">
+              <TextBlock Text="&#x25A3;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#14B8A6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock Text="Storage Drives"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="DriveList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,8" CornerRadius="{StaticResource RadiusMd}"
+                        BorderThickness="1" Padding="16">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
+                  <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+                  </Border.BorderBrush>
+                  <Grid RowDefinitions="Auto,Auto,Auto">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding Label}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"
+                                   Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding SizeText}"
+                                 FontSize="{DynamicResource FontSizeBody}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </Grid>
+                    <Border Grid.Row="1" Height="5" CornerRadius="3" Background="#FFFFFF0A" Margin="0,10,0,4">
+                      <Border Height="5" CornerRadius="3" Background="{Binding BarBrush}"
+                              HorizontalAlignment="Left" Width="{Binding BarWidth}"/>
+                    </Border>
+                    <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding FreeText}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                      <TextBlock Grid.Column="1" Text="{Binding UsedPct}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                 Foreground="{Binding PctBrush}"/>
+                    </Grid>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
 
-      <!-- ── CPU Cores Section ── -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#3B82F614">
-          <TextBlock Text="&#x25C6;" FontSize="10" Foreground="#3B82F6"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="CPU Cores" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
+      <!-- CPU Cores -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#3B82F614">
+              <TextBlock Text="&#x25C6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#3B82F6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="CPU Cores"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel x:Name="CpuCoresPanel" Spacing="6"/>
+        </StackPanel>
+      </controls:GlassCard>
 
-      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-        </Border.BorderBrush>
-        <StackPanel x:Name="CpuCoresPanel" Spacing="6"/>
-      </Border>
-
-      <!-- ── GPU Section ── -->
-      <StackPanel x:Name="GpuHeader" Orientation="Horizontal" Spacing="8" IsVisible="False"
-                  Margin="0,4,0,8">
+      <!-- GPU Section (conditionally visible) -->
+      <StackPanel x:Name="GpuHeader" Orientation="Horizontal" Spacing="8" IsVisible="False">
         <Border Width="20" Height="20" CornerRadius="6" Background="#A855F714">
-          <TextBlock Text="&#x25B6;" FontSize="10" Foreground="#A855F7"
+          <TextBlock Text="&#x25B6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="#A855F7"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <TextBlock Text="Graphics" FontSize="12" FontWeight="SemiBold"
+        <TextBlock Text="Graphics"
+                   FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                    Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
       </StackPanel>
 
@@ -290,14 +283,17 @@
               </Border.BorderBrush>
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="4">
-                  <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
+                  <TextBlock Text="{Binding Name}"
+                             FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                              Foreground="{DynamicResource TextPrimaryBrush}"/>
-                  <TextBlock Text="{Binding Detail}" FontSize="11"
+                  <TextBlock Text="{Binding Detail}"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
                              Foreground="{DynamicResource TextSecondaryBrush}"/>
                 </StackPanel>
                 <Border Grid.Column="1" Width="24" Height="24" CornerRadius="6"
                         Background="#A855F71E" Padding="4" VerticalAlignment="Top">
-                  <TextBlock Text="&#x25B6;" FontSize="11" Foreground="#A855F7"
+                  <TextBlock Text="&#x25B6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="#A855F7"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
               </Grid>

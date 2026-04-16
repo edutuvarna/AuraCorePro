@@ -8,6 +8,7 @@ using AuraCore.Module.LinuxAppInstaller;
 using AuraCore.Module.PurgeableSpaceManager;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.Module.SpotlightManager;
+using AuraCore.Module.XcodeCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -283,5 +284,35 @@ public class DependencyInjectionSmokeTests
         Assert.Null(vm.PendingRebuildVolume);
         Assert.False(vm.HasPendingRebuild);
         Assert.Empty(vm.VolumeItems);
+    }
+
+    /// <summary>
+    /// Phase 4.4.4: XcodeCleanerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void XcodeCleanerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.4.4 block
+        sc.AddSingleton<XcodeCleanerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<XcodeCleanerModule>());
+        sc.AddTransient<XcodeCleanerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<XcodeCleanerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<XcodeCleanerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.False(vm.XcodeInstalled);
+        Assert.False(vm.DangerAcknowledged);
+        Assert.Empty(vm.SafeCategoriesItems);
+        Assert.Empty(vm.GranularCategoriesItems);
+        Assert.Empty(vm.DangerCategoriesItems);
     }
 }

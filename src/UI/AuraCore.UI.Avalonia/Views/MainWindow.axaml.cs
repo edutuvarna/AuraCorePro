@@ -370,6 +370,7 @@ public sealed partial class MainWindow : Window
             "dns-flusher" => CreateDnsFlusherView(),
             "purgeable-space-manager" => CreatePurgeableSpaceView(),
             "spotlight-manager" => CreateSpotlightManagerView(),
+            "xcode-cleaner" => CreateXcodeCleanerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -474,6 +475,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SpotlightManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateXcodeCleanerView()
+    {
+        var v = new Pages.XcodeCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.XcodeCleanerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

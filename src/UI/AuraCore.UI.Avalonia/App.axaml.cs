@@ -100,7 +100,14 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.LaunchAgentManager.LaunchAgentManagerRegistration.AddLaunchAgentManagerModule(sc);
             AuraCore.Module.BrewManager.BrewManagerRegistration.AddBrewManagerModule(sc);
             AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
-            AuraCore.Module.XcodeCleaner.XcodeCleanerRegistration.AddXcodeCleanerModule(sc);
+            // Xcode Cleaner (Phase 4.4.4): replaces the old single-line
+            // AddXcodeCleanerModule registration — same concrete +
+            // IOptimizationModule alias pattern as 4.3.1-4.4.3 so the VM can
+            // inject the concrete module while keeping the engine-wide _moduleMap
+            // binding intact.
+            sc.AddSingleton<AuraCore.Module.XcodeCleaner.XcodeCleanerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.XcodeCleaner.XcodeCleanerModule>());
             // DNS Flusher (Phase 4.4.1): same concrete + IOptimizationModule alias
             // pattern as JournalCleaner / SnapFlatpakCleaner / KernelCleaner / LinuxAppInstaller
             // / GrubManager above — lets the VM inject the concrete module while keeping the
@@ -220,6 +227,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.4.3: Spotlight Manager VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.SpotlightManagerViewModel>();
+
+        // ── Phase 4.4.4: Xcode Cleaner VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.XcodeCleanerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

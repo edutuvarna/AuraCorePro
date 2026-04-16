@@ -1,0 +1,247 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.XcodeCleanerView"
+             x:Name="RootUserControl"
+             x:DataType="vm:XcodeCleanerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header: NO Scan button (auto-scan on Loaded — du is fast) -->
+      <controls:ModuleHeader x:Name="Header"/>
+
+      <!-- 3-stat row: Total / Categories present / Oldest item -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="TotalStatCard"
+                           Value="{Binding TotalDisplay}"
+                           ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
+        <controls:StatCard x:Name="CategoriesStatCard"
+                           Value="{Binding CategoriesPresentDisplay}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard x:Name="OldestStatCard"
+                           Value="{Binding OldestItemDisplay}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+      </controls:StatRow>
+
+      <!-- ═══ SAFE CLEANUP (green hero) ═══ -->
+      <controls:GlassCard x:Name="SafeCard">
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="SafeKicker"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource StatusSuccessBrush}"/>
+            <TextBlock x:Name="SafeDescription"
+                       Text="{Binding SafeDescriptionText}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+            <Button x:Name="PruneSafeBtn"
+                    Classes="action-btn"
+                    HorizontalAlignment="Right"
+                    Padding="16,8"
+                    Command="{Binding PruneSafeCommand}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ GRANULAR CONTROL ═══ -->
+      <controls:GlassCard x:Name="GranularCard">
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="GranularHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <ItemsControl x:Name="GranularItemsList"
+                          ItemsSource="{Binding GranularCategoriesItems}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="6"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:CategoryItemVM">
+                  <Border CornerRadius="{DynamicResource RadiusSm}"
+                          Background="{DynamicResource BgCardBrush}"
+                          BorderBrush="{DynamicResource BorderSubtleBrush}"
+                          BorderThickness="1"
+                          Padding="12,10">
+                    <Grid ColumnDefinitions="*,12,Auto,12,Auto">
+                      <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding SizeDisplay}"
+                                   FontSize="10"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                      </StackPanel>
+                      <Button Grid.Column="4"
+                              Classes="action-btn category-prune-btn"
+                              Padding="12,6"
+                              Command="{Binding #RootUserControl.((vm:XcodeCleanerViewModel)DataContext).PruneCategoryCommand}"
+                              CommandParameter="{Binding}"
+                              IsEnabled="{Binding IsEnabled}"
+                              VerticalAlignment="Center"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock x:Name="GranularNote"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ DANGER ZONE (red, ack-gated) ═══ -->
+      <Border x:Name="DangerCard"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusErrorBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="DangerKicker"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource StatusErrorBrush}"/>
+          <TextBlock x:Name="DangerWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     TextWrapping="Wrap"/>
+
+          <ItemsControl x:Name="DangerItemsList"
+                        ItemsSource="{Binding DangerCategoriesItems}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Spacing="6"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="vm:CategoryItemVM">
+                <Border CornerRadius="{DynamicResource RadiusSm}"
+                        Background="{DynamicResource BgCardBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}"
+                        BorderThickness="1"
+                        Padding="12,10">
+                  <Grid ColumnDefinitions="*,12,Auto,12,Auto">
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                      <TextBlock Text="{Binding Name}"
+                                 FontSize="11"
+                                 FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      <TextBlock Text="{Binding SizeDisplay}"
+                                 FontSize="10"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <Button Grid.Column="4"
+                            Classes="action-btn danger-prune-btn"
+                            Padding="12,6"
+                            Command="{Binding #RootUserControl.((vm:XcodeCleanerViewModel)DataContext).PruneCategoryCommand}"
+                            CommandParameter="{Binding}"
+                            IsEnabled="{Binding #RootUserControl.((vm:XcodeCleanerViewModel)DataContext).DangerAcknowledged}"
+                            VerticalAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <CheckBox x:Name="DangerAckCheckBox"
+                    IsChecked="{Binding DangerAcknowledged, Mode=TwoWay}"
+                    VerticalAlignment="Center"/>
+
+          <Button x:Name="PruneDangerAllBtn"
+                  Classes="action-btn"
+                  HorizontalAlignment="Right"
+                  Padding="16,8"
+                  Command="{Binding PruneDangerAllCommand}"
+                  IsEnabled="{Binding DangerAcknowledged}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Status + Progress + Cancel + ErrorBanner -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- About Xcode Caches (educational) -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="8">
+            <TextBlock x:Name="AboutHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="AboutItem1"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="AboutItem2"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="AboutItem3"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="AboutItem4"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="AboutItem5"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

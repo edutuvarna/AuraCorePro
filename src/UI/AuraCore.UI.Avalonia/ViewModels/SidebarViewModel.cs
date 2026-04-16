@@ -155,6 +155,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         if (OperatingSystem.IsMacOS())
         {
             items.Add(Module("purgeable-space-manager", "nav.purgeableSpace", "macos"));
+            items.Add(Module("xcode-cleaner", "nav.xcodeCleaner", "macos"));
         }
 
         return items;

@@ -163,7 +163,9 @@ public class DependencyInjectionSmokeTests
     public void LinuxAppInstallerViewModel_ResolvesFromContainer()
     {
         var sc = new ServiceCollection();
-        // Mirror App.axaml.cs Phase 4.3.5 block
+        // Mirror App.axaml.cs Phase 4.3.5 block.
+        // IShellCommandService is required since Phase 5.2.1.11b migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
         sc.AddSingleton<LinuxAppInstallerModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<LinuxAppInstallerModule>());
         sc.AddTransient<LinuxAppInstallerViewModel>();

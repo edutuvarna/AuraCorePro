@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.LinuxAppInstaller.Models;
@@ -10,6 +11,13 @@ namespace AuraCore.Module.LinuxAppInstaller;
 
 public sealed class LinuxAppInstallerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public LinuxAppInstallerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "linux-app-installer";
     public string DisplayName => "Linux App Installer";
     public OptimizationCategory Category => OptimizationCategory.ApplicationManagement;
@@ -145,42 +153,106 @@ public sealed class LinuxAppInstallerModule : IOptimizationModule
         }
     }
 
-    private static async Task<bool> InstallAsync(LinuxBundleApp app, CancellationToken ct)
+    /// <summary>
+    /// Installs an app via IShellCommandService for privileged sources (apt, snap)
+    /// or directly via ProcessRunner for unprivileged sources (flatpak).
+    /// </summary>
+    private async Task<bool> InstallAsync(LinuxBundleApp app, CancellationToken ct)
     {
-        // Validate package name to prevent shell injection
+        // Validate package name to prevent injection
         if (!IsValidPackageName(app.PackageName)) return false;
 
-        var cmd = app.Source switch
+        switch (app.Source)
         {
-            LinuxPackageSource.Apt => $"sudo -n apt-get install -y {app.PackageName}",
-            LinuxPackageSource.Snap => $"sudo -n snap install {app.PackageName}",
-            LinuxPackageSource.Flatpak => $"flatpak install -y flathub {app.PackageName}",
-            _ => ""
-        };
-        if (string.IsNullOrEmpty(cmd)) return false;
+            case LinuxPackageSource.Apt:
+            {
+                // argv: ["apt", "install", "-y", packageName]
+                var result = await _shell.RunPrivilegedAsync(
+                    new PrivilegedCommand(
+                        Id: "app-installer",
+                        Executable: "/usr/bin/apt-get",
+                        Arguments: new[] { "apt", "install", "-y", app.PackageName },
+                        TimeoutSeconds: 600),
+                    ct);
+                return result.Success;
+            }
 
-        var result = await ProcessRunner.RunAsync("/bin/sh", $"-c \"{cmd}\"", ct, timeoutSeconds: 600);
-        return result.Success;
+            case LinuxPackageSource.Snap:
+            {
+                // argv: ["snap", "install", packageName]
+                var result = await _shell.RunPrivilegedAsync(
+                    new PrivilegedCommand(
+                        Id: "app-installer",
+                        Executable: "/usr/bin/snap",
+                        Arguments: new[] { "snap", "install", app.PackageName },
+                        TimeoutSeconds: 600),
+                    ct);
+                return result.Success;
+            }
+
+            case LinuxPackageSource.Flatpak:
+            {
+                // flatpak install is unprivileged — keep using ProcessRunner
+                var result = await ProcessRunner.RunAsync(
+                    "/bin/sh", $"-c \"flatpak install -y flathub {app.PackageName}\"", ct, timeoutSeconds: 600);
+                return result.Success;
+            }
+
+            default:
+                return false;
+        }
     }
 
-    private static async Task<bool> UninstallAsync(LinuxBundleApp app, CancellationToken ct)
+    /// <summary>
+    /// Uninstalls an app via IShellCommandService for privileged sources (apt, snap)
+    /// or directly via ProcessRunner for unprivileged sources (flatpak).
+    /// </summary>
+    private async Task<bool> UninstallAsync(LinuxBundleApp app, CancellationToken ct)
     {
         if (!IsValidPackageName(app.PackageName)) return false;
 
         // For uninstall, strip flags like "--classic"
         var pkgName = app.PackageName.Split(' ', 2)[0];
 
-        var cmd = app.Source switch
+        switch (app.Source)
         {
-            LinuxPackageSource.Apt => $"sudo -n apt-get remove -y {pkgName}",
-            LinuxPackageSource.Snap => $"sudo -n snap remove {pkgName}",
-            LinuxPackageSource.Flatpak => $"flatpak uninstall -y {pkgName}",
-            _ => ""
-        };
-        if (string.IsNullOrEmpty(cmd)) return false;
+            case LinuxPackageSource.Apt:
+            {
+                // argv: ["apt", "remove", "-y", pkgName]
+                var result = await _shell.RunPrivilegedAsync(
+                    new PrivilegedCommand(
+                        Id: "app-installer",
+                        Executable: "/usr/bin/apt-get",
+                        Arguments: new[] { "apt", "remove", "-y", pkgName },
+                        TimeoutSeconds: 300),
+                    ct);
+                return result.Success;
+            }
 
-        var result = await ProcessRunner.RunAsync("/bin/sh", $"-c \"{cmd}\"", ct, timeoutSeconds: 300);
-        return result.Success;
+            case LinuxPackageSource.Snap:
+            {
+                // argv: ["snap", "remove", pkgName]
+                var result = await _shell.RunPrivilegedAsync(
+                    new PrivilegedCommand(
+                        Id: "app-installer",
+                        Executable: "/usr/bin/snap",
+                        Arguments: new[] { "snap", "remove", pkgName },
+                        TimeoutSeconds: 300),
+                    ct);
+                return result.Success;
+            }
+
+            case LinuxPackageSource.Flatpak:
+            {
+                // flatpak uninstall is unprivileged — keep using ProcessRunner
+                var result = await ProcessRunner.RunAsync(
+                    "/bin/sh", $"-c \"flatpak uninstall -y {pkgName}\"", ct, timeoutSeconds: 300);
+                return result.Success;
+            }
+
+            default:
+                return false;
+        }
     }
 
     private static bool IsValidPackageName(string name)

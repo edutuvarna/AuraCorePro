@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AuraCore.Application;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Module.LinuxAppInstaller;
 using AuraCore.Module.LinuxAppInstaller.Models;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -61,7 +62,7 @@ public class LinuxAppInstallerViewModelTests : IDisposable
     [Fact]
     public void Ctor_AcceptsConcreteModule_ViaAdapter()
     {
-        var module = new LinuxAppInstallerModule();
+        var module = new LinuxAppInstallerModule(new StubLinuxShell());
         var vm = new LinuxAppInstallerViewModel(module);
         Assert.NotNull(vm);
     }
@@ -481,4 +482,20 @@ public class LinuxAppInstallerViewModelTests : IDisposable
             return new OptimizationResult(Id, operationId, OptimizeSuccess, plan.SelectedItemIds?.Count ?? 0, 0, TimeSpan.Zero);
         }
     }
+}
+
+/// <summary>
+/// Minimal hand-rolled stub for IShellCommandService used in LinuxAppInstallerViewModelTests.
+/// Returns HelperMissing for every call — sufficient to prove the module adapts correctly
+/// without invoking any real privilege path.
+/// </summary>
+file sealed class StubLinuxShell : IShellCommandService
+{
+    public Task<ShellResult> RunPrivilegedAsync(PrivilegedCommand command, CancellationToken ct = default)
+        => Task.FromResult(new ShellResult(
+            Success: false,
+            ExitCode: -1,
+            Stdout: string.Empty,
+            Stderr: string.Empty,
+            AuthResult: PrivilegeAuthResult.HelperMissing));
 }

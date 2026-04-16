@@ -5,6 +5,7 @@ using AuraCore.Module.GrubManager;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.KernelCleaner;
 using AuraCore.Module.LinuxAppInstaller;
+using AuraCore.Module.PurgeableSpaceManager;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
@@ -225,5 +226,32 @@ public class DependencyInjectionSmokeTests
         Assert.Null(vm.Report);
         Assert.False(vm.DscacheutilAvailable);
         Assert.Null(vm.LastFlush);
+    }
+
+    /// <summary>
+    /// Phase 4.4.2: PurgeableSpaceManagerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void PurgeableSpaceManagerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.4.2 block
+        sc.AddSingleton<PurgeableSpaceManagerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<PurgeableSpaceManagerModule>());
+        sc.AddTransient<PurgeableSpaceManagerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<PurgeableSpaceManagerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<PurgeableSpaceManagerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.Equal(0, vm.TotalCapacityBytes);
+        Assert.Equal("1*,0*,0*", vm.ColumnDefinitions);
     }
 }

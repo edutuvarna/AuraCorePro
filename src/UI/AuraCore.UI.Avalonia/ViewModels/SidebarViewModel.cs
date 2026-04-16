@@ -152,6 +152,11 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             items.Add(Module("kernel-cleaner", "nav.kernelCleaner", "linux"));
         }
 
+        if (OperatingSystem.IsMacOS())
+        {
+            items.Add(Module("purgeable-space-manager", "nav.purgeableSpace", "macos"));
+        }
+
         return items;
     }
 

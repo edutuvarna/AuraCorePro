@@ -40,6 +40,16 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
             var containerFree = ParseByteValue(diskInfo.Stdout, "Container Free Space");
             var purgeable = volumeFree > containerFree ? volumeFree - containerFree : 0;
 
+            // Phase 4.4.2: also parse total capacity so the UI can compute
+            // Used/Purgeable/Free proportions. diskutil output on modern APFS
+            // systems usually shows "Container Total Space"; older / non-APFS
+            // volumes may show "Volume Total Space" instead. Fall back in that
+            // order and default to 0 so the additive contract still holds if
+            // neither label is present.
+            var totalCapacity = ParseByteValue(diskInfo.Stdout, "Container Total Space");
+            if (totalCapacity <= 0)
+                totalCapacity = ParseByteValue(diskInfo.Stdout, "Volume Total Space");
+
             // List local snapshots
             var snapshots = await ListLocalSnapshotsAsync(ct);
 
@@ -49,7 +59,8 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
                 PurgeableBytes: purgeable,
                 LocalSnapshotCount: snapshots.Count,
                 LocalSnapshots: snapshots,
-                IsAvailable: true);
+                IsAvailable: true,
+                TotalCapacityBytes: totalCapacity);
 
             LastReport = report;
 

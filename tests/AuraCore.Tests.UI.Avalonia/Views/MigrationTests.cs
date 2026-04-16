@@ -28,4 +28,12 @@ public class MigrationTests
         Assert.NotNull(view);
         Assert.NotNull(view.Content);
     }
+
+    [AvaloniaFact]
+    public void SettingsView_Renders()
+    {
+        var view = new global::AuraCore.UI.Avalonia.Views.Pages.SettingsView();
+        Assert.NotNull(view);
+        Assert.NotNull(view.Content);
+    }
 }

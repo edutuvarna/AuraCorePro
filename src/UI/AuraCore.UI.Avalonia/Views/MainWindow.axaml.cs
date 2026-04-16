@@ -371,6 +371,7 @@ public sealed partial class MainWindow : Window
             "purgeable-space-manager" => CreatePurgeableSpaceView(),
             "spotlight-manager" => CreateSpotlightManagerView(),
             "xcode-cleaner" => CreateXcodeCleanerView(),
+            "mac-app-installer" => CreateMacAppInstallerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -486,6 +487,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.XcodeCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateMacAppInstallerView()
+    {
+        var v = new Pages.MacAppInstallerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.MacAppInstallerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

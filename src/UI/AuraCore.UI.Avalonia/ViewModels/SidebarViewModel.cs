@@ -202,6 +202,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             items.Add(Module("defaults-optimizer",  "nav.defaultsOptimizer",  "macos"));
             items.Add(Module("brew-manager",         "nav.brewManager",         "macos"));
             items.Add(Module("dns-flusher",          "nav.dnsFlusher",          "macos"));
+            items.Add(Module("mac-app-installer",    "nav.macAppInstaller",     "macos"));
         }
 
         return items;

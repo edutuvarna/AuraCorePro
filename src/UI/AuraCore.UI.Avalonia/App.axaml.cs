@@ -131,7 +131,14 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.SpotlightManager.SpotlightManagerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.SpotlightManager.SpotlightManagerModule>());
-            AuraCore.Module.MacAppInstaller.MacAppInstallerRegistration.AddMacAppInstallerModule(sc);
+            // Mac App Installer (Phase 4.4.5): replaces the old single-line
+            // AddMacAppInstallerModule registration — same concrete +
+            // IOptimizationModule alias pattern as 4.3.1-4.4.4 so the VM can
+            // inject the concrete module while keeping the engine-wide _moduleMap
+            // binding intact.
+            sc.AddSingleton<AuraCore.Module.MacAppInstaller.MacAppInstallerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.MacAppInstaller.MacAppInstallerModule>());
         }
 
         // ── Linux + macOS shared modules ──
@@ -230,6 +237,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.4.4: Xcode Cleaner VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.XcodeCleanerViewModel>();
+
+        // ── Phase 4.4.5: Mac App Installer VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.MacAppInstallerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

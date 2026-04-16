@@ -1,82 +1,107 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.NetworkOptimizerView">
   <ScrollViewer>
     <StackPanel Spacing="12">
-      <!-- Header -->
-      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-        <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Network" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock x:Name="SubText" Text="Monitor, optimize and benchmark your network" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
-        </StackPanel>
-        <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Margin="0,0,8,0" Padding="14,8" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-          </StackPanel>
-        </Button>
-        <Button Grid.Column="2" x:Name="BenchBtn" Classes="action-btn" Click="Bench_Click" Padding="14,8" VerticalAlignment="Center"
-                Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F" FontWeight="Bold" Margin="0,0,8,0">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="&#x26A1;" FontSize="12"/><TextBlock x:Name="BenchLabel" Text="Benchmark DNS" FontSize="11" FontWeight="Bold"/>
-          </StackPanel>
-        </Button>
-        <Button Grid.Column="3" x:Name="FindBestDnsBtn" Classes="action-btn" Click="FindBestDns_Click" Padding="14,8" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="&#x1F3AF;" FontSize="12"/><TextBlock x:Name="FindBestDnsLabel" Text="Best DNS" FontSize="11" FontWeight="SemiBold"/>
-          </StackPanel>
-        </Button>
-      </Grid>
 
-      <!-- Current DNS - Glassmorphic -->
-      <Border BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="14">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Network"
+                             Subtitle="Monitor, optimize and benchmark your network">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click" Margin="0,0,8,0" Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <Button x:Name="BenchBtn" Classes="action-btn" Click="Bench_Click" Padding="14,8" VerticalAlignment="Center"
+                    Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F" FontWeight="Bold" Margin="0,0,8,0">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="BenchLabel" Text="Benchmark DNS"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"/>
+              </StackPanel>
+            </Button>
+            <Button x:Name="FindBestDnsBtn" Classes="action-btn" Click="FindBestDns_Click" Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F3AF;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="FindBestDnsLabel" Text="Best DNS"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden bridge for code-behind subtitle writes -->
+      <TextBlock x:Name="SubText" Text="Monitor, optimize and benchmark your network"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 IsVisible="False"/>
+
+      <!-- Current DNS Card -->
+      <controls:GlassCard>
         <Grid ColumnDefinitions="*,*,*">
           <StackPanel Spacing="4">
-            <TextBlock Text="Current DNS" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="DnsPrimary" Text="--" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-            <TextBlock x:Name="DnsSecondary" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock Text="Current DNS" FontSize="{DynamicResource FontSizeLabel}"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="DnsPrimary" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}"/>
+            <TextBlock x:Name="DnsSecondary" Text=""
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4">
-            <TextBlock Text="Provider" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="DnsProvider" Text="--" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="Provider" FontSize="{DynamicResource FontSizeLabel}"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="DnsProvider" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Spacing="4">
-            <TextBlock Text="Response Time" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="DnsLatency" Text="--" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}"/>
+            <TextBlock Text="Response Time" FontSize="{DynamicResource FontSizeLabel}"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="DnsLatency" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AccentBlueBrush}"/>
           </StackPanel>
         </Grid>
-      </Border>
+      </controls:GlassCard>
 
-      <!-- Network Traffic Stats - Glassmorphic -->
-      <Border BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="14">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <!-- Network Traffic Stats Card -->
+      <controls:GlassCard>
         <Grid ColumnDefinitions="*,*,*">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Interfaces:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-            <TextBlock x:Name="IfaceCount" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+            <TextBlock Text="Interfaces:" FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="IfaceCount" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="&#x2B06; Sent:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-            <TextBlock x:Name="TotalSent" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
+            <TextBlock Text="&#x2B06; Sent:" FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalSent" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="&#x2B07; Recv:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-            <TextBlock x:Name="TotalRecv" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+            <TextBlock Text="&#x2B07; Recv:" FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalRecv" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
           </StackPanel>
         </Grid>
-      </Border>
+      </controls:GlassCard>
 
-      <!-- Wi-Fi Signal Strength - Glassmorphic -->
+      <!-- Wi-Fi Signal Strength Card -->
       <Border x:Name="WifiPanel" BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="14" IsVisible="False">
         <Border.Background>
           <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
@@ -87,12 +112,16 @@
         <StackPanel Spacing="8">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Border Width="20" Height="20" CornerRadius="6" Background="#14A78BFA">
-              <TextBlock Text="&#x1F4F6;" FontSize="10" Foreground="#A78BFA"
+              <TextBlock Text="&#x1F4F6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#A78BFA"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Wi-Fi Signal Strength" FontSize="12" FontWeight="SemiBold"
+            <TextBlock Text="Wi-Fi Signal Strength"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-            <TextBlock x:Name="WifiSsid" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            <TextBlock x:Name="WifiSsid" Text=""
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0"/>
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
             <Border Height="16" CornerRadius="8" ClipToBounds="True">
@@ -105,27 +134,37 @@
                 </Border.Background>
               </Border>
             </Border>
-            <TextBlock Grid.Column="1" x:Name="WifiSignalText" Text="--%" FontSize="14" FontWeight="Bold"
+            <TextBlock Grid.Column="1" x:Name="WifiSignalText" Text="--%"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
                        Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
           </Grid>
           <StackPanel Orientation="Horizontal" Spacing="16">
             <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock Text="Channel:" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="WifiChannel" Text="--" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="Channel:" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="WifiChannel" Text="--"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock Text="Band:" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="WifiBand" Text="--" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="Band:" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="WifiBand" Text="--"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="4">
-              <TextBlock Text="Speed:" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="WifiSpeed" Text="--" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock Text="Speed:" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="WifiSpeed" Text="--"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
           </StackPanel>
         </StackPanel>
       </Border>
 
-      <!-- Before/After DNS Comparison - Glassmorphic -->
+      <!-- Before/After DNS Comparison Card -->
       <Border x:Name="DnsComparisonPanel" BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="14" IsVisible="False">
         <Border.Background>
           <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
@@ -136,167 +175,239 @@
         <StackPanel Spacing="6">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Border Width="20" Height="20" CornerRadius="6" Background="#1422C55E">
-              <TextBlock Text="&#x2194;" FontSize="10" Foreground="#22C55E"
+              <TextBlock Text="&#x2194;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#22C55E"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="DNS Change Results" FontSize="12" FontWeight="SemiBold"
+            <TextBlock Text="DNS Change Results"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto,*" Margin="0,4,0,0">
             <StackPanel Spacing="2" HorizontalAlignment="Center">
-              <TextBlock Text="Before" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-              <TextBlock x:Name="DnsBeforeLatency" Text="--" FontSize="18" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center"/>
+              <TextBlock Text="Before" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="DnsBeforeLatency" Text="--" FontSize="18" FontWeight="Bold"
+                         Foreground="#EF4444" HorizontalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Grid.Column="1" Text="&#x2192;" FontSize="18" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="16,8,16,0"/>
+            <TextBlock Grid.Column="1" Text="&#x2192;" FontSize="18"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="16,8,16,0"/>
             <StackPanel Grid.Column="2" Spacing="2" HorizontalAlignment="Center">
-              <TextBlock Text="After" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
-              <TextBlock x:Name="DnsAfterLatency" Text="--" FontSize="18" FontWeight="Bold" Foreground="#22C55E" HorizontalAlignment="Center"/>
+              <TextBlock Text="After" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
+              <TextBlock x:Name="DnsAfterLatency" Text="--" FontSize="18" FontWeight="Bold"
+                         Foreground="#22C55E" HorizontalAlignment="Center"/>
             </StackPanel>
           </Grid>
-          <TextBlock x:Name="DnsImprovementText" Text="" FontSize="12" FontWeight="Bold"
+          <TextBlock x:Name="DnsImprovementText" Text=""
+                     FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
                      Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </StackPanel>
       </Border>
 
-      <!-- Network Adapters Section Title -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#1422C55E">
-          <TextBlock Text="&#x25C9;" FontSize="10" Foreground="#22C55E"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="Network Adapters" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-
-      <!-- Network Adapters List -->
-      <ItemsControl x:Name="AdapterList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="12,8">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid ColumnDefinitions="*,Auto,Auto">
-                <StackPanel Spacing="2">
-                  <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                  <TextBlock Text="{Binding Desc}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Margin="12,0" Spacing="2">
-                  <TextBlock Text="{Binding Sent}" FontSize="10" Foreground="{DynamicResource AccentBlueBrush}" TextAlignment="Right"/>
-                  <TextBlock Text="{Binding Recv}" FontSize="10" Foreground="{DynamicResource SuccessBrush}" TextAlignment="Right"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="2">
-                  <TextBlock Text="{Binding Ip}" FontSize="11" Foreground="{DynamicResource AccentBlueBrush}" TextAlignment="Right"/>
-                  <TextBlock Text="{Binding Speed}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
-                </StackPanel>
-              </Grid>
+      <!-- Network Adapters -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#1422C55E">
+              <TextBlock Text="&#x25C9;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#22C55E"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock Text="Network Adapters"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="AdapterList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="12,8">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
+                  <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+                  </Border.BorderBrush>
+                  <Grid ColumnDefinitions="*,Auto,Auto">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Name}"
+                                 FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      <TextBlock Text="{Binding Desc}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="12,0" Spacing="2">
+                      <TextBlock Text="{Binding Sent}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource AccentBlueBrush}" TextAlignment="Right"/>
+                      <TextBlock Text="{Binding Recv}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource SuccessBrush}" TextAlignment="Right"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Right" Spacing="2">
+                      <TextBlock Text="{Binding Ip}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}"
+                                 Foreground="{DynamicResource AccentBlueBrush}" TextAlignment="Right"/>
+                      <TextBlock Text="{Binding Speed}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"/>
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
 
-      <!-- DNS Presets Section Title -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#1460A5FA">
-          <TextBlock Text="&#x25C6;" FontSize="10" Foreground="#60A5FA"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="DNS Presets" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-
-      <!-- DNS Presets List -->
-      <ItemsControl x:Name="DnsPresetList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="12,8">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid ColumnDefinitions="*,100,70,70">
-                <StackPanel>
-                  <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                  <TextBlock Text="{Binding Servers}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                </StackPanel>
-                <TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding ActiveLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{Binding ActiveBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                <Button Grid.Column="3" Tag="{Binding Name}" Classes="action-btn" Padding="6,3" Click="SwitchDns_Click" FontSize="9"
-                        Content="Switch" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Grid>
+      <!-- DNS Presets -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#1460A5FA">
+              <TextBlock Text="&#x25C6;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#60A5FA"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock Text="DNS Presets"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="DnsPresetList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="12,8">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
+                  <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+                  </Border.BorderBrush>
+                  <Grid ColumnDefinitions="*,100,70,70">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Name}"
+                                 FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      <TextBlock Text="{Binding Servers}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding Category}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{Binding ActiveLabel}"
+                               FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                               Foreground="{Binding ActiveBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                    <Button Grid.Column="3" Tag="{Binding Name}" Classes="action-btn"
+                            Padding="6,3" Click="SwitchDns_Click"
+                            FontSize="{DynamicResource FontSizeLabel}"
+                            Content="Switch" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
 
-      <!-- DNS Benchmark Section Title -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,4">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#14A78BFA">
-          <TextBlock Text="&#x26A1;" FontSize="10" Foreground="#A78BFA"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock x:Name="BenchHeader" Text="DNS Benchmark" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" IsVisible="False"/>
-      </StackPanel>
-
-      <TextBlock x:Name="RecommendText" Text="" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentPrimaryBrush}" IsVisible="False"/>
-      <StackPanel x:Name="BenchResults" Spacing="4"/>
-
-      <!-- Best DNS Auto-Detect Section -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,4">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#14F59E0B">
-          <TextBlock Text="&#x1F3AF;" FontSize="10" Foreground="#F59E0B"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock x:Name="BestDnsHeader" Text="Best DNS for You" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" IsVisible="False"/>
-      </StackPanel>
-      <TextBlock x:Name="BestDnsRecommend" Text="" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentPrimaryBrush}" IsVisible="False"/>
-      <StackPanel x:Name="BestDnsResults" Spacing="4"/>
-
-      <!-- Bandwidth Per Process Section Title -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,4">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#14F472B6">
-          <TextBlock Text="&#x1F4CA;" FontSize="10" Foreground="#F472B6"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="Bandwidth by Process" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-        <Button x:Name="RefreshBwBtn" Classes="action-btn" Click="RefreshBandwidth_Click" Padding="8,3" FontSize="9" Content="Refresh" VerticalAlignment="Center" Margin="8,0,0,0"/>
-      </StackPanel>
-
-      <!-- Bandwidth Per Process List -->
-      <ItemsControl x:Name="BandwidthList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,3" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="10,6">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                <TextBlock Text="{Binding Rank}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"
-                           VerticalAlignment="Center" Margin="0,0,8,0" Width="20"/>
-                <StackPanel Grid.Column="1" Spacing="1">
-                  <TextBlock Text="{Binding ProcessName}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                  <TextBlock Text="{Binding Details}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/>
-                </StackPanel>
-                <TextBlock Grid.Column="2" Text="{Binding Connections}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}"
-                           VerticalAlignment="Center" Margin="8,0"/>
-                <TextBlock Grid.Column="3" Text="{Binding Pid}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"
-                           VerticalAlignment="Center" Width="50" TextAlignment="Right"/>
-              </Grid>
+      <!-- DNS Benchmark Results -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#14A78BFA">
+              <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#A78BFA"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock x:Name="BenchHeader" Text="DNS Benchmark"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" IsVisible="False"/>
+          </StackPanel>
+          <TextBlock x:Name="RecommendText" Text=""
+                     FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" IsVisible="False"/>
+          <StackPanel x:Name="BenchResults" Spacing="4"/>
+        </StackPanel>
+      </controls:GlassCard>
+
+      <!-- Best DNS Auto-Detect -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#14F59E0B">
+              <TextBlock Text="&#x1F3AF;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#F59E0B"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="BestDnsHeader" Text="Best DNS for You"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" IsVisible="False"/>
+          </StackPanel>
+          <TextBlock x:Name="BestDnsRecommend" Text=""
+                     FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource AccentPrimaryBrush}" IsVisible="False"/>
+          <StackPanel x:Name="BestDnsResults" Spacing="4"/>
+        </StackPanel>
+      </controls:GlassCard>
+
+      <!-- Bandwidth by Process -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6" Background="#14F472B6">
+              <TextBlock Text="&#x1F4CA;" FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="#F472B6"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Bandwidth by Process"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+            <Button x:Name="RefreshBwBtn" Classes="action-btn" Click="RefreshBandwidth_Click"
+                    Padding="8,3" FontSize="{DynamicResource FontSizeLabel}"
+                    Content="Refresh" VerticalAlignment="Center" Margin="8,0,0,0"/>
+          </StackPanel>
+          <ItemsControl x:Name="BandwidthList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,3" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="10,6">
+                  <Border.Background>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                  </Border.Background>
+                  <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
+                  </Border.BorderBrush>
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <TextBlock Text="{Binding Rank}"
+                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"
+                               Foreground="{DynamicResource AccentPrimaryBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" Width="20"/>
+                    <StackPanel Grid.Column="1" Spacing="1">
+                      <TextBlock Text="{Binding ProcessName}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      <TextBlock Text="{Binding Details}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding Connections}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" Margin="8,0"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Pid}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               VerticalAlignment="Center" Width="50" TextAlignment="Right"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

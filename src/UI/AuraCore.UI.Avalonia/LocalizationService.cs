@@ -1047,6 +1047,26 @@ public static class LocalizationService
         ["nav.packageCleaner"] = "Package Cleaner",
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Manager",
+        ["nav.journalCleaner"] = "Journal Cleaner",
+
+        // Phase 4.3.1 Journal Cleaner (Linux)
+        ["journalCleaner.subtitle"] = "Clean systemd journal logs and manage disk usage",
+        ["journalCleaner.stat.usage"] = "Current Usage",
+        ["journalCleaner.stat.files"] = "Journal Files",
+        ["journalCleaner.stat.oldest"] = "Oldest Entry",
+        ["journalCleaner.action.scan"] = "Scan",
+        ["journalCleaner.action.cancel"] = "Cancel",
+        ["journalCleaner.action.vacuum500m"] = "Vacuum to 500 MB",
+        ["journalCleaner.action.vacuum1g"] = "Vacuum to 1 GB",
+        ["journalCleaner.action.vacuum7days"] = "Last 7 days only",
+        ["journalCleaner.action.vacuum30days"] = "Last 30 days only",
+        ["journalCleaner.status.idle"] = "Ready to scan",
+        ["journalCleaner.status.scanning"] = "Scanning journal...",
+        ["journalCleaner.status.vacuuming"] = "Vacuuming...",
+        ["journalCleaner.status.done"] = "Complete. Freed {0}.",
+        ["journalCleaner.status.error"] = "Error: {0}",
+        ["journalCleaner.status.unavailable"] = "journalctl not available. This module requires systemd-journald.",
+        ["journalCleaner.warning.privilege"] = "Some operations require admin group membership or sudo. Run AuraCore with appropriate privileges if vacuum fails.",
 
         // ── macOS-only Modules ──
         ["nav.macosTools"] = "MACOS TOOLS",
@@ -2188,6 +2208,26 @@ public static class LocalizationService
         ["nav.packageCleaner"] = "Paket Temizleyici",
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Yoneticisi",
+        ["nav.journalCleaner"] = "Gunluk Temizleyici",
+
+        // Phase 4.3.1 Journal Cleaner (Linux)
+        ["journalCleaner.subtitle"] = "Systemd gunluk kayitlarini temizle, disk kullanimini yonet",
+        ["journalCleaner.stat.usage"] = "Mevcut Kullanim",
+        ["journalCleaner.stat.files"] = "Gunluk Dosyalari",
+        ["journalCleaner.stat.oldest"] = "En Eski Kayit",
+        ["journalCleaner.action.scan"] = "Tara",
+        ["journalCleaner.action.cancel"] = "Iptal",
+        ["journalCleaner.action.vacuum500m"] = "500 MB'a kadar kucult",
+        ["journalCleaner.action.vacuum1g"] = "1 GB'a kadar kucult",
+        ["journalCleaner.action.vacuum7days"] = "Sadece son 7 gun",
+        ["journalCleaner.action.vacuum30days"] = "Sadece son 30 gun",
+        ["journalCleaner.status.idle"] = "Taramaya hazir",
+        ["journalCleaner.status.scanning"] = "Gunluk taraniyor...",
+        ["journalCleaner.status.vacuuming"] = "Kuculuyor...",
+        ["journalCleaner.status.done"] = "Tamamlandi. {0} kazanildi.",
+        ["journalCleaner.status.error"] = "Hata: {0}",
+        ["journalCleaner.status.unavailable"] = "journalctl kullanilamiyor. Bu modul systemd-journald gerektirir.",
+        ["journalCleaner.warning.privilege"] = "Bazi islemler admin grubu uyeligi veya sudo gerektirir. Vakum basarisiz olursa AuraCore'u uygun yetkilerle calistirin.",
 
         // ── macOS-only Modules ──
         ["nav.macosTools"] = "MACOS ARACLARI",

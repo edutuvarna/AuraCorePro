@@ -145,7 +145,10 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         };
 
         if (OperatingSystem.IsLinux())
+        {
             items.Add(Module("package-cleaner", "nav.packageCleaner", "linux"));
+            items.Add(Module("journal-cleaner", "nav.journalCleaner", "linux"));
+        }
 
         return items;
     }

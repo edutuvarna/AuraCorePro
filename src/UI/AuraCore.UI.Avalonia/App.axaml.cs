@@ -59,7 +59,12 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.PackageCleaner.PackageCleanerRegistration.AddPackageCleanerModule(sc);
             AuraCore.Module.SwapOptimizer.SwapOptimizerRegistration.AddSwapOptimizerModule(sc);
             AuraCore.Module.CronManager.CronManagerRegistration.AddCronManagerModule(sc);
-            AuraCore.Module.JournalCleaner.JournalCleanerRegistration.AddJournalCleanerModule(sc);
+            // Journal Cleaner (Phase 4.3.1): register concrete first so the VM can inject
+            // JournalCleanerModule directly, then alias it to IOptimizationModule so the
+            // engine-wide multi-binding (_moduleMap in MainWindow) also sees it.
+            sc.AddSingleton<AuraCore.Module.JournalCleaner.JournalCleanerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.JournalCleaner.JournalCleanerModule>());
             AuraCore.Module.KernelCleaner.KernelCleanerRegistration.AddKernelCleanerModule(sc);
             AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
             AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerRegistration.AddSnapFlatpakCleanerModule(sc);
@@ -143,6 +148,9 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.ModelManagerDialogViewModel>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.ModelManagerDialog>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.TierUpgradePlaceholderDialog>();
+
+        // ── Phase 4.3.1: Journal Cleaner VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.JournalCleanerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

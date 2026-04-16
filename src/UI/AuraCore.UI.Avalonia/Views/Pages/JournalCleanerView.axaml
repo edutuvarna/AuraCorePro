@@ -1,0 +1,147 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Avalonia.Data.Converters"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.JournalCleanerView"
+             x:DataType="vm:JournalCleanerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header with inline Scan button -->
+      <controls:ModuleHeader x:Name="Header">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button x:Name="ScanBtn"
+                    Content="Scan"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding ScanCommand}"
+                    IsEnabled="{Binding !IsBusy}"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Stat row: current usage, file count, oldest entry -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="UsageCard"
+                           Value="{Binding CurrentUsageDisplay}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard x:Name="FilesCard"
+                           Value="{Binding FileCountDisplay}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard x:Name="OldestCard"
+                           Value="{Binding OldestEntryDisplay}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+      </controls:StatRow>
+
+      <!-- Vacuum actions card -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="VacuumHeading"
+                       Text="Vacuum Actions"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,10,Auto">
+              <Button x:Name="Vacuum500Btn"
+                      Grid.Row="0" Grid.Column="0"
+                      Content="Vacuum to 500 MB"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding VacuumCommand}"
+                      CommandParameter="vacuum-500m"
+                      IsEnabled="{Binding !IsBusy}"/>
+              <Button x:Name="Vacuum1GBtn"
+                      Grid.Row="0" Grid.Column="2"
+                      Content="Vacuum to 1 GB"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding VacuumCommand}"
+                      CommandParameter="vacuum-1g"
+                      IsEnabled="{Binding !IsBusy}"/>
+              <Button x:Name="Vacuum7DaysBtn"
+                      Grid.Row="2" Grid.Column="0"
+                      Content="Last 7 days only"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding VacuumCommand}"
+                      CommandParameter="vacuum-7days"
+                      IsEnabled="{Binding !IsBusy}"/>
+              <Button x:Name="Vacuum30DaysBtn"
+                      Grid.Row="2" Grid.Column="2"
+                      Content="Last 30 days only"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding VacuumCommand}"
+                      CommandParameter="vacuum-30days"
+                      IsEnabled="{Binding !IsBusy}"/>
+            </Grid>
+
+            <!-- Status + progress row -->
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Content="Cancel"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+
+            <!-- Error banner — visible only when ErrorMessage is set -->
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege warning -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <TextBlock x:Name="PrivilegeWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource StatusWarningBrush}"
+                     TextWrapping="Wrap"/>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

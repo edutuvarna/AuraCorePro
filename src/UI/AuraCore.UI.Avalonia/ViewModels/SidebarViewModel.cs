@@ -218,7 +218,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             Module("environment-variables",  "nav.environmentVariables"),
             Module("symlink-manager",        "nav.symlinkManager"),
             Module("process-monitor",        "nav.processMonitor"),
-            Module("font-manager",           "nav.fontManager"),
+            // Phase 5.1.10: font-manager soft-hidden (sidebar + route only; files kept).
             Module("context-menu",           "nav.contextMenu",           "windows"),
             Module("taskbar-tweaks",         "nav.taskbar",               "windows"),
             Module("explorer-tweaks",        "nav.explorer",              "windows"),

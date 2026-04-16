@@ -352,7 +352,7 @@ public sealed partial class MainWindow : Window
             "environment-variables" => new Pages.EnvironmentVariablesView(),
             "symlink-manager" => new Pages.SymlinkManagerView(),
             "process-monitor" => new Pages.ProcessMonitorView(),
-            "font-manager" => new Pages.FontManagerView(),
+            // Phase 5.1.10: font-manager soft-hidden; falls through to Dashboard default.
             "context-menu" => CreateTweakListView("context-menu"),
             "taskbar-tweaks" => CreateTweakListView("taskbar-tweaks"),
             "explorer-tweaks" => CreateTweakListView("explorer-tweaks"),

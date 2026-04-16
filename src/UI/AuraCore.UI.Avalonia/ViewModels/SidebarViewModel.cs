@@ -150,7 +150,6 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             items.Add(Module("journal-cleaner", "nav.journalCleaner", "linux"));
             items.Add(Module("snap-flatpak-cleaner", "nav.snapFlatpakCleaner", "linux"));
             items.Add(Module("kernel-cleaner", "nav.kernelCleaner", "linux"));
-            items.Add(Module("linux-app-installer", "nav.linuxAppInstaller", "linux"));
         }
 
         return items;
@@ -188,6 +187,9 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             Module("space-analyzer",  "nav.spaceAnalyzer"),
             Module("system-health",   "nav.systemHealth"),
         };
+
+        if (OperatingSystem.IsLinux())
+            items.Add(Module("linux-app-installer", "nav.linuxAppInstaller", "linux"));
 
         if (OperatingSystem.IsMacOS())
         {

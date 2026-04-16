@@ -20,5 +20,6 @@
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Telemetry/AuraCore.Platform.Telemetry.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Diagnostics/AuraCore.Platform.Diagnostics.csproj" />
     <ProjectReference Include="..\..\src\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+    <ProjectReference Include="../../src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
   </ItemGroup>
 </Project>

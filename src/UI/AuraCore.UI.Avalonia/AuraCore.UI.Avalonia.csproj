@@ -32,6 +32,8 @@
   <!-- Infrastructure (Phase 5.2.1.10: PrivHelperInstaller wiring) -->
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+    <!-- Phase 5.2.1 DI fix: HelperAvailabilityService lives here; no cycle risk -->
+    <ProjectReference Include="..\..\Desktop\AuraCore.Desktop.Services\AuraCore.Desktop.Services.csproj" />
   </ItemGroup>
 
   <!-- Engines -->

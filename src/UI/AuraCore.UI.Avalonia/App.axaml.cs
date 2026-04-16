@@ -1,5 +1,8 @@
 using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Markup.Xaml;
+using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Desktop.Services.PrivilegeIpc;
+using AuraCore.Infrastructure.PrivilegeIpc;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +19,13 @@ public partial class App : global::Avalonia.Application
     {
         var sc = new ServiceCollection();
 
+
+        // ── Phase 5.2.1: Privilege IPC + helper availability ──
+        // IShellCommandService is required by the three migrated Linux modules
+        // (SnapFlatpakCleaner, LinuxAppInstaller, GrubManager) injected via ctor.
+        // IHelperAvailabilityService drives the PrivilegeHelperMissingBanner in MainWindow.
+        sc.AddPrivilegeIpc();
+        sc.AddSingleton<IHelperAvailabilityService, HelperAvailabilityService>();
 
         // ── Cross-platform modules (Windows + Linux + macOS) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);

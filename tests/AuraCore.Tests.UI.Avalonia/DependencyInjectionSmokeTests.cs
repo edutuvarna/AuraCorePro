@@ -2,6 +2,7 @@ using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.DockerCleaner;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.KernelCleaner;
+using AuraCore.Module.LinuxAppInstaller;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
@@ -142,5 +143,31 @@ public class DependencyInjectionSmokeTests
         Assert.False(vm.PackageManagerAvailable);
         Assert.False(vm.DangerAcknowledged);
         Assert.Empty(vm.KernelItems);
+    }
+
+    /// <summary>
+    /// Phase 4.3.5: LinuxAppInstallerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void LinuxAppInstallerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.3.5 block
+        sc.AddSingleton<LinuxAppInstallerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<LinuxAppInstallerModule>());
+        sc.AddTransient<LinuxAppInstallerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<LinuxAppInstallerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<LinuxAppInstallerViewModel>();
+        Assert.NotNull(vm);
+        Assert.NotEmpty(vm.AllBundles);
+        Assert.False(vm.HasSelection);
     }
 }

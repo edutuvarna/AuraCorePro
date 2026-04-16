@@ -365,6 +365,7 @@ public sealed partial class MainWindow : Window
             "snap-flatpak-cleaner" => CreateSnapFlatpakCleanerView(),
             "docker-cleaner" => CreateDockerCleanerView(),
             "kernel-cleaner" => CreateKernelCleanerView(),
+            "linux-app-installer" => CreateLinuxAppInstallerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -414,6 +415,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.KernelCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateLinuxAppInstallerView()
+    {
+        var v = new Pages.LinuxAppInstallerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.LinuxAppInstallerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

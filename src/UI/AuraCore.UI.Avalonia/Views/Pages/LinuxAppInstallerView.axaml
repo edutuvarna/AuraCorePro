@@ -1,0 +1,249 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.LinuxAppInstallerView"
+             x:DataType="vm:LinuxAppInstallerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header with inline Search + Scan buttons -->
+      <controls:ModuleHeader x:Name="Header">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBox x:Name="SearchBox"
+                     Width="220"
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding !IsBusy}"/>
+            <Button x:Name="ScanBtn"
+                    Content="Scan"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding ScanCommand}"
+                    IsEnabled="{Binding !IsBusy}"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Stat row: total / installed / available -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="TotalAppsCard"
+                           Value="{Binding TotalAppsDisplay}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard x:Name="InstalledCard"
+                           Value="{Binding InstalledDisplay}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard x:Name="AvailableCard"
+                           Value="{Binding AvailableDisplay}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+      </controls:StatRow>
+
+      <!-- ═══ BUNDLES ACCORDION ═══ -->
+      <ItemsControl x:Name="BundlesList"
+                    ItemsSource="{Binding VisibleBundles}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="12"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="vm:BundleVM">
+            <Border CornerRadius="{DynamicResource RadiusLg}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="1"
+                    Padding="16">
+              <StackPanel Spacing="8">
+                <!-- Bundle header row (click to toggle) -->
+                <Button Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="0"
+                        Cursor="Hand"
+                        Command="{Binding ToggleExpandCommand}">
+                  <Grid ColumnDefinitions="Auto,12,*,Auto">
+                    <!-- Bundle glyph — rendered as Segoe Fluent Icons character -->
+                    <Border Grid.Column="0"
+                            Width="32" Height="32"
+                            CornerRadius="{DynamicResource RadiusSm}"
+                            Background="{DynamicResource BgElevatedBrush}"
+                            VerticalAlignment="Center">
+                      <TextBlock Text="&#xE774;"
+                                 FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                 FontSize="16"
+                                 Foreground="{DynamicResource AccentBlueBrush}"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+                      <TextBlock Text="{Binding Name}"
+                                 FontSize="12"
+                                 FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      <TextBlock Text="{Binding SummaryDisplay}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding ChevronGlyph}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               VerticalAlignment="Center"/>
+                  </Grid>
+                </Button>
+
+                <!-- App list body (visible when expanded) -->
+                <ItemsControl ItemsSource="{Binding VisibleApps}"
+                              IsVisible="{Binding IsExpanded}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="4"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:AppVM">
+                      <Border CornerRadius="{DynamicResource RadiusSm}"
+                              Background="{DynamicResource BgElevatedBrush}"
+                              Padding="10,8">
+                        <Grid ColumnDefinitions="Auto,10,*,Auto">
+                          <CheckBox Grid.Column="0"
+                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                    IsVisible="{Binding IsCheckboxVisible}"
+                                    VerticalAlignment="Center"/>
+                          <!-- Spacer when checkbox is hidden so installed rows still line up -->
+                          <Border Grid.Column="0"
+                                  Width="18"
+                                  IsVisible="{Binding !IsCheckboxVisible}"/>
+                          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <TextBlock Text="{Binding Description}"
+                                         FontSize="{DynamicResource FontSizeBodySmall}"
+                                         Foreground="{DynamicResource TextMutedBrush}"/>
+                              <TextBlock Text="·"
+                                         FontSize="{DynamicResource FontSizeBodySmall}"
+                                         Foreground="{DynamicResource TextMutedBrush}"/>
+                              <TextBlock Text="{Binding SourceDisplay}"
+                                         FontSize="{DynamicResource FontSizeBodySmall}"
+                                         Foreground="{DynamicResource TextMutedBrush}"/>
+                            </StackPanel>
+                          </StackPanel>
+                          <!-- Installed pill -->
+                          <Border Grid.Column="3"
+                                  CornerRadius="{DynamicResource RadiusSm}"
+                                  Padding="8,3"
+                                  VerticalAlignment="Center"
+                                  Background="{DynamicResource BgCardBrush}"
+                                  IsVisible="{Binding IsInstalled}">
+                            <TextBlock x:Name="InstalledPillText"
+                                       Text="INSTALLED"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource StatusSuccessBrush}"/>
+                          </Border>
+                          <!-- Source pill (for not-installed) -->
+                          <Border Grid.Column="3"
+                                  CornerRadius="{DynamicResource RadiusSm}"
+                                  Padding="8,3"
+                                  VerticalAlignment="Center"
+                                  Background="{DynamicResource BgCardBrush}"
+                                  IsVisible="{Binding IsSourcePillVisible}">
+                            <TextBlock Text="{Binding SourceDisplay}"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextMutedBrush}"/>
+                          </Border>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- ═══ STICKY ACTION FOOTER (visible only when selection > 0) ═══ -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource AccentBlueBrush}"
+              BorderThickness="1"
+              Padding="16"
+              IsVisible="{Binding HasSelection}">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock x:Name="SelectedSummary"
+                     Grid.Column="0"
+                     Text="{Binding SelectedSummaryDisplay}"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     VerticalAlignment="Center"/>
+          <Button x:Name="InstallSelectedBtn"
+                  Grid.Column="1"
+                  Content="Install Selected"
+                  Classes="action-btn"
+                  Padding="16,8"
+                  Command="{Binding InstallSelectedCommand}"/>
+        </Grid>
+      </Border>
+
+      <!-- ═══ STATUS + PROGRESS + ERROR BANNER ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Content="Cancel"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege warning -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <TextBlock x:Name="PrivilegeWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource StatusWarningBrush}"
+                     TextWrapping="Wrap"/>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -71,7 +71,12 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.KernelCleaner.KernelCleanerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.KernelCleaner.KernelCleanerModule>());
-            AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
+            // Linux App Installer (Phase 4.3.5): same concrete + IOptimizationModule alias
+            // pattern as JournalCleaner / SnapFlatpakCleaner / KernelCleaner above — lets the
+            // VM inject the concrete module while keeping the engine-wide _moduleMap binding.
+            sc.AddSingleton<AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerModule>());
             // Snap/Flatpak Cleaner (Phase 4.3.2): same concrete + IOptimizationModule alias
             // pattern as JournalCleaner above — lets the VM inject the concrete module
             // (with its additive Last* count properties) while keeping the engine-wide
@@ -174,6 +179,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.4: Kernel Cleaner VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.KernelCleanerViewModel>();
+
+        // ── Phase 4.3.5: Linux App Installer VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.LinuxAppInstallerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

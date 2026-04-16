@@ -65,6 +65,10 @@
           <SolidColorBrush x:Key="AccentBgBrush" Color="#00D4AA0D"/>
           <SolidColorBrush x:Key="AccentBorderBrush" Color="#00D4AA20"/>
 
+          <!-- Action button (ported from V1 bridge 2026-04-16) -->
+          <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12FFFFFF"/>
+          <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#1500D4AA"/>
+
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
 
@@ -138,5 +142,21 @@
   </Style>
   <Style Selector="Button.section-nav-item:pointerover /template/ ContentPresenter">
     <Setter Property="Background" Value="#10FFFFFF" />
+  </Style>
+
+  <!-- ── ACTION BUTTON STYLE (ported from V1 bridge 2026-04-16) ─── -->
+  <Style Selector="Button.action-btn">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnBgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="12,9" />
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.action-btn:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnHoverBrush}" />
   </Style>
 </Styles>

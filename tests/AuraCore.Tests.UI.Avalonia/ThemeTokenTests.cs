@@ -99,4 +99,19 @@ public class ThemeTokenTests
             $"V2 theme missing ported brush: {key}");
         Assert.IsType<SolidColorBrush>(value);
     }
+
+    // Phase 5.1.2: Action button brushes ported from V1 bridge (AuraCoreTheme.axaml) into V2.
+    // The Button.action-btn style is referenced by 40+ views; moving it + these brushes to V2
+    // unblocks V1-bridge deletion later in Phase 5.1.
+    [AvaloniaTheory]
+    [InlineData("ActionBtnBgBrush")]
+    [InlineData("ActionBtnHoverBrush")]
+    public void V2_Ports_ActionButtonBrushes(string key)
+    {
+        var styles = LoadThemeV2();
+        Assert.True(
+            styles.Resources.TryGetResource(key, ThemeVariant.Dark, out var value),
+            $"V2 theme missing ported brush: {key}");
+        Assert.IsType<SolidColorBrush>(value);
+    }
 }

@@ -8,7 +8,9 @@ using global::Avalonia.Media;
 using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Domain.Enums;
+using AuraCore.UI.Avalonia.Views.Banners;
 using AuraCore.UI.Avalonia.Views.Dialogs;
 using AuraCore.UI.Avalonia.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +21,9 @@ public sealed partial class MainWindow : Window
 {
     private readonly Dictionary<string, IOptimizationModule> _moduleMap = new();
     private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm;
+
+    // Phase 5.2.0 Task 11: privilege helper availability banner
+    private readonly IHelperAvailabilityService? _helperAvailability;
 
     public MainWindow()
     {
@@ -42,6 +47,19 @@ public sealed partial class MainWindow : Window
                 _moduleMap[m.Id] = m;
         }
         catch { /* DI not available during design time */ }
+
+        // Phase 5.2.0 Task 11: resolve helper availability service and wire banner visibility
+        try
+        {
+            _helperAvailability = App.Services.GetRequiredService<IHelperAvailabilityService>();
+            SyncBannerVisibility();
+            _helperAvailability.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName is nameof(IHelperAvailabilityService.IsBannerVisible) or null)
+                    Dispatcher.UIThread.Post(SyncBannerVisibility);
+            };
+        }
+        catch { /* DI / design-time fallback — banner stays hidden */ }
 
         BuildNavigation();
         RefreshUserChip();
@@ -553,6 +571,26 @@ public sealed partial class MainWindow : Window
     {
         RefreshUserChip();
         RebuildSidebar();
+    }
+
+    // ─── PRIVILEGE BANNER HANDLERS (Phase 5.2.0 Task 11) ────────────
+
+    private void SyncBannerVisibility()
+    {
+        if (this.FindControl<PrivilegeHelperMissingBanner>("PrivilegeMissingBanner") is { } banner)
+            banner.IsVisible = _helperAvailability?.IsBannerVisible ?? false;
+    }
+
+    private void OnPrivilegeInstallNowClicked(object? sender, EventArgs e)
+    {
+        // Install invocation is wired in 5.2.1 Task 22. For 5.2.0, log + no-op.
+        // DO NOT throw — the UI action must remain safe.
+        System.Diagnostics.Debug.WriteLine("[privilege] install requested — pending 5.2.1 wiring");
+    }
+
+    private void OnPrivilegeDismissClicked(object? sender, EventArgs e)
+    {
+        _helperAvailability?.DismissBanner();
     }
 
     private sealed class RelayCommand : System.Windows.Input.ICommand

@@ -26,6 +26,24 @@
         </controls:ModuleHeader.Actions>
       </controls:ModuleHeader>
 
+      <!-- Info banner: Explorer restart notice (not a warning — just heads-up) -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource InfoBgBrush}"
+              BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1"
+              Padding="14,10">
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <TextBlock Text="&#x2139;"
+                     FontSize="{DynamicResource FontSizeBody}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock Text="Applying tweaks will restart Windows Explorer so the UI changes take effect. Any open Explorer windows will briefly close and reopen."
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
       <!-- Hidden bridge TextBlocks — code-behind writes stat counts via .Text -->
       <StackPanel IsVisible="False" Height="0">
         <TextBlock x:Name="TotalCount"    Text="--"/>

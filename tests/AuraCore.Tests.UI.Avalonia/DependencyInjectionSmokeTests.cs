@@ -191,7 +191,9 @@ public class DependencyInjectionSmokeTests
     public void GrubManagerViewModel_ResolvesFromContainer()
     {
         var sc = new ServiceCollection();
-        // Mirror App.axaml.cs Phase 4.3.6 block
+        // Mirror App.axaml.cs Phase 4.3.6 block.
+        // IShellCommandService is required since Phase 5.2.1.11c migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
         sc.AddSingleton<GrubManagerModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<GrubManagerModule>());
         sc.AddTransient<GrubManagerViewModel>();

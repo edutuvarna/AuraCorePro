@@ -1,4 +1,5 @@
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Module.DockerCleaner;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia;
@@ -85,5 +86,32 @@ public class DependencyInjectionSmokeTests
         Assert.NotNull(vm);
         Assert.Equal(0, vm.SnapDisabledCount);
         Assert.Equal(0, vm.FlatpakUnusedCount);
+    }
+
+    /// <summary>
+    /// Phase 4.3.3: DockerCleanerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void DockerCleanerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.3.3 block
+        sc.AddSingleton<DockerCleanerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<DockerCleanerModule>());
+        sc.AddTransient<DockerCleanerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<DockerCleanerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<DockerCleanerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.False(vm.DockerAvailable);
+        Assert.False(vm.VolumeRiskAcknowledged);
     }
 }

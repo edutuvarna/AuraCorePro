@@ -94,7 +94,10 @@ public partial class App : global::Avalonia.Application
         // ── Linux + macOS shared modules ──
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
-            AuraCore.Module.DockerCleaner.DockerCleanerRegistration.AddDockerCleanerModule(sc);
+            // Docker Cleaner (Phase 4.3.3): concrete first for VM injection, alias to IOptimizationModule.
+            sc.AddSingleton<AuraCore.Module.DockerCleaner.DockerCleanerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.DockerCleaner.DockerCleanerModule>());
         }
 
         // ── AI Analyzer Engine ──
@@ -160,6 +163,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.2: Snap/Flatpak Cleaner VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.SnapFlatpakCleanerViewModel>();
+
+        // ── Phase 4.3.3: Docker Cleaner VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.DockerCleanerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

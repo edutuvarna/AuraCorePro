@@ -216,7 +216,10 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         };
 
         if (OperatingSystem.IsLinux())
+        {
             items.Add(Module("cron-manager", "nav.cronManager", "linux"));
+            items.Add(Module("docker-cleaner", "nav.dockerCleaner", "linux"));
+        }
 
         if (OperatingSystem.IsMacOS())
             items.Add(Module("launchagent-manager", "nav.launchAgentManager", "macos"));

@@ -1,104 +1,172 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.BatteryOptimizerView">
   <ScrollViewer>
-    <StackPanel Spacing="12">
-      <Grid ColumnDefinitions="*,Auto,Auto">
-        <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Battery Optimizer" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock x:Name="SubText" Text="Monitor battery health and optimize power usage" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-        </StackPanel>
-        <Button Grid.Column="1" Classes="action-btn" Click="BatteryReport_Click" Padding="14,8" VerticalAlignment="Center" Margin="0,0,8,0">
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="&#x1F4CA;" FontSize="12"/>
-            <TextBlock Text="Battery Report" FontSize="11" FontWeight="SemiBold"/>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Battery Optimizer"
+                             Subtitle="Monitor battery health and optimize power usage">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="BatteryReport_Click"
+                    Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F4CA;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock Text="Battery Report"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="action-btn" Click="Scan_Click"
+                    Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
-        </Button>
-        <Button Grid.Column="2" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
-        </Button>
-      </Grid>
-      <!-- Battery Status -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden bridge for code-behind subtitle writes -->
+      <TextBlock x:Name="SubText"
+                 Text="Monitor battery health and optimize power usage"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 IsVisible="False"/>
+
+      <!-- Battery Status Card -->
+      <controls:GlassCard>
         <Grid ColumnDefinitions="Auto,*">
           <StackPanel Spacing="4" Margin="0,0,24,0">
-            <TextBlock x:Name="ChargePct" Text="--%"  FontSize="42" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-            <TextBlock x:Name="ChargeStatus" Text="" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
-            <TextBlock x:Name="EstRemaining" Text="" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <TextBlock x:Name="ChargePct" Text="--%"
+                       FontSize="42" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}"/>
+            <TextBlock x:Name="ChargeStatus" Text=""
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="EstRemaining" Text=""
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>
           <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*">
-            <StackPanel Spacing="2"><TextBlock Text="Health" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="HealthGrade" Text="--" FontSize="16" FontWeight="Bold"/></StackPanel>
-            <StackPanel Grid.Column="1" Spacing="2"><TextBlock Text="Wear" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="WearPct" Text="--%"  FontSize="16" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/></StackPanel>
-            <StackPanel Grid.Row="1" Spacing="2"><TextBlock Text="Design" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="DesignCap" Text="--" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
-            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2"><TextBlock Text="Full Charge" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock x:Name="FullCap" Text="--" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/></StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Text="Health"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="HealthGrade" Text="--"
+                         FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="2">
+              <TextBlock Text="Wear"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="WearPct" Text="--%"
+                         FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                         Foreground="{DynamicResource StatusWarningBrush}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Spacing="2">
+              <TextBlock Text="Design"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="DesignCap" Text="--"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
+              <TextBlock Text="Full Charge"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock x:Name="FullCap" Text="--"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
           </Grid>
         </Grid>
-      </Border>
-      <!-- Power Plans -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#1422C55E">
-          <TextBlock Text="&#x26A1;" FontSize="10" Foreground="#22C55E"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="Power Plans" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-      <ItemsControl x:Name="PlanList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,8">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid ColumnDefinitions="*,60">
-                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding ActiveLabel}" FontSize="10" FontWeight="Bold" Foreground="{Binding ActiveBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-              </Grid>
+      </controls:GlassCard>
+
+      <!-- Power Plans Card -->
+      <controls:GlassCard>
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6"
+                    Background="{DynamicResource StatusSuccessBgBrush}">
+              <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource StatusSuccessBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-      <!-- Drain Apps -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#1400D4AA">
-          <TextBlock Text="&#x1F50B;" FontSize="10" Foreground="#00D4AA"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="High Drain Apps" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-      <ItemsControl x:Name="DrainList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="14,8">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-              </Border.BorderBrush>
-              <Grid ColumnDefinitions="*,80,60">
-                <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Cpu}" FontSize="10" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBlock Grid.Column="2" Text="{Binding Impact}" FontSize="10" FontWeight="SemiBold" Foreground="{Binding ImpactBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-              </Grid>
+            <TextBlock Text="Power Plans"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="PlanList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}"
+                        BorderThickness="1" Padding="14,8"
+                        Background="{DynamicResource BgCardBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}">
+                  <Grid ColumnDefinitions="*,60">
+                    <TextBlock Text="{Binding Name}"
+                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding ActiveLabel}"
+                               FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                               Foreground="{Binding ActiveBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
+
+      <!-- High Drain Apps Card -->
+      <controls:GlassCard>
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="6"
+                    Background="{DynamicResource AccentBgBrush}">
+              <TextBlock Text="&#x1F50B;" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock Text="High Drain Apps"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="DrainList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}"
+                        BorderThickness="1" Padding="14,8"
+                        Background="{DynamicResource BgCardBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}">
+                  <Grid ColumnDefinitions="*,80,60">
+                    <TextBlock Text="{Binding Name}"
+                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Cpu}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource AccentBlueBrush}"
+                               VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Impact}"
+                               FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                               Foreground="{Binding ImpactBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

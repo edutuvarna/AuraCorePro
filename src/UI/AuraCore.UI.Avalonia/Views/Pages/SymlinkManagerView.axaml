@@ -1,23 +1,21 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.SymlinkManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Symlink Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Create, view, and delete symbolic links and junctions"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
-      </StackPanel>
+    <StackPanel Spacing="16">
 
-      <!-- Create New -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Symlink Manager"
+                             Subtitle="Create, view, and delete symbolic links and junctions">
+        <controls:ModuleHeader.Actions>
+          <!-- PageTitle: hidden bridge, code-behind writes localized string -->
+          <TextBlock x:Name="PageTitle" IsVisible="False"/>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Create New Link -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Border Width="16" Height="16" CornerRadius="4">
@@ -27,7 +25,7 @@
               <TextBlock Text="&#x2B06;" FontSize="8" Foreground="#3B82F6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Create New Link" FontSize="11" FontWeight="SemiBold"
+            <TextBlock Text="Create New Link" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ComboBox x:Name="LinkTypeCombo" SelectedIndex="0" Width="260">
@@ -40,18 +38,13 @@
           <TextBox x:Name="TargetPathBox" Watermark="Target path (what it points to)" Width="500"/>
           <Button Content="Create Link" Click="CreateLink_Click" Classes="action-btn" Padding="16,10"
                   HorizontalAlignment="Left"/>
-          <TextBlock x:Name="StatusText" Text="" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+          <TextBlock x:Name="StatusText" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
 
       <!-- Scan Existing -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -62,25 +55,27 @@
                 <TextBlock Text="&#x1F50D;" FontSize="8" Foreground="#3B82F6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Existing Links" FontSize="11" FontWeight="SemiBold"
+              <TextBlock Text="Existing Links" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <Button Content="Scan Directory" Click="Scan_Click" Grid.Column="1"
-                    Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
+                    Padding="12,6" Classes="action-btn"/>
           </Grid>
           <TextBox x:Name="ScanPathBox" Watermark="Directory to scan (e.g. C:\Users)" Width="500"/>
           <ItemsControl x:Name="LinkList"/>
-          <TextBlock x:Name="ScanStatus" Text="Enter a directory and click Scan" FontSize="12"
+          <TextBlock x:Name="ScanStatus" Text="Enter a directory and click Scan"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
 
       <!-- Info -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
         <TextBlock Text="Creating symbolic links requires administrator privileges on Windows."
-                   FontSize="12" Foreground="#F59E0B"/>
+                   FontSize="{DynamicResource FontSizeBodySmall}" Foreground="#F59E0B"/>
       </Border>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

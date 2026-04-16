@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AuraCore.PrivHelper.Linux</RootNamespace>
+    <AssemblyName>auracore-privhelper</AssemblyName>
+    <!-- Linux-only daemon; Windows dev boxes only need it to restore and compile.
+         Publish-time: dotnet publish -r linux-x64 -c Release -p:SelfContained=true -p:PublishSingleFile=true -->
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <PublishSingleFile Condition="'$(PublishSingleFile)' == ''">false</PublishSingleFile>
+    <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Tmds.DBus" Version="0.15.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.*" />
+  </ItemGroup>
+</Project>

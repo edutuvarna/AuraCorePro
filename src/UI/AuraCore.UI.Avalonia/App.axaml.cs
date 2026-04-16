@@ -144,11 +144,15 @@ public partial class App : global::Avalonia.Application
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.ModelManagerDialog>();
         sc.AddTransient<global::AuraCore.UI.Avalonia.Views.Dialogs.TierUpgradePlaceholderDialog>();
 
-        // SidebarViewModel with tier service (Phase 3: defaults to Free tier; Phase 5 wires real UserSession)
+        // SidebarViewModel with tier service.
+        // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module
+        // is reachable for manual QA. Phase 5 wires real UserSession.Tier lookup
+        // (keyed off the signed-in account's plan — admin@auracore.pro => Admin,
+        // other users => Free / Pro / Enterprise from their entitlement row).
         sc.AddSingleton<global::AuraCore.UI.Avalonia.ViewModels.SidebarViewModel>(sp =>
             new global::AuraCore.UI.Avalonia.ViewModels.SidebarViewModel(
                 sp.GetRequiredService<global::AuraCore.UI.Avalonia.Services.AI.ITierService>(),
-                currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Free));
+                currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Admin));
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();

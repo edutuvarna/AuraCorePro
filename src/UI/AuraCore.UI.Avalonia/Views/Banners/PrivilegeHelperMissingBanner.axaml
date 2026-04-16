@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Banners.PrivilegeHelperMissingBanner"
+             Background="{DynamicResource BgCardElevatedBrush}">
+  <Border Padding="12,8" CornerRadius="{StaticResource RadiusMd}"
+          BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="0,0,0,1">
+    <Grid ColumnDefinitions="*,Auto,Auto" VerticalAlignment="Center">
+      <TextBlock x:Name="BodyText"
+                 Grid.Column="0"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+      <Button x:Name="InstallNowButton" Classes="primary"
+              Grid.Column="1" Margin="8,0,4,0" />
+      <Button x:Name="DismissButton"
+              Grid.Column="2" />
+    </Grid>
+  </Border>
+</UserControl>

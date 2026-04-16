@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using AuraCore.UI.Avalonia.Views.Banners;
 using AuraCore.UI.Avalonia.Views.Dialogs;
 using FluentAssertions;
 
@@ -30,5 +31,14 @@ public class DialogRenderTests
         dialog.Should().NotBeNull();
         installFired.Should().BeFalse();
         cancelFired.Should().BeFalse();
+    }
+
+    [AvaloniaFact]
+    public void PrivilegeHelperMissingBanner_renders_with_install_and_dismiss_buttons()
+    {
+        var banner = new PrivilegeHelperMissingBanner();
+        banner.Should().NotBeNull();
+        banner.FindControl<Button>("InstallNowButton").Should().NotBeNull();
+        banner.FindControl<Button>("DismissButton").Should().NotBeNull();
     }
 }

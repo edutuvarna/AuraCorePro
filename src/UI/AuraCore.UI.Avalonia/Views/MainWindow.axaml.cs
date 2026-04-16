@@ -364,6 +364,7 @@ public sealed partial class MainWindow : Window
             "journal-cleaner" => CreateJournalCleanerView(),
             "snap-flatpak-cleaner" => CreateSnapFlatpakCleanerView(),
             "docker-cleaner" => CreateDockerCleanerView(),
+            "kernel-cleaner" => CreateKernelCleanerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -402,6 +403,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.DockerCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateKernelCleanerView()
+    {
+        var v = new Pages.KernelCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.KernelCleanerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

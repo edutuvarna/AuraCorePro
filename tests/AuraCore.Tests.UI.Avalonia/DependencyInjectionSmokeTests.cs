@@ -1,6 +1,7 @@
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.DockerCleaner;
 using AuraCore.Module.JournalCleaner;
+using AuraCore.Module.KernelCleaner;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
@@ -113,5 +114,33 @@ public class DependencyInjectionSmokeTests
         Assert.Null(vm.Report);
         Assert.False(vm.DockerAvailable);
         Assert.False(vm.VolumeRiskAcknowledged);
+    }
+
+    /// <summary>
+    /// Phase 4.3.4: KernelCleanerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void KernelCleanerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.3.4 block
+        sc.AddSingleton<KernelCleanerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<KernelCleanerModule>());
+        sc.AddTransient<KernelCleanerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<KernelCleanerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<KernelCleanerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Null(vm.Report);
+        Assert.False(vm.PackageManagerAvailable);
+        Assert.False(vm.DangerAcknowledged);
+        Assert.Empty(vm.KernelItems);
     }
 }

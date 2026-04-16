@@ -65,7 +65,12 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.JournalCleaner.JournalCleanerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.JournalCleaner.JournalCleanerModule>());
-            AuraCore.Module.KernelCleaner.KernelCleanerRegistration.AddKernelCleanerModule(sc);
+            // Kernel Cleaner (Phase 4.3.4): same concrete + IOptimizationModule alias
+            // pattern as JournalCleaner / SnapFlatpakCleaner above — lets the VM inject
+            // the concrete module while keeping the engine-wide _moduleMap binding intact.
+            sc.AddSingleton<AuraCore.Module.KernelCleaner.KernelCleanerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.KernelCleaner.KernelCleanerModule>());
             AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
             // Snap/Flatpak Cleaner (Phase 4.3.2): same concrete + IOptimizationModule alias
             // pattern as JournalCleaner above — lets the VM inject the concrete module
@@ -166,6 +171,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.3: Docker Cleaner VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.DockerCleanerViewModel>();
+
+        // ── Phase 4.3.4: Kernel Cleaner VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.KernelCleanerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

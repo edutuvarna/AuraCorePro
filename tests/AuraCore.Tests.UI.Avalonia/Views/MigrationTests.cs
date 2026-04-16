@@ -44,4 +44,17 @@ public class MigrationTests
         Assert.NotNull(view);
         Assert.NotNull(view.Content);
     }
+
+    [AvaloniaFact]
+    public void V1Bridge_IsNotMergedIntoApplication()
+    {
+        // Pick a V1-unique key that we explicitly did NOT port to V2
+        // (e.g., OrbitalCoreLogo — used by no one, so not ported).
+        // After Phase 5.1.9 it must not resolve.
+        var app = global::Avalonia.Application.Current;
+        Assert.NotNull(app);
+        var found = app!.TryGetResource("OrbitalCoreLogo", global::Avalonia.Styling.ThemeVariant.Dark, out _);
+        Assert.False(found,
+            "OrbitalCoreLogo leaked from the deleted V1 bridge — bridge deletion incomplete.");
+    }
 }

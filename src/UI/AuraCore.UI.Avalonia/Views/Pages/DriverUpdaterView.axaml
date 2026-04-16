@@ -1,146 +1,181 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DriverUpdaterView">
-  <Grid RowDefinitions="Auto,Auto,*,Auto">
-    <!-- Header -->
-    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Driver Updater" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubText" Text="Scan, analyze, and backup system drivers"
-                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-      </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Backup_Click"
-              VerticalAlignment="Center" Padding="12,8" Margin="0,0,8,0">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F4BE;" FontSize="12"/>
-          <TextBlock x:Name="BackupLabel" Text="Backup Drivers" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-      <Button Grid.Column="2" Classes="action-btn" Click="Scan_Click"
-              VerticalAlignment="Center" Padding="12,8">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F50D;" FontSize="12"/>
-          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-    </Grid>
+  <ScrollViewer>
+    <StackPanel Spacing="16">
 
-    <!-- Stats -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid ColumnDefinitions="*,*,*,*">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
-            <Border.Background>
-              <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
-            </Border.Background>
-            <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#F59E0B"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-          </Border>
-          <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalDrivers" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="#F59E0B" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Current:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="CurrentDrivers" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Outdated:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="OutdatedDrivers" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Problems:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="ProblemDrivers" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-      </Grid>
-    </Border>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Driver Updater"
+                             Subtitle="Scan, analyze, and backup system drivers">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Backup_Click"
+                    VerticalAlignment="Center" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F4BE;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="BackupLabel" Text="Backup Drivers"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <Button Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
 
-    <!-- Driver List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            BorderThickness="1" Padding="4">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid RowDefinitions="Auto,*">
-        <Border Padding="12,8" CornerRadius="8,8,0,0">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
-          </Border.Background>
-          <Grid ColumnDefinitions="2*,*,100,100,80">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <Border Width="16" Height="16" CornerRadius="4">
-                <Border.Background>
-                  <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
-                </Border.Background>
-                <TextBlock Text="&#x2699;" FontSize="8" Foreground="#F59E0B"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
-              <TextBlock Text="DEVICE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-            </StackPanel>
-            <TextBlock Grid.Column="1" Text="MANUFACTURER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="2" Text="VERSION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="3" Text="DATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="4" Text="STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-          </Grid>
-        </Border>
-        <ScrollViewer Grid.Row="1">
-          <ItemsControl x:Name="DriverList">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Border Padding="12,6" Margin="2,1" CornerRadius="6">
+      <!-- Hidden bridge for code-behind subtitle writes -->
+      <TextBlock x:Name="SubText"
+                 Text="Scan, analyze, and backup system drivers"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 IsVisible="False"/>
+
+      <!-- Stats Card -->
+      <controls:GlassCard>
+        <Grid ColumnDefinitions="*,*,*,*">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
+              <Border.Background>
+                <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
+              </Border.Background>
+              <TextBlock Text="&#x25CF;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Total:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalDrivers" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="#F59E0B" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Current:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="CurrentDrivers" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Outdated:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="OutdatedDrivers" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Problems:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="ProblemDrivers" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Grid>
+      </controls:GlassCard>
+
+      <!-- Driver List Card -->
+      <controls:GlassCard>
+        <Grid RowDefinitions="Auto,*">
+          <!-- Column Headers -->
+          <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
+            <Grid ColumnDefinitions="2*,*,100,100,80">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="16" Height="16" CornerRadius="4">
                   <Border.Background>
-                    <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                    <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
                   </Border.Background>
-                  <Grid ColumnDefinitions="2*,*,100,100,80">
-                    <StackPanel VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
-                                 Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                      <TextBlock Text="{Binding Class}" FontSize="9"
-                                 Foreground="{DynamicResource TextMutedBrush}"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="1" Text="{Binding Mfr}" FontSize="10"
-                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" Text="{Binding Version}" FontSize="10"
-                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                    <TextBlock Grid.Column="3" Text="{Binding Date}" FontSize="10"
-                               Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                    <Border Grid.Column="4" CornerRadius="8" Padding="6,2"
-                            Background="{Binding StatusBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Status}" FontSize="9" FontWeight="SemiBold"
-                                 Foreground="{Binding StatusFg}"/>
-                    </Border>
-                  </Grid>
+                  <TextBlock Text="&#x2699;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </ScrollViewer>
-      </Grid>
-    </Border>
+                <TextBlock Text="DEVICE"
+                           FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="MANUFACTURER"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}"/>
+              <TextBlock Grid.Column="2" Text="VERSION"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+              <TextBlock Grid.Column="3" Text="DATE"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+              <TextBlock Grid.Column="4" Text="STATUS"
+                         FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
+            </Grid>
+          </Border>
+          <!-- Driver rows -->
+          <ScrollViewer Grid.Row="1">
+            <ItemsControl x:Name="DriverList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Padding="12,6" Margin="2,1" CornerRadius="6">
+                    <Border.Background>
+                      <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
+                    </Border.Background>
+                    <Grid ColumnDefinitions="2*,*,100,100,80">
+                      <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding Class}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding Mfr}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                                 TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Grid.Column="2" Text="{Binding Version}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                                 TextAlignment="Center"/>
+                      <TextBlock Grid.Column="3" Text="{Binding Date}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"
+                                 TextAlignment="Center"/>
+                      <Border Grid.Column="4" CornerRadius="8" Padding="6,2"
+                              Background="{Binding StatusBg}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Status}"
+                                   FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                                   Foreground="{Binding StatusFg}"/>
+                      </Border>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </controls:GlassCard>
 
-    <!-- Bottom: WinUpdate + DevMgr -->
-    <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*" Margin="0,12,0,0">
-      <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8" Margin="0,0,8,0">
-        <TextBlock Text="Open Windows Update" FontSize="11" FontWeight="SemiBold"/>
-      </Button>
-      <Button Grid.Column="1" Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
-        <TextBlock Text="Open Device Manager" FontSize="11" FontWeight="SemiBold"/>
-      </Button>
-    </Grid>
-  </Grid>
+      <!-- Bottom Actions Card -->
+      <controls:GlassCard>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8">
+            <TextBlock Text="Open Windows Update"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+          </Button>
+          <Button Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
+            <TextBlock Text="Open Device Manager"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+          </Button>
+        </StackPanel>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

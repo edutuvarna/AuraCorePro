@@ -10,10 +10,14 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.12.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Avalonia" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.7" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\UI\AuraCore.UI.Avalonia\AuraCore.UI.Avalonia.csproj" />
     <ProjectReference Include="../../src/Core/AuraCore.Application/AuraCore.Application.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Configuration/AuraCore.Platform.Configuration.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj" />

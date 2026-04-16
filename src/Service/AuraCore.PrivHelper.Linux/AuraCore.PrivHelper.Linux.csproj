@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Tmds.DBus" Version="0.15.*" />
+    <PackageReference Include="Tmds.DBus" Version="0.92.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.*" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.*" />
   </ItemGroup>

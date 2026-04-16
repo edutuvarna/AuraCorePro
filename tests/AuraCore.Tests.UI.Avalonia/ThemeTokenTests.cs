@@ -75,4 +75,28 @@ public class ThemeTokenTests
             $"Font size token '{key}' not found.");
         Assert.Equal(expected, Assert.IsType<double>(value));
     }
+
+    // Phase 5.1.1: Semantic tinted bg/border brushes ported from V1 bridge (AuraCoreTheme.axaml)
+    // into V2 so the bridge can be deleted in a later Phase 5.1 step. Loading V2 styles in
+    // isolation (not via Application.Current) guarantees these keys must exist *in V2 itself*,
+    // not merely be reachable via the still-merged V1 dictionary.
+    [AvaloniaTheory]
+    [InlineData("SuccessBgBrush")]
+    [InlineData("SuccessBorderBrush")]
+    [InlineData("WarningBgBrush")]
+    [InlineData("WarningBorderBrush")]
+    [InlineData("ErrorBgBrush")]
+    [InlineData("ErrorBorderBrush")]
+    [InlineData("InfoBgBrush")]
+    [InlineData("InfoBorderBrush")]
+    [InlineData("AccentBgBrush")]
+    [InlineData("AccentBorderBrush")]
+    public void V2_Ports_SemanticTintBrushes(string key)
+    {
+        var styles = LoadThemeV2();
+        Assert.True(
+            styles.Resources.TryGetResource(key, ThemeVariant.Dark, out var value),
+            $"V2 theme missing ported brush: {key}");
+        Assert.IsType<SolidColorBrush>(value);
+    }
 }

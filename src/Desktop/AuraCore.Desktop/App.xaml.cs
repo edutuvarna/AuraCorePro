@@ -27,7 +27,7 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var sc = new ServiceCollection();
+        var sc = AppBootstrapper.CreateServices();
 
         // ── Cross-platform modules (register on ALL platforms) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);

@@ -94,7 +94,7 @@ public partial class FirewallRulesView : UserControl
                                     Foreground = new SolidColorBrush(Color.Parse("#8888A0")) }
                             }},
                             new Border { [Grid.ColumnProperty] = 2, CornerRadius = new global::Avalonia.CornerRadius(4),
-                                Background = new SolidColorBrush(Color.Parse($"20{actionColor[1..]}")),
+                                Background = new SolidColorBrush(Color.Parse($"#20{actionColor[1..]}")),
                                 Padding = new global::Avalonia.Thickness(8,3), Margin = new global::Avalonia.Thickness(8,0),
                                 VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                                 Child = new TextBlock { Text = r.Action, FontSize = 10, FontWeight = FontWeight.SemiBold,

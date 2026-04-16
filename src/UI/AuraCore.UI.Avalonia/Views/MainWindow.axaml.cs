@@ -362,6 +362,7 @@ public sealed partial class MainWindow : Window
             "admin-panel" => new Pages.AdminPanelView(),
             "storage-compression" => new Pages.GenericModuleView(), // placeholder — feature dev deferred
             "journal-cleaner" => CreateJournalCleanerView(),
+            "snap-flatpak-cleaner" => CreateSnapFlatpakCleanerView(),
             _ => new Pages.DashboardView(),
         };
     }
@@ -378,6 +379,17 @@ public sealed partial class MainWindow : Window
         try
         {
             v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.JournalCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateSnapFlatpakCleanerView()
+    {
+        var v = new Pages.SnapFlatpakCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SnapFlatpakCleanerViewModel>();
         }
         catch { /* design-time fallback: Loaded handler will try again */ }
         return v;

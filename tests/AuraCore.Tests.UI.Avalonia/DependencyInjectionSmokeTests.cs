@@ -1,5 +1,6 @@
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.JournalCleaner;
+using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -58,5 +59,31 @@ public class DependencyInjectionSmokeTests
         var vm = sp.GetRequiredService<JournalCleanerViewModel>();
         Assert.NotNull(vm);
         Assert.Null(vm.Report);
+    }
+
+    /// <summary>
+    /// Phase 4.3.2: SnapFlatpakCleanerViewModel must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule, then the VM as transient.
+    /// </summary>
+    [Fact]
+    public void SnapFlatpakCleanerViewModel_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 4.3.2 block
+        sc.AddSingleton<SnapFlatpakCleanerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SnapFlatpakCleanerModule>());
+        sc.AddTransient<SnapFlatpakCleanerViewModel>();
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<SnapFlatpakCleanerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+
+        var vm = sp.GetRequiredService<SnapFlatpakCleanerViewModel>();
+        Assert.NotNull(vm);
+        Assert.Equal(0, vm.SnapDisabledCount);
+        Assert.Equal(0, vm.FlatpakUnusedCount);
     }
 }

@@ -148,6 +148,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         {
             items.Add(Module("package-cleaner", "nav.packageCleaner", "linux"));
             items.Add(Module("journal-cleaner", "nav.journalCleaner", "linux"));
+            items.Add(Module("snap-flatpak-cleaner", "nav.snapFlatpakCleaner", "linux"));
         }
 
         return items;

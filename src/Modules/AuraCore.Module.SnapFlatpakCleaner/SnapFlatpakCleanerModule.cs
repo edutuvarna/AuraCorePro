@@ -16,6 +16,15 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     public RiskLevel Risk => RiskLevel.Low;
     public SupportedPlatform Platform => SupportedPlatform.Linux;
 
+    // Phase 4.3.2 UI exposure — additive: last scan results, populated by ScanAsync.
+    // ViewModel reads these to render per-category stats ("-- " when unavailable)
+    // without needing to shell out on its own. Kept as properties with private setters
+    // to mirror the JournalCleanerModule.LastReport pattern.
+    public int LastDisabledSnapCount { get; private set; }
+    public int LastUnusedFlatpakCount { get; private set; }
+    public bool LastSnapAvailable { get; private set; }
+    public bool LastFlatpakAvailable { get; private set; }
+
     /// <summary>
     /// Validates snap package names and flatpak application IDs.
     /// Allows alphanumeric characters, dashes, dots, and underscores.
@@ -33,17 +42,25 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
 
             // 1. Check for disabled snap revisions
             bool hasSnap = await ProcessRunner.CommandExistsAsync("snap", ct);
+            LastSnapAvailable = hasSnap;
+            int snapCount = 0;
             if (hasSnap)
             {
-                totalItems += await CountDisabledSnapsAsync(ct);
+                snapCount = await CountDisabledSnapsAsync(ct);
+                totalItems += snapCount;
             }
+            LastDisabledSnapCount = snapCount;
 
             // 2. Check for unused flatpak runtimes
             bool hasFlatpak = await ProcessRunner.CommandExistsAsync("flatpak", ct);
+            LastFlatpakAvailable = hasFlatpak;
+            int flatpakCount = 0;
             if (hasFlatpak)
             {
-                totalItems += await CountUnusedFlatpaksAsync(ct);
+                flatpakCount = await CountUnusedFlatpaksAsync(ct);
+                totalItems += flatpakCount;
             }
+            LastUnusedFlatpakCount = flatpakCount;
 
             if (!hasSnap && !hasFlatpak)
             {

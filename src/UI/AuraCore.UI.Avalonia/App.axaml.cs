@@ -67,7 +67,13 @@ public partial class App : global::Avalonia.Application
                 sp => sp.GetRequiredService<AuraCore.Module.JournalCleaner.JournalCleanerModule>());
             AuraCore.Module.KernelCleaner.KernelCleanerRegistration.AddKernelCleanerModule(sc);
             AuraCore.Module.LinuxAppInstaller.LinuxAppInstallerRegistration.AddLinuxAppInstallerModule(sc);
-            AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerRegistration.AddSnapFlatpakCleanerModule(sc);
+            // Snap/Flatpak Cleaner (Phase 4.3.2): same concrete + IOptimizationModule alias
+            // pattern as JournalCleaner above — lets the VM inject the concrete module
+            // (with its additive Last* count properties) while keeping the engine-wide
+            // _moduleMap binding intact.
+            sc.AddSingleton<AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerModule>();
+            sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
+                sp => sp.GetRequiredService<AuraCore.Module.SnapFlatpakCleaner.SnapFlatpakCleanerModule>());
             AuraCore.Module.GrubManager.GrubManagerRegistration.AddGrubManagerModule(sc);
         }
 
@@ -151,6 +157,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 4.3.1: Journal Cleaner VM ──
         sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.JournalCleanerViewModel>();
+
+        // ── Phase 4.3.2: Snap/Flatpak Cleaner VM ──
+        sc.AddTransient<global::AuraCore.UI.Avalonia.ViewModels.SnapFlatpakCleanerViewModel>();
 
         // SidebarViewModel with tier service.
         // Phase 4.2 interim: defaults to Admin (bypasses all locks) so every module

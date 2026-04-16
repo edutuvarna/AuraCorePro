@@ -1048,6 +1048,7 @@ public static class LocalizationService
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Manager",
         ["nav.journalCleaner"] = "Journal Cleaner",
+        ["nav.snapFlatpakCleaner"] = "Snap / Flatpak Cleaner",
 
         // Phase 4.3.1 Journal Cleaner (Linux)
         ["journalCleaner.subtitle"] = "Clean systemd journal logs and manage disk usage",
@@ -1067,6 +1068,23 @@ public static class LocalizationService
         ["journalCleaner.status.error"] = "Error: {0}",
         ["journalCleaner.status.unavailable"] = "journalctl not available. This module requires systemd-journald.",
         ["journalCleaner.warning.privilege"] = "Some operations require admin group membership or sudo. Run AuraCore with appropriate privileges if vacuum fails.",
+
+        // Phase 4.3.2 Snap/Flatpak Cleaner (Linux)
+        ["snapFlatpakCleaner.subtitle"] = "Remove disabled snap revisions and unused flatpak runtimes",
+        ["snapFlatpakCleaner.stat.snap"] = "Disabled Snaps",
+        ["snapFlatpakCleaner.stat.flatpak"] = "Unused Flatpaks",
+        ["snapFlatpakCleaner.action.scan"] = "Scan",
+        ["snapFlatpakCleaner.action.cancel"] = "Cancel",
+        ["snapFlatpakCleaner.action.cleanSnap"] = "Clean disabled snaps",
+        ["snapFlatpakCleaner.action.cleanFlatpak"] = "Clean unused flatpaks",
+        ["snapFlatpakCleaner.action.cleanBoth"] = "Clean both",
+        ["snapFlatpakCleaner.status.idle"] = "Ready to scan",
+        ["snapFlatpakCleaner.status.scanning"] = "Scanning snap and flatpak...",
+        ["snapFlatpakCleaner.status.cleaning"] = "Cleaning...",
+        ["snapFlatpakCleaner.status.done"] = "Complete. Cleaned {0} items.",
+        ["snapFlatpakCleaner.status.error"] = "Error: {0}",
+        ["snapFlatpakCleaner.status.unavailable"] = "Neither snap nor flatpak is installed.",
+        ["snapFlatpakCleaner.warning.privilege"] = "Snap removal requires sudo. Run AuraCore with privileges, or use 'sudo snap remove' directly from a terminal.",
 
         // ── macOS-only Modules ──
         ["nav.macosTools"] = "MACOS TOOLS",
@@ -2209,6 +2227,7 @@ public static class LocalizationService
         ["nav.swapOptimizer"] = "Swap Optimizer",
         ["nav.cronManager"] = "Cron Yoneticisi",
         ["nav.journalCleaner"] = "Günlük Temizleyici",
+        ["nav.snapFlatpakCleaner"] = "Snap / Flatpak Temizleyici",
 
         // Phase 4.3.1 Journal Cleaner (Linux)
         ["journalCleaner.subtitle"] = "Systemd günlük kayıtlarını temizle, disk kullanımını yönet",
@@ -2228,6 +2247,23 @@ public static class LocalizationService
         ["journalCleaner.status.error"] = "Hata: {0}",
         ["journalCleaner.status.unavailable"] = "journalctl kullanılamıyor. Bu modül systemd-journald gerektirir.",
         ["journalCleaner.warning.privilege"] = "Bazı işlemler admin grubu üyeliği veya sudo gerektirir. Vakum başarısız olursa AuraCore'u uygun yetkilerle çalıştırın.",
+
+        // Phase 4.3.2 Snap/Flatpak Cleaner (Linux)
+        ["snapFlatpakCleaner.subtitle"] = "Devre dışı snap sürümlerini ve kullanılmayan flatpak kütüphanelerini kaldır",
+        ["snapFlatpakCleaner.stat.snap"] = "Devre Dışı Snap'ler",
+        ["snapFlatpakCleaner.stat.flatpak"] = "Kullanılmayan Flatpak'lar",
+        ["snapFlatpakCleaner.action.scan"] = "Tara",
+        ["snapFlatpakCleaner.action.cancel"] = "İptal",
+        ["snapFlatpakCleaner.action.cleanSnap"] = "Devre dışı snap'leri temizle",
+        ["snapFlatpakCleaner.action.cleanFlatpak"] = "Kullanılmayan flatpak'ları temizle",
+        ["snapFlatpakCleaner.action.cleanBoth"] = "Her ikisini de temizle",
+        ["snapFlatpakCleaner.status.idle"] = "Taramaya hazır",
+        ["snapFlatpakCleaner.status.scanning"] = "Snap ve flatpak taranıyor...",
+        ["snapFlatpakCleaner.status.cleaning"] = "Temizleniyor...",
+        ["snapFlatpakCleaner.status.done"] = "Tamamlandı. {0} öğe temizlendi.",
+        ["snapFlatpakCleaner.status.error"] = "Hata: {0}",
+        ["snapFlatpakCleaner.status.unavailable"] = "Snap veya flatpak kurulu değil.",
+        ["snapFlatpakCleaner.warning.privilege"] = "Snap kaldırma işlemi sudo gerektirir. AuraCore'u yetkili kullanıcı olarak çalıştırın veya terminalden 'sudo snap remove' komutunu kullanın.",
 
         // ── macOS-only Modules ──
         ["nav.macosTools"] = "MACOS ARACLARI",

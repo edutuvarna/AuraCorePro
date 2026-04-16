@@ -1,30 +1,45 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DnsBenchmarkView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="DNS Benchmark" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Test DNS servers and find the fastest one for your connection"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
-      </StackPanel>
-      <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource BgCardBrush}"
-              BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" Padding="16">
+    <StackPanel Spacing="16">
+
+      <controls:ModuleHeader Title="DNS Benchmark"
+                             Subtitle="Test DNS servers and find the fastest one for your connection">
+        <controls:ModuleHeader.Actions>
+          <TextBlock x:Name="PageTitle" IsVisible="False" />
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="DNS Servers" FontSize="13" FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-            <Button x:Name="BenchBtn" Content="Run Benchmark" Click="Bench_Click" Grid.Column="1"
-                    Classes="action-btn" Padding="16,8"/>
+            <TextBlock Text="DNS Servers"
+                       FontSize="{DynamicResource FontSizeBody}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       VerticalAlignment="Center" />
+            <Button x:Name="BenchBtn"
+                    Grid.Column="1"
+                    Content="Run Benchmark"
+                    Click="Bench_Click"
+                    Classes="action-btn"
+                    Padding="16,8" />
           </Grid>
-          <TextBlock x:Name="SubText" Text="Click Run Benchmark to test popular DNS servers" FontSize="12"
-                     Foreground="{DynamicResource TextMutedBrush}"/>
-          <ItemsControl x:Name="DnsList"/>
-          <TextBlock x:Name="RecommendText" Text="" FontSize="13" FontWeight="SemiBold"
-                     Foreground="{DynamicResource SuccessBrush}"/>
+          <TextBlock x:Name="SubText"
+                     Text="Click Run Benchmark to test popular DNS servers"
+                     FontSize="{DynamicResource FontSizeBody}"
+                     Foreground="{DynamicResource TextMutedBrush}" />
+          <ItemsControl x:Name="DnsList" />
+          <TextBlock x:Name="RecommendText"
+                     Text=""
+                     FontSize="{DynamicResource FontSizeBody}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource StatusSuccessBrush}" />
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

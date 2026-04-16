@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>AuraCorePro</vendor>
+  <vendor_url>https://auracore.pro</vendor_url>
+
+  <action id="pro.auracore.privhelper.journal">
+    <description>Manage systemd journal cleanup</description>
+    <message>AuraCorePro needs to clean the systemd journal on your system.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="pro.auracore.privhelper.snap-flatpak">
+    <description>Remove Snap/Flatpak packages</description>
+    <message>AuraCorePro needs to remove Snap or Flatpak packages on your system.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="pro.auracore.privhelper.docker">
+    <description>Prune Docker resources</description>
+    <message>AuraCorePro needs to prune unused Docker images, containers and volumes.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="pro.auracore.privhelper.kernel">
+    <description>Remove old kernel packages</description>
+    <message>AuraCorePro needs to remove unused Linux kernel packages.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="pro.auracore.privhelper.app-installer">
+    <description>Install or remove applications</description>
+    <message>AuraCorePro needs to install or remove an application on your system.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="pro.auracore.privhelper.grub">
+    <description>Edit or rebuild GRUB bootloader configuration</description>
+    <message>AuraCorePro needs to edit or rebuild the GRUB bootloader configuration.</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

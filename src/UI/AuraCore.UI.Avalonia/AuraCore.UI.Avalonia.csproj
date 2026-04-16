@@ -29,6 +29,11 @@
     <ProjectReference Include="..\..\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj" />
   </ItemGroup>
 
+  <!-- Infrastructure (Phase 5.2.1.10: PrivHelperInstaller wiring) -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+  </ItemGroup>
+
   <!-- Engines -->
   <ItemGroup>
     <ProjectReference Include="..\..\Engines\AuraCore.Engine.AIAnalyzer\AuraCore.Engine.AIAnalyzer.csproj" />

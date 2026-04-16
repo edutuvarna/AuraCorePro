@@ -31,6 +31,11 @@ public static class ServiceCollectionExtensions
         {
             services.AddSingleton<IPrivHelperConnectionFactory, DefaultPrivHelperConnectionFactory>();
             services.AddSingleton<IShellCommandService, LinuxShellCommandService>();
+
+            // Phase 5.2.1.10: installer wiring — Linux-only
+            services.AddSingleton<IPkexecInvoker, DefaultPkexecInvoker>();
+            services.AddSingleton<IDaemonBinaryLocator, DefaultDaemonBinaryLocator>();
+            services.AddSingleton<PrivHelperInstaller>();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             services.AddSingleton<IShellCommandService, MacOSShellCommandService>();

@@ -581,11 +581,28 @@ public sealed partial class MainWindow : Window
             banner.IsVisible = _helperAvailability?.IsBannerVisible ?? false;
     }
 
-    private void OnPrivilegeInstallNowClicked(object? sender, EventArgs e)
+    private async void OnPrivilegeInstallNowClicked(object? sender, EventArgs e)
     {
-        // Install invocation is wired in 5.2.1 Task 22. For 5.2.0, log + no-op.
-        // DO NOT throw — the UI action must remain safe.
-        System.Diagnostics.Debug.WriteLine("[privilege] install requested — pending 5.2.1 wiring");
+        // Phase 5.2.1 Task 22: resolve installer (may be null on Windows/macOS — coordinator handles it)
+        var installer = App.Services?.GetService<AuraCore.Infrastructure.PrivilegeIpc.Linux.PrivHelperInstaller>();
+        var availability = App.Services?.GetService<IHelperAvailabilityService>();
+
+        if (availability is null)
+        {
+            System.Diagnostics.Debug.WriteLine("[privilege] IHelperAvailabilityService not resolvable; aborting install");
+            return;
+        }
+
+        var outcome = await PrivilegeInstallCoordinator.RunInstallFlowAsync(installer, availability);
+        if (outcome.Success)
+        {
+            System.Diagnostics.Debug.WriteLine("[privilege] install succeeded: " + outcome.Stdout.Trim());
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[privilege] install failed (exit={outcome.ExitCode}): {outcome.Stderr.Trim()}");
+        }
     }
 
     private void OnPrivilegeDismissClicked(object? sender, EventArgs e)

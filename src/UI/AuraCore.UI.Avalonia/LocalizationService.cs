@@ -1509,6 +1509,21 @@ public static class LocalizationService
         ["nav.module.launchagent-manager"] = "Launch Agent Manager",
         ["nav.module.brew-manager"] = "Brew Manager",
         ["nav.module.timemachine-manager"] = "Time Machine Manager",
+
+        // ── Privilege Helper ──
+        ["privilege.install.dialog_title"] = "Install privilege helper",
+        ["privilege.install.dialog_body"] = "AuraCorePro needs to install a small helper service ({helperName}) to run system-level commands on your behalf. You will be asked for your admin password. Continue?",
+        ["privilege.install.btn_install"] = "Install",
+        ["privilege.install.btn_cancel"] = "Cancel",
+        ["privilege.install.in_progress"] = "Installing helper…",
+        ["privilege.install.success"] = "Helper installed successfully.",
+        ["privilege.install.failed"] = "Helper install failed: {reason}",
+        ["privilege.denied.title"] = "Permission denied",
+        ["privilege.denied.body"] = "You declined the admin-password prompt. The action was not performed.",
+        ["privilege.denied.btn_retry"] = "Retry",
+        ["privilege.missing.banner_text"] = "Privilege helper is not installed. Some modules can't perform system changes.",
+        ["privilege.missing.btn_install_now"] = "Install now",
+        ["privilege.missing.btn_dismiss"] = "Dismiss",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -2958,6 +2973,21 @@ public static class LocalizationService
         ["nav.module.launchagent-manager"] = "Launch Agent Yöneticisi",
         ["nav.module.brew-manager"] = "Brew Yöneticisi",
         ["nav.module.timemachine-manager"] = "Time Machine Yöneticisi",
+
+        // ── Privilege Helper ──
+        ["privilege.install.dialog_title"] = "Ayrıcalık yardımcısını yükle",
+        ["privilege.install.dialog_body"] = "AuraCorePro, sistem komutlarını sizin adınıza çalıştırmak için küçük bir yardımcı servis ({helperName}) yüklemelidir. Yönetici parolanız istenecek. Devam edilsin mi?",
+        ["privilege.install.btn_install"] = "Yükle",
+        ["privilege.install.btn_cancel"] = "İptal",
+        ["privilege.install.in_progress"] = "Yardımcı yükleniyor…",
+        ["privilege.install.success"] = "Yardımcı başarıyla yüklendi.",
+        ["privilege.install.failed"] = "Yardımcı yüklenemedi: {reason}",
+        ["privilege.denied.title"] = "İzin reddedildi",
+        ["privilege.denied.body"] = "Yönetici parolası istemini reddettiniz. İşlem gerçekleştirilmedi.",
+        ["privilege.denied.btn_retry"] = "Tekrar dene",
+        ["privilege.missing.banner_text"] = "Ayrıcalık yardımcısı yüklü değil. Bazı modüller sistem değişikliği yapamayabilir.",
+        ["privilege.missing.btn_install_now"] = "Şimdi yükle",
+        ["privilege.missing.btn_dismiss"] = "Kapat",
     };
 
     private static void Save()

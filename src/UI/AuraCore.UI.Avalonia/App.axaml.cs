@@ -2,6 +2,7 @@ using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Markup.Xaml;
 using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Desktop.Services.PrivilegeIpc;
+using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,9 @@ public partial class App : global::Avalonia.Application
         // IHelperAvailabilityService drives the PrivilegeHelperMissingBanner in MainWindow.
         sc.AddPrivilegeIpc();
         sc.AddSingleton<IHelperAvailabilityService, HelperAvailabilityService>();
+
+        // ── Phase 5.3: Narrow-mode responsive service ──
+        sc.AddSingleton<INarrowModeService, NarrowModeService>();
 
         // ── Cross-platform modules (Windows + Linux + macOS) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);

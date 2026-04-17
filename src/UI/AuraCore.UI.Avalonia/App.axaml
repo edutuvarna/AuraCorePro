@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:AuraCore.UI.Avalonia.Converters"
              x:Class="AuraCore.UI.Avalonia.App"
              RequestedThemeVariant="Dark">
 
@@ -8,4 +9,13 @@
     <StyleInclude Source="avares://AuraCore.Pro/Themes/AuraCoreThemeV2.axaml"/>
     <StyleInclude Source="avares://AuraCore.Pro/Themes/Icons.axaml"/>
   </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <!-- Phase 5.3 narrow-mode converters -->
+      <conv:BoundsToIsNarrowModeConverter x:Key="BoundsToIsNarrowModeConverter" />
+      <conv:NarrowToColumnCountConverter  x:Key="NarrowToColumnCountConverter" />
+    </ResourceDictionary>
+  </Application.Resources>
+
 </Application>

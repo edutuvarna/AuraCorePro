@@ -1044,6 +1044,12 @@ public static class LocalizationService
         ["aiChat.experimentalBadge"] = "EXPERIMENTAL",
         ["aiChat.experimentalWarning"] = "This feature is experimental. Responses may be inaccurate. For reliable AI-powered analysis, use the AI Insights page.",
 
+        // ── Chat model reload (Phase 5 debt A1) ──
+        ["chat.reload.success"]   = "Model reloaded",
+        ["chat.reload.cancelled"] = "Model reload cancelled",
+        ["chat.reload.busy"]      = "Another reload is in progress",
+        ["chat.reload.failed"]    = "Model reload failed",
+
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Environment Variables",
         ["nav.firewallRules"] = "Firewall Rules",
@@ -2526,6 +2532,12 @@ public static class LocalizationService
         ["aiChat.inputHint"] = "Bir mesaj yazin...",
         ["aiChat.experimentalBadge"] = "DENEYSEL",
         ["aiChat.experimentalWarning"] = "Bu ozellik deneyseldir. Yanitlar hatali olabilir. Guvenilir AI destekli analiz icin AI Analiz sayfasini kullanin.",
+
+        // ── Chat model reload (Phase 5 debt A1) ──
+        ["chat.reload.success"]   = "Model yeniden yüklendi",
+        ["chat.reload.cancelled"] = "Model yeniden yükleme iptal edildi",
+        ["chat.reload.busy"]      = "Başka bir yeniden yükleme sürüyor",
+        ["chat.reload.failed"]    = "Model yeniden yükleme başarısız",
 
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Ortam Degiskenleri",

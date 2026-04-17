@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using global::Avalonia.Controls;
 using global::Avalonia.Input;
 using global::Avalonia.Interactivity;
@@ -19,6 +22,34 @@ public partial class ChatSection : UserControl
     private IAIAnalyzerEngine? _aiEngine;
     private bool _initialized;
     private bool _isSending;
+    private CancellationTokenSource? _reloadCts;
+
+    // ── ReloadAsync helper ─────────────────────────────────────────────────
+
+    public enum ReloadStatus { Ok, Cancelled, Busy, Failed }
+    public readonly record struct ReloadResult(ReloadStatus Status, string? Error = null);
+
+    public static async Task<ReloadResult> ApplyModelChangeAsync(
+        IAuraCoreLLM llm, LlmConfiguration newConfig, CancellationToken ct)
+    {
+        try
+        {
+            await llm.ReloadAsync(newConfig, ct);
+            return new ReloadResult(ReloadStatus.Ok);
+        }
+        catch (OperationCanceledException)
+        {
+            return new ReloadResult(ReloadStatus.Cancelled);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return new ReloadResult(ReloadStatus.Busy, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return new ReloadResult(ReloadStatus.Failed, ex.Message);
+        }
+    }
 
     public ChatSection()
     {
@@ -133,15 +164,19 @@ public partial class ChatSection : UserControl
 
     /// <summary>
     /// Switches the active chat model in AppSettings, saves to disk, rebuilds
-    /// the menu so the active indicator moves, and posts an in-chat system
-    /// message telling the user to restart so the inference engine picks up
-    /// the new model. (IAuraCoreLLM has no Reload method today — Phase 4+
-    /// debt item.)
+    /// the menu so the active indicator moves, then hot-reloads the inference
+    /// engine via <see cref="ApplyModelChangeAsync"/> — no app restart required.
     /// </summary>
-    private void OnSwitchModel(string modelId)
+    private async void OnSwitchModel(string modelId)
     {
         AppSettings? settings = null;
-        try { settings = App.Services.GetService<AppSettings>(); } catch { }
+        IInstalledModelStore? installed = null;
+        try
+        {
+            settings  = App.Services.GetService<AppSettings>();
+            installed = App.Services.GetService<IInstalledModelStore>();
+        }
+        catch { }
         if (settings is null) return;
 
         if (settings.ActiveChatModelId == modelId) return; // no-op when picking the same model
@@ -151,11 +186,37 @@ public partial class ChatSection : UserControl
 
         BuildModelMenu();
 
-        // Advise user to restart — the live IAuraCoreLLM still points at the old file.
-        // Phase 4+ can add a proper Reload hook on the LLM engine.
-        var hint = "Model changed. Restart AuraCore to load the new model.";
-        AddMessage(hint, isUser: false);
-        ChatHistoryStore.Add("assistant", hint);
+        if (_llm is null)
+        {
+            var failMsg = LocalizationService.Get("chat.reload.failed");
+            AddMessage(failMsg, isUser: false);
+            ChatHistoryStore.Add("assistant", failMsg);
+            return;
+        }
+
+        // Resolve the model file path from the installed store, falling back to
+        // the model-id filename so the engine can surface a "file not found" error.
+        var modelFile = installed?.GetFile(modelId);
+        var modelPath = modelFile?.FullName ?? (modelId + ".gguf");
+        var newConfig = new LlmConfiguration(modelPath);
+
+        // Cancel any in-flight reload before starting the new one.
+        _reloadCts?.Cancel();
+        _reloadCts?.Dispose();
+        _reloadCts = new CancellationTokenSource();
+
+        var result = await ApplyModelChangeAsync(_llm, newConfig, _reloadCts.Token);
+        var toastKey = result.Status switch
+        {
+            ReloadStatus.Ok        => "chat.reload.success",
+            ReloadStatus.Cancelled => "chat.reload.cancelled",
+            ReloadStatus.Busy      => "chat.reload.busy",
+            ReloadStatus.Failed    => "chat.reload.failed",
+            _ => "chat.reload.failed"
+        };
+        var toast = LocalizationService.Get(toastKey);
+        AddMessage(toast, isUser: false);
+        ChatHistoryStore.Add("assistant", toast);
     }
 
     /// <summary>

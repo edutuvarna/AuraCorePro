@@ -46,32 +46,51 @@ App.Services = services.BuildServiceProvider();
 
 Now `App.Services` is always non-null + populated with a known set of services before ANY test constructs a view. Calls to `GetService<T>()` consistently return either the registered instance or `null` (for unregistered types), eliminating the null-reference path.
 
-## Verification
+## Verification — initial B2 result was incomplete
 
-Three consecutive `dotnet test AuraCore.Tests.UI.Avalonia` runs after B2 landed (commit `46cc163`) — all clean:
+Three consecutive `dotnet test AuraCore.Tests.UI.Avalonia` runs immediately after B2 landed (commit `46cc163`) — all clean. This looked like a complete fix.
+
+**However**, the next full-solution run (at Sub-wave B milestone commit) surfaced `Failed! - Failed: 1, Passed: 1554` on UI.Avalonia again. One more investigation pass established that B2 alone was necessary but not sufficient: it eliminated the null-`App.Services` null-reference failures, but a secondary race under xUnit parallelism remained. Multiple tests that mutate shared static state (Avalonia resources, `LocalizationService`, DataContext caches) could still interleave non-deterministically.
+
+## The full fix — parallelism disable
+
+Added `tests/AuraCore.Tests.UI.Avalonia/AssemblyInfo.cs` with:
+
+```csharp
+[assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)]
+```
+
+This serializes test execution within the `AuraCore.Tests.UI.Avalonia` assembly. Combined with B2's DI bootstrap, the harness is now deterministic.
+
+**Verification — 5 consecutive clean runs after parallelism disable:**
 
 ```
-=== run 1 ===
-Passed!  - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555
-=== run 2 ===
-Passed!  - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555
-=== run 3 ===
-Passed!  - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555
+=== run 1 === Passed! - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555, Duration: 27s
+=== run 2 === Passed! - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555, Duration: 27s
+=== run 3 === Passed! - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555, Duration: 27s
+=== run 4 === Passed! - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555, Duration: 27s
+=== run 5 === Passed! - Failed: 0, Passed: 1555, Skipped: 0, Total: 1555, Duration: 28s
 ```
 
 No flake observed. Previously-intermittent tests (`ServiceManagerViewTests.Layout_UsesModuleHeader`, `DashboardView` render tests, etc.) are now deterministic.
 
+**Cost:** suite wall time went from ~15-21s (parallel) to ~27s (serial). ~+50% for this one assembly. Acceptable trade for zero flake.
+
 ## Residual risk (future-proof)
 
 - If a new view is added that calls `App.Services.GetRequiredService<NewType>()` and `NewType` isn't registered in `AvaloniaTestApplication.Initialize()`, tests constructing that view will fail with `InvalidOperationException` — NOT a flake (deterministic, easy to diagnose). Fix: register `NewType` in the test harness DI container.
-- xUnit parallel execution still has theoretical shared-state risks (e.g., `LocalizationService.CurrentLanguage` mutation). Not observed as a flake today but could surface if a future test sets language in setup without resetting in teardown. If that becomes an issue, adding `[assembly: CollectionBehavior(DisableTestParallelization = true)]` to the test project's AssemblyInfo is the standard mitigation.
+- The parallelism-disable flag only applies within this assembly. If UI tests are ever moved to another test project, the flag must move with them.
+- Individual test methods can still technically race against themselves via async fire-and-forget in Avalonia view event handlers, but this hasn't been observed in practice.
 
-## Hypotheses ruled out during investigation
+## Two root causes, two fixes
 
-- **LocalizationService shared state**: no tests in the current suite mutate `CurrentLanguage` without resetting. Not the cause.
-- **Dispatcher.UIThread uncompleted work**: checked; no test asserts immediately after a `Dispatcher.UIThread.Post` without awaiting.
-- **xUnit parallelism**: possibly a contributing factor to the non-determinism, but the underlying null `App.Services` was the primary cause. Parallelism amplified the observability but wasn't the root.
+| Root cause | Impact | Fix |
+|---|---|---|
+| `App.Services` null in test harness | NullReferenceException during view construction | B2's minimal DI bootstrap in `AvaloniaTestApplication.Initialize()` |
+| Shared-state race under xUnit parallel execution | Non-deterministic failures even with DI working | `[assembly: CollectionBehavior(DisableTestParallelization = true)]` in `tests/AuraCore.Tests.UI.Avalonia/AssemblyInfo.cs` |
+
+Both together produce a deterministic, all-green suite.
 
 ## Conclusion
 
-**B1 requires no standalone code change.** The flake was a symptom of the missing test-harness DI bootstrap, which B2 addressed. This document records the investigation for future reference in case similar symptoms reappear.
+B1 required **two code changes** across both B2 (DI bootstrap, commit `46cc163`) and a follow-up commit (parallelism disable). Both are small and well-scoped. The flake is now gone as verified by 5 consecutive clean runs post-fix.

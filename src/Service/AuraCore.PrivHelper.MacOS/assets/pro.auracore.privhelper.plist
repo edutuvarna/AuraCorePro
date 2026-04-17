@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>pro.auracore.PrivHelper</string>
+
+    <key>Program</key>
+    <string>/Library/PrivilegedHelperTools/pro.auracore.privhelper</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/PrivilegedHelperTools/pro.auracore.privhelper</string>
+    </array>
+
+    <key>UserName</key>
+    <string>root</string>
+
+    <key>MachServices</key>
+    <dict>
+        <key>pro.auracore.PrivHelper</key>
+        <true/>
+    </dict>
+
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <key>StandardErrorPath</key>
+    <string>/var/log/pro.auracore.privhelper.log</string>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+    </dict>
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>2048</integer>
+    </dict>
+</dict>
+</plist>

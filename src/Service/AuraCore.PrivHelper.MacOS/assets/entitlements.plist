@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+        AuraCorePro privilege helper runs as root under launchd with the
+        hardened runtime. Sandbox is intentionally disabled — the helper
+        shells out to system binaries (dscacheutil, tmutil, mdutil)
+        which a sandbox would block. The security boundary is enforced by
+        the XPC peer-identity check (SecCodeCheckValidity against the
+        expected bundle id + team id) plus the daemon-side argv whitelist.
+
+        No network, no user data, no automation, no accessibility. The
+        helper only needs to receive XPC messages and exec whitelisted
+        system binaries.
+    -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+
+    <!-- Explicitly deny network access -->
+    <key>com.apple.security.network.client</key>
+    <false/>
+    <key>com.apple.security.network.server</key>
+    <false/>
+
+    <!-- No Apple events automation -->
+    <key>com.apple.security.automation.apple-events</key>
+    <false/>
+</dict>
+</plist>

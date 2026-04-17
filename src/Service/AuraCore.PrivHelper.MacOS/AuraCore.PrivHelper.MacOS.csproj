@@ -30,4 +30,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.*" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.*" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="assets/pro.auracore.privhelper.plist">
+      <LogicalName>pro.auracore.privhelper.plist</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="assets/entitlements.plist">
+      <LogicalName>entitlements.plist</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

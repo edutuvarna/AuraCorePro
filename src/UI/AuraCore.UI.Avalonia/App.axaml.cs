@@ -14,8 +14,8 @@ namespace AuraCore.UI.Avalonia;
 
 public partial class App : global::Avalonia.Application
 {
-    private static ServiceProvider? _services;
-    public static IServiceProvider Services => _services!;
+    private static IServiceProvider? _services;
+    public static IServiceProvider Services { get => _services!; internal set => _services = value; }
 
     /// <summary>
     /// Phase 5.3 Task 9: App-level singleton accessor for the narrow-mode service.
@@ -288,10 +288,10 @@ public partial class App : global::Avalonia.Application
                 currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Admin));
         // ── end Phase 3 ──
 
-        _services = sc.BuildServiceProvider();
+        Services = sc.BuildServiceProvider();
 
         // Phase 5.3 Task 9: expose the narrow-mode service for StatRow code-behind binding.
-        NarrowMode = _services.GetService<INarrowModeService>();
+        NarrowMode = Services.GetService<INarrowModeService>();
 
         // Initialize theme (loads saved preference)
         ThemeService.Initialize();

@@ -789,6 +789,13 @@ public static class LocalizationService
         ["dash.cleanupError"] = "Cleanup error: {0}",
         ["dash.healthUnavailable"] = "Health module not available.",
         ["dash.healthFailed"] = "Health scan failed: {0}",
+        // ── Dashboard Quick Action Tiles (Phase 5.5.2.1) ──
+        ["quickaction.quickcleanup.label"]    = "Quick cleanup",
+        ["quickaction.quickcleanup.sublabel"] = "Temp, cache, logs",
+        ["quickaction.optimizeram.label"]     = "Optimize RAM",
+        ["quickaction.optimizeram.sublabel"]  = "Free memory",
+        ["quickaction.removebloat.label"]     = "Remove Windows bloat",
+        ["quickaction.removebloat.sublabel"]  = "Safe pre-installed apps",
         // ── Startup Optimizer (runtime) ──
         ["startup.scanning"] = "Scanning startup programs...",
         ["startup.noPrograms"] = "No startup programs found.",
@@ -2263,6 +2270,13 @@ public static class LocalizationService
         ["dash.cleanupError"] = "Temizlik hatası: {0}",
         ["dash.healthUnavailable"] = "Sağlık modülü kullanılamıyor.",
         ["dash.healthFailed"] = "Sağlık taraması başarısız: {0}",
+        // ── Kontrol Paneli Hızlı İşlem Kutucukları (Phase 5.5.2.1) ──
+        ["quickaction.quickcleanup.label"]    = "Hızlı temizlik",
+        ["quickaction.quickcleanup.sublabel"] = "Geçici dosya, önbellek, günlük",
+        ["quickaction.optimizeram.label"]     = "RAM optimize et",
+        ["quickaction.optimizeram.sublabel"]  = "Belleği boşalt",
+        ["quickaction.removebloat.label"]     = "Windows şişkinliğini kaldır",
+        ["quickaction.removebloat.sublabel"]  = "Güvenli ön yüklü uygulamalar",
         // ── Başlangıç Yöneticisi (çalışma zamanı) ──
         ["startup.scanning"] = "Başlangıç programları taranıyor...",
         ["startup.noPrograms"] = "Başlangıç programı bulunamadı.",

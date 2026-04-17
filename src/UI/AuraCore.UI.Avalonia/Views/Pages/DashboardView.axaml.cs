@@ -3,11 +3,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using global::Avalonia.Controls;
 using global::Avalonia.Threading;
 using global::Avalonia.VisualTree;
+using AuraCore.Application;
 using AuraCore.Application.Interfaces.Engines;
+using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Module.BloatwareRemoval;
+using AuraCore.Module.JunkCleaner;
+using AuraCore.Module.RamOptimizer;
 using AuraCore.UI.Avalonia.Helpers;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -74,6 +80,7 @@ public partial class DashboardView : UserControl
             StartPolling();
             HookHeroButton();
             HookResponsiveBreakpoint();
+            InitQuickActionsFromDI();
         };
         Unloaded += (s, e) => StopPolling();
     }
@@ -139,6 +146,53 @@ public partial class DashboardView : UserControl
     private void HookHeroButton()
     {
         HeroCta.PrimaryCommand = new RelayCommand(NavigateToAIFeatures);
+    }
+
+    private void InitQuickActionsFromDI()
+    {
+        try
+        {
+            var services = App.Services;
+            if (services is null) return;
+
+            var modules = services.GetServices<IOptimizationModule>().ToList();
+            var junkModule    = modules.OfType<JunkCleanerModule>().FirstOrDefault();
+            var ramModule     = modules.OfType<RamOptimizerModule>().FirstOrDefault();
+            var bloatModule   = modules.OfType<BloatwareRemovalModule>().FirstOrDefault();
+
+            _vm.InitQuickActions(
+                quickCleanup: async () =>
+                {
+                    if (junkModule is null) return;
+                    try
+                    {
+                        // Scan first, then clean all categories ("all" sentinel = clean everything)
+                        await junkModule.ScanAsync(new ScanOptions());
+                        if (junkModule.LastReport is not null && junkModule.LastReport.TotalFiles > 0)
+                            await junkModule.OptimizeAsync(
+                                new OptimizationPlan(junkModule.Id, new[] { "all" }));
+                    }
+                    catch { /* fire-and-forget; suppress all errors in the quick action */ }
+                },
+                optimizeRam: async () =>
+                {
+                    if (ramModule is null) return;
+                    try
+                    {
+                        // RamOptimizer.OptimizeAsync ignores SelectedItemIds and iterates all processes
+                        await ramModule.OptimizeAsync(
+                            new OptimizationPlan(ramModule.Id, System.Array.Empty<string>()));
+                    }
+                    catch { }
+                },
+                removeBloat: async () =>
+                {
+                    if (bloatModule is null) return;
+                    try { await bloatModule.RemoveDefaultPresetAsync(); }
+                    catch { }
+                });
+        }
+        catch { /* DI unavailable — tiles remain with no-op stubs */ }
     }
 
     private void NavigateToAIFeatures()

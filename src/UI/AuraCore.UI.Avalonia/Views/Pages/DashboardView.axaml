@@ -166,24 +166,48 @@
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold"
                        LetterSpacing="1"/>
-            <Grid x:Name="QuickActionsGrid" ColumnDefinitions="*,*" RowDefinitions="*,*">
-              <controls:QuickActionTile Grid.Row="0" Grid.Column="0" MinHeight="58" HorizontalAlignment="Stretch"
-                                         Title="Clean Junk" SubLabel="Temp, cache, logs"
-                                         Icon="{StaticResource IconSparkles}"
-                                         TintBrush="{DynamicResource AccentTealBrush}"/>
-              <controls:QuickActionTile Grid.Row="0" Grid.Column="1" Margin="6,0,0,0" MinHeight="58" HorizontalAlignment="Stretch"
-                                         Title="Optimize RAM" SubLabel="Free memory"
-                                         Icon="{StaticResource IconRotateCcw}"
-                                         TintBrush="{DynamicResource AccentPurpleBrush}"/>
-              <controls:QuickActionTile Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" MinHeight="58" HorizontalAlignment="Stretch"
-                                         Title="Gaming Mode" SubLabel="Ready to game"
-                                         Icon="{StaticResource IconGamepad}"
-                                         TintBrush="{DynamicResource AccentAmberBrush}"/>
-              <controls:QuickActionTile Grid.Row="1" Grid.Column="1" Margin="6,6,0,0" MinHeight="58" HorizontalAlignment="Stretch"
-                                         Title="Security Scan" SubLabel="Defender + firewall"
-                                         Icon="{StaticResource IconShieldCheck}"
-                                         TintBrush="{DynamicResource AccentTealBrush}"/>
-            </Grid>
+            <ItemsControl x:Name="QuickActionsGrid" ItemsSource="{Binding QuickActions}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Columns="3"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Command="{Binding Command}"
+                          Background="{DynamicResource AccentTealDimBrush}"
+                          BorderBrush="{DynamicResource AccentBorderBrush}"
+                          BorderThickness="1"
+                          CornerRadius="{DynamicResource RadiusMd}"
+                          Padding="6,5"
+                          Margin="3"
+                          MinHeight="58"
+                          Cursor="Hand"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          VerticalContentAlignment="Stretch">
+                    <StackPanel VerticalAlignment="Center" Spacing="3">
+                      <TextBlock Text="{Binding IconGlyph}"
+                                 FontSize="18"
+                                 HorizontalAlignment="Center"/>
+                      <TextBlock Text="{Binding Label}"
+                                 FontSize="{DynamicResource FontSizeBody}"
+                                 FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 HorizontalAlignment="Center"
+                                 TextWrapping="Wrap"
+                                 TextAlignment="Center"/>
+                      <TextBlock Text="{Binding SubLabel}"
+                                 FontSize="{DynamicResource FontSizeCaption}"
+                                 Foreground="{DynamicResource TextMutedBrush}"
+                                 HorizontalAlignment="Center"
+                                 TextWrapping="Wrap"
+                                 TextAlignment="Center"/>
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </StackPanel>
         </Border>
       </Grid>

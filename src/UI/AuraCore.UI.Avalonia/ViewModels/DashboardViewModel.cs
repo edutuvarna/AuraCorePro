@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using AuraCore.UI.Avalonia.Helpers;
 using AuraCore.UI.Avalonia.Services.AI;
+using AuraCore.UI.Avalonia.ViewModels.Dashboard;
 using AuraCore.UI.Avalonia.Views.Controls;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
@@ -26,6 +28,20 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    // Delegates injected from the View (code-behind) to execute real module logic.
+    // Null-safe: tiles are initialized with no-op stubs so the Dashboard renders
+    // even in design-time or test contexts where modules are unavailable.
+    private Func<Task>? _executeQuickCleanup;
+    private Func<Task>? _executeOptimizeRam;
+    private Func<Task>? _executeRemoveBloat;
+
+    /// <summary>
+    /// Data-bound Quick Action tiles. Initialized with stub delegates;
+    /// call <see cref="InitQuickActions"/> once real module delegates are available.
+    /// </summary>
+    public IReadOnlyList<QuickActionTileVM> QuickActions { get; private set; }
+        = System.Array.Empty<QuickActionTileVM>();
+
     /// <summary>
     /// Primary ctor. Both parameters optional so existing call sites
     /// (<c>new DashboardViewModel()</c> in DashboardView field init + tests)
@@ -41,6 +57,29 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         {
             _ambient.PropertyChanged += OnAmbientPropertyChanged;
         }
+        // Initialize tiles with no-op stubs so bindings are never null.
+        // DashboardView.Loaded calls InitQuickActions() with real delegates.
+        QuickActions = QuickActionPresets.Windows(
+            quickCleanup: () => Task.CompletedTask,
+            optimizeRam:  () => Task.CompletedTask,
+            removeBloat:  () => Task.CompletedTask);
+    }
+
+    /// <summary>
+    /// Replaces the stub delegates with real module execution delegates.
+    /// Called from <see cref="DashboardView"/> once modules are resolved from DI.
+    /// </summary>
+    public void InitQuickActions(Func<Task> quickCleanup, Func<Task> optimizeRam, Func<Task> removeBloat)
+    {
+        _executeQuickCleanup = quickCleanup;
+        _executeOptimizeRam  = optimizeRam;
+        _executeRemoveBloat  = removeBloat;
+        Func<Task> noOp = () => Task.CompletedTask;
+        QuickActions = QuickActionPresets.Windows(
+            quickCleanup: () => (_executeQuickCleanup ?? noOp)(),
+            optimizeRam:  () => (_executeOptimizeRam  ?? noOp)(),
+            removeBloat:  () => (_executeRemoveBloat  ?? noOp)());
+        OnChanged(nameof(QuickActions));
     }
 
     private void OnAmbientPropertyChanged(object? sender, PropertyChangedEventArgs e)

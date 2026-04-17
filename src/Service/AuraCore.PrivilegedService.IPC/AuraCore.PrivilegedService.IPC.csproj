@@ -4,5 +4,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj" />
+    <ProjectReference Include="../AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
 </Project>

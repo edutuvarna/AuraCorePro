@@ -18,5 +18,7 @@
     <ProjectReference Include="../../src/Infrastructure/AuraCore.Infrastructure.Http/AuraCore.Infrastructure.Http.csproj" />
     <ProjectReference Include="../../src/Infrastructure/AuraCore.Infrastructure.PrivilegeIpc/AuraCore.Infrastructure.PrivilegeIpc.csproj" />
     <ProjectReference Include="../../src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
+    <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.IPC/AuraCore.PrivilegedService.IPC.csproj" />
+    <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj" />
   </ItemGroup>
 </Project>

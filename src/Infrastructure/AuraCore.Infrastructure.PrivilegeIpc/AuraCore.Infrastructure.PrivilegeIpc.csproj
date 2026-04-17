@@ -4,6 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>AuraCore.Infrastructure.PrivilegeIpc</RootNamespace>
+    <!-- Required by LibraryImport source generator (MacOS/Interop/LibXpcClient.cs). -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\AuraCore.Application\AuraCore.Application.csproj" />

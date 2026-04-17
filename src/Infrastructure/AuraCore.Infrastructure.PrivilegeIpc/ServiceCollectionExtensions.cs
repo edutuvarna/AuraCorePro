@@ -38,7 +38,10 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<PrivHelperInstaller>();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            services.AddSingleton<IXpcConnectionFactory, DefaultXpcConnectionFactory>();
             services.AddSingleton<IShellCommandService, MacOSShellCommandService>();
+        }
         else
             services.AddSingleton<IShellCommandService, InProcessShellCommandService>();
 

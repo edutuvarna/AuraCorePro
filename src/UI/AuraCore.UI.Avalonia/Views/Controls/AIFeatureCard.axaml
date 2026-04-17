@@ -51,6 +51,17 @@
                    Margin="0,3,0,0"
                    TextWrapping="Wrap" />
 
+        <!-- View details affordance (bottom-right corner) -->
+        <TextBlock Grid.Row="3" Grid.Column="1"
+                   x:Name="ViewDetailsAffordance"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,0,0"
+                   FontSize="11"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   IsHitTestVisible="False"
+                   Opacity="0.75" />
+
       </Grid>
     </controls:GlassCard.CardContent>
   </controls:GlassCard>

@@ -12,6 +12,11 @@ public partial class AIFeatureCard : UserControl
     {
         InitializeComponent();
         PointerPressed += OnCardClick;
+        ApplyLocalization();
+
+        // Re-apply strings if the user switches language while the card is visible.
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void OnCardClick(object? sender, PointerPressedEventArgs e)
@@ -33,6 +38,13 @@ public partial class AIFeatureCard : UserControl
             current = current.Parent as Control;
         }
         return null;
+    }
+
+    private void ApplyLocalization()
+    {
+        var affordance = this.FindControl<TextBlock>("ViewDetailsAffordance");
+        if (affordance is not null)
+            affordance.Text = LocalizationService.Get("aiFeatures.card.viewDetails");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

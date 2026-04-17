@@ -126,6 +126,15 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
                 }
                 else if (itemId == "run-periodic")
                 {
+                    // TODO(phase-5.2.2): this call-site is dead code (no UI/plan path feeds
+                    // itemId="run-periodic" today) but retains a raw `sudo -n periodic ...`
+                    // invocation that the 5.2.2 safety sweep flagged. Two follow-ups:
+                    //   (a) remove the branch entirely if "run-periodic" is never reintroduced,
+                    //   (b) OR add a new "run-periodic" action id to Task 16/27 ActionWhitelist
+                    //       with a strict argv validator `["daily"|"weekly"|"monthly"...]`
+                    //       + polkit / launchd policy entry, then migrate the call.
+                    // Until resolved, this branch will fail closed via ProcessRunner — safe
+                    // because the branch is unreachable from the product surface.
                     var r = await ProcessRunner.RunAsync("sudo", "-n periodic daily weekly monthly", ct, timeoutSeconds: 300);
                     ok = r.Success;
                 }

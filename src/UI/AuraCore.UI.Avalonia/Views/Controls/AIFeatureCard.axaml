@@ -13,7 +13,7 @@
         <!-- Accent kicker (uppercase title) -->
         <TextBlock Grid.Row="0" Grid.Column="0"
                    x:Name="PART_Kicker"
-                   Text="{Binding Title}"
+                   Text="{Binding Title, Converter={StaticResource UppercaseTransformConverter}}"
                    FontSize="9"
                    Foreground="{DynamicResource AccentPurpleBrush}"
                    FontWeight="Bold" />

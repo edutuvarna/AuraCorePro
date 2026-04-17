@@ -17,6 +17,8 @@
       <conv:NarrowToColumnCountConverter         x:Key="NarrowToColumnCountConverter" />
       <conv:BoolToGridLengthConverter            x:Key="BoolToGridLengthConverter" />
       <conv:NarrowModeGridLengthChainConverter   x:Key="NarrowModeGridLengthChainConverter" />
+      <!-- Phase 5.4 uppercase transform converter -->
+      <conv:UppercaseTransformConverter          x:Key="UppercaseTransformConverter" />
     </ResourceDictionary>
   </Application.Resources>
 

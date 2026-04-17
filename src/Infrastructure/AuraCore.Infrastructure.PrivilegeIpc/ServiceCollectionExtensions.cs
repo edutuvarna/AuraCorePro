@@ -39,8 +39,13 @@ public static class ServiceCollectionExtensions
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            services.AddSingleton<IXpcConnectionFactory, DefaultXpcConnectionFactory>();
             services.AddSingleton<IShellCommandService, MacOSShellCommandService>();
+            services.AddSingleton<IXpcConnectionFactory, DefaultXpcConnectionFactory>();
+
+            // Phase 5.2.2.6: SMAppService registration wiring — macOS-only
+            services.AddSingleton<ISMAppServiceBridge, DefaultSMAppServiceBridge>();
+            services.AddSingleton<IBundleSignatureDetector, DefaultBundleSignatureDetector>();
+            services.AddSingleton<SMAppServiceRegistrar>();
         }
         else
             services.AddSingleton<IShellCommandService, InProcessShellCommandService>();

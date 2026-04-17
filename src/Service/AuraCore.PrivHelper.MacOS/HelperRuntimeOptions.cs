@@ -34,4 +34,11 @@ public static class HelperRuntimeOptions
     /// (defense against cross-project action name collisions).
     /// </summary>
     public const string ActionIdNamespace = "pro.auracore.privhelper";
+
+    /// <summary>
+    /// Maximum allowed <c>timeout_seconds</c> value accepted from XPC clients.
+    /// Requests with larger values are silently clamped to this ceiling
+    /// (prevents malicious clients from requesting indefinite blocking).
+    /// </summary>
+    internal const long MaxAllowedTimeoutSeconds = 3600L;
 }

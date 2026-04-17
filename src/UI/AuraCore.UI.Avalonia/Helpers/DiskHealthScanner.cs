@@ -28,6 +28,50 @@ public sealed record DiskHealthScanResult(
 /// </summary>
 public static class DiskHealthScanner
 {
+    // =========================================================================
+    // Phase 5 debt-A3 — WMI SMART augmentation
+    // =========================================================================
+
+    /// <summary>
+    /// A single temperature reading from one disk.
+    /// </summary>
+    public readonly record struct SmartSample(string DeviceId, int TempCelsius);
+
+    /// <summary>
+    /// Abstraction over the SMART temperature data source.
+    /// Allows unit tests to inject a fake without WMI.
+    /// </summary>
+    public interface ISmartProbe
+    {
+        IReadOnlyList<SmartSample> Sample();
+    }
+
+    /// <summary>
+    /// Returns the highest temperature across all samples, or null when the
+    /// list is null/empty (caller should display placeholder).
+    /// </summary>
+    public static int? PickWorstTempCelsius(IReadOnlyList<SmartSample>? samples)
+    {
+        if (samples is null || samples.Count == 0) return null;
+        int worst = int.MinValue;
+        foreach (var s in samples)
+        {
+            if (s.TempCelsius > worst) worst = s.TempCelsius;
+        }
+        return worst == int.MinValue ? null : worst;
+    }
+
+    /// <summary>
+    /// Formats a nullable temperature for display.
+    /// Null → "—"; value → "45°C".
+    /// </summary>
+    public static string FormatWorstTemp(int? celsius)
+        => celsius.HasValue ? $"{celsius.Value}°C" : "—";
+
+    // =========================================================================
+    // Public API
+    // =========================================================================
+
     /// <summary>
     /// The result that is shown while no scan has completed yet.
     /// </summary>
@@ -43,7 +87,7 @@ public static class DiskHealthScanner
     {
         try
         {
-            return await Task.Run(() => ScanCore(), cancellationToken)
+            return await Task.Run(() => ScanCore(new WmiSmartProbe()), cancellationToken)
                              .ConfigureAwait(false);
         }
         catch
@@ -52,11 +96,31 @@ public static class DiskHealthScanner
         }
     }
 
-    // -------------------------------------------------------------------------
-    // private
-    // -------------------------------------------------------------------------
+    /// <summary>
+    /// Synchronous, testable entry point.  Drive-enumeration result is
+    /// produced by <see cref="ScanDrivesCore"/> then augmented with the
+    /// worst temperature returned by <paramref name="probe"/>.
+    /// </summary>
+    public static DiskHealthScanResult ScanCore(ISmartProbe probe)
+    {
+        var driveResult = ScanDrivesCore();
 
-    private static DiskHealthScanResult ScanCore()
+        int? worst = null;
+        try { worst = PickWorstTempCelsius(probe.Sample()); }
+        catch { /* probe may throw — swallow and keep placeholder */ }
+
+        return driveResult with { WorstTempText = FormatWorstTemp(worst) };
+    }
+
+    // =========================================================================
+    // Private
+    // =========================================================================
+
+    /// <summary>
+    /// Drive-enumeration logic (previously the body of ScanCore).
+    /// Returns WorstTempText = "—"; <see cref="ScanCore(ISmartProbe)"/> overwrites it.
+    /// </summary>
+    private static DiskHealthScanResult ScanDrivesCore()
     {
         var results = new List<(string Name, string Health, double UsedPct)>();
 
@@ -107,11 +171,61 @@ public static class DiskHealthScanner
             smartText = "OK";
         }
 
-        // WorstTempText: disk temperature via SMART is platform-specific;
-        // we return "—" for now since DriveInfo does not expose temperature.
-        // A future phase can extend this via WMI/smartctl on the real SMART path.
-        const string worstTempText = "—";
+        // WorstTempText will be set by ScanCore(ISmartProbe) after drive enumeration.
+        return new DiskHealthScanResult(statusText, smartText, "—");
+    }
 
-        return new DiskHealthScanResult(statusText, smartText, worstTempText);
+    /// <summary>
+    /// Production SMART probe: queries ROOT\WMI\MSStorageDriver_ATAPISmartData
+    /// for attribute 0xC2 (temperature) or 0xBE (airflow temp).
+    /// Returns an empty list on any failure so the caller gracefully falls back
+    /// to the placeholder dash.
+    /// </summary>
+    private sealed class WmiSmartProbe : ISmartProbe
+    {
+        public IReadOnlyList<SmartSample> Sample()
+        {
+            var list = new List<SmartSample>();
+            if (!System.OperatingSystem.IsWindows()) return list;
+
+            try
+            {
+                using var searcher = new System.Management.ManagementObjectSearcher(
+                    "root\\WMI",
+                    "SELECT InstanceName, VendorSpecific FROM MSStorageDriver_ATAPISmartData");
+                foreach (System.Management.ManagementObject o in searcher.Get())
+                {
+                    try
+                    {
+                        var instanceName = o["InstanceName"]?.ToString() ?? "";
+                        var bytes = o["VendorSpecific"] as byte[];
+                        if (bytes is null || bytes.Length < 14) continue;
+
+                        // SMART data layout: 2-byte header followed by 12-byte attribute records.
+                        // Each record: [AttrId(1), Flags(2), Current(1), Worst(1), RawBytes(6), Reserved(1)]
+                        for (int i = 2; i + 12 <= bytes.Length; i += 12)
+                        {
+                            var attrId = bytes[i];
+                            if (attrId == 0xC2 /* temperature */ || attrId == 0xBE /* airflow temp */)
+                            {
+                                // Raw bytes start at offset i+5 (after attrId + flags(2) + current + worst).
+                                var rawLow = bytes[i + 5];
+                                if (rawLow is > 0 and < 120)
+                                {
+                                    list.Add(new SmartSample(instanceName, rawLow));
+                                    break; // one temperature reading per disk is enough
+                                }
+                            }
+                        }
+                    }
+                    catch { /* one bad drive shouldn't abort the whole scan */ }
+                }
+            }
+            catch
+            {
+                // WMI denied / namespace missing / not supported — return empty list.
+            }
+            return list;
+        }
     }
 }

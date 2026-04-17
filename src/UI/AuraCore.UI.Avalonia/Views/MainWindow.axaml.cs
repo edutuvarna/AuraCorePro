@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -9,6 +10,7 @@ using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Domain.Enums;
 using AuraCore.UI.Avalonia.Views.Banners;
 using AuraCore.UI.Avalonia.Views.Dialogs;
@@ -24,6 +26,9 @@ public sealed partial class MainWindow : Window
 
     // Phase 5.2.0 Task 11: privilege helper availability banner
     private readonly IHelperAvailabilityService? _helperAvailability;
+
+    // Phase 5.3 Task 6: responsive narrow-mode service
+    private readonly INarrowModeService? _narrowMode;
 
     public MainWindow()
     {
@@ -60,6 +65,20 @@ public sealed partial class MainWindow : Window
             };
         }
         catch { /* DI / design-time fallback — banner stays hidden */ }
+
+        // Phase 5.3 Task 6: resolve narrow-mode service and subscribe to window Bounds changes
+        try
+        {
+            _narrowMode = App.Services?.GetService<INarrowModeService>();
+            // Subscribe to Bounds changes — BoundsProperty is AvaloniaProperty<Rect> on Visual/Window.
+            // Use GetObservable + a typed IObserver<Rect> wrapper (avoids hard System.Reactive dep).
+            this.GetObservable(BoundsProperty)
+                .Subscribe(new BoundsObserver(OnWindowBoundsChanged));
+            // Push initial width (may be zero before first render; subsequent emissions will correct it)
+            if (_narrowMode is NarrowModeService concreteInit)
+                concreteInit.UpdateWidth(Bounds.Width);
+        }
+        catch { /* DI / design-time fallback — narrow mode stays at default wide state */ }
 
         BuildNavigation();
         RefreshUserChip();
@@ -573,6 +592,14 @@ public sealed partial class MainWindow : Window
         RebuildSidebar();
     }
 
+    // ─── RESPONSIVE NARROW MODE (Phase 5.3 Task 6) ──────────────────
+
+    private void OnWindowBoundsChanged(Rect bounds)
+    {
+        if (_narrowMode is NarrowModeService concrete)
+            concrete.UpdateWidth(bounds.Width);
+    }
+
     // ─── PRIVILEGE BANNER HANDLERS (Phase 5.2.0 Task 11) ────────────
 
     private void SyncBannerVisibility()
@@ -617,5 +644,18 @@ public sealed partial class MainWindow : Window
         public event EventHandler? CanExecuteChanged;
         public bool CanExecute(object? parameter) => true;
         public void Execute(object? parameter) => _action();
+    }
+
+    /// <summary>
+    /// Minimal IObserver&lt;Rect&gt; wrapper so we can subscribe to
+    /// GetObservable(BoundsProperty) without a System.Reactive dependency.
+    /// </summary>
+    private sealed class BoundsObserver : IObserver<Rect>
+    {
+        private readonly Action<Rect> _onNext;
+        public BoundsObserver(Action<Rect> onNext) => _onNext = onNext;
+        public void OnNext(Rect value) => _onNext(value);
+        public void OnError(Exception error) { /* no-op */ }
+        public void OnCompleted() { /* no-op */ }
     }
 }

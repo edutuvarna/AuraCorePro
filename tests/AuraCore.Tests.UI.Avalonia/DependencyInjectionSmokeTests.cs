@@ -10,6 +10,7 @@ using AuraCore.Module.MacAppInstaller;
 using AuraCore.Module.PurgeableSpaceManager;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.Module.SpotlightManager;
+using AuraCore.Module.TimeMachineManager;
 using AuraCore.Module.XcodeCleaner;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.Services.AI;
@@ -327,6 +328,30 @@ public class DependencyInjectionSmokeTests
         Assert.Empty(vm.SafeCategoriesItems);
         Assert.Empty(vm.GranularCategoriesItems);
         Assert.Empty(vm.DangerCategoriesItems);
+    }
+
+    /// <summary>
+    /// Phase 5.2.2.7d: TimeMachineManagerModule must resolve via the same
+    /// registration pattern App.axaml.cs uses — concrete module registered
+    /// first, then aliased to IOptimizationModule. IShellCommandService is
+    /// required since Phase 5.2.2.7d migration.
+    /// </summary>
+    [Fact]
+    public void TimeMachineManagerModule_ResolvesFromContainer()
+    {
+        var sc = new ServiceCollection();
+        // Mirror App.axaml.cs Phase 5.2.2.7d block.
+        // IShellCommandService is required since Phase 5.2.2.7d migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
+        sc.AddSingleton<TimeMachineManagerModule>();
+        sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<TimeMachineManagerModule>());
+
+        using var sp = sc.BuildServiceProvider();
+
+        var module = sp.GetRequiredService<TimeMachineManagerModule>();
+        var asInterface = sp.GetRequiredService<IOptimizationModule>();
+        Assert.Same(module, asInterface); // Single instance aliased
+        Assert.NotNull(module);
     }
 
     /// <summary>

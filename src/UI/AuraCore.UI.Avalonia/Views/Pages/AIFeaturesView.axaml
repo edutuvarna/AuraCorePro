@@ -21,6 +21,15 @@
       <Setter Property="BorderBrush" Value="#38B088FF" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+
+    <!-- Phase 5.3 narrow-mode: section-nav buttons compress to icon-only at narrow (<1000px).
+         When PART_IsNarrowNavMode is set on the UserControl, this style trims text
+         and tightens padding to fit inside the 80-DIP sidebar. -->
+    <Style Selector="UserControl.narrow-nav StackPanel#PART_SectionNav Button">
+      <Setter Property="Padding" Value="4,6" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
   </UserControl.Styles>
 
   <DockPanel Margin="20,16">
@@ -57,7 +66,9 @@
     <!-- Overview / Detail swap -->
     <Panel>
 
-      <!-- Overview mode: 2x2 grid of AIFeatureCards -->
+      <!-- Overview mode: 2x2 grid of AIFeatureCards.
+           Phase 5.3 Task 10: at very-narrow (<900px) columns collapse to 1
+           so cards stack vertically. Code-behind adjusts PART_OverviewGrid.Columns. -->
       <UniformGrid Rows="2" Columns="2"
                    x:Name="PART_OverviewGrid"
                    IsVisible="{Binding IsOverview}">
@@ -67,10 +78,19 @@
         <controls:AIFeatureCard DataContext="{Binding ChatCard}" />
       </UniformGrid>
 
-      <!-- Detail mode: sidebar + content -->
-      <Grid ColumnDefinitions="120,*"
-            x:Name="PART_DetailRoot"
+      <!-- Detail mode: sidebar nav + content.
+           Phase 5.3 Task 10 narrow-mode column widths:
+             Wide   (>= 1000px): sidebar col = 120 DIP (original)
+             Narrow  (< 1000px): sidebar col =  80 DIP (icon-only style via .narrow-nav class)
+             V-Narrow(< 900px) : sidebar col =   0 DIP (hidden)
+           Code-behind drives PART_DetailRoot.ColumnDefinitions[0].Width. -->
+      <Grid x:Name="PART_DetailRoot"
             IsVisible="{Binding IsDetail}">
+        <Grid.ColumnDefinitions>
+          <!-- Column 0 width managed by code-behind (NarrowModeService subscription) -->
+          <ColumnDefinition Width="120" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" x:Name="PART_SectionNav" Spacing="2" Margin="0,8,8,0">
           <Button Content="Overview" Classes="section-nav-item"
@@ -78,7 +98,7 @@
           <Button Content="Insights" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="insights" />
-          <Button Content="Recommendations" Classes="section-nav-item"
+          <Button Content="Recs" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="recommendations" />
           <Button Content="Schedule" Classes="section-nav-item"

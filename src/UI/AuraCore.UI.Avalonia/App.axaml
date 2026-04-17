@@ -13,8 +13,10 @@
   <Application.Resources>
     <ResourceDictionary>
       <!-- Phase 5.3 narrow-mode converters -->
-      <conv:BoundsToIsNarrowModeConverter x:Key="BoundsToIsNarrowModeConverter" />
-      <conv:NarrowToColumnCountConverter  x:Key="NarrowToColumnCountConverter" />
+      <conv:BoundsToIsNarrowModeConverter        x:Key="BoundsToIsNarrowModeConverter" />
+      <conv:NarrowToColumnCountConverter         x:Key="NarrowToColumnCountConverter" />
+      <conv:BoolToGridLengthConverter            x:Key="BoolToGridLengthConverter" />
+      <conv:NarrowModeGridLengthChainConverter   x:Key="NarrowModeGridLengthChainConverter" />
     </ResourceDictionary>
   </Application.Resources>
 

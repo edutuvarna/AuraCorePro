@@ -1,5 +1,8 @@
+using System.ComponentModel;
 using global::Avalonia.Controls;
+using global::Avalonia.Controls.Primitives;
 using global::Avalonia.Markup.Xaml;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.UI.Avalonia;
 using AuraCore.UI.Avalonia.ViewModels;
 using AuraCore.UI.Avalonia.Views.Dialogs;
@@ -9,10 +12,84 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class AIFeaturesView : UserControl
 {
+    // Phase 5.3 Task 10 narrow-mode constants
+    private const double SidebarWide       = 120;  // original width
+    private const double SidebarNarrow     =  80;  // compressed at <1000 px
+    private const double SidebarVeryNarrow =   0;  // hidden at <900 px
+
+    private readonly INarrowModeService? _narrowMode;
+
     public AIFeaturesView()
     {
         InitializeComponent();
+
+        // Resolve NarrowModeService from App singleton (null in test harness / design-time).
+        _narrowMode = App.NarrowMode;
+        if (_narrowMode is not null)
+        {
+            _narrowMode.PropertyChanged += OnNarrowModeChanged;
+            // Apply initial state before the first layout pass so there is no flicker.
+            ApplyNarrowMode();
+        }
+
         Loaded += OnLoaded;
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        if (_narrowMode is not null)
+            _narrowMode.PropertyChanged -= OnNarrowModeChanged;
+
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnNarrowModeChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(INarrowModeService.IsNarrow)
+                           or nameof(INarrowModeService.IsVeryNarrow))
+        {
+            ApplyNarrowMode();
+        }
+    }
+
+    /// <summary>
+    /// Applies the three-state narrow layout:
+    /// - Wide   (>= 1000 px): sidebar 120 DIP, full text, overview grid 2-col
+    /// - Narrow  (< 1000 px): sidebar  80 DIP, compact style, overview grid 2-col
+    /// - V-Narrow(< 900  px): sidebar   0 DIP (hidden),      overview grid 1-col
+    /// </summary>
+    private void ApplyNarrowMode()
+    {
+        bool isVeryNarrow = _narrowMode?.IsVeryNarrow ?? false;
+        bool isNarrow     = _narrowMode?.IsNarrow     ?? false;
+
+        // --- Detail mode: sidebar column width ---
+        double sidebarWidth = isVeryNarrow ? SidebarVeryNarrow
+                            : isNarrow     ? SidebarNarrow
+                                           : SidebarWide;
+
+        if (PART_DetailRoot?.ColumnDefinitions?.Count >= 1)
+            PART_DetailRoot.ColumnDefinitions[0].Width = new GridLength(sidebarWidth);
+
+        // Sidebar panel visibility (collapsed at very-narrow so it takes no space)
+        if (PART_SectionNav is not null)
+            PART_SectionNav.IsVisible = !isVeryNarrow;
+
+        // Compact style class on this UserControl drives narrower button padding/font
+        if (isNarrow && !isVeryNarrow)
+            Classes.Add("narrow-nav");
+        else
+            Classes.Remove("narrow-nav");
+
+        // --- Overview mode: card grid columns ---
+        // Very-narrow -> 1-col stack; otherwise keep 2-col (Rows=2, Columns=2)
+        if (PART_OverviewGrid is not null)
+        {
+            PART_OverviewGrid.Columns = isVeryNarrow ? 1 : 2;
+            // At very-narrow, 1-col means all 4 cards stack vertically;
+            // set Rows to 0 (auto) so UniformGrid calculates from child count.
+            PART_OverviewGrid.Rows = isVeryNarrow ? 0 : 2;
+        }
     }
 
     private void OnLoaded(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)

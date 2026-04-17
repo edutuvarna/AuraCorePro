@@ -1011,8 +1011,6 @@ public static class LocalizationService
         ["nav.serviceManager"] = "Service Manager",
         ["nav.autoSchedule"] = "Auto-Schedule",
         ["nav.aiRecommendations"] = "AI Recommendations",
-        ["nav.aiInsights"] = "AI Insights",
-        ["nav.aiChat"] = "AI Chat [Experimental]",
         ["nav.isoBuilder"] = "ISO Builder",
         ["nav.adminPanel"] = "Admin Panel",
 
@@ -1425,7 +1423,6 @@ public static class LocalizationService
 
         // ── Phase 3: AI Features ──
         ["nav.aiFeatures.title"] = "AI Features",
-        ["nav.aiFeatures.badge"] = "CORTEX",
 
         ["aiFeatures.hero.kicker"] = "CORTEX",
         ["aiFeatures.hero.title"] = "AI Features",
@@ -2475,8 +2472,6 @@ public static class LocalizationService
         ["nav.serviceManager"] = "Servis Yoneticisi",
         ["nav.autoSchedule"] = "Otomatik Zamanlama",
         ["nav.aiRecommendations"] = "Yapay Zeka Onerileri",
-        ["nav.aiInsights"] = "AI Analiz",
-        ["nav.aiChat"] = "AI Sohbet [Deneysel]",
         ["nav.isoBuilder"] = "ISO Olusturucu",
         ["nav.adminPanel"] = "Yonetici Paneli",
 
@@ -2889,7 +2884,6 @@ public static class LocalizationService
 
         // ── Phase 3: AI Features ──
         ["nav.aiFeatures.title"] = "Yapay Zekâ",
-        ["nav.aiFeatures.badge"] = "CORTEX",
 
         ["aiFeatures.hero.kicker"] = "CORTEX",
         ["aiFeatures.hero.title"] = "Yapay Zekâ",

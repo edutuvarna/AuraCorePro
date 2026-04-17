@@ -32,6 +32,19 @@
         </controls:ModuleHeader.Actions>
       </controls:ModuleHeader>
 
+      <!-- Intro Card -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="IntroTitle" Text="About System Health" FontWeight="SemiBold"
+                     FontSize="{DynamicResource FontSizeBody}"/>
+          <TextBlock x:Name="IntroBody"
+                     Text="This is the deep-dive view of all system vitals — CPU, RAM, disk, battery, startup programs, running processes. For real-time gauges at a glance, see the Dashboard."
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </controls:GlassCard>
+
       <!-- Health Score + System Info Row -->
       <Grid ColumnDefinitions="Auto,*">
 

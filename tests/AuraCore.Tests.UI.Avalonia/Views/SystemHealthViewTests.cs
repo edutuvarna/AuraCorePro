@@ -65,4 +65,34 @@ public class SystemHealthViewTests
         var cards = v.GetVisualDescendants().OfType<GlassCard>().ToList();
         Assert.NotEmpty(cards);
     }
+
+    [AvaloniaFact]
+    public void IntroCard_ContainsTitle()
+    {
+        EnsureAppServicesInitialized();
+        var v = new SystemHealthView();
+        using var handle = AvaloniaTestBase.RenderInWindow(v, 1200, 800);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var textBlocks = v.GetVisualDescendants().OfType<TextBlock>().ToList();
+        // Check for intro title (either EN or TR depending on locale)
+        var hasIntro = textBlocks.Any(tb =>
+            (tb.Text ?? "").Contains("About System Health", System.StringComparison.OrdinalIgnoreCase) ||
+            (tb.Text ?? "").Contains("Sistem Sağlığı Hakkında", System.StringComparison.Ordinal));
+        Assert.True(hasIntro, "Intro card title should be present");
+    }
+
+    [AvaloniaFact]
+    public void IntroCard_ContainsBody()
+    {
+        EnsureAppServicesInitialized();
+        var v = new SystemHealthView();
+        using var handle = AvaloniaTestBase.RenderInWindow(v, 1200, 800);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var textBlocks = v.GetVisualDescendants().OfType<TextBlock>().ToList();
+        // Check for intro body text (either EN or TR depending on locale)
+        var hasBody = textBlocks.Any(tb =>
+            (tb.Text ?? "").Contains("deep-dive", System.StringComparison.OrdinalIgnoreCase) ||
+            (tb.Text ?? "").Contains("ayrıntılı", System.StringComparison.Ordinal));
+        Assert.True(hasBody, "Intro card body should be present");
+    }
 }

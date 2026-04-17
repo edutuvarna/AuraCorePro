@@ -311,5 +311,7 @@ public partial class SystemHealthView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.systemHealth");
+        if (IntroTitle != null) IntroTitle.Text = LocalizationService._("systemhealth.intro.title");
+        if (IntroBody != null) IntroBody.Text = LocalizationService._("systemhealth.intro.body");
     }
 }

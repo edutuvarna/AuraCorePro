@@ -543,3 +543,7 @@ C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\pro.auracore.privhelper.exe
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\pro.auracore.privhelper.dll
 C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\pro.auracore.privhelper.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\AuraCore.IPC.Contracts.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\AuraCore.PrivilegedService.Ops.dll
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\AuraCore.PrivilegedService.Ops.pdb
+C:\Users\Admin\Desktop\AuraCorePro\AuraCorePro\tests\AuraCore.Tests.Platform\bin\Debug\net8.0\AuraCore.IPC.Contracts.pdb

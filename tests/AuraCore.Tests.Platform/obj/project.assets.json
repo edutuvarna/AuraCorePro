@@ -2635,6 +2635,19 @@
           "bin/placeholder/AuraCore.Infrastructure.Windows.dll": {}
         }
       },
+      "AuraCore.IPC.Contracts/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "AuraCore.SharedKernel": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/AuraCore.IPC.Contracts.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AuraCore.IPC.Contracts.dll": {}
+        }
+      },
       "AuraCore.Module.AppInstaller/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
@@ -3404,6 +3417,20 @@
         },
         "runtime": {
           "bin/placeholder/AuraCore.Platform.Update.dll": {}
+        }
+      },
+      "AuraCore.PrivilegedService.Ops/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "AuraCore.IPC.Contracts": "1.0.0",
+          "AuraCore.SharedKernel": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/AuraCore.PrivilegedService.Ops.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AuraCore.PrivilegedService.Ops.dll": {}
         }
       },
       "AuraCore.Pro/1.0.0": {
@@ -7252,6 +7279,11 @@
       "path": "../../src/Infrastructure/AuraCore.Infrastructure.Windows/AuraCore.Infrastructure.Windows.csproj",
       "msbuildProject": "../../src/Infrastructure/AuraCore.Infrastructure.Windows/AuraCore.Infrastructure.Windows.csproj"
     },
+    "AuraCore.IPC.Contracts/1.0.0": {
+      "type": "project",
+      "path": "../../src/IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj",
+      "msbuildProject": "../../src/IPC/AuraCore.IPC.Contracts/AuraCore.IPC.Contracts.csproj"
+    },
     "AuraCore.Module.AppInstaller/1.0.0": {
       "type": "project",
       "path": "../../src/Modules/AuraCore.Module.AppInstaller/AuraCore.Module.AppInstaller.csproj",
@@ -7507,6 +7539,11 @@
       "path": "../../src/Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj",
       "msbuildProject": "../../src/Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj"
     },
+    "AuraCore.PrivilegedService.Ops/1.0.0": {
+      "type": "project",
+      "path": "../../src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj",
+      "msbuildProject": "../../src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj"
+    },
     "AuraCore.Pro/1.0.0": {
       "type": "project",
       "path": "../../src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj",
@@ -7532,6 +7569,7 @@
       "AuraCore.Platform.Diagnostics >= 1.0.0",
       "AuraCore.Platform.Telemetry >= 1.0.0",
       "AuraCore.Platform.Update >= 1.0.0",
+      "AuraCore.PrivilegedService.Ops >= 1.0.0",
       "AuraCore.Pro >= 1.0.0",
       "Avalonia >= 11.2.7",
       "Avalonia.Headless.XUnit >= 11.2.7",
@@ -7607,6 +7645,9 @@
             },
             "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Service\\AuraCore.PrivHelper.MacOS\\AuraCore.PrivHelper.MacOS.csproj": {
               "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Service\\AuraCore.PrivHelper.MacOS\\AuraCore.PrivHelper.MacOS.csproj"
+            },
+            "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Service\\AuraCore.PrivilegedService.Ops\\AuraCore.PrivilegedService.Ops.csproj": {
+              "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Service\\AuraCore.PrivilegedService.Ops\\AuraCore.PrivilegedService.Ops.csproj"
             },
             "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\UI\\AuraCore.UI.Avalonia\\AuraCore.UI.Avalonia.csproj": {
               "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\UI\\AuraCore.UI.Avalonia\\AuraCore.UI.Avalonia.csproj"

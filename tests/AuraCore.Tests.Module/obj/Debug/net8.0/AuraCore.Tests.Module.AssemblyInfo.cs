@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Tests.Module")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9aee439b5359b448f4eb75d7eedd5dc560c3ac70")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cc278585789abed03d6991e1c45bad3048cb608")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Tests.Module")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Tests.Module")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

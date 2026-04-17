@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.API.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdce30b68327afc689fbbcf30137871e795b2d90")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cc278585789abed03d6991e1c45bad3048cb608")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.API.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.API.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

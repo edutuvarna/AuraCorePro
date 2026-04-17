@@ -34,11 +34,11 @@ public class SidebarViewModelPhase3Tests
     }
 
     [Fact]
-    public void AIFeaturesCategory_IsAccent()
+    public void AIFeaturesCategory_HasBadge()
     {
         var vm = new SidebarViewModel();
         var aiCategory = vm.Categories.First(c => c.Id == "ai-features");
-        Assert.True(aiCategory.IsAccent);
+        Assert.True(aiCategory.HasBadge);
     }
 
     [Fact]

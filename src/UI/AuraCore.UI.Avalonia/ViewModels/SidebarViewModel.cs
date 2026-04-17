@@ -13,9 +13,12 @@ public sealed record SidebarCategoryVM(
     string LocalizationKey,
     string Icon,
     IReadOnlyList<SidebarModuleVM> Modules,
-    bool IsAccent = false,
-    string? Badge = null
-);
+    string? Badge = null)
+{
+    /// <summary>True when <see cref="Badge"/> is non-empty — derives the
+    /// accent styling the dropped <c>IsAccent</c> flag used to drive.</summary>
+    public bool HasBadge => !string.IsNullOrEmpty(Badge);
+}
 
 /// <summary>A single navigable module under a category.</summary>
 public sealed record SidebarModuleVM(
@@ -107,7 +110,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             new("apps-tools", "nav.categoryAppsTools", "IconPackage", BuildAppsTools()),
             new("ai-features", "nav.categoryAiFeatures", "IconSparklesFilled",
                 new SidebarModuleVM[] { Module("ai-features", "nav.categoryAiFeatures") },
-                IsAccent: true, Badge: "CORTEX"),
+                Badge: "CORTEX"),
         };
         return list;
     }

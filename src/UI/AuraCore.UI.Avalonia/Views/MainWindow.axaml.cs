@@ -208,13 +208,13 @@ public sealed partial class MainWindow : Window
         {
             var catIdCapture = cat.Id;
             var isExpanded = _sidebarVm.ExpandedCategoryId == cat.Id;
-            var accent = cat.IsAccent
+            var accent = cat.HasBadge
                 ? FindBrush("AccentPurpleBrush", global::Avalonia.Media.Brushes.MediumPurple)
                 : FindBrush("AccentTealBrush", global::Avalonia.Media.Brushes.Teal);
 
             NavPanel.Children.Add(CreateNavItem(cat.LocalizationKey, cat.Icon, accent,
                 isActive: false,
-                trailingChipText: cat.IsAccent ? "CORTEX" : null,
+                trailingChipText: cat.HasBadge ? cat.Badge : null,
                 onClick: () => { _sidebarVm.ToggleCategory(catIdCapture); RebuildSidebar(); }));
 
             if (isExpanded)

@@ -7,6 +7,7 @@ using global::Avalonia.Controls;
 using global::Avalonia.Threading;
 using global::Avalonia.VisualTree;
 using AuraCore.Application.Interfaces.Engines;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.UI.Avalonia.Helpers;
 using AuraCore.UI.Avalonia.Services.AI;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -142,11 +143,18 @@ public partial class DashboardView : UserControl
 
     private void NavigateToAIFeatures()
     {
-        // Phase 3: Smart Optimize CTA routes to the unified AIFeaturesView (overview).
-        // Task 32 will refine this with conditional logic based on RecommendationsEnabled
-        // and may deep-link into the Recommendations section.
-        if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
+        // Phase 5.4 Task 11: route through INavigationService so MainWindow can
+        // deep-link into the Recommendations section instead of just landing on
+        // the overview. Falls back to direct navigation if DI is unavailable.
+        var nav = App.Services?.GetService<INavigationService>();
+        if (nav is not null)
+        {
+            nav.NavigateTo("ai-recommendations");
+        }
+        else if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
+        {
             main.NavigateToModule("ai-features");
+        }
     }
 
     private void HookResponsiveBreakpoint()

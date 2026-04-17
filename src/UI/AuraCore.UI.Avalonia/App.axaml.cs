@@ -1,6 +1,7 @@
 using global::Avalonia.Controls.ApplicationLifetimes;
 using global::Avalonia.Markup.Xaml;
 using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Desktop.Services.Navigation;
 using AuraCore.Desktop.Services.PrivilegeIpc;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
@@ -37,6 +38,9 @@ public partial class App : global::Avalonia.Application
 
         // ── Phase 5.3: Narrow-mode responsive service ──
         sc.AddSingleton<INarrowModeService, NarrowModeService>();
+
+        // ── Phase 5.4: Navigation service (Dashboard Smart Optimize deep-link) ──
+        sc.AddSingleton<INavigationService, NavigationService>();
 
         // ── Cross-platform modules (Windows + Linux + macOS) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);

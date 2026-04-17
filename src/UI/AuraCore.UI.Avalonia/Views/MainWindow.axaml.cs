@@ -10,6 +10,7 @@ using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Desktop.Services.Navigation;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Domain.Enums;
 using AuraCore.UI.Avalonia.Views.Banners;
@@ -29,6 +30,10 @@ public sealed partial class MainWindow : Window
 
     // Phase 5.3 Task 6: responsive narrow-mode service
     private readonly INarrowModeService? _narrowMode;
+
+    // Phase 5.4 Task 11: navigation service for deep-links (e.g. Dashboard Smart Optimize)
+    private readonly INavigationService? _nav;
+    private EventHandler<NavigationRequestedEventArgs>? _navSectionRequestedHandler;
 
     public MainWindow()
     {
@@ -79,6 +84,18 @@ public sealed partial class MainWindow : Window
                 concreteInit.UpdateWidth(Bounds.Width);
         }
         catch { /* DI / design-time fallback — narrow mode stays at default wide state */ }
+
+        // Phase 5.4 Task 11: subscribe to navigation service for Smart Optimize deep-link
+        try
+        {
+            _nav = App.Services?.GetService<INavigationService>();
+            if (_nav is not null)
+            {
+                _navSectionRequestedHandler = OnNavigationSectionRequested;
+                _nav.SectionRequested += _navSectionRequestedHandler;
+            }
+        }
+        catch { /* DI / design-time fallback — navigation deep-links unavailable */ }
 
         BuildNavigation();
         RefreshUserChip();
@@ -183,6 +200,33 @@ public sealed partial class MainWindow : Window
     }
 
     // ─── NAVIGATION (SidebarViewModel-driven) ────────────────────────
+
+    // Phase 5.4 Task 11: INavigationService subscription handler + cleanup
+
+    private void OnNavigationSectionRequested(object? sender, NavigationRequestedEventArgs e)
+    {
+        if (e.SectionId.StartsWith("ai-", StringComparison.Ordinal))
+        {
+            var subId = e.SectionId.Substring("ai-".Length);
+            // Navigate to the AI features page (mirrors the sidebar click path)
+            NavigateToModule("ai-features");
+            // Forward the sub-section to the view that is now active in ContentArea
+            if (ContentArea.Content is Pages.AIFeaturesView aiView)
+                aiView.ShowSection(subId);
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[MainWindow.OnNavigationSectionRequested] unhandled section id: {e.SectionId}");
+        }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (_nav is not null && _navSectionRequestedHandler is not null)
+            _nav.SectionRequested -= _navSectionRequestedHandler;
+        base.OnClosed(e);
+    }
 
     /// <summary>Public entry so other components (e.g., Dashboard) can navigate.</summary>
     public void NavigateToModule(string moduleId)

@@ -135,6 +135,14 @@ public partial class AIFeaturesView : UserControl
 
         // Apply localization to back button
         ApplyLocalization();
+
+        // Drain any pending ShowSection call that arrived before DataContext was set.
+        if (_pendingSection is not null)
+        {
+            var pending = _pendingSection;
+            _pendingSection = null;
+            ApplySection(vm, pending);
+        }
     }
 
     /// <summary>
@@ -165,6 +173,47 @@ public partial class AIFeaturesView : UserControl
             "chat" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AI.ChatSection>(),
             _ => new UserControl { Content = new TextBlock { Text = $"[{section}] placeholder — wired in Task 20+" } },
         };
+    }
+
+    /// <summary>
+    /// Switch the active inner section. Called by MainWindow routing when
+    /// INavigationService.SectionRequested fires with an "ai-*" id.
+    /// Accepted subSectionIds: "overview", "insights", "recommendations",
+    /// "schedule", "chat". Unknown ids are no-ops (graceful forward-compat).
+    /// </summary>
+    public void ShowSection(string subSectionId)
+    {
+        if (DataContext is not AIFeaturesViewModel vm)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[AIFeaturesView.ShowSection] DataContext not yet an AIFeaturesViewModel — queuing section: {subSectionId}");
+            _pendingSection = subSectionId;
+            return;
+        }
+
+        ApplySection(vm, subSectionId);
+    }
+
+    private string? _pendingSection;
+
+    private void ApplySection(AIFeaturesViewModel vm, string subSectionId)
+    {
+        switch (subSectionId)
+        {
+            case "overview":
+                vm.NavigateToOverview.Execute(null);
+                break;
+            case "insights":
+            case "recommendations":
+            case "schedule":
+            case "chat":
+                vm.NavigateToSection.Execute(subSectionId);
+                break;
+            default:
+                System.Diagnostics.Debug.WriteLine(
+                    $"[AIFeaturesView.ShowSection] unknown subSectionId: {subSectionId}");
+                break;
+        }
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

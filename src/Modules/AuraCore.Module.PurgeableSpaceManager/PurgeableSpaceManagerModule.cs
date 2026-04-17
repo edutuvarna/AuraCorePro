@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.PurgeableSpaceManager.Models;
@@ -12,6 +13,13 @@ namespace AuraCore.Module.PurgeableSpaceManager;
 
 public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public PurgeableSpaceManagerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "purgeable-space-manager";
     public string DisplayName => "Purgeable Space Manager";
     public OptimizationCategory Category => OptimizationCategory.DiskCleanup;
@@ -104,9 +112,16 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 
                 if (itemId == "thin-snapshots")
                 {
-                    // Aggressive: ask for 1TB of free space (impossible), which forces
-                    // tmutil to remove all thinnable local snapshots
-                    var r = await ProcessRunner.RunAsync("tmutil", "thinlocalsnapshots / 999999999999 1", ct, timeoutSeconds: 300);
+                    // Aggressive: ask for 1TB of free space (9.99GB = 9990000000 bytes; max 10 digits per validator),
+                    // which forces tmutil to remove all thinnable local snapshots.
+                    // Action id "purgeable" per mini-spec §3.9; argv: ["thinlocalsnapshots", "/", bytes, urgency]
+                    var r = await _shell.RunPrivilegedAsync(
+                        new PrivilegedCommand(
+                            Id: "purgeable",
+                            Executable: "tmutil",
+                            Arguments: new[] { "thinlocalsnapshots", "/", "9990000000", "1" },
+                            TimeoutSeconds: 300),
+                        ct);
                     ok = r.Success;
                 }
                 else if (itemId == "run-periodic")
@@ -120,7 +135,13 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
                 }
                 else if (itemId == "all")
                 {
-                    var r1 = await ProcessRunner.RunAsync("tmutil", "thinlocalsnapshots / 999999999999 1", ct, timeoutSeconds: 300);
+                    var r1 = await _shell.RunPrivilegedAsync(
+                        new PrivilegedCommand(
+                            Id: "purgeable",
+                            Executable: "tmutil",
+                            Arguments: new[] { "thinlocalsnapshots", "/", "9990000000", "1" },
+                            TimeoutSeconds: 300),
+                        ct);
                     ok = r1.Success;
                     var userCachesOk = await CleanOldUserCachesAsync(ct);
                     ok = ok || userCachesOk;
@@ -205,5 +226,9 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 public static class PurgeableSpaceManagerRegistration
 {
     public static IServiceCollection AddPurgeableSpaceManagerModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, PurgeableSpaceManagerModule>();
+    {
+        services.AddSingleton<PurgeableSpaceManagerModule>();
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<PurgeableSpaceManagerModule>());
+        return services;
+    }
 }

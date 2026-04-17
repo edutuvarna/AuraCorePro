@@ -250,6 +250,7 @@ public class DependencyInjectionSmokeTests
     {
         var sc = new ServiceCollection();
         // Mirror App.axaml.cs Phase 4.4.2 block
+        sc.AddSingleton<IShellCommandService>(new StubShellCommandService());
         sc.AddSingleton<PurgeableSpaceManagerModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<PurgeableSpaceManagerModule>());
         sc.AddTransient<PurgeableSpaceManagerViewModel>();

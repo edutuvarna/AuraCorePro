@@ -212,6 +212,9 @@
         </Border>
       </Grid>
 
+      <!-- Row 4: Disk Health summary card (Phase 5.5.2.2 — moved from sidebar) -->
+      <controls:DiskHealthSummaryCard x:Name="DiskHealthCard"/>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -192,7 +192,6 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             Module("driver-updater",  "nav.driverUpdater", "windows"),
             Module("service-manager", "nav.serviceManager","windows"),
             Module("iso-builder",     "nav.isoBuilder",    "windows"),
-            Module("disk-health",     "nav.diskHealth"),
             Module("space-analyzer",  "nav.spaceAnalyzer"),
             Module("system-health",   "nav.systemHealth"),
         };

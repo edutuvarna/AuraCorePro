@@ -81,6 +81,7 @@ public partial class DashboardView : UserControl
             HookHeroButton();
             HookResponsiveBreakpoint();
             InitQuickActionsFromDI();
+            InitDiskHealthCard();
         };
         Unloaded += (s, e) => StopPolling();
     }
@@ -193,6 +194,19 @@ public partial class DashboardView : UserControl
                 });
         }
         catch { /* DI unavailable — tiles remain with no-op stubs */ }
+    }
+
+    private void InitDiskHealthCard()
+    {
+        // Phase 5.5.2.2: Disk Health widget on Dashboard.
+        // Live SMART data integration is a follow-up item; the card is a navigation
+        // surface today — "View details" deep-links to the full DiskHealthView.
+        try
+        {
+            var nav = App.Services?.GetService<INavigationService>();
+            DiskHealthCard?.Initialize(nav, "—", "—", "—");
+        }
+        catch { /* DI unavailable — card remains with placeholder strings */ }
     }
 
     private void NavigateToAIFeatures()

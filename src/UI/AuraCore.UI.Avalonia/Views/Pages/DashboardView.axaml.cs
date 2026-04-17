@@ -198,15 +198,37 @@ public partial class DashboardView : UserControl
 
     private void InitDiskHealthCard()
     {
-        // Phase 5.5.2.2: Disk Health widget on Dashboard.
-        // Live SMART data integration is a follow-up item; the card is a navigation
-        // surface today — "View details" deep-links to the full DiskHealthView.
+        // Phase 5.5.2.2.1: Wire real disk data into Dashboard widget.
+        // Step 1 — initialise card with placeholders immediately so Dashboard
+        //          Loaded returns fast (no blocking).
+        // Step 2 — fire background scan; post result back to UI thread when done.
         try
         {
             var nav = App.Services?.GetService<INavigationService>();
             DiskHealthCard?.Initialize(nav, "—", "—", "—");
         }
-        catch { /* DI unavailable — card remains with placeholder strings */ }
+        catch { /* DI unavailable — card stays with placeholder strings */ }
+
+        // Fire-and-forget: run scan on background thread, update card on UI thread.
+        _ = RunDiskHealthScanAsync();
+    }
+
+    private async Task RunDiskHealthScanAsync()
+    {
+        try
+        {
+            var result = await DiskHealthScanner.ScanAsync().ConfigureAwait(false);
+            Dispatcher.UIThread.Post(() =>
+            {
+                try { DiskHealthCard?.ApplyScanResult(result); }
+                catch { /* card may have been unloaded — ignore */ }
+            });
+        }
+        catch
+        {
+            // Graceful degradation: card stays at placeholders, no crash.
+            System.Diagnostics.Debug.WriteLine("[DashboardView] DiskHealthScanner failed silently.");
+        }
     }
 
     private void NavigateToAIFeatures()

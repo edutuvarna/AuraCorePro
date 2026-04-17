@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using AuraCore.Application.Interfaces.Platform;
+using AuraCore.UI.Avalonia.Helpers;
 
 namespace AuraCore.UI.Avalonia.Views.Controls;
 
@@ -36,6 +38,21 @@ public partial class DiskHealthSummaryCard : UserControl
         StatusLine.Text = status;
         SmartBadge.Text = smartBadge;
         WorstTemp.Text  = worstTemp;
+    }
+
+    /// <summary>
+    /// Updates the card's three summary fields from a completed scan result.
+    /// Must be called on the UI thread (use <see cref="Dispatcher.UIThread"/> when
+    /// posting from a background task).
+    /// </summary>
+    public void ApplyScanResult(DiskHealthScanResult result)
+    {
+        StatusText    = result.StatusText;
+        SmartText     = result.SmartText;
+        WorstTempText = result.WorstTempText;
+        StatusLine.Text = result.StatusText;
+        SmartBadge.Text = result.SmartText;
+        WorstTemp.Text  = result.WorstTempText;
     }
 
     private void ViewDetails_Click(object? sender, RoutedEventArgs e)

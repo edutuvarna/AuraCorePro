@@ -1,7 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:converters="using:AuraCore.UI.Avalonia.Converters"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.SpaceAnalyzerView">
+  <UserControl.Resources>
+    <converters:DirectoryGlyphConverter x:Key="DirectoryGlyphConverter"/>
+    <converters:ByteSizeConverter       x:Key="ByteSizeConverter"/>
+  </UserControl.Resources>
   <ScrollViewer>
     <StackPanel Spacing="16">
 
@@ -60,42 +65,33 @@
         </Grid>
       </controls:GlassCard>
 
-      <!-- Folder list card -->
+      <!-- Directory tree card — lazy-loading drill-down (Phase 5.5.4) -->
       <controls:GlassCard>
-        <ScrollViewer>
-          <ItemsControl x:Name="FolderList">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <Button Background="Transparent" HorizontalAlignment="Stretch"
-                        Padding="12,8" Margin="0,1" CornerRadius="4"
-                        Click="Folder_Click" Tag="{Binding Path}">
-                  <Grid ColumnDefinitions="Auto,*,80,80">
-                    <TextBlock Text="{Binding Icon}" FontSize="{DynamicResource FontSizeBody}"
-                               VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}"
-                                 FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
-                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
-                      <TextBlock Text="{Binding ItemCount}"
-                                 FontSize="{DynamicResource FontSizeLabel}"
-                                 Foreground="{DynamicResource TextMutedBrush}"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding Size}"
-                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
-                               Foreground="{DynamicResource AccentBlueBrush}"
-                               VerticalAlignment="Center" TextAlignment="Right"/>
-                    <Border Grid.Column="3" Height="6" CornerRadius="3"
-                            Background="{DynamicResource BgCardBrush}"
-                            VerticalAlignment="Center" Margin="8,0,0,0">
-                      <Border Height="6" CornerRadius="3" Background="{Binding BarBrush}"
-                              HorizontalAlignment="Left" Width="{Binding BarWidth}"/>
-                    </Border>
-                  </Grid>
-                </Button>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </ScrollViewer>
+        <TreeView x:Name="DirectoryTree" MinHeight="200">
+          <TreeView.ItemTemplate>
+            <TreeDataTemplate ItemsSource="{Binding Children}">
+              <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2">
+                <TextBlock Text="{Binding IsDirectory, Converter={StaticResource DirectoryGlyphConverter}}"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding DisplayName}"
+                           Margin="8,0,0,0"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock Grid.Column="2"
+                           Text="{Binding SizeBytes, Converter={StaticResource ByteSizeConverter}}"
+                           Foreground="{DynamicResource AccentBlueBrush}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           VerticalAlignment="Center"
+                           Margin="16,0,0,0"/>
+              </Grid>
+            </TreeDataTemplate>
+          </TreeView.ItemTemplate>
+        </TreeView>
       </controls:GlassCard>
 
     </StackPanel>

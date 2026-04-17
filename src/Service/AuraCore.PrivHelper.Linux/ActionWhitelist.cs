@@ -67,6 +67,8 @@ public sealed class ActionWhitelist
             ["kernel"]         = new KernelArgvValidator(),
             ["app-installer"]  = new AppInstallerArgvValidator(),
             ["grub"]           = new GrubArgvValidator(),
+            // Phase 5.5 — Symlink Manager (create new symlinks)
+            ["symlink.create"] = new SymlinkArgvValidator(),
         };
     }
 

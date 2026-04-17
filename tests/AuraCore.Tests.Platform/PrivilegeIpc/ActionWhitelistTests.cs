@@ -9,11 +9,12 @@ public class ActionWhitelistTests
     private readonly ActionWhitelist _wl = new();
 
     [Fact]
-    public void RegisteredActionIds_has_the_six_action_ids()
+    public void RegisteredActionIds_has_the_seven_action_ids()
     {
         _wl.RegisteredActionIds.Should().BeEquivalentTo(new[]
         {
             "journal", "snap-flatpak", "docker", "kernel", "app-installer", "grub",
+            "symlink.create",  // Phase 5.5 — Symlink Manager create action
         });
     }
 
@@ -205,11 +206,45 @@ public class ActionWhitelistTests
         r.IsRejected.Should().BeTrue();
     }
 
+    // Symlink.Create (Phase 5.5)
+    [Fact]
+    public void SymlinkCreate_valid_abs_paths_accepted()
+    {
+        var r = _wl.Dispatch("symlink.create",
+            new[] { "-s", "-f", "--", "/opt/mytool/bin/tool", "/usr/local/bin/mytool" });
+        r.IsRejected.Should().BeFalse();
+        r.Executable.Should().Be("/bin/ln");
+    }
+
+    [Fact]
+    public void SymlinkCreate_rejects_shell_metacharacters_in_path()
+    {
+        var r = _wl.Dispatch("symlink.create",
+            new[] { "-s", "-f", "--", "/opt/tool; rm -rf /", "/usr/local/bin/x" });
+        r.IsRejected.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SymlinkCreate_rejects_path_traversal()
+    {
+        var r = _wl.Dispatch("symlink.create",
+            new[] { "-s", "-f", "--", "/opt/../../etc/passwd", "/usr/local/bin/x" });
+        r.IsRejected.Should().BeTrue();
+    }
+
+    [Fact]
+    public void SymlinkCreate_rejects_wrong_arg_count()
+    {
+        var r = _wl.Dispatch("symlink.create", new[] { "-s", "/opt/tool" });
+        r.IsRejected.Should().BeTrue();
+    }
+
     [Fact]
     public void IsRegistered_returns_true_for_known_action()
     {
         _wl.IsRegistered("journal").Should().BeTrue();
         _wl.IsRegistered("grub").Should().BeTrue();
+        _wl.IsRegistered("symlink.create").Should().BeTrue();
     }
 
     [Fact]

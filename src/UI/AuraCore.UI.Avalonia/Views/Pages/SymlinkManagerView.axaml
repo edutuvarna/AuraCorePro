@@ -5,6 +5,12 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
+      <!-- Intro -->
+      <TextBlock Text="Find and repair broken links, or create new ones."
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 Margin="0,0,0,-4"/>
+
       <!-- Header -->
       <controls:ModuleHeader Title="Symlink Manager"
                              Subtitle="Create, view, and delete symbolic links and junctions">

@@ -27,7 +27,7 @@ public class PrivHelperAssetsTests
     }
 
     [Fact]
-    public void Polkit_policy_has_all_six_action_ids()
+    public void Polkit_policy_has_all_seven_action_ids()
     {
         using var stream = OpenEmbeddedResource("pro.auracore.privhelper.policy");
         var doc = new XmlDocument();
@@ -41,6 +41,7 @@ public class PrivHelperAssetsTests
             "pro.auracore.privhelper.kernel",
             "pro.auracore.privhelper.app-installer",
             "pro.auracore.privhelper.grub",
+            "pro.auracore.privhelper.symlink-create",  // Phase 5.5
         });
     }
 
@@ -52,7 +53,7 @@ public class PrivHelperAssetsTests
         doc.Load(stream);
         var defaults = doc.SelectNodes("//defaults/allow_active")!.Cast<XmlElement>().Select(e => e.InnerText).ToList();
         defaults.Should().AllBe("auth_admin_keep");
-        defaults.Should().HaveCount(6);
+        defaults.Should().HaveCount(7); // Phase 5.5: added symlink-create
     }
 
     [Fact]

@@ -163,7 +163,9 @@ public partial class DashboardView : UserControl
         _narrow = narrow;
 
         SystemInfoCard.IsVisible = !narrow;
-        MonitoringText.Text = narrow ? "Cortex monitoring" : "Cortex is monitoring · Auto-detected";
+        MonitoringText.Text = narrow
+            ? LocalizationService.Get("dash.cortex.monitoring.subtitle")
+            : LocalizationService.Get("dash.cortex.monitoring.subtitle.wide");
 
         // In narrow mode, Quick Actions card expands to fill the full bottom row
         // (since SystemInfoCard is hidden, we avoid a lonely Quick Actions on the right).

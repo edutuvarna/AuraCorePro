@@ -14,7 +14,6 @@
                      FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="SemiBold"/>
           <TextBlock x:Name="MonitoringText"
-                     Text="Cortex is monitoring"
                      IsVisible="{Binding ShowCortexSubtitle}"
                      Foreground="{DynamicResource TextMutedBrush}"
                      FontSize="{DynamicResource FontSizeBodySmall}"/>

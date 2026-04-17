@@ -106,6 +106,8 @@ public static class LocalizationService
         // ── Dashboard ──
         ["dash.title"] = "Dashboard",
         ["dash.subtitle"] = "Real-time system monitoring and quick actions",
+        ["dash.cortex.monitoring.subtitle"] = "Cortex is monitoring",
+        ["dash.cortex.monitoring.subtitle.wide"] = "Cortex is monitoring · Auto-detected",
         ["dash.welcome"] = "Welcome back, {0}",
         ["dash.cpu"] = "CPU",
         ["dash.ram"] = "RAM",
@@ -1582,6 +1584,8 @@ public static class LocalizationService
         // ── Kontrol Paneli ──
         ["dash.title"] = "Kontrol Paneli",
         ["dash.subtitle"] = "Gerçek zamanlı sistem izleme ve hızlı işlemler",
+        ["dash.cortex.monitoring.subtitle"] = "Cortex sisteminizi izliyor",
+        ["dash.cortex.monitoring.subtitle.wide"] = "Cortex sisteminizi izliyor · Otomatik tespit",
         ["dash.welcome"] = "Tekrar hoş geldiniz, {0}",
         ["dash.cpu"] = "İşlemci",
         ["dash.ram"] = "Bellek",

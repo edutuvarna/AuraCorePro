@@ -164,15 +164,32 @@
 
       <!-- Bottom Actions Card -->
       <controls:GlassCard>
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8">
-            <TextBlock Text="Open Windows Update"
-                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
-          </Button>
-          <Button Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
-            <TextBlock Text="Open Device Manager"
-                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
-          </Button>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8">
+              <TextBlock Text="Open Windows Update"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+            </Button>
+            <Button Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
+              <TextBlock Text="Open Device Manager"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+            </Button>
+            <Button Classes="action-btn" Click="PrivScan_Click" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="PrivScanLabel" Text="Scan devices (privileged)"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+          <!-- Privileged helper status banner (hidden until needed) -->
+          <Border x:Name="HelperMissingBanner"
+                  IsVisible="False"
+                  Background="#20EF4444" CornerRadius="6" Padding="12,8">
+            <TextBlock Text="Privileged helper not installed — run scripts/install-privileged-service.ps1 as admin"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="#EF4444" TextWrapping="Wrap"/>
+          </Border>
         </StackPanel>
       </controls:GlassCard>
 

@@ -93,6 +93,32 @@ public partial class DriverUpdaterView : UserControl
     private async void DevMgr_Click(object? sender, RoutedEventArgs e)
     {
         if (_module is not null) await _module.OpenDeviceManagerAsync();
+    }
+
+    private async void PrivScan_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_module is null) return;
+        PrivScanLabel.Text = "Scanning...";
+        HelperMissingBanner.IsVisible = false;
+        try
+        {
+            var outcome = await _module.ScanDevicesAsync();
+            if (outcome.HelperMissing)
+            {
+                HelperMissingBanner.IsVisible = true;
+                SubText.Text = "Privileged helper not installed.";
+            }
+            else if (outcome.Success)
+            {
+                SubText.Text = "Privileged device scan complete.";
+            }
+            else
+            {
+                SubText.Text = $"Scan failed: {outcome.Error}";
+            }
+        }
+        catch (System.Exception ex) { SubText.Text = $"Scan error: {ex.Message}"; }
+        finally { PrivScanLabel.Text = "Scan devices (privileged)"; }
 }
 
     private void ApplyLocalization()

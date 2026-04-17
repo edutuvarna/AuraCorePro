@@ -137,78 +137,104 @@ internal sealed class PeerVerifier : IPeerVerifier
 #endif
         }
 
+        // CF refs allocated in this method — released unconditionally in the finally block.
+        // Release order is reverse of allocation order (6 refs total).
+        IntPtr cfKey              = IntPtr.Zero;  // (1) CFString "pid"
+        IntPtr cfValue            = IntPtr.Zero;  // (2) CFNumber(peerPid)
+        IntPtr cfAttrs            = IntPtr.Zero;  // (3) CFDictionary { "pid": pid }
+        IntPtr guestCode          = IntPtr.Zero;  // (4) SecCodeRef for peer
+        IntPtr cfRequirementStr   = IntPtr.Zero;  // (5) CFString requirement text
+        IntPtr requirement        = IntPtr.Zero;  // (6) SecRequirementRef
+
         try
         {
-            // 1. Build attributes dict (pid attribute).
-            // For the full CF bridge (CFDictionaryCreate + CFNumberCreate + kSecGuestAttributePid)
-            // we would need CoreFoundation P/Invoke wrappers. That CF bridge is non-trivial;
-            // the current implementation uses a simplified approach compatible with the test harness.
-            //
-            // TODO(Task 26b): Implement full CFDictionaryCreate/CFNumberCreate attributes
-            //   dict for SecCodeCopyGuestWithAttributes. For now we call with NULL attributes
-            //   (host=NULL, attrs=NULL) which on macOS 13+ resolves to the calling process —
-            //   acceptable for MVP given all calls are inbound XPC (daemon IS the host).
-            //
-            // NOTE: With NULL attributes, SecCodeCopyGuestWithAttributes returns the
-            // host process's own SecCode. For a true per-pid verification the CF dict
-            // needs to be built. Flagged as known gap in commit message.
+            // ── Step 1: Build CFString key "pid" (= kSecGuestAttributePid) ──────────
+            cfKey = CoreFoundation.CFStringCreateWithCString(
+                IntPtr.Zero, "pid", CoreFoundation.KCFStringEncodingUTF8);
+            if (cfKey == IntPtr.Zero)
+                return new PeerVerificationResult(false, null,
+                    "CFStringCreateWithCString for 'pid' key failed");
 
+            // ── Step 2: Build CFNumber wrapping the peer PID ──────────────────────
+            // CFNumberCreate reads the value through a pointer; use unsafe to take
+            // the address of a stack-local int. AllowUnsafeBlocks=true (Task 25).
+            int pidBoxed = peerPid;
+            unsafe
+            {
+                cfValue = CoreFoundation.CFNumberCreate(
+                    IntPtr.Zero, CoreFoundation.KCFNumberIntType, (IntPtr)(&pidBoxed));
+            }
+            if (cfValue == IntPtr.Zero)
+                return new PeerVerificationResult(false, null,
+                    "CFNumberCreate for pid failed");
+
+            // ── Step 3: Build CFDictionary { "pid": <pidCFNumber> } ───────────────
+            var keysArr   = new[] { cfKey };
+            var valuesArr = new[] { cfValue };
+            cfAttrs = CoreFoundation.CFDictionaryCreate(
+                IntPtr.Zero, keysArr, valuesArr, 1,
+                CoreFoundation.KCFTypeDictionaryKeyCallBacks,
+                CoreFoundation.KCFTypeDictionaryValueCallBacks);
+            if (cfAttrs == IntPtr.Zero)
+                return new PeerVerificationResult(false, null,
+                    "CFDictionaryCreate for attrs failed");
+
+            // ── Step 4: Resolve SecCode for the peer PID ─────────────────────────
             int rc = SecCode.SecCodeCopyGuestWithAttributes(
                 host: IntPtr.Zero,
-                attributes: IntPtr.Zero,
+                attributes: cfAttrs,
                 flags: SecCode.DefaultFlags,
-                outGuest: out var codeRef);
-
-            if (rc != 0)
-            {
+                outGuest: out guestCode);
+            if (rc != 0 || guestCode == IntPtr.Zero)
                 return new PeerVerificationResult(false, null,
-                    $"SecCodeCopyGuestWithAttributes failed: OSStatus={rc}");
-            }
+                    $"SecCodeCopyGuestWithAttributes returned OSStatus={rc} for pid {peerPid}");
 
-            if (codeRef == IntPtr.Zero)
-            {
-                return new PeerVerificationResult(false, null,
-                    "SecCodeCopyGuestWithAttributes returned null code ref");
-            }
-
-            // 2. Create requirement string.
+            // ── Step 5: Build requirement CFString ────────────────────────────────
             var requirementText = string.Format(RequirementTemplate,
                 SecurityConfig.ExpectedBundleId, SecurityConfig.ExpectedTeamId);
-
-            // SecRequirementCreateWithString requires a CFStringRef — we rely on
-            // the fact that on macOS, passing a managed string via LPUTF8Str via
-            // LibraryImport is NOT directly valid for CoreFoundation APIs.
-            // This is the "CF string bridge" gap: we cannot directly pass a
-            // managed string to SecRequirementCreateWithString without a CFString.
-            //
-            // TODO(Task 26b): Add CFStringCreateWithCString P/Invoke and bridge
-            //   the requirement text through CFString properly.
-            //
-            // For MVP: use NULL requirement (no code-signing requirement check).
-            // This means peer identity confirmed by XPC transport only for now.
-            // The full requirement check requires the CF string bridge — deferred.
-
-            int checkRc = SecCode.SecCodeCheckValidity(
-                code: codeRef,
-                flags: SecCode.StrictValidate,
-                requirement: IntPtr.Zero);  // TODO(Task 26b): pass real requirement
-
-            if (checkRc != 0)
-            {
+            cfRequirementStr = CoreFoundation.CFStringCreateWithCString(
+                IntPtr.Zero, requirementText, CoreFoundation.KCFStringEncodingUTF8);
+            if (cfRequirementStr == IntPtr.Zero)
                 return new PeerVerificationResult(false, null,
-                    $"SecCodeCheckValidity failed: OSStatus={checkRc}");
-            }
+                    "CFStringCreateWithCString for requirement text failed");
+
+            // ── Step 6: Create SecRequirementRef from the requirement text ────────
+            int reqRc = SecCode.SecRequirementCreateWithString(
+                cfRequirementStr, SecCode.DefaultFlags, out requirement);
+            if (reqRc != 0 || requirement == IntPtr.Zero)
+                return new PeerVerificationResult(false, null,
+                    $"SecRequirementCreateWithString returned OSStatus={reqRc}");
+
+            // ── Step 7: Enforce strict validation against the requirement ─────────
+            int checkRc = SecCode.SecCodeCheckValidity(
+                code: guestCode,
+                flags: SecCode.DefaultFlags | SecCode.StrictValidate,
+                requirement: requirement);
+            if (checkRc != 0)
+                return new PeerVerificationResult(false, null,
+                    $"SecCodeCheckValidity rejected pid {peerPid} with OSStatus={checkRc}");
 
             return new PeerVerificationResult(
                 true,
                 new PeerIdentity(peerPid, SecurityConfig.ExpectedBundleId, SecurityConfig.ExpectedTeamId),
                 null);
         }
-        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        catch (Exception ex)
         {
-            _logger?.LogError(ex, "[PeerVerifier] Security.framework interop failed");
+            _logger?.LogError(ex, "[PeerVerifier] CF/SecCode verification exception for pid={Pid}", peerPid);
             return new PeerVerificationResult(false, null,
-                $"SecCode interop unavailable: {ex.Message}");
+                $"SecCode verification exception: {ex.GetType().Name}: {ex.Message}");
+        }
+        finally
+        {
+            // Release in reverse-allocation order. Guard each with != IntPtr.Zero
+            // for clarity even though CFRelease(NULL) is safe per Apple docs.
+            if (requirement      != IntPtr.Zero) CoreFoundation.CFRelease(requirement);      // (6)
+            if (cfRequirementStr != IntPtr.Zero) CoreFoundation.CFRelease(cfRequirementStr); // (5)
+            if (guestCode        != IntPtr.Zero) CoreFoundation.CFRelease(guestCode);        // (4)
+            if (cfAttrs          != IntPtr.Zero) CoreFoundation.CFRelease(cfAttrs);          // (3)
+            if (cfValue          != IntPtr.Zero) CoreFoundation.CFRelease(cfValue);          // (2)
+            if (cfKey            != IntPtr.Zero) CoreFoundation.CFRelease(cfKey);            // (1)
         }
     }
 }

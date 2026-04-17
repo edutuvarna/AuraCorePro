@@ -209,6 +209,96 @@
         }
       }
     },
+    "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\AuraCore.Desktop.Services.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\AuraCore.Desktop.Services.csproj",
+        "projectName": "AuraCore.Desktop.Services",
+        "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\AuraCore.Desktop.Services.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj"
+              },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj"
+              },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\AuraCore.Infrastructure.Windows.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\AuraCore.Infrastructure.Windows.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Http\\AuraCore.Infrastructure.Http.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -288,6 +378,93 @@
         }
       }
     },
+    "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj",
+        "projectName": "AuraCore.Infrastructure.PrivilegeIpc",
+        "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj"
+              },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.SharedKernel\\AuraCore.SharedKernel.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.SharedKernel\\AuraCore.SharedKernel.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.*, )"
+            },
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.*, )"
+            },
+            "Tmds.DBus": {
+              "target": "Package",
+              "version": "[0.92.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Storage\\AuraCore.Infrastructure.Storage.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -296,6 +473,85 @@
         "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Storage\\AuraCore.Infrastructure.Storage.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Storage\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj"
+              },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.SharedKernel\\AuraCore.SharedKernel.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.SharedKernel\\AuraCore.SharedKernel.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\AuraCore.Infrastructure.Windows.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\AuraCore.Infrastructure.Windows.csproj",
+        "projectName": "AuraCore.Infrastructure.Windows",
+        "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\AuraCore.Infrastructure.Windows.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Windows\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -399,8 +655,14 @@
               "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj": {
                 "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Core\\AuraCore.Application\\AuraCore.Application.csproj"
               },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\AuraCore.Desktop.Services.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Desktop\\AuraCore.Desktop.Services\\AuraCore.Desktop.Services.csproj"
+              },
               "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Http\\AuraCore.Infrastructure.Http.csproj": {
                 "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Http\\AuraCore.Infrastructure.Http.csproj"
+              },
+              "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj": {
+                "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.PrivilegeIpc\\AuraCore.Infrastructure.PrivilegeIpc.csproj"
               },
               "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Storage\\AuraCore.Infrastructure.Storage.csproj": {
                 "projectPath": "C:\\Users\\Admin\\Desktop\\AuraCorePro\\AuraCorePro\\src\\Infrastructure\\AuraCore.Infrastructure.Storage\\AuraCore.Infrastructure.Storage.csproj"
@@ -424,6 +686,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "FluentAssertions": {
+              "target": "Package",
+              "version": "[6.12.1, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[17.11.1, )"

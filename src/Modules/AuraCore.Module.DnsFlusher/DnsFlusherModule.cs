@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.DnsFlusher.Models;
@@ -11,6 +12,13 @@ namespace AuraCore.Module.DnsFlusher;
 
 public sealed class DnsFlusherModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public DnsFlusherModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "dns-flusher";
     public string DisplayName => "DNS Flusher";
     public OptimizationCategory Category => OptimizationCategory.NetworkOptimization;
@@ -79,14 +87,23 @@ public sealed class DnsFlusherModule : IOptimizationModule
                 {
                     bool anyOk = false;
 
-                    // These all require sudo on macOS. Running without sudo will fail gracefully.
-                    var r1 = await ProcessRunner.RunAsync("sudo", "-n dscacheutil -flushcache", ct);
+                    // Flush primary DNS cache via dscacheutil (requires privilege escalation).
+                    // Per Task 27 DnsFlushArgvValidator, daemon hardcodes /usr/bin/dscacheutil.
+                    var r1 = await _shell.RunPrivilegedAsync(
+                        new PrivilegedCommand(
+                            Id: "dns-flush",
+                            Executable: "dscacheutil",
+                            Arguments: new[] { "-flushcache" },
+                            TimeoutSeconds: 60),
+                        ct);
                     if (r1.Success) anyOk = true;
 
-                    var r2 = await ProcessRunner.RunAsync("sudo", "-n killall -HUP mDNSResponder", ct);
+                    // Signal mDNSResponder daemon to reload caches (unprivileged, best-effort).
+                    var r2 = await ProcessRunner.RunAsync("killall", "-HUP mDNSResponder", ct);
                     if (r2.Success) anyOk = true;
 
-                    var r3 = await ProcessRunner.RunAsync("sudo", "-n killall mDNSResponderHelper", ct);
+                    // Kill mDNSResponderHelper (unprivileged, best-effort; may not exist).
+                    var r3 = await ProcessRunner.RunAsync("killall", "mDNSResponderHelper", ct);
                     // mDNSResponderHelper may not always be present, ignore failure
 
                     if (anyOk)
@@ -147,5 +164,9 @@ public sealed class DnsFlusherModule : IOptimizationModule
 public static class DnsFlusherRegistration
 {
     public static IServiceCollection AddDnsFlusherModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, DnsFlusherModule>();
+    {
+        services.AddSingleton<DnsFlusherModule>();
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<DnsFlusherModule>());
+        return services;
+    }
 }

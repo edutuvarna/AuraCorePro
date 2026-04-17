@@ -220,7 +220,9 @@ public class DependencyInjectionSmokeTests
     public void DnsFlusherViewModel_ResolvesFromContainer()
     {
         var sc = new ServiceCollection();
-        // Mirror App.axaml.cs Phase 4.4.1 block
+        // Mirror App.axaml.cs Phase 4.4.1 block.
+        // IShellCommandService is required since Phase 5.2.2.7a migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
         sc.AddSingleton<DnsFlusherModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<DnsFlusherModule>());
         sc.AddTransient<DnsFlusherViewModel>();

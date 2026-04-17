@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.PurgeableSpaceManager.Models;
@@ -12,6 +13,13 @@ namespace AuraCore.Module.PurgeableSpaceManager;
 
 public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public PurgeableSpaceManagerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "purgeable-space-manager";
     public string DisplayName => "Purgeable Space Manager";
     public OptimizationCategory Category => OptimizationCategory.DiskCleanup;
@@ -40,6 +48,16 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
             var containerFree = ParseByteValue(diskInfo.Stdout, "Container Free Space");
             var purgeable = volumeFree > containerFree ? volumeFree - containerFree : 0;
 
+            // Phase 4.4.2: also parse total capacity so the UI can compute
+            // Used/Purgeable/Free proportions. diskutil output on modern APFS
+            // systems usually shows "Container Total Space"; older / non-APFS
+            // volumes may show "Volume Total Space" instead. Fall back in that
+            // order and default to 0 so the additive contract still holds if
+            // neither label is present.
+            var totalCapacity = ParseByteValue(diskInfo.Stdout, "Container Total Space");
+            if (totalCapacity <= 0)
+                totalCapacity = ParseByteValue(diskInfo.Stdout, "Volume Total Space");
+
             // List local snapshots
             var snapshots = await ListLocalSnapshotsAsync(ct);
 
@@ -49,7 +67,8 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
                 PurgeableBytes: purgeable,
                 LocalSnapshotCount: snapshots.Count,
                 LocalSnapshots: snapshots,
-                IsAvailable: true);
+                IsAvailable: true,
+                TotalCapacityBytes: totalCapacity);
 
             LastReport = report;
 
@@ -93,13 +112,29 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 
                 if (itemId == "thin-snapshots")
                 {
-                    // Aggressive: ask for 1TB of free space (impossible), which forces
-                    // tmutil to remove all thinnable local snapshots
-                    var r = await ProcessRunner.RunAsync("tmutil", "thinlocalsnapshots / 999999999999 1", ct, timeoutSeconds: 300);
+                    // Aggressive: ask for 1TB of free space (9.99GB = 9990000000 bytes; max 10 digits per validator),
+                    // which forces tmutil to remove all thinnable local snapshots.
+                    // Action id "purgeable" per mini-spec §3.9; argv: ["thinlocalsnapshots", "/", bytes, urgency]
+                    var r = await _shell.RunPrivilegedAsync(
+                        new PrivilegedCommand(
+                            Id: "purgeable",
+                            Executable: "tmutil",
+                            Arguments: new[] { "thinlocalsnapshots", "/", "9990000000", "1" },
+                            TimeoutSeconds: 300),
+                        ct);
                     ok = r.Success;
                 }
                 else if (itemId == "run-periodic")
                 {
+                    // TODO(phase-5.2.2): this call-site is dead code (no UI/plan path feeds
+                    // itemId="run-periodic" today) but retains a raw `sudo -n periodic ...`
+                    // invocation that the 5.2.2 safety sweep flagged. Two follow-ups:
+                    //   (a) remove the branch entirely if "run-periodic" is never reintroduced,
+                    //   (b) OR add a new "run-periodic" action id to Task 16/27 ActionWhitelist
+                    //       with a strict argv validator `["daily"|"weekly"|"monthly"...]`
+                    //       + polkit / launchd policy entry, then migrate the call.
+                    // Until resolved, this branch will fail closed via ProcessRunner — safe
+                    // because the branch is unreachable from the product surface.
                     var r = await ProcessRunner.RunAsync("sudo", "-n periodic daily weekly monthly", ct, timeoutSeconds: 300);
                     ok = r.Success;
                 }
@@ -109,7 +144,13 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
                 }
                 else if (itemId == "all")
                 {
-                    var r1 = await ProcessRunner.RunAsync("tmutil", "thinlocalsnapshots / 999999999999 1", ct, timeoutSeconds: 300);
+                    var r1 = await _shell.RunPrivilegedAsync(
+                        new PrivilegedCommand(
+                            Id: "purgeable",
+                            Executable: "tmutil",
+                            Arguments: new[] { "thinlocalsnapshots", "/", "9990000000", "1" },
+                            TimeoutSeconds: 300),
+                        ct);
                     ok = r1.Success;
                     var userCachesOk = await CleanOldUserCachesAsync(ct);
                     ok = ok || userCachesOk;
@@ -194,5 +235,9 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 public static class PurgeableSpaceManagerRegistration
 {
     public static IServiceCollection AddPurgeableSpaceManagerModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, PurgeableSpaceManagerModule>();
+    {
+        services.AddSingleton<PurgeableSpaceManagerModule>();
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<PurgeableSpaceManagerModule>());
+        return services;
+    }
 }

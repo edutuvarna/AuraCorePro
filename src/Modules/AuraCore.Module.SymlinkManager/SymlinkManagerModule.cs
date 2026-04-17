@@ -2,13 +2,25 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.SymlinkManager.Models;
 
 namespace AuraCore.Module.SymlinkManager;
 
+public sealed record SymlinkCreateOutcome(bool Success, string? Error = null);
+
 public sealed class SymlinkManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService? _shellCommandService;
+
+    public SymlinkManagerModule() { }
+
+    public SymlinkManagerModule(IShellCommandService shellCommandService)
+    {
+        _shellCommandService = shellCommandService;
+    }
+
     public string Id => "symlink-manager";
     public string DisplayName => "Symlink Manager";
     public OptimizationCategory Category => OptimizationCategory.ShellCustomization;
@@ -148,6 +160,36 @@ public sealed class SymlinkManagerModule : IOptimizationModule
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default) => Task.FromResult(false);
     public Task RollbackAsync(string operationId, CancellationToken ct = default) => Task.CompletedTask;
 
+    /// <summary>
+    /// Creates a symbolic link using the Linux privilege helper.
+    /// POSIX ln ordering: <paramref name="target"/> is what the symlink points AT;
+    /// <paramref name="source"/> is the link name (where the link is created).
+    /// Calls: ln -s -f -- target source
+    /// </summary>
+    public async Task<SymlinkCreateOutcome> CreateSymlinkAsync(
+        string source, string target, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
+            return new SymlinkCreateOutcome(false, "source and target are required");
+
+        if (_shellCommandService is null)
+            return new SymlinkCreateOutcome(false, "shell command service not wired");
+
+        // ln -s -f -- <target> <source>
+        // target = what the link points to, source = the link name itself
+        var result = await _shellCommandService.RunPrivilegedAsync(
+            new PrivilegedCommand(
+                "symlink.create",
+                "ln",
+                new[] { "-s", "-f", "--", target, source },
+                15),
+            ct);
+
+        return result.Success
+            ? new SymlinkCreateOutcome(true)
+            : new SymlinkCreateOutcome(false, result.Stderr);
+    }
+
     // ---- Helpers ----
 
     private static List<SymlinkInfo> ScanDirectory(string dir, CancellationToken ct)
@@ -229,5 +271,15 @@ public sealed class SymlinkManagerModule : IOptimizationModule
 public static class SymlinkManagerRegistration
 {
     public static IServiceCollection AddSymlinkManagerModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, SymlinkManagerModule>();
+    {
+        services.AddSingleton<SymlinkManagerModule>(sp =>
+        {
+            var shellSvc = sp.GetService<IShellCommandService>();
+            return shellSvc is not null
+                ? new SymlinkManagerModule(shellSvc)
+                : new SymlinkManagerModule();
+        });
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SymlinkManagerModule>());
+        return services;
+    }
 }

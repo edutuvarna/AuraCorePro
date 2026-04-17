@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.AI.ChatSection">
+
+  <DockPanel>
+
+    <!-- Permanent warning banner at top -->
+    <Border DockPanel.Dock="Top"
+            Background="#1AF59E0B"
+            BorderBrush="#4DF59E0B"
+            BorderThickness="0,0,0,1"
+            Padding="12,8"
+            Margin="0,0,0,8">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{DynamicResource IconWarningTriangleFilled}"
+                  Width="14" Height="14"
+                  Foreground="{DynamicResource AccentAmberBrush}" />
+        <TextBlock Text="⚠ Experimental — CORTEX Chat may produce inaccurate outputs. Verify before applying any suggestion."
+                   FontSize="10"
+                   Foreground="{DynamicResource AccentAmberBrush}"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
+
+    <!-- Section header with model chip placeholder -->
+    <Grid ColumnDefinitions="*,Auto,Auto" DockPanel.Dock="Top" Margin="0,4,0,12">
+      <TextBlock Grid.Column="0" Text="✦ CORTEX Chat" FontSize="14" FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+      <SplitButton Grid.Column="1"
+                   x:Name="ModelChip"
+                   Content="⚙ No model selected ▾"
+                   FontSize="10"
+                   Background="Transparent"
+                   BorderBrush="{DynamicResource BorderSubtleBrush}"
+                   BorderThickness="1"
+                   Padding="8,4"
+                   Margin="0,0,8,0">
+        <SplitButton.Flyout>
+          <MenuFlyout>
+            <!-- Items populated at runtime in BuildModelMenu() via chip.Flyout -->
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
+      <!-- Future: Chat section toggle will go here in column 2 -->
+    </Grid>
+
+    <!-- EXPERIMENTAL WARNING BANNER (existing, preserved from AIChatView) -->
+    <Border DockPanel.Dock="Top" CornerRadius="{StaticResource RadiusMd}"
+            Padding="10" Margin="0,0,0,10" BorderThickness="1">
+      <Border.Background>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.08"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
+      </Border.BorderBrush>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="&#x26A0;" FontSize="13" Foreground="#F59E0B"
+                   VerticalAlignment="Top" Margin="0,1,0,0"/>
+        <TextBlock x:Name="WarningText"
+                   Text="This feature is experimental. Responses may be inaccurate."
+                   FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap"
+                   Opacity="0.9"/>
+      </StackPanel>
+    </Border>
+
+    <!-- INPUT AREA -->
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+      <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="4">
+        <Border.Background>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.03"/>
+        </Border.Background>
+        <Border.BorderBrush>
+          <SolidColorBrush Color="#FFFFFF" Opacity="0.08"/>
+        </Border.BorderBrush>
+        <TextBox x:Name="InputBox"
+                 Watermark="Type a message..."
+                 FontSize="12"
+                 AcceptsReturn="False"
+                 TextWrapping="Wrap"
+                 MinHeight="36"
+                 Background="Transparent"
+                 BorderThickness="0"/>
+      </Border>
+      <Button x:Name="SendButton" Grid.Column="1"
+              Margin="8,0,0,0" Padding="12,8"
+              VerticalAlignment="Stretch"
+              CornerRadius="{StaticResource RadiusMd}">
+        <Button.Background>
+          <SolidColorBrush Color="#8B5CF6" Opacity="0.15"/>
+        </Button.Background>
+        <TextBlock Text="&#x27A4;" FontSize="14" Foreground="#8B5CF6"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+      </Button>
+    </Grid>
+
+    <!-- CHAT MESSAGES -->
+    <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+            Padding="10" Margin="0,0,0,10">
+      <Border.Background>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+      </Border.Background>
+      <Border.BorderBrush>
+        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+      </Border.BorderBrush>
+      <ScrollViewer x:Name="ChatScroll" VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="MessagesPanel" Spacing="8"/>
+      </ScrollViewer>
+    </Border>
+
+  </DockPanel>
+
+</UserControl>

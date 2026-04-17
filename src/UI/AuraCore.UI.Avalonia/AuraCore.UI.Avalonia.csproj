@@ -16,6 +16,7 @@
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.7" />
     <PackageReference Include="Avalonia.Diagnostics" Version="11.2.7" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
     <PackageReference Include="System.Management" Version="8.0.0" />
     <PackageReference Include="QuestPDF" Version="2024.12.2" />
@@ -26,6 +27,13 @@
     <ProjectReference Include="..\..\Core\AuraCore.Domain\AuraCore.Domain.csproj" />
     <ProjectReference Include="..\..\Core\AuraCore.Application\AuraCore.Application.csproj" />
     <ProjectReference Include="..\..\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <!-- Infrastructure (Phase 5.2.1.10: PrivHelperInstaller wiring) -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+    <!-- Phase 5.2.1 DI fix: HelperAvailabilityService lives here; no cycle risk -->
+    <ProjectReference Include="..\..\Desktop\AuraCore.Desktop.Services\AuraCore.Desktop.Services.csproj" />
   </ItemGroup>
 
   <!-- Engines -->
@@ -82,5 +90,6 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.MacAppInstaller\AuraCore.Module.MacAppInstaller.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.SnapFlatpakCleaner\AuraCore.Module.SnapFlatpakCleaner.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.GrubManager\AuraCore.Module.GrubManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ServiceManager\AuraCore.Module.ServiceManager.csproj" />
   </ItemGroup>
 </Project>

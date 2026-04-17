@@ -117,6 +117,49 @@ public partial class DefenderManagerView : UserControl
     private static SolidColorBrush P(string hex) => new(Color.Parse(hex));
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
 
+    private async void UpdateSigs_Click(object? sender, RoutedEventArgs e)
+        => await RunDefenderAction(() => _module!.UpdateSignaturesAsync(), "Updating signatures...", "Signatures updated.");
+
+    private async void QuickScan_Click(object? sender, RoutedEventArgs e)
+        => await RunDefenderAction(() => _module!.QuickScanAsync(), "Running quick scan...", "Quick scan started.");
+
+    private async void FullScan_Click(object? sender, RoutedEventArgs e)
+        => await RunDefenderAction(() => _module!.FullScanAsync(), "Running full scan...", "Full scan started.");
+
+    private async Task RunDefenderAction(
+        System.Func<System.Threading.Tasks.Task<DefenderManagerModule.DefenderOperationOutcome>> action,
+        string inProgressText, string successText)
+    {
+        if (_module is null) { DefActionStatus.Text = "Module not available."; return; }
+        DefActionStatus.Text = inProgressText;
+        SetActionButtonsEnabled(false);
+        try
+        {
+            var result = await action();
+            if (result.HelperMissing)
+                DefActionStatus.Text = "Privileged helper not installed — run scripts/install-privileged-service.ps1 as admin";
+            else if (result.Success)
+                DefActionStatus.Text = successText;
+            else
+                DefActionStatus.Text = $"Failed: {result.Error ?? "unknown error"}";
+        }
+        catch (System.Exception ex)
+        {
+            DefActionStatus.Text = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            SetActionButtonsEnabled(true);
+        }
+    }
+
+    private void SetActionButtonsEnabled(bool enabled)
+    {
+        UpdateSigsBtn.IsEnabled = enabled;
+        QuickScanBtn.IsEnabled  = enabled;
+        FullScanBtn.IsEnabled   = enabled;
+    }
+
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.defender");

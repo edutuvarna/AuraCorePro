@@ -60,6 +60,36 @@ public sealed class BloatwareRemovalModule : IOptimizationModule
     public Task RollbackAsync(string operationId, CancellationToken ct = default)
         => Task.CompletedTask;
 
+    /// <summary>
+    /// Dashboard Quick Action preset: scans and removes apps from the curated
+    /// <see cref="BloatwareDatabase.MicrosoftBloat"/> list that are actually
+    /// installed and not in the SystemRequired set.
+    /// This is intentionally conservative — only BloatRisk.Safe entries are removed.
+    /// </summary>
+    public async Task<OptimizationResult> RemoveDefaultPresetAsync(
+        IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
+    {
+        // 1. Scan to get current installed packages
+        await ScanAsync(new ScanOptions(), ct);
+
+        if (LastReport is null || LastReport.Apps.Count == 0)
+            return new OptimizationResult(Id, "", false, 0, 0, TimeSpan.Zero);
+
+        // 2. Filter to only apps that are in MicrosoftBloat and BloatRisk.Safe
+        var toRemove = LastReport.Apps
+            .Where(a => a.Risk == Models.BloatRisk.Safe &&
+                        a.Category == Models.BloatCategory.MicrosoftBloat &&
+                        !string.IsNullOrEmpty(a.PackageFullName))
+            .Select(a => a.PackageFullName)
+            .ToList<string>();
+
+        if (toRemove.Count == 0)
+            return new OptimizationResult(Id, Guid.NewGuid().ToString(), true, 0, 0, TimeSpan.Zero);
+
+        var plan = new OptimizationPlan(Id, toRemove);
+        return await OptimizeAsync(plan, progress, ct);
+    }
+
     private static List<AppxInfo> EnumerateAppxPackages()
     {
         var apps = new List<AppxInfo>();

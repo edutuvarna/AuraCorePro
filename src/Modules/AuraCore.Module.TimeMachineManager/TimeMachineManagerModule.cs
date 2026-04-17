@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.TimeMachineManager.Models;
@@ -12,6 +13,13 @@ namespace AuraCore.Module.TimeMachineManager;
 
 public sealed class TimeMachineManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public TimeMachineManagerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "time-machine-manager";
     public string DisplayName => "Time Machine Manager";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
@@ -141,14 +149,11 @@ public sealed class TimeMachineManagerModule : IOptimizationModule
 
                 if (itemId == "delete-local-snapshots")
                 {
-                    // Aggressive: ask for 1TB of free space (impossible), which forces
-                    // tmutil to remove all thinnable local snapshots. No sudo required.
-                    var r = await ProcessRunner.RunAsync(
-                        "tmutil",
-                        "thinlocalsnapshots / 999999999999 1",
-                        ct,
-                        timeoutSeconds: 300);
-                    if (r.Success) processed++;
+                    // TODO(phase-5.2.2): thinlocalsnapshots uses action id "purgeable" (not "time-machine"),
+                    // which belongs to PurgeableSpaceManager. Defer this operation to Phase 5.3
+                    // when we can coordinate with PurgeableSpaceManager's implementation or define
+                    // a separate "thin-snapshots-time-machine" action for this module.
+                    Debug.WriteLine($"[{Id}] delete-local-snapshots deferred: thinlocalsnapshots belongs to purgeable action");
                 }
                 else if (itemId.StartsWith("delete-old-backups:", StringComparison.Ordinal))
                 {
@@ -157,25 +162,11 @@ public sealed class TimeMachineManagerModule : IOptimizationModule
                     if (!int.TryParse(daysStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var days) || days <= 0)
                         continue;
 
-                    var cutoff = DateTime.Now.AddDays(-days);
-                    if (LastReport == null) continue;
-
-                    foreach (var backup in LastReport.Backups.Where(b => b.Date != DateTime.MinValue && b.Date < cutoff))
-                    {
-                        ct.ThrowIfCancellationRequested();
-                        // Path came from LastReport.Backups (parsed from tmutil listbackups output).
-                        // Additional sanitization against shell metacharacters anyway.
-                        if (ContainsShellMetacharacter(backup.Path)) continue;
-
-                        var escapedPath = backup.Path.Replace("\"", "\\\"");
-                        var deleteCmd = $"sudo -n tmutil delete \"{escapedPath}\"";
-                        var r = await ProcessRunner.RunAsync(
-                            "/bin/sh",
-                            $"-c \"{deleteCmd}\"",
-                            ct,
-                            timeoutSeconds: 300);
-                        if (r.Success) processed++;
-                    }
+                    // TODO(phase-5.2.2): tmutil delete <path> is explicitly forbidden by TimeMachineArgvValidator.
+                    // The validator only allows: startbackup, stopbackup, listbackups, enable, disable, deletelocalsnapshots.
+                    // Deleting backups by age requires either (a) decomposition into allowed verbs or
+                    // (b) new verb support in the validator. Defer to Phase 5.2.3 for further analysis.
+                    Debug.WriteLine($"[{Id}] delete-old-backups deferred: tmutil delete is forbidden by validator");
                 }
                 else if (itemId.StartsWith("delete-backup:", StringComparison.Ordinal))
                 {
@@ -188,14 +179,11 @@ public sealed class TimeMachineManagerModule : IOptimizationModule
                     // Extra defense: reject shell metacharacters even if the path is in LastReport.
                     if (ContainsShellMetacharacter(path)) continue;
 
-                    var escapedPath = path.Replace("\"", "\\\"");
-                    var deleteCmd = $"sudo -n tmutil delete \"{escapedPath}\"";
-                    var r = await ProcessRunner.RunAsync(
-                        "/bin/sh",
-                        $"-c \"{deleteCmd}\"",
-                        ct,
-                        timeoutSeconds: 300);
-                    if (r.Success) processed++;
+                    // TODO(phase-5.2.2): tmutil delete <path> is explicitly forbidden by TimeMachineArgvValidator.
+                    // The validator only allows: startbackup, stopbackup, listbackups, enable, disable, deletelocalsnapshots.
+                    // Deleting specific backups requires either (a) decomposition into allowed verbs or
+                    // (b) new verb support in the validator. Defer to Phase 5.2.3 for further analysis.
+                    Debug.WriteLine($"[{Id}] delete-backup deferred: tmutil delete is forbidden by validator");
                 }
                 // Unknown item IDs are silently ignored
             }
@@ -237,5 +225,9 @@ public sealed class TimeMachineManagerModule : IOptimizationModule
 public static class TimeMachineManagerRegistration
 {
     public static IServiceCollection AddTimeMachineManagerModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, TimeMachineManagerModule>();
+    {
+        services.AddSingleton<TimeMachineManagerModule>();
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<TimeMachineManagerModule>());
+        return services;
+    }
 }

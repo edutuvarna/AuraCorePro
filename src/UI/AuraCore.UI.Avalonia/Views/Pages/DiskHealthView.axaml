@@ -1,58 +1,110 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.DiskHealthView">
   <ScrollViewer>
-    <StackPanel Spacing="12">
-      <Grid ColumnDefinitions="*,Auto">
-        <StackPanel Spacing="4">
-          <TextBlock x:Name="PageTitle" Text="Disk Health" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock x:Name="SubText" Text="SMART status and drive diagnostics" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-        </StackPanel>
-        <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
-          <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
-        </Button>
-      </Grid>
-      <!-- Drive Cards -->
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
-        <Border Width="20" Height="20" CornerRadius="6" Background="#1400D4AA">
-          <TextBlock Text="&#x1F4BF;" FontSize="10" Foreground="#00D4AA"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Border>
-        <TextBlock Text="Detected Drives" FontSize="12" FontWeight="SemiBold"
-                   Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-      </StackPanel>
-      <ItemsControl x:Name="DriveList">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Border Margin="0,0,0,8" CornerRadius="10" BorderThickness="1" Padding="14,12">
-              <Border.Background>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-              </Border.Background>
-              <Border.BorderBrush>
-                <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-              </Border.BorderBrush>
-              <StackPanel Spacing="10">
-                <Grid ColumnDefinitions="*,Auto">
-                  <StackPanel><TextBlock Text="{Binding Model}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <TextBlock Text="{Binding Info}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/></StackPanel>
-                  <Border Grid.Column="1" CornerRadius="8" Padding="10,4" Background="{Binding HealthBg}" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Health}" FontSize="11" FontWeight="Bold" Foreground="{Binding HealthFg}"/></Border>
-                </Grid>
-                <Grid ColumnDefinitions="*,*,*,*">
-                  <StackPanel Spacing="2"><TextBlock Text="Size" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Size}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
-                  <StackPanel Grid.Column="1" Spacing="2"><TextBlock Text="Type" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding MediaType}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentBlueBrush}"/></StackPanel>
-                  <StackPanel Grid.Column="2" Spacing="2"><TextBlock Text="Format" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Interface}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
-                  <StackPanel Grid.Column="3" Spacing="2"><TextBlock Text="Partitions" FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock Text="{Binding Partitions}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/></StackPanel>
-                </Grid>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Disk Health"
+                             Subtitle="SMART status and drive diagnostics">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden subtitle bridge for code-behind -->
+      <TextBlock x:Name="SubText"
+                 Text="SMART status and drive diagnostics"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 IsVisible="False"/>
+
+      <!-- Drive list card -->
+      <controls:GlassCard>
+        <StackPanel Spacing="8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="20" Height="20" CornerRadius="6"
+                    Background="{DynamicResource BgCardBrush}">
+              <TextBlock Text="&#x1F4BF;" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+            <TextBlock Text="Detected Drives"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <ItemsControl x:Name="DriveList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Margin="0,0,0,8" CornerRadius="10" BorderThickness="1" Padding="14,12"
+                        Background="{DynamicResource BgCardBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}">
+                  <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Model}"
+                                   FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding Info}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                      </StackPanel>
+                      <Border Grid.Column="1" CornerRadius="8" Padding="10,4"
+                              Background="{Binding HealthBg}" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Health}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"
+                                   Foreground="{Binding HealthFg}"/>
+                      </Border>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*,*,*">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="Size" FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding Size}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock Text="Type" FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding MediaType}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AccentBlueBrush}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Spacing="2">
+                        <TextBlock Text="Format" FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding Interface}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="3" Spacing="2">
+                        <TextBlock Text="Partitions" FontSize="{DynamicResource FontSizeLabel}"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding Partitions}"
+                                   FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                      </StackPanel>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

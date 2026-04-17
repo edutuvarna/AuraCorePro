@@ -1,0 +1,210 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.SpotlightManagerView"
+             x:Name="RootUserControl"
+             x:DataType="vm:SpotlightManagerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header: NO Scan button (auto-scan on Loaded — user-directed hero UX) -->
+      <controls:ModuleHeader x:Name="Header"/>
+
+      <!-- 3-stat row: Volumes / Indexed / Not Indexed -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="VolumesStatCard"
+                           Value="{Binding TotalVolumesDisplay}"/>
+        <controls:StatCard x:Name="IndexedStatCard"
+                           Value="{Binding EnabledCountDisplay}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard x:Name="DisabledStatCard"
+                           Value="{Binding DisabledCountDisplay}"
+                           ValueBrush="{DynamicResource TextMutedBrush}"/>
+      </controls:StatRow>
+
+      <!-- Volumes card (main per-row content) -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="VolumesHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <!-- Inline rebuild-confirmation bar — only visible when a volume is pending -->
+            <Border x:Name="RebuildConfirmBar"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusWarningBrush}"
+                    BorderThickness="1"
+                    Padding="12,10"
+                    IsVisible="{Binding HasPendingRebuild}">
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="RebuildConfirmTitle"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource StatusWarningBrush}"/>
+                <TextBlock Text="{Binding RebuildConfirmationBody}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                  <Button x:Name="RebuildCancelBtn"
+                          Classes="action-btn"
+                          Padding="12,6"
+                          Command="{Binding CancelRebuildCommand}"/>
+                  <Button x:Name="RebuildConfirmBtn"
+                          Classes="action-btn"
+                          Padding="12,6"
+                          Command="{Binding ConfirmRebuildCommand}"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <ItemsControl x:Name="VolumeItemsList"
+                          ItemsSource="{Binding VolumeItems}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="6"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:VolumeItemVM">
+                  <Border CornerRadius="{DynamicResource RadiusSm}"
+                          Background="{DynamicResource BgCardBrush}"
+                          BorderBrush="{DynamicResource BorderSubtleBrush}"
+                          BorderThickness="1"
+                          Padding="12,10">
+                    <Grid ColumnDefinitions="*,12,Auto,12,Auto,12,Auto">
+                      <!-- Column 0: mount point + status subtext -->
+                      <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{Binding MountPoint}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding StatusDisplay}"
+                                   FontSize="9"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                      </StackPanel>
+                      <!-- Column 2: status badge (mirrors toggle) -->
+                      <Border Grid.Column="2"
+                              CornerRadius="{DynamicResource RadiusSm}"
+                              Padding="8,3"
+                              VerticalAlignment="Center"
+                              Background="{DynamicResource BgElevatedBrush}">
+                        <TextBlock Text="{Binding BadgeText}"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                      </Border>
+                      <!-- Column 4: toggle switch (TwoWay → fires engine via VM.Requested event) -->
+                      <ToggleSwitch Grid.Column="4"
+                                    IsChecked="{Binding IsIndexed, Mode=TwoWay}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    VerticalAlignment="Center"/>
+                      <!-- Column 6: rebuild button (opens inline confirmation bar).
+                           Command is bound via ElementName to the root UserControl's
+                           DataContext (the SpotlightManagerViewModel), with the row's
+                           VolumeItemVM as CommandParameter. Content is set in
+                           code-behind ApplyLocalizedTexts after initial load. -->
+                      <Button Grid.Column="6"
+                              Classes="action-btn rebuild-btn"
+                              Padding="12,6"
+                              Content="Rebuild"
+                              Command="{Binding #RootUserControl.((vm:SpotlightManagerViewModel)DataContext).BeginRebuildCommand}"
+                              CommandParameter="{Binding}"
+                              VerticalAlignment="Center"/>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock x:Name="EmptyStateText"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding IsEmpty}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- About Spotlight card (educational, always visible) -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="AboutHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="AboutBody1"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="AboutBody2"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Status + Progress + Cancel + ErrorBanner -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege warning card (always visible, amber border) -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusWarningBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <TextBlock x:Name="PrivilegeWarning"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource StatusWarningBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

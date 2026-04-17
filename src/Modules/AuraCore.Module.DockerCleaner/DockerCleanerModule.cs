@@ -54,6 +54,8 @@ public sealed class DockerCleanerModule : IOptimizationModule
 
             // Parse system df output - each line is JSON with Type, TotalCount, Active, Size, Reclaimable
             long imagesBytes = 0, volumesBytes = 0, buildCacheBytes = 0, totalReclaimable = 0;
+            // Phase 4.3.3 additive: per-category reclaimable so UI can compute "safe cleanup" (non-volume) savings.
+            long imagesReclaimable = 0, containersReclaimable = 0, volumesReclaimable = 0, buildCacheReclaimable = 0;
             foreach (var line in dfResult.Stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
                 try
@@ -71,17 +73,21 @@ public sealed class DockerCleanerModule : IOptimizationModule
                     {
                         case "Images":
                             imagesBytes = sizeBytes;
+                            imagesReclaimable = reclaimableBytes;
                             totalReclaimable += reclaimableBytes;
                             break;
                         case "Containers":
+                            containersReclaimable = reclaimableBytes;
                             totalReclaimable += reclaimableBytes;
                             break;
                         case "Local Volumes":
                             volumesBytes = sizeBytes;
+                            volumesReclaimable = reclaimableBytes;
                             totalReclaimable += reclaimableBytes;
                             break;
                         case "Build Cache":
                             buildCacheBytes = sizeBytes;
+                            buildCacheReclaimable = reclaimableBytes;
                             totalReclaimable += reclaimableBytes;
                             break;
                     }
@@ -99,7 +105,11 @@ public sealed class DockerCleanerModule : IOptimizationModule
                 ImagesTotalBytes: imagesBytes,
                 VolumesTotalBytes: volumesBytes,
                 BuildCacheBytes: buildCacheBytes,
-                TotalReclaimableBytes: totalReclaimable);
+                TotalReclaimableBytes: totalReclaimable,
+                ImagesReclaimableBytes: imagesReclaimable,
+                ContainersReclaimableBytes: containersReclaimable,
+                VolumesReclaimableBytes: volumesReclaimable,
+                BuildCacheReclaimableBytes: buildCacheReclaimable);
 
             LastReport = report;
             int itemCount = stoppedContainers + danglingImages + unusedVolumes;

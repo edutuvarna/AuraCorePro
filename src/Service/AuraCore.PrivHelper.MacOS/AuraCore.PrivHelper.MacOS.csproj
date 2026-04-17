@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AuraCore.PrivHelper.MacOS</RootNamespace>
+    <AssemblyName>pro.auracore.privhelper</AssemblyName>
+    <!-- macOS-only daemon. Publish-time:
+         dotnet publish -r osx-x64    -c Release -p:SelfContained=true -p:PublishSingleFile=true
+         dotnet publish -r osx-arm64  -c Release -p:SelfContained=true -p:PublishSingleFile=true
+         Universal binary can be assembled post-publish with `lipo -create`. -->
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
+    <PublishSingleFile Condition="'$(PublishSingleFile)' == ''">false</PublishSingleFile>
+    <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
+    <!-- LibraryImport source generator emits unsafe code for P/Invoke marshalling;
+         AllowUnsafeBlocks is required. Scope is limited to the Interop/ folder. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Security: suppress P/Invoke analyzer false positives that are load-bearing for libxpc interop -->
+    <NoWarn>$(NoWarn);CA1401;CA5392</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Deliberately NO Xamarin.Mac / Microsoft.macOS.Sdk dependency —
+         we P/Invoke libxpc + Security directly. This keeps attack surface
+         minimal (no transitive deps) and binary size small.
+         CVE status: Microsoft.Extensions.Logging 8.0.* clean as of 2026-04-17. -->
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="assets/pro.auracore.privhelper.plist">
+      <LogicalName>pro.auracore.privhelper.plist</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="assets/entitlements.plist">
+      <LogicalName>entitlements.plist</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

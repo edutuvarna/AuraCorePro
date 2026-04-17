@@ -8,7 +8,7 @@
                Foreground="{DynamicResource TextSecondaryBrush}"/>
     <Border CornerRadius="{StaticResource RadiusLg}"
             Background="{DynamicResource BgCardBrush}"
-            BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1"
+            BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1"
             Padding="32" MinHeight="300">
       <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
         <TextBlock x:Name="ModIcon" FontSize="32" HorizontalAlignment="Center"/>

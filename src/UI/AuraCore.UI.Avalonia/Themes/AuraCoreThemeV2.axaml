@@ -1,0 +1,162 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ══════════════════════════════════════════════════════
+       AuraCore Pro V2 Design System
+       Source: docs/superpowers/specs/2026-04-14-ui-rebuild-vision-document.md
+       Dark-only in v1. Modern glassmorphism, cross-platform.
+       ══════════════════════════════════════════════════════ -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+
+          <!-- ── Backgrounds ──────────────────────────── -->
+          <SolidColorBrush x:Key="BgDeepBrush" Color="#0A0A10"/>
+          <SolidColorBrush x:Key="BgSurfaceBrush" Color="#0E0E14"/>
+          <SolidColorBrush x:Key="BgSidebarBrush" Color="#0B0B11"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#06FFFFFF"/><!-- ~2.5% alpha white -->
+          <SolidColorBrush x:Key="BgCardElevatedBrush" Color="#0AFFFFFF"/><!-- ~4% -->
+
+          <!-- ── Borders ─────────────────────────────── -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#0FFFFFFF"/><!-- ~6% -->
+          <SolidColorBrush x:Key="BorderEmphasisBrush" Color="#14FFFFFF"/><!-- ~8% -->
+
+          <!-- ── Text ─────────────────────────────────── -->
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F0F0F5"/>
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#E8E8F0"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#888899"/>
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#555570"/>
+
+          <!-- ── Accent: Teal ─────────────────────────── -->
+          <SolidColorBrush x:Key="AccentTealBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="AccentTealLightBrush" Color="#6CE0C0"/>
+          <SolidColorBrush x:Key="AccentTealDimBrush" Color="#1400D4AA"/><!-- ~8% -->
+
+          <!-- ── Accent: Purple ───────────────────────── -->
+          <SolidColorBrush x:Key="AccentPurpleBrush" Color="#B088FF"/>
+          <SolidColorBrush x:Key="AccentPurpleDeepBrush" Color="#8B5CF6"/>
+          <SolidColorBrush x:Key="AccentPurpleDimBrush" Color="#0F8B5CF6"/><!-- ~6% -->
+
+          <!-- ── Accent: Amber ────────────────────────── -->
+          <SolidColorBrush x:Key="AccentAmberBrush" Color="#F59E0B"/>
+          <SolidColorBrush x:Key="AccentAmberDimBrush" Color="#14F59E0B"/><!-- ~8% -->
+
+          <!-- ── Accent: Pink ─────────────────────────── -->
+          <SolidColorBrush x:Key="AccentPinkBrush" Color="#EC4899"/>
+          <SolidColorBrush x:Key="AccentPinkDimBrush" Color="#14EC4899"/><!-- ~8% -->
+
+          <!-- ── Semantic ─────────────────────────────── -->
+          <SolidColorBrush x:Key="StatusSuccessBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="StatusWarningBrush" Color="#F59E0B"/>
+          <SolidColorBrush x:Key="StatusErrorBrush" Color="#EF4444"/>
+          <SolidColorBrush x:Key="StatusInfoBrush" Color="#B088FF"/>
+
+          <!-- Semantic tinted backgrounds + borders (ported from V1 bridge 2026-04-16) -->
+          <SolidColorBrush x:Key="SuccessBgBrush" Color="#22C55E20"/>
+          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#22C55E30"/>
+          <SolidColorBrush x:Key="WarningBgBrush" Color="#F59E0B0D"/>
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#F59E0B33"/>
+          <SolidColorBrush x:Key="ErrorBgBrush" Color="#EF444420"/>
+          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#EF444430"/>
+          <SolidColorBrush x:Key="InfoBgBrush" Color="#3B82F60D"/>
+          <SolidColorBrush x:Key="InfoBorderBrush" Color="#3B82F620"/>
+          <SolidColorBrush x:Key="AccentBgBrush" Color="#00D4AA0D"/>
+          <SolidColorBrush x:Key="AccentBorderBrush" Color="#00D4AA20"/>
+
+          <!-- Action button (ported from V1 bridge 2026-04-16) -->
+          <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12FFFFFF"/>
+          <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#1500D4AA"/>
+
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- ── SHARED (theme-independent) TOKENS ────── -->
+
+      <!-- Typography: font family stack -->
+      <FontFamily x:Key="PrimaryFontFamily">Inter, Segoe UI Variable, Segoe UI, sans-serif</FontFamily>
+
+      <!-- Typography: sizes (double) -->
+      <x:Double x:Key="FontSizeDisplay">24</x:Double>
+      <x:Double x:Key="FontSizeHeading">18</x:Double>
+      <x:Double x:Key="FontSizeSubheading">14</x:Double>
+      <x:Double x:Key="FontSizeBody">12</x:Double>
+      <x:Double x:Key="FontSizeBodySmall">11</x:Double>
+      <x:Double x:Key="FontSizeLabel">10</x:Double>
+      <x:Double x:Key="FontSizeCaption">9</x:Double>
+
+      <!-- Smaller typography for micro-UI elements -->
+      <x:Double x:Key="FontSizeMicro">8</x:Double>
+      <x:Double x:Key="FontSizeTiny">7</x:Double>
+      <x:Double x:Key="FontSizeLarge">14</x:Double>
+
+      <!-- Radius scale -->
+      <CornerRadius x:Key="RadiusXs">4</CornerRadius>
+      <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+      <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+      <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+      <CornerRadius x:Key="RadiusXl">14</CornerRadius>
+
+      <!-- Spacing (Thickness) -->
+      <Thickness x:Key="SpacingCardPadding">14</Thickness>
+      <Thickness x:Key="SpacingPagePadding">22,18</Thickness>
+      <Thickness x:Key="SpacingGapSm">0,6</Thickness>
+      <Thickness x:Key="SpacingGapMd">0,10</Thickness>
+      <Thickness x:Key="SpacingGapLg">0,14</Thickness>
+
+      <!-- Glow shadows (BoxShadow "offsetX offsetY blur spread color") -->
+      <BoxShadows x:Key="GlowTeal">0 0 20 0 #3300D4AA</BoxShadows>
+      <BoxShadows x:Key="GlowPurple">0 0 20 0 #33B088FF</BoxShadows>
+      <BoxShadows x:Key="GlowAmber">0 0 20 0 #2EF59E0B</BoxShadows>
+      <BoxShadows x:Key="GlowPink">0 0 20 0 #33EC4899</BoxShadows>
+      <BoxShadows x:Key="GlowHealth">0 0 28 0 #6600D4AA</BoxShadows>
+      <BoxShadows x:Key="GlowHero">0 0 32 0 #1A00D4AA</BoxShadows>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Apply Inter font globally via FluentTheme-aware selectors -->
+  <Style Selector="Window">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="TextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="TextBox">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+  <Style Selector="Button">
+    <Setter Property="FontFamily" Value="{DynamicResource PrimaryFontFamily}"/>
+  </Style>
+
+  <!-- AIFeaturesView section navigation buttons -->
+  <Style Selector="Button.section-nav-item">
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.section-nav-item:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#10FFFFFF" />
+  </Style>
+
+  <!-- ── ACTION BUTTON STYLE (ported from V1 bridge 2026-04-16) ─── -->
+  <Style Selector="Button.action-btn">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnBgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Padding" Value="12,9" />
+    <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.action-btn:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ActionBtnHoverBrush}" />
+  </Style>
+</Styles>

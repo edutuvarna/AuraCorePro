@@ -9,10 +9,16 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Core/AuraCore.Application/AuraCore.Application.csproj" />
     <ProjectReference Include="../../src/Infrastructure/AuraCore.Infrastructure.Storage/AuraCore.Infrastructure.Storage.csproj" />
     <ProjectReference Include="../../src/Infrastructure/AuraCore.Infrastructure.Http/AuraCore.Infrastructure.Http.csproj" />
+    <ProjectReference Include="../../src/Infrastructure/AuraCore.Infrastructure.PrivilegeIpc/AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+    <ProjectReference Include="../../src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
+    <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.IPC/AuraCore.PrivilegedService.IPC.csproj" />
+    <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj" />
   </ItemGroup>
 </Project>

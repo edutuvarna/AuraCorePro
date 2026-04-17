@@ -1,37 +1,39 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.EnvironmentVariablesView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Environment Variables" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="View and edit system/user environment variables and PATH"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
-      </StackPanel>
+    <StackPanel Spacing="16">
 
-      <!-- PATH Editor -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Environment Variables"
+                             Subtitle="View and edit system/user environment variables and PATH">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- PATH Editor card -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4">
                 <Border.Background>
                   <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x2261;" FontSize="8" Foreground="#A855F7"
+                <TextBlock Text="&#x2261;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="PATH Entries (User)" FontSize="11" FontWeight="SemiBold"
+              <TextBlock Text="PATH Entries (User)"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <TextBlock x:Name="PathCount" Grid.Column="1" Text="0 entries" FontSize="12"
+            <TextBlock x:Name="PathCount" Grid.Column="1" Text="0 entries"
+                       FontSize="{DynamicResource FontSizeBody}"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </Grid>
           <ItemsControl x:Name="PathList"/>
@@ -40,36 +42,32 @@
             <Button Content="Add" Click="AddPath_Click" Classes="action-btn" Padding="16,8"/>
           </StackPanel>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
 
-      <!-- All Variables -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+      <!-- All Variables card -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4">
                 <Border.Background>
                   <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x25A0;" FontSize="8" Foreground="#A855F7"
+                <TextBlock Text="&#x25A0;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="User Environment Variables" FontSize="11" FontWeight="SemiBold"
+              <TextBlock Text="User Environment Variables"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Refresh" Click="Refresh_Click" Padding="12,6"
-                    Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}" Grid.Column="1"/>
+            <Button Content="Refresh" Click="Refresh_Click" Padding="12,6" Grid.Column="1"
+                    Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </Grid>
           <TextBox x:Name="SearchBox" Watermark="Search variables..." Margin="0,4,0,0"/>
           <ItemsControl x:Name="VarList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Dialogs.PrivilegeHelperInstallDialog">
+
+  <!-- Centered dialog card using V2 tokens -->
+  <Border MaxWidth="480"
+          HorizontalAlignment="Center" VerticalAlignment="Center"
+          Background="{DynamicResource BgCardElevatedBrush}"
+          BorderBrush="{DynamicResource BorderEmphasisBrush}"
+          BorderThickness="1"
+          CornerRadius="{StaticResource RadiusLg}"
+          Padding="24">
+    <StackPanel Spacing="16">
+
+      <!-- Title -->
+      <TextBlock x:Name="TitleText"
+                 Text="Install privilege helper"
+                 FontSize="{StaticResource FontSizeHeading}"
+                 FontWeight="SemiBold"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+
+      <!-- Body -->
+      <TextBlock x:Name="BodyText"
+                 TextWrapping="Wrap"
+                 FontSize="{StaticResource FontSizeSubheading}"
+                 Foreground="{DynamicResource TextSecondaryBrush}" />
+
+      <!-- Action buttons -->
+      <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,8,0,0">
+        <Button x:Name="CancelButton" Content="Cancel" Padding="16,8" />
+        <Button x:Name="InstallButton" Content="Install" Classes="primary" Padding="16,8" />
+      </StackPanel>
+
+    </StackPanel>
+  </Border>
+</UserControl>

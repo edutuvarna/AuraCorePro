@@ -193,7 +193,7 @@ public partial class TweakListView : UserControl
             var result = await _module.OptimizeAsync(plan);
 
             StatusText.Text = result.Success
-                ? $"Applied {result.ItemsProcessed} tweak(s) in {result.Duration.TotalSeconds:F1}s. Explorer may restart."
+                ? $"Applied {result.ItemsProcessed} tweak(s) in {result.Duration.TotalSeconds:F1}s."
                 : "Some tweaks failed. Try running as administrator.";
 
             await RunScan(); // refresh state

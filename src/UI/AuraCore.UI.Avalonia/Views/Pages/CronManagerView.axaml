@@ -1,95 +1,83 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.CronManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Cron Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="View and manage scheduled cron jobs"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Cron Manager"
+                             Subtitle="View and manage scheduled cron jobs">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Refresh" Click="Scan_Click" Classes="action-btn" Padding="16,8"/>
+            <!-- PageTitle: hidden bridge, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="UserJobCount"   Text="--"/>
+        <TextBlock x:Name="SystemJobCount" Text="--"/>
       </StackPanel>
-      <Grid ColumnDefinitions="*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="User Cron Jobs" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="UserJobCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="System Cron Files" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="SystemJobCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-      <!-- User cron -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
-        <StackPanel Spacing="12">
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
-              <TextBlock Text="User Crontab" FontSize="11" FontWeight="SemiBold"
-                         Foreground="{DynamicResource TextSecondaryBrush}"/>
-            </StackPanel>
-            <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
-          </Grid>
-          <TextBlock x:Name="SubText" Text="Click Refresh to load cron jobs" FontSize="12"
-                     Foreground="{DynamicResource TextMutedBrush}"/>
-          <ItemsControl x:Name="CronList"/>
-        </StackPanel>
-      </Border>
-      <!-- System cron -->
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="USER JOBS"
+                           Value="{Binding #UserJobCount.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="SYSTEM CRON FILES"
+                           Value="{Binding #SystemJobCount.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+      </controls:StatRow>
+
+      <!-- User crontab -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
               <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="System Cron Directories" FontSize="11" FontWeight="SemiBold"
+            <TextBlock Text="User Crontab" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+          </StackPanel>
+          <TextBlock x:Name="SubText" Text="Click Refresh to load cron jobs"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <ItemsControl x:Name="CronList"/>
+        </StackPanel>
+      </controls:GlassCard>
+
+      <!-- System cron directories -->
+      <controls:GlassCard>
+        <StackPanel Spacing="12">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
+              <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="System Cron Directories" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ItemsControl x:Name="SystemCronList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
       <!-- Cron syntax help -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource InfoBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1">
         <StackPanel Spacing="6">
-          <TextBlock Text="Cron Syntax: MIN HOUR DAY MONTH WEEKDAY COMMAND" FontSize="12"
+          <TextBlock Text="Cron Syntax: MIN HOUR DAY MONTH WEEKDAY COMMAND"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      FontWeight="SemiBold" Foreground="#0080FF"/>
           <TextBlock Text="Examples: '0 */6 * * * /usr/bin/backup.sh' (every 6h) | '30 2 * * 0 apt update' (Sun 2:30am)"
-                     FontSize="11" Foreground="#6699CC" TextWrapping="Wrap"/>
+                     FontSize="{DynamicResource FontSizeLabel}" Foreground="#6699CC" TextWrapping="Wrap"/>
         </StackPanel>
       </Border>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

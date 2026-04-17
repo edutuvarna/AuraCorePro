@@ -1,109 +1,125 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.ProcessMonitorView">
-  <Grid RowDefinitions="Auto,Auto,*">
+  <Grid RowDefinitions="Auto,Auto,Auto,*">
 
     <!-- Header -->
-    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Process Monitor" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubtitleText" Text="Monitor, kill, and manage running processes"
-                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-      </StackPanel>
-      <!-- Search -->
-      <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
-              Padding="8,4" Margin="0,0,8,0" VerticalAlignment="Center" MinWidth="200">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
-        <TextBox x:Name="SearchBox" Watermark="Search processes..."
-                 Background="Transparent" BorderThickness="0"
-                 Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"
-                 TextChanged="SearchBox_TextChanged"/>
-      </Border>
-      <!-- Auto-refresh toggle -->
-      <Button Grid.Column="2" x:Name="AutoRefreshBtn" Classes="action-btn"
-              Click="AutoRefresh_Click" VerticalAlignment="Center"
-              Padding="12,8" Margin="0,0,8,0">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F504;" FontSize="12"/>
-          <TextBlock x:Name="AutoRefreshLabel" Text="Auto: OFF" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-      <!-- Scan button -->
-      <Button Grid.Column="3" Classes="action-btn" Click="Scan_Click"
-              VerticalAlignment="Center" Padding="12,8">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F50D;" FontSize="12"/>
-          <TextBlock x:Name="ScanBtnLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-    </Grid>
-
-    <!-- Stats Bar -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
-            Padding="16,10" Margin="0,0,0,12">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid ColumnDefinitions="*,*,*,*">
+    <controls:ModuleHeader Title="Process Monitor"
+                           Subtitle="Monitor, kill, and manage running processes">
+      <controls:ModuleHeader.Actions>
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Processes:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
-                     VerticalAlignment="Center"/>
-          <TextBlock x:Name="ProcCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+          <!-- Auto-refresh toggle -->
+          <Button x:Name="AutoRefreshBtn" Classes="action-btn"
+                  Click="AutoRefresh_Click" VerticalAlignment="Center"
+                  Padding="12,8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
+              <TextBlock x:Name="AutoRefreshLabel" Text="Auto: OFF"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+            </StackPanel>
+          </Button>
+          <!-- Scan button -->
+          <Button Classes="action-btn" Click="Scan_Click"
+                  VerticalAlignment="Center" Padding="12,8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+              <TextBlock x:Name="ScanBtnLabel" Text="Scan"
+                         FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+            </StackPanel>
+          </Button>
+          <!-- PageTitle: invisible, code-behind writes localized string -->
+          <TextBlock x:Name="PageTitle" IsVisible="False"/>
         </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Total CPU:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
-                     VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalCpu" Text="--%" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Total RAM:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"
-                     VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalRam" Text="-- MB" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentPurpleBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-          <TextBlock x:Name="LastScanTime" Text="" FontSize="10"
-                     Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-      </Grid>
-    </Border>
+      </controls:ModuleHeader.Actions>
+    </controls:ModuleHeader>
 
-    <!-- Process List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="4">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
+    <!-- Hidden bridge for code-behind subtitle writes -->
+    <TextBlock Grid.Row="0" x:Name="SubtitleText"
+               Text="Monitor, kill, and manage running processes"
+               FontSize="{DynamicResource FontSizeBodySmall}"
+               Foreground="{DynamicResource TextSecondaryBrush}"
+               IsVisible="False"/>
+
+    <!-- Search + Stats Row -->
+    <controls:GlassCard Grid.Row="1" Margin="0,16,0,0">
+      <Grid RowDefinitions="Auto,Auto">
+        <!-- Search box -->
+        <Border CornerRadius="{StaticResource RadiusMd}" BorderThickness="1"
+                Padding="8,4" MinWidth="200">
+          <Border.Background>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
+          </Border.Background>
+          <Border.BorderBrush>
+            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
+          </Border.BorderBrush>
+          <TextBox x:Name="SearchBox" Watermark="Search processes..."
+                   Background="Transparent" BorderThickness="0"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   FontSize="{DynamicResource FontSizeBody}"
+                   TextChanged="SearchBox_TextChanged"/>
+        </Border>
+        <!-- Stats bar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Margin="0,10,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Processes:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="ProcCount" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Total CPU:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalCpu" Text="--%"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Total RAM:"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalRam" Text="-- MB"
+                       FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
+                       Foreground="{DynamicResource AccentPurpleBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+          <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <TextBlock x:Name="LastScanTime" Text=""
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </controls:GlassCard>
+
+    <!-- Process List Card -->
+    <controls:GlassCard Grid.Row="3" Margin="0,12,0,0">
       <Grid RowDefinitions="Auto,*">
         <!-- Column Headers -->
         <Border Padding="12,8" Background="#08FFFFFF" CornerRadius="8,8,0,0">
           <Grid ColumnDefinitions="60,2*,*,80,80,80,120">
-            <TextBlock Text="PID" FontSize="10" FontWeight="Bold"
+            <TextBlock Text="PID"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="1" Text="NAME" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="1" Text="NAME"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="2" Text="DESCRIPTION" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="2" Text="DESCRIPTION"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="3" Text="CPU %" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="3" Text="CPU %"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="4" Text="RAM MB" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="4" Text="RAM MB"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="5" Text="THREADS" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="5" Text="THREADS"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="6" Text="ACTIONS" FontSize="10" FontWeight="Bold"
+            <TextBlock Grid.Column="6" Text="ACTIONS"
+                       FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
         </Border>
@@ -112,7 +128,8 @@
           <ItemsControl x:Name="ProcessList">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <Border Padding="12,6" Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1">
+                <Border Padding="12,6" Margin="0,0,0,4"
+                        CornerRadius="{StaticResource RadiusMd}" BorderThickness="1">
                   <Border.Background>
                     <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
                   </Border.Background>
@@ -120,28 +137,36 @@
                     <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
                   </Border.BorderBrush>
                   <Grid ColumnDefinitions="60,2*,*,80,80,80,120">
-                    <TextBlock Text="{Binding Pid}" FontSize="11"
+                    <TextBlock Text="{Binding Pid}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                    <TextBlock Grid.Column="1" Text="{Binding Name}"
+                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" Text="{Binding Description}" FontSize="10"
+                    <TextBlock Grid.Column="2" Text="{Binding Description}"
+                               FontSize="{DynamicResource FontSizeLabel}"
                                Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="3" Text="{Binding CpuText}" FontSize="11" FontWeight="SemiBold"
+                    <TextBlock Grid.Column="3" Text="{Binding CpuText}"
+                               FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                                Foreground="{Binding CpuBrush}" TextAlignment="Right" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="4" Text="{Binding RamText}" FontSize="11"
+                    <TextBlock Grid.Column="4" Text="{Binding RamText}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"
                                VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="5" Text="{Binding Threads}" FontSize="11"
+                    <TextBlock Grid.Column="5" Text="{Binding Threads}"
+                               FontSize="{DynamicResource FontSizeBodySmall}"
                                Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Right"
                                VerticalAlignment="Center"/>
                     <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="4"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                       <Button Tag="{Binding KillTag}" Classes="action-btn" Padding="6,3"
-                              Click="Action_Click" FontSize="10" Content="Kill"/>
+                              Click="Action_Click" FontSize="{DynamicResource FontSizeLabel}"
+                              Content="Kill"/>
                       <Button Tag="{Binding SuspendTag}" Classes="action-btn" Padding="6,3"
-                              Click="Action_Click" FontSize="10" Content="{Binding SuspendLabel}"/>
+                              Click="Action_Click" FontSize="{DynamicResource FontSizeLabel}"
+                              Content="{Binding SuspendLabel}"/>
                     </StackPanel>
                   </Grid>
                 </Border>
@@ -150,7 +175,7 @@
           </ItemsControl>
         </ScrollViewer>
       </Grid>
-    </Border>
+    </controls:GlassCard>
 
   </Grid>
 </UserControl>

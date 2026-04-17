@@ -1,0 +1,189 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Avalonia.Data.Converters"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.DockerCleanerView"
+             x:DataType="vm:DockerCleanerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header with inline Scan button -->
+      <controls:ModuleHeader x:Name="Header">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button x:Name="ScanBtn"
+                    Content="Scan"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding ScanCommand}"
+                    IsEnabled="{Binding !IsBusy}"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Stat row: images / containers / volumes / build cache -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="ImagesCard"
+                           Value="{Binding ImagesDisplay}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard x:Name="ContainersCard"
+                           Value="{Binding ContainersDisplay}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard x:Name="VolumesCard"
+                           Value="{Binding VolumesDisplay}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+        <controls:StatCard x:Name="BuildCacheCard"
+                           Value="{Binding BuildCacheDisplay}"
+                           ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
+      </controls:StatRow>
+
+      <!-- ═══ SAFE CLEANUP (green hero) ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="SafeKicker"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource StatusSuccessBrush}"/>
+            <TextBlock x:Name="SafeDescription"
+                       Text="{Binding SafeDescriptionText}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+            <Button x:Name="PruneSafeBtn"
+                    Content="Prune Safe"
+                    Classes="action-btn"
+                    HorizontalAlignment="Right"
+                    Padding="16,8"
+                    Command="{Binding PruneSafeCommand}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ GRANULAR CONTROL ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="GranularHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <Grid ColumnDefinitions="*,8,*,8,*">
+              <Button x:Name="PruneImagesBtn"
+                      Grid.Column="0"
+                      Content="Prune Images"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding PruneImagesCommand}"/>
+              <Button x:Name="PruneContainersBtn"
+                      Grid.Column="2"
+                      Content="Prune Containers"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding PruneContainersCommand}"/>
+              <Button x:Name="PruneBuildCacheBtn"
+                      Grid.Column="4"
+                      Content="Prune Build Cache"
+                      Classes="action-btn"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"
+                      Padding="12,8"
+                      Command="{Binding PruneBuildCacheCommand}"/>
+            </Grid>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ DANGER ZONE (red, volume prune gated by checkbox) ═══ -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusErrorBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="DangerKicker"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource StatusErrorBrush}"/>
+          <TextBlock x:Name="VolumeDataLossWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     TextWrapping="Wrap"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <CheckBox x:Name="VolumeAckCheckBox"
+                      Grid.Column="0"
+                      IsChecked="{Binding VolumeRiskAcknowledged, Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+            <Button x:Name="PruneVolumesBtn"
+                    Grid.Column="1"
+                    Content="Prune Volumes"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding PruneVolumesCommand}"
+                    IsEnabled="{Binding VolumeRiskAcknowledged}"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ═══ STATUS + PROGRESS + ERROR BANNER ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Content="Cancel"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege warning -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <TextBlock x:Name="PrivilegeWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource StatusWarningBrush}"
+                     TextWrapping="Wrap"/>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

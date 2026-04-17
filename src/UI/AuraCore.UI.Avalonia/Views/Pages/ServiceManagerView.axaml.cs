@@ -1,7 +1,9 @@
 using System.ServiceProcess;
+using AuraCore.Module.ServiceManager;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -11,9 +13,12 @@ public record ServiceDisplayItem(string DisplayName, string ServiceName, string 
 public partial class ServiceManagerView : UserControl
 {
     private List<ServiceDisplayItem> _allItems = new();
+    private ServiceManagerEngine? _engine;
+
     public ServiceManagerView()
     {
         InitializeComponent();
+        _engine = App.Services.GetService<ServiceManagerEngine>();
         Loaded += async (s, e) => { await RunScan(); ApplyLocalization(); };
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
@@ -68,5 +73,88 @@ public partial class ServiceManagerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.serviceManager");
+    }
+
+    // ── Context menu helpers ──────────────────────────────────────────────────
+
+    private ServiceDisplayItem? GetContextItem(object? sender)
+    {
+        if (sender is MenuItem mi && mi.Parent is ContextMenu cm)
+            return cm.PlacementTarget?.DataContext as ServiceDisplayItem;
+        return null;
+    }
+
+    private async void ServiceStart_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.StartAsync(item.ServiceName), $"Starting {item.DisplayName}…");
+    }
+
+    private async void ServiceStop_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.StopAsync(item.ServiceName), $"Stopping {item.DisplayName}…");
+    }
+
+    private async void ServiceRestart_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.RestartAsync(item.ServiceName), $"Restarting {item.DisplayName}…");
+    }
+
+    private async void ServiceStartupAuto_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "auto"),
+            $"Setting {item.DisplayName} startup to Automatic…");
+    }
+
+    private async void ServiceStartupManual_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "demand"),
+            $"Setting {item.DisplayName} startup to Manual…");
+    }
+
+    private async void ServiceStartupDisabled_Click(object? sender, RoutedEventArgs e)
+    {
+        var item = GetContextItem(sender);
+        if (item is null || _engine is null) return;
+        await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "disabled"),
+            $"Setting {item.DisplayName} startup to Disabled…");
+    }
+
+    private async Task DispatchOp(Func<Task<ServiceOperationOutcome>> op, string progressMsg)
+    {
+        ShowBanner(progressMsg, isError: false);
+        try
+        {
+            var outcome = await op();
+            if (outcome.HelperMissing)
+                ShowBanner("Privileged helper not installed. Run scripts/install-privileged-service.ps1 as admin.", isError: true);
+            else if (!outcome.Success)
+                ShowBanner($"Error: {outcome.Error ?? "unknown"}", isError: true);
+            else
+            {
+                ShowBanner("Done.", isError: false);
+                await RunScan();
+            }
+        }
+        catch (System.Exception ex)
+        {
+            ShowBanner($"Exception: {ex.Message}", isError: true);
+        }
+    }
+
+    private void ShowBanner(string message, bool isError)
+    {
+        StatusBannerText.Text = message;
+        StatusBannerText.Foreground = isError ? P("#EF4444") : P("#22C55E");
+        StatusBanner.IsVisible = true;
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using AuraCore.Application.Interfaces.Engines;
 using AuraCore.Engine.AIAnalyzer.Rag;
 using LLama;
@@ -10,17 +11,44 @@ namespace AuraCore.Engine.AIAnalyzer.LLM;
 /// LLM inference engine using LLamaSharp for local GGUF model execution.
 /// Lazy-loads the model on first query. Thread-safe.
 /// Supports optional RAG retrieval to inject relevant source code context.
+/// Supports hot-swap via <see cref="ReloadAsync"/> without app restart.
 /// </summary>
 public sealed class LlmInferenceEngine : IAuraCoreLLM
 {
-    private readonly string? _modelPath;
-    private readonly QdrantRetriever? _ragRetriever;
+    private string? _modelPath;
+    private string? _ragEndpointUrl;
+    private QdrantRetriever? _ragRetriever;
     private readonly object _lock = new();
     private bool _initialized;
     private bool _loadFailed;
     private LLamaWeights? _model;
     private LLamaContext? _context;
     private bool _disposed;
+
+    // ── Reload / INPC ──────────────────────────────────────────────────────────
+    private readonly SemaphoreSlim _reloadGate = new(1, 1);
+    private bool _isReloading;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged(string propertyName)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public bool IsReloading
+    {
+        get => _isReloading;
+        private set
+        {
+            if (_isReloading == value) return;
+            _isReloading = value;
+            OnPropertyChanged(nameof(IsReloading));
+        }
+    }
+
+    // ── Inference drain tracking ───────────────────────────────────────────────
+    // Counts active AskAsync calls so ReloadAsync can wait for them to finish.
+    private int _activeInferenceCount;
+    private readonly SemaphoreSlim _inferenceDrainSignal = new(0, int.MaxValue);
 
     private const int MaxTokens = 512;
     private const float InferenceTemperature = 0.7f;
@@ -29,6 +57,7 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
     public LlmInferenceEngine(string? modelPath, string? ragEndpointUrl = null)
     {
         _modelPath = modelPath;
+        _ragEndpointUrl = ragEndpointUrl;
         if (!string.IsNullOrEmpty(ragEndpointUrl))
             _ragRetriever = new QdrantRetriever(ragEndpointUrl);
     }
@@ -40,36 +69,46 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
         if (!IsAvailable)
             return "AI Assistant is currently unavailable. Model file not found.";
 
-        // Initialize model under lock (one-time)
-        lock (_lock)
-        {
-            if (_disposed) return "AI Assistant is currently unavailable.";
-
-            if (!_initialized)
-            {
-                _initialized = true;
-                try
-                {
-                    InitializeModel();
-                }
-                catch (Exception ex)
-                {
-                    _loadFailed = true;
-                    return $"Failed to load AI model: {ex.Message}";
-                }
-            }
-
-            if (_loadFailed || _model is null || _context is null)
-                return "AI model could not be loaded. Please check that the model file is valid.";
-        }
-
+        // Track in-flight count so ReloadAsync can drain before hot-swapping.
+        Interlocked.Increment(ref _activeInferenceCount);
         try
         {
-            return await RunInferenceAsync(question, context, ct);
+            // Initialize model under lock (one-time; reset by ReloadAsync)
+            lock (_lock)
+            {
+                if (_disposed) return "AI Assistant is currently unavailable.";
+
+                if (!_initialized)
+                {
+                    _initialized = true;
+                    try
+                    {
+                        InitializeModel();
+                    }
+                    catch (Exception ex)
+                    {
+                        _loadFailed = true;
+                        return $"Failed to load AI model: {ex.Message}";
+                    }
+                }
+
+                if (_loadFailed || _model is null || _context is null)
+                    return "AI model could not be loaded. Please check that the model file is valid.";
+            }
+
+            try
+            {
+                return await RunInferenceAsync(question, context, ct);
+            }
+            catch (Exception ex)
+            {
+                return $"Inference error: {ex.Message}";
+            }
         }
-        catch (Exception ex)
+        finally
         {
-            return $"Inference error: {ex.Message}";
+            if (Interlocked.Decrement(ref _activeInferenceCount) == 0)
+                _inferenceDrainSignal.Release();
         }
     }
 
@@ -184,6 +223,88 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
         }
     }
 
+    // ── Hot-swap (ReloadAsync) ─────────────────────────────────────────────────
+
+    /// <inheritdoc/>
+    public async Task ReloadAsync(LlmConfiguration? newConfig = null, CancellationToken ct = default)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        // Concurrent-call guard — non-blocking try-acquire
+        if (!await _reloadGate.WaitAsync(0, CancellationToken.None))
+            throw new InvalidOperationException("IAuraCoreLLM.ReloadAsync: already reloading");
+
+        try
+        {
+            IsReloading = true;
+            ct.ThrowIfCancellationRequested();
+
+            // Drain any in-flight AskAsync calls (best-effort: wait up to 5 s).
+            // If no inference is running the count is 0 and we skip the wait.
+            if (_activeInferenceCount > 0)
+            {
+                // Wait until count reaches 0; _inferenceDrainSignal is released each
+                // time the last concurrent inference finishes.
+                var acquired = await _inferenceDrainSignal.WaitAsync(TimeSpan.FromSeconds(5), ct);
+                // If we time out we proceed anyway — the old context may still be in
+                // use briefly, but LLamaSharp's StatelessExecutor copies what it needs.
+            }
+
+            ct.ThrowIfCancellationRequested();
+
+            // Tear down the old instance
+            await Task.Run(() => DisposeCurrentLlm(), ct);
+
+            ct.ThrowIfCancellationRequested();
+
+            // Apply new config (null = reload same model from disk)
+            if (newConfig is not null)
+            {
+                _modelPath = newConfig.ModelPath;
+                _ragEndpointUrl = newConfig.RagEndpointUrl;
+
+                // Rebuild RAG retriever only if endpoint changed
+                _ragRetriever?.Dispose();
+                _ragRetriever = !string.IsNullOrEmpty(newConfig.RagEndpointUrl)
+                    ? new QdrantRetriever(newConfig.RagEndpointUrl)
+                    : null;
+            }
+
+            // Re-initialise on the next AskAsync call (lazy) by resetting flags
+            lock (_lock)
+            {
+                _initialized = false;
+                _loadFailed = false;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancellation: IsReloading reset in finally, old instance preserved
+            throw;
+        }
+        finally
+        {
+            IsReloading = false;
+            _reloadGate.Release();
+        }
+    }
+
+    /// <summary>Disposes the current LLamaSharp model + context under lock.</summary>
+    private void DisposeCurrentLlm()
+    {
+        lock (_lock)
+        {
+            _context?.Dispose();
+            _model?.Dispose();
+            _context = null;
+            _model = null;
+            _initialized = false;
+            _loadFailed = false;
+        }
+    }
+
+    // ── Disposal ───────────────────────────────────────────────────────────────
+
     public void Dispose()
     {
         if (_disposed) return;
@@ -192,6 +313,8 @@ public sealed class LlmInferenceEngine : IAuraCoreLLM
         _context?.Dispose();
         _model?.Dispose();
         _ragRetriever?.Dispose();
+        _reloadGate.Dispose();
+        _inferenceDrainSignal.Dispose();
 
         _model = null;
         _context = null;

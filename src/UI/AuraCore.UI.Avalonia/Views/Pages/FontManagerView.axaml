@@ -1,43 +1,71 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.FontManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Font Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Browse installed fonts with live preview"
-                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-      </StackPanel>
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBox x:Name="SearchBox" Watermark="Search fonts..." TextChanged="Search_Changed"/>
-        <TextBlock x:Name="FontCount" Grid.Column="1" Text="--" FontSize="13"
-                   Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
-      </Grid>
-      <TextBox x:Name="PreviewText" Text="The quick brown fox jumps over the lazy dog. 0123456789"
-               Watermark="Preview text..." Margin="0,0,0,8"/>
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="14,12">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Font Manager"
+                             Subtitle="Browse installed fonts with live preview">
+        <controls:ModuleHeader.Actions>
+          <!-- PageTitle: invisible, code-behind writes localized string -->
+          <TextBlock x:Name="PageTitle" IsVisible="False"/>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Info banner: Explorer restart notice (not a warning — just heads-up) -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource InfoBgBrush}"
+              BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1"
+              Padding="14,10">
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <TextBlock Text="&#x2139;"
+                     FontSize="{DynamicResource FontSizeBody}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock Text="Installing or removing fonts will restart Windows Explorer so the system font cache refreshes. Any open Explorer windows will briefly close and reopen."
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Search + count row -->
+      <controls:GlassCard>
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox x:Name="SearchBox" Watermark="Search fonts..." TextChanged="Search_Changed"/>
+            <TextBlock x:Name="FontCount" Grid.Column="1" Text="--"
+                       FontSize="{DynamicResource FontSizeBody}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       VerticalAlignment="Center" Margin="12,0,0,0"/>
+          </Grid>
+          <TextBox x:Name="PreviewText"
+                   Text="The quick brown fox jumps over the lazy dog. 0123456789"
+                   Watermark="Preview text..."/>
+        </StackPanel>
+      </controls:GlassCard>
+
+      <!-- Font list -->
+      <controls:GlassCard>
         <StackPanel Spacing="8">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Border Width="16" Height="16" CornerRadius="4">
-              <Border.Background>
-                <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
-              </Border.Background>
-              <TextBlock Text="A" FontSize="8" FontWeight="Bold" Foreground="#14B8A6"
+            <Border Width="16" Height="16" CornerRadius="4"
+                    Background="{DynamicResource BgCardBrush}">
+              <TextBlock Text="A" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Installed Fonts" FontSize="11" FontWeight="SemiBold"
+            <TextBlock Text="Installed Fonts"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ItemsControl x:Name="FontList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AuraCore.UI.Avalonia.Views.Controls"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.UserChip"
+             x:Name="Root">
+  <Grid ColumnDefinitions="Auto,*,Auto" Margin="8,6,8,6">
+    <!-- 13px: half of 26×26 width for perfect circle -->
+    <Border Width="26" Height="26" CornerRadius="13">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Offset="0" Color="#8B5CF6"/>
+          <GradientStop Offset="1" Color="#EC4899"/>
+        </LinearGradientBrush>
+      </Border.Background>
+      <TextBlock Text="{Binding #Root.AvatarInitial}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Foreground="White"
+                 FontWeight="Bold"
+                 FontSize="{DynamicResource FontSizeBodySmall}"/>
+    </Border>
+    <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+      <TextBlock Text="{Binding #Root.Email}"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 TextTrimming="CharacterEllipsis"/>
+      <TextBlock Text="{Binding #Root.StatusText}"
+                 Foreground="{DynamicResource AccentTealLightBrush}"
+                 FontSize="{DynamicResource FontSizeMicro}"/>
+    </StackPanel>
+    <local:AccentBadge Grid.Column="2" Label="{Binding #Root.Role}" VerticalAlignment="Center"
+                       IsVisible="{Binding #Root.Role, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+  </Grid>
+</UserControl>

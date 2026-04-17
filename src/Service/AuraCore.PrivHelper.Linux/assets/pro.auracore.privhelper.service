@@ -1,0 +1,34 @@
+[Unit]
+Description=AuraCorePro Privilege Helper Daemon
+Documentation=https://auracore.pro/docs/privhelper
+After=dbus.service
+Requires=dbus.service
+
+[Service]
+Type=dbus
+BusName=pro.auracore.PrivHelper
+ExecStart=/usr/local/lib/auracore/privhelper
+Restart=on-failure
+RestartSec=5s
+User=root
+
+# Hardening — see spec §9
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+# NoNewPrivileges must stay false: apt-get / snap exec children need to escalate
+NoNewPrivileges=false
+# Tight capability set: only what the whitelisted commands need to run as root
+CapabilityBoundingSet=CAP_DAC_OVERRIDE CAP_SYS_ADMIN CAP_CHOWN CAP_FOWNER
+# Deny everything else (defense-in-depth)
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+# Socket family allowlist (D-Bus uses Unix sockets; journalctl/etc may use AF_NETLINK)
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+
+# Read-write paths for the operations we actually allow
+ReadWritePaths=/var/log/journal /var/cache/apt /var/lib/snapd /var/lib/flatpak /var/lib/docker /var/lib/grub /boot/grub
+
+[Install]
+WantedBy=multi-user.target
+Alias=dbus-pro.auracore.PrivHelper.service

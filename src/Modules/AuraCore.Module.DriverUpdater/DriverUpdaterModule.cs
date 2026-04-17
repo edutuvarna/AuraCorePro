@@ -15,6 +15,15 @@ namespace AuraCore.Module.DriverUpdater;
 /// </summary>
 public sealed class DriverUpdaterModule : IOptimizationModule
 {
+    private readonly AuraCore.Application.Interfaces.Platform.IShellCommandService? _shellCommandService;
+
+    public DriverUpdaterModule() { }
+
+    public DriverUpdaterModule(AuraCore.Application.Interfaces.Platform.IShellCommandService shellCommandService)
+    {
+        _shellCommandService = shellCommandService;
+    }
+
     public string Id => "driver-updater";
     public string DisplayName => "Driver Updater";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
@@ -345,11 +354,52 @@ public sealed class DriverUpdaterModule : IOptimizationModule
         if (!el.TryGetProperty(prop, out var v)) return "";
         return v.ValueKind == JsonValueKind.String ? (v.GetString() ?? "") : "";
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // Privileged write capability (Phase 5.5)
+    // ═══════════════════════════════════════════════════════════
+
+    public sealed record DriverOperationOutcome(bool Success, string Output, bool HelperMissing, string? Error = null);
+
+    public async Task<DriverOperationOutcome> ScanDevicesAsync(CancellationToken ct = default)
+    {
+        if (_shellCommandService is null)
+            return new DriverOperationOutcome(false, "", true, "shell command service not wired");
+
+        var result = await _shellCommandService.RunPrivilegedAsync(
+            new AuraCore.Application.Interfaces.Platform.PrivilegedCommand(
+                "driver.scan", "pnputil", System.Array.Empty<string>(), TimeoutSeconds: 90),
+            ct);
+        return new DriverOperationOutcome(
+            result.Success,
+            result.Stdout,
+            result.AuthResult == AuraCore.Application.Interfaces.Platform.PrivilegeAuthResult.HelperMissing,
+            result.Success ? null : result.Stderr);
+    }
+
+    public async Task<DriverOperationOutcome> ExportDriversAsync(string backupDirectory, CancellationToken ct = default)
+    {
+        if (_shellCommandService is null)
+            return new DriverOperationOutcome(false, "", true, "shell command service not wired");
+
+        var result = await _shellCommandService.RunPrivilegedAsync(
+            new AuraCore.Application.Interfaces.Platform.PrivilegedCommand(
+                "driver.export", "pnputil", new[] { backupDirectory }, TimeoutSeconds: 300),
+            ct);
+        return new DriverOperationOutcome(
+            result.Success,
+            result.Stdout,
+            result.AuthResult == AuraCore.Application.Interfaces.Platform.PrivilegeAuthResult.HelperMissing,
+            result.Success ? null : result.Stderr);
+    }
 }
 
 public static class DriverUpdaterRegistration
 {
-    public static IServiceCollection AddDriverUpdaterModule(
-        this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, DriverUpdaterModule>();
+    public static IServiceCollection AddDriverUpdaterModule(this IServiceCollection services)
+        => services.AddSingleton<IOptimizationModule, DriverUpdaterModule>(sp =>
+        {
+            var shell = sp.GetService<AuraCore.Application.Interfaces.Platform.IShellCommandService>();
+            return shell is not null ? new DriverUpdaterModule(shell) : new DriverUpdaterModule();
+        });
 }

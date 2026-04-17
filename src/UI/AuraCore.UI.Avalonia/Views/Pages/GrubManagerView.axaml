@@ -1,0 +1,296 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.GrubManagerView"
+             x:DataType="vm:GrubManagerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header with NO Scan button (auto-scan on Loaded) -->
+      <controls:ModuleHeader x:Name="Header"/>
+
+      <!-- Backup Status card -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="BackupKicker"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="BackupStatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding BackupStatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         VerticalAlignment="Center"
+                         TextWrapping="Wrap"/>
+              <Button x:Name="RollbackBtn"
+                      Grid.Column="1"
+                      Content="Rollback to Backup"
+                      Classes="action-btn"
+                      Padding="16,8"
+                      Command="{Binding RollbackCommand}"
+                      IsVisible="{Binding HasBackup}"/>
+            </Grid>
+            <TextBlock x:Name="BackupPathBlock"
+                       Text="{Binding BackupPathDisplay}"
+                       FontFamily="Consolas,Menlo,monospace"
+                       FontSize="11"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       IsVisible="{Binding HasBackup}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Current Settings card -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="16">
+            <TextBlock x:Name="SettingsHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <!-- Timeout section -->
+            <StackPanel Spacing="6">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="TimeoutLabel"
+                           Grid.Column="0"
+                           FontSize="{DynamicResource FontSizeBody}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                  <TextBlock Text="{Binding CurrentTimeout}"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="{DynamicResource TextMutedBrush}"
+                             VerticalAlignment="Center"/>
+                  <TextBlock Text="s"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="{DynamicResource TextMutedBrush}"
+                             VerticalAlignment="Center"/>
+                  <TextBlock Text="&#x2192;"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="{DynamicResource TextMutedBrush}"
+                             VerticalAlignment="Center"/>
+                  <TextBlock Text="{Binding PendingTimeout}"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
+                             FontWeight="SemiBold"
+                             Foreground="{DynamicResource StatusWarningBrush}"
+                             VerticalAlignment="Center"/>
+                  <TextBlock Text="s"
+                             FontSize="{DynamicResource FontSizeBodySmall}"
+                             Foreground="{DynamicResource StatusWarningBrush}"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+              </Grid>
+              <TextBlock x:Name="TimeoutHelp"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         TextWrapping="Wrap"/>
+              <Slider x:Name="TimeoutSlider"
+                      Minimum="0"
+                      Maximum="30"
+                      TickFrequency="1"
+                      IsSnapToTickEnabled="True"
+                      Value="{Binding PendingTimeout, Mode=TwoWay}"/>
+              <Grid ColumnDefinitions="*,*">
+                <TextBlock Grid.Column="0"
+                           Text="0s"
+                           FontSize="10"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+                <TextBlock Grid.Column="1"
+                           Text="30s"
+                           FontSize="10"
+                           HorizontalAlignment="Right"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+              </Grid>
+            </StackPanel>
+
+            <!-- Default Boot Entry section -->
+            <StackPanel Spacing="6">
+              <TextBlock x:Name="DefaultLabel"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="DefaultHelp"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         TextWrapping="Wrap"/>
+              <ComboBox x:Name="DefaultComboBox"
+                        ItemsSource="{Binding DefaultEntryOptions}"
+                        SelectedValue="{Binding PendingGrubDefault, Mode=TwoWay}"
+                        SelectedValueBinding="{Binding Value}"
+                        HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate DataType="vm:GrubDefaultOption">
+                    <TextBlock Text="{Binding Display}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+
+            <!-- OS Prober toggle section -->
+            <StackPanel Spacing="6">
+              <TextBlock x:Name="OsProberLabel"
+                         FontSize="{DynamicResource FontSizeBody}"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="OsProberHelp"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         TextWrapping="Wrap"/>
+              <ToggleSwitch x:Name="OsProberToggle"
+                            IsChecked="{Binding PendingOsProberEnabled, Mode=TwoWay}"/>
+            </StackPanel>
+
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Installed Kernels (read-only list) -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="KernelsHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <ItemsControl x:Name="KernelsList"
+                          ItemsSource="{Binding KernelList}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="4"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}"
+                             FontFamily="Consolas,Menlo,monospace"
+                             FontSize="11"
+                             Foreground="{DynamicResource TextPrimaryBrush}"/>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock x:Name="KernelsHelperText"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextMutedBrush}"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Pending Changes zone (amber, visible only when HasPendingChanges) -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusWarningBrush}"
+              BorderThickness="1"
+              Padding="16"
+              IsVisible="{Binding HasPendingChanges}">
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="PendingKicker"
+                     Text="{Binding PendingKickerText}"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource StatusWarningBrush}"/>
+          <ItemsControl x:Name="PendingChangesList"
+                        ItemsSource="{Binding PendingChangeDescriptions}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Spacing="4"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}"
+                           FontFamily="Consolas,Menlo,monospace"
+                           FontSize="11"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock x:Name="PendingHelpText"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     TextWrapping="Wrap"/>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <CheckBox x:Name="BackupAckCheckBox"
+                      Grid.Column="0"
+                      IsChecked="{Binding BackupAcknowledged, Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+            <Button x:Name="ResetBtn"
+                    Grid.Column="1"
+                    Content="Reset"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Margin="0,0,8,0"
+                    Command="{Binding ResetCommand}"/>
+            <Button x:Name="ApplyChangesBtn"
+                    Grid.Column="2"
+                    Content="Apply Changes"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding ApplyChangesCommand}"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Status + Progress + Error banner -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Content="Cancel"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Boot Loader Warning (red, always visible) -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusErrorBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <TextBlock x:Name="BootWarning"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource StatusErrorBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

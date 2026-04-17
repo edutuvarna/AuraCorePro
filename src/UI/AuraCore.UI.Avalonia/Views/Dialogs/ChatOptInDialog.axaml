@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+        x:Class="AuraCore.UI.Avalonia.Views.Dialogs.ChatOptInDialog"
+        x:DataType="vm:ChatOptInDialogViewModel"
+        Title="CORTEX Chat — Experimental"
+        Width="540" Height="520"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+  <Border Background="{DynamicResource BgSurfaceBrush}"
+          BorderBrush="{DynamicResource BorderEmphasisBrush}"
+          BorderThickness="1"
+          CornerRadius="12">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="24">
+
+      <!-- Row 0: Progress indicator — 2-dot header -->
+      <StackPanel Grid.Row="0"
+                  Orientation="Horizontal"
+                  Spacing="6"
+                  HorizontalAlignment="Center"
+                  Margin="0,0,0,12">
+        <!-- Step 1: filled dot when active, outlined when not -->
+        <Ellipse Width="10" Height="10"
+                 Fill="{DynamicResource AccentTealBrush}"
+                 IsVisible="{Binding IsStep1}" />
+        <Ellipse Width="10" Height="10"
+                 Stroke="{DynamicResource AccentTealBrush}"
+                 StrokeThickness="2"
+                 Fill="Transparent"
+                 IsVisible="{Binding IsNotStep1}" />
+
+        <TextBlock x:Name="Step1Label"
+                   FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   VerticalAlignment="Center" />
+
+        <TextBlock Text="—"
+                   FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   VerticalAlignment="Center"
+                   Margin="2,0" />
+
+        <!-- Step 2: filled dot when active, outlined when not -->
+        <Ellipse Width="10" Height="10"
+                 Fill="{DynamicResource AccentTealBrush}"
+                 IsVisible="{Binding IsStep2}" />
+        <Ellipse Width="10" Height="10"
+                 Stroke="{DynamicResource AccentTealBrush}"
+                 StrokeThickness="2"
+                 Fill="Transparent"
+                 IsVisible="{Binding IsNotStep2}" />
+
+        <TextBlock x:Name="Step2Label"
+                   FontSize="10"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   VerticalAlignment="Center" />
+      </StackPanel>
+
+      <!-- Row 1: Dialog title / step header -->
+      <StackPanel Grid.Row="1" Spacing="4">
+        <TextBlock Text="✦ CORTEX CHAT — STEP 1 of 2"
+                   FontSize="10" FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentPurpleBrush}" />
+        <TextBlock Text="⚠ Experimental Feature"
+                   FontSize="18" FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentAmberBrush}" />
+      </StackPanel>
+
+      <!-- Row 2: Step content -->
+      <ScrollViewer Grid.Row="2" Margin="0,16"
+                    IsVisible="{Binding IsStep1}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system."
+                     FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="This feature is under active development."
+                     FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
+        </StackPanel>
+      </ScrollViewer>
+
+      <StackPanel Grid.Row="2" Margin="0,16,0,0"
+                  IsVisible="{Binding IsStep2}"
+                  Spacing="0">
+        <!-- Hero recommendation card -->
+        <Border x:Name="PART_HeroCard"
+                Background="{DynamicResource BgCardElevatedBrush}"
+                CornerRadius="{StaticResource RadiusMd}"
+                Padding="14"
+                BorderBrush="{DynamicResource AccentTealBrush}"
+                BorderThickness="2"
+                Margin="0,0,0,10"
+                IsVisible="{Binding RecommendedId, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <StackPanel Spacing="6">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{Binding RecommendedDisplayName}"
+                         FontSize="13" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         VerticalAlignment="Center" />
+              <Border Background="{DynamicResource AccentTealBrush}"
+                      CornerRadius="4"
+                      Padding="6,2"
+                      VerticalAlignment="Center">
+                <TextBlock x:Name="RecommendedBadge"
+                           Foreground="White"
+                           FontSize="9"
+                           FontWeight="SemiBold" />
+              </Border>
+            </StackPanel>
+            <TextBlock x:Name="HeroRationale"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextSecondaryBrush}" />
+          </StackPanel>
+        </Border>
+
+        <ContentControl x:Name="PART_Step2Host" />
+      </StackPanel>
+
+      <!-- Row 3: Step 1 action buttons -->
+      <StackPanel Grid.Row="3" Orientation="Horizontal"
+                  HorizontalAlignment="Right" Spacing="10"
+                  IsVisible="{Binding IsStep1}">
+        <Button Content="Cancel" Command="{Binding CancelFromStep1}" Padding="16,8" />
+        <Button Content="I understand, continue" Command="{Binding ContinueFromStep1}"
+                Classes="primary" Padding="16,8" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

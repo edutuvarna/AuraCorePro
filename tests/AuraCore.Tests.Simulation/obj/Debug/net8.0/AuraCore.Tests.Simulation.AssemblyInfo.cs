@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.Tests.Simulation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+59af1cb97fb6849dc816ff7288d3d5cdac2e14b5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3cc278585789abed03d6991e1c45bad3048cb608")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.Tests.Simulation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.Tests.Simulation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

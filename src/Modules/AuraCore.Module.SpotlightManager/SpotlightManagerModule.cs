@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.SpotlightManager.Models;
@@ -11,6 +12,13 @@ namespace AuraCore.Module.SpotlightManager;
 
 public sealed class SpotlightManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public SpotlightManagerModule(IShellCommandService shell)
+    {
+        _shell = shell;
+    }
+
     public string Id => "spotlight-manager";
     public string DisplayName => "Spotlight Manager";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
@@ -112,23 +120,28 @@ public sealed class SpotlightManagerModule : IOptimizationModule
                 // Extra defense: reject shell metacharacters even if the path is in LastReport.
                 if (ContainsShellMetacharacter(volume)) continue;
 
-                var escapedVolume = volume.Replace("\"", "\\\"");
-                var args = action switch
+                // Build argv per daemon's SpotlightArgvValidator:
+                // - disable: ["-i", "off", volume]
+                // - enable: ["-i", "on", volume]
+                // - rebuild: ["-E", volume]
+                var argv = action switch
                 {
-                    "disable" => $"-i off \"{escapedVolume}\"",
-                    "enable" => $"-i on \"{escapedVolume}\"",
-                    "rebuild" => $"-E \"{escapedVolume}\"",
-                    _ => ""
+                    "disable" => new[] { "-i", "off", volume },
+                    "enable" => new[] { "-i", "on", volume },
+                    "rebuild" => new[] { "-E", volume },
+                    _ => null
                 };
-                if (string.IsNullOrEmpty(args)) continue;
+                if (argv is null) continue;
 
-                // mdutil requires sudo for most operations. Use -n for non-interactive.
-                var cmd = $"sudo -n mdutil {args}";
-                var r = await ProcessRunner.RunAsync(
-                    "/bin/sh",
-                    $"-c \"{cmd}\"",
-                    ct,
-                    timeoutSeconds: 120);
+                // Use IShellCommandService with action id "spotlight".
+                // Daemon hardcodes /usr/bin/mdutil per Task 27 SpotlightArgvValidator.
+                var r = await _shell.RunPrivilegedAsync(
+                    new PrivilegedCommand(
+                        Id: "spotlight",
+                        Executable: "mdutil",
+                        Arguments: argv,
+                        TimeoutSeconds: 120),
+                    ct);
                 if (r.Success) processed++;
             }
 
@@ -218,5 +231,9 @@ public sealed class SpotlightManagerModule : IOptimizationModule
 public static class SpotlightManagerRegistration
 {
     public static IServiceCollection AddSpotlightManagerModule(this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, SpotlightManagerModule>();
+    {
+        services.AddSingleton<SpotlightManagerModule>();
+        services.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SpotlightManagerModule>());
+        return services;
+    }
 }

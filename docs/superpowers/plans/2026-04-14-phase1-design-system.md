@@ -13,6 +13,10 @@
 ## Context & References
 
 - **Vision Document:** `docs/superpowers/specs/2026-04-14-ui-rebuild-vision-document.md` — authoritative source for all token values and component specs. Read this first.
+
+> **Codebase note 1 (discovered during Task 2):** The codebase has an `AuraCore.Application` namespace (from `src/Core/AuraCore.Application/`). From inside `namespace AuraCore.Tests.UI.Avalonia`, the unqualified identifier `Application` resolves to that namespace, NOT to `Avalonia.Application`. Existing production code (`src/UI/AuraCore.UI.Avalonia/App.axaml.cs`, `Program.cs`) handles this with `global::Avalonia.Application` or `using global::Avalonia;`. Apply the same pattern whenever new test code references `Avalonia.Application` unqualified.
+
+> **Codebase note 2 (discovered during Task 3):** The UI project's csproj has `<AssemblyName>AuraCore.Pro</AssemblyName>`, so the assembly name differs from the project name. All `avares://` URIs must use `AuraCore.Pro` as the host, NOT `AuraCore.UI.Avalonia`. Example: `avares://AuraCore.Pro/Themes/AuraCoreThemeV2.axaml`. Existing `App.axaml` uses this form. Apply to all subsequent tasks that load XAML via `avares://` (Tasks 3, 4, 5, 19).
 - **Reference Dashboard mockup:** `.superpowers/brainstorm/1483-1776150339/content/full-dashboard-mockup-v4.html` — visual source of truth.
 - **Old theme:** `src/UI/AuraCore.UI.Avalonia/Themes/AuraCoreTheme.axaml` — keep unchanged this phase. V2 will live alongside. Phase 2 will switch `App.axaml` to V2.
 - **Existing control pattern:** `src/UI/AuraCore.UI.Avalonia/Views/Controls/OrbitalLogo.axaml/.cs` — follow this pattern.

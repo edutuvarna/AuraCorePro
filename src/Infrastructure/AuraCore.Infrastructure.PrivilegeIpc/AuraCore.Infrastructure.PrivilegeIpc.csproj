@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AuraCore.Infrastructure.PrivilegeIpc</RootNamespace>
+    <!-- Required by LibraryImport source generator (MacOS/Interop/LibXpcClient.cs). -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\AuraCore.Application\AuraCore.Application.csproj" />
+    <ProjectReference Include="..\..\Core\AuraCore.SharedKernel\AuraCore.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\IPC\AuraCore.IPC.Contracts\AuraCore.IPC.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.*" />
+    <PackageReference Include="Tmds.DBus" Version="0.92.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Service\AuraCore.PrivHelper.Linux\install.sh" Link="install.sh">
+      <LogicalName>install.sh</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\Service\AuraCore.PrivHelper.Linux\assets\pro.auracore.privhelper.policy" Link="pro.auracore.privhelper.policy">
+      <LogicalName>pro.auracore.privhelper.policy</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\Service\AuraCore.PrivHelper.Linux\assets\pro.auracore.privhelper.service" Link="pro.auracore.privhelper.service">
+      <LogicalName>pro.auracore.privhelper.service</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

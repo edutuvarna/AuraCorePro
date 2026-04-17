@@ -9,6 +9,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="NSubstitute" Version="5.*" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Core/AuraCore.Application/AuraCore.Application.csproj" />
@@ -37,5 +38,8 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.MacAppInstaller\AuraCore.Module.MacAppInstaller.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.SnapFlatpakCleaner\AuraCore.Module.SnapFlatpakCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.GrubManager\AuraCore.Module.GrubManager.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DriverUpdater\AuraCore.Module.DriverUpdater.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DefenderManager\AuraCore.Module.DefenderManager.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.ServiceManager\AuraCore.Module.ServiceManager.csproj" />
   </ItemGroup>
 </Project>

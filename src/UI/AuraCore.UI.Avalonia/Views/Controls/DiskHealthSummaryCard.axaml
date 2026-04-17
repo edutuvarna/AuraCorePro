@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.DiskHealthSummaryCard">
+  <controls:GlassCard>
+    <StackPanel Spacing="8">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="TitleText" Text="Disk Health"
+                   FontWeight="SemiBold" FontSize="{DynamicResource FontSizeBody}"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <Button Grid.Column="1" Classes="link-btn"
+                Click="ViewDetails_Click"
+                Content="View details →"
+                FontSize="{DynamicResource FontSizeBodySmall}"/>
+      </Grid>
+      <TextBlock x:Name="StatusLine" Text="—"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"/>
+      <StackPanel Orientation="Horizontal" Spacing="24">
+        <StackPanel>
+          <TextBlock Text="SMART" FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <TextBlock x:Name="SmartBadge" Text="—" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="Worst temp" FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <TextBlock x:Name="WorstTemp" Text="—" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </controls:GlassCard>
+</UserControl>

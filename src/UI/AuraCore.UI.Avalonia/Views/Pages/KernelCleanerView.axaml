@@ -1,0 +1,250 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.KernelCleanerView"
+             x:DataType="vm:KernelCleanerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / RebuildSidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header with inline Scan button -->
+      <controls:ModuleHeader x:Name="Header">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Button x:Name="ScanBtn"
+                    Content="Scan"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding ScanCommand}"
+                    IsEnabled="{Binding !IsBusy}"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Stat row: active kernel / removable -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="ActiveKernelCard"
+                           Value="{Binding ActiveKernelDisplay}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard x:Name="RemovableCard"
+                           Value="{Binding RemovableDisplay}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+      </controls:StatRow>
+
+      <!-- ═══ SAFE CLEANUP (green hero) ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="SafeKicker"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource StatusSuccessBrush}"/>
+            <TextBlock x:Name="SafeDescription"
+                       Text="{Binding SafeDescriptionText}"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       TextWrapping="Wrap"/>
+            <Button x:Name="AutoRemoveOldBtn"
+                    Content="Auto-Remove Old"
+                    Classes="action-btn"
+                    HorizontalAlignment="Right"
+                    Padding="16,8"
+                    Command="{Binding AutoRemoveOldCommand}"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ MANUAL SELECTION (kernel list) ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="ManualHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <ItemsControl x:Name="KernelItemsList"
+                          ItemsSource="{Binding KernelItems}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="6"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:KernelItemVM">
+                  <Border Classes.kernel-running="{Binding IsRunning}"
+                          CornerRadius="{DynamicResource RadiusSm}"
+                          Background="{DynamicResource BgCardBrush}"
+                          BorderBrush="{DynamicResource BorderSubtleBrush}"
+                          BorderThickness="1"
+                          Padding="12,10">
+                    <Border.Styles>
+                      <Style Selector="Border.kernel-running">
+                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBlueBrush}"/>
+                      </Style>
+                    </Border.Styles>
+                    <Grid ColumnDefinitions="Auto,12,*,Auto">
+                      <!-- Left cell: checkbox OR running placeholder -->
+                      <CheckBox Grid.Column="0"
+                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                IsEnabled="{Binding IsCheckboxEnabled}"
+                                IsVisible="{Binding IsCheckboxVisible}"
+                                VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="0"
+                                 Text="—"
+                                 Foreground="{DynamicResource TextMutedBrush}"
+                                 VerticalAlignment="Center"
+                                 IsVisible="{Binding IsRunning}"/>
+
+                      <!-- Center cell: version (bold) + package name · size (muted) -->
+                      <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{Binding Version}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <TextBlock Text="{Binding PackageName}"
+                                     FontSize="{DynamicResource FontSizeBodySmall}"
+                                     Foreground="{DynamicResource TextMutedBrush}"/>
+                          <TextBlock Text="·"
+                                     FontSize="{DynamicResource FontSizeBodySmall}"
+                                     Foreground="{DynamicResource TextMutedBrush}"/>
+                          <TextBlock Text="{Binding SizeDisplay}"
+                                     FontSize="{DynamicResource FontSizeBodySmall}"
+                                     Foreground="{DynamicResource TextMutedBrush}"/>
+                        </StackPanel>
+                      </StackPanel>
+
+                      <!-- Right cell: RUNNING (blue) or NEWEST (amber) pill badge -->
+                      <Border Grid.Column="3"
+                              CornerRadius="{DynamicResource RadiusSm}"
+                              Padding="8,3"
+                              VerticalAlignment="Center"
+                              IsVisible="{Binding IsRunning}"
+                              Background="{DynamicResource BgElevatedBrush}">
+                        <TextBlock Text="● RUNNING"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AccentBlueBrush}"/>
+                      </Border>
+                      <Border Grid.Column="3"
+                              CornerRadius="{DynamicResource RadiusSm}"
+                              Padding="8,3"
+                              VerticalAlignment="Center"
+                              IsVisible="{Binding IsNewestBadgeVisible}"
+                              Background="{DynamicResource BgElevatedBrush}">
+                        <TextBlock Text="★ NEWEST"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource StatusWarningBrush}"/>
+                      </Border>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="SelectedSummary"
+                         Grid.Column="0"
+                         Text="{Binding SelectedCountDisplay}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="RemoveSelectedBtn"
+                      Grid.Column="1"
+                      Content="Remove Selected"
+                      Classes="action-btn"
+                      Padding="16,8"
+                      Command="{Binding RemoveSelectedCommand}"/>
+            </Grid>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- ═══ DANGER ZONE (red, remove-all-but-current gated by checkbox) ═══ -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusErrorBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <StackPanel Spacing="10">
+          <TextBlock x:Name="DangerKicker"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     FontWeight="SemiBold"
+                     Foreground="{DynamicResource StatusErrorBrush}"/>
+          <TextBlock x:Name="NoFallbackWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     TextWrapping="Wrap"/>
+          <Grid ColumnDefinitions="*,Auto">
+            <CheckBox x:Name="DangerAckCheckBox"
+                      Grid.Column="0"
+                      IsChecked="{Binding DangerAcknowledged, Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+            <Button x:Name="RemoveAllButCurrentBtn"
+                    Grid.Column="1"
+                    Content="Remove All But Running"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Command="{Binding RemoveAllButCurrentCommand}"
+                    IsEnabled="{Binding DangerAcknowledged}"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ═══ STATUS + PROGRESS + ERROR BANNER ═══ -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Content="Cancel"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege warning -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <TextBlock x:Name="PrivilegeWarning"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource StatusWarningBrush}"
+                     TextWrapping="Wrap"/>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

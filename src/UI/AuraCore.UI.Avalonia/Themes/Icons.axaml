@@ -1,0 +1,126 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ══════════════════════════════════════════════════════
+       Lucide Icons (MIT License) — https://lucide.dev
+       Each icon is a 24×24 StreamGeometry, stroke="currentColor"
+       stroke-width="2" by default when rendered via Path control.
+       ══════════════════════════════════════════════════════ -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+
+      <!-- layout-dashboard -->
+      <StreamGeometry x:Key="IconDashboard">M3 3H10V12H3zM14 3H21V8H14zM14 12H21V21H14zM3 16H10V21H3z</StreamGeometry>
+
+      <!-- cpu -->
+      <StreamGeometry x:Key="IconCpu">M4 4H20A2 2 0 0 1 22 6V18A2 2 0 0 1 20 20H4A2 2 0 0 1 2 18V6A2 2 0 0 1 4 4zM9 9H15V15H9zM9 2V4M15 2V4M9 20V22M15 20V22M2 9H4M2 15H4M20 9H22M20 15H22</StreamGeometry>
+
+      <!-- memory-stick -->
+      <StreamGeometry x:Key="IconRam">M2 8H22V16H2zM4 8V6M8 8V6M12 8V6M16 8V6M20 8V6M6 16V18M10 16V18M14 16V18M18 16V18</StreamGeometry>
+
+      <!-- circuit-board / gpu -->
+      <StreamGeometry x:Key="IconGpu">M2 7H22V19H2zM8 13A2 2 0 1 1 8 13.001M16 13A1 1 0 1 1 16 13.001M2 11H6M18 11H22</StreamGeometry>
+
+      <!-- hard-drive -->
+      <StreamGeometry x:Key="IconHardDrive">M22 12H2M5.45 5.11L2 12V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V12L18.55 5.11A2 2 0 0 0 16.76 4H7.24A2 2 0 0 0 5.45 5.11zM6 16L6.01 16M10 16L10.01 16</StreamGeometry>
+
+      <!-- heart (filled variant used via Path Fill property) -->
+      <StreamGeometry x:Key="IconHeart">M20.84 4.61A5.5 5.5 0 0 0 13.06 4.61L12 5.67L10.94 4.61A5.5 5.5 0 0 0 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39A5.5 5.5 0 0 0 20.84 4.61z</StreamGeometry>
+
+      <!-- zap -->
+      <StreamGeometry x:Key="IconZap">M13 2L3 14H12L11 22L21 10H12L13 2z</StreamGeometry>
+
+      <!-- sparkles -->
+      <StreamGeometry x:Key="IconSparkles">M9.937 15.5A2 2 0 0 0 8.5 14.063L2.365 12.481A0.5 0.5 0 0 1 2.365 11.519L8.5 9.936A2 2 0 0 0 9.937 8.5L11.519 2.365A0.5 0.5 0 0 1 12.482 2.365L14.063 8.5A2 2 0 0 0 15.5 9.937L21.636 11.518A0.5 0.5 0 0 1 21.636 12.482L15.5 14.063A2 2 0 0 0 14.063 15.5L12.482 21.636A0.5 0.5 0 0 1 11.519 21.636zM20 3V7M22 5H18M4 17V19M5 18H3</StreamGeometry>
+
+      <!-- rotate-ccw -->
+      <StreamGeometry x:Key="IconRotateCcw">M3 12A9 9 0 1 0 12 3A9.75 9.75 0 0 0 5.26 5.74L3 8M3 3V8H8</StreamGeometry>
+
+      <!-- gamepad-2 -->
+      <StreamGeometry x:Key="IconGamepad">M2 6H22A2 2 0 0 1 22 18H2A2 2 0 0 1 2 6zM6 12H10M8 10V14M15 10A1 1 0 1 1 15 10.001M18 13A1 1 0 1 1 18 13.001</StreamGeometry>
+
+      <!-- shield -->
+      <StreamGeometry x:Key="IconShield">M12 22S20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22z</StreamGeometry>
+
+      <!-- shield-check -->
+      <StreamGeometry x:Key="IconShieldCheck">M12 22S20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22zM9 12L11 14L15 10</StreamGeometry>
+
+      <!-- package -->
+      <StreamGeometry x:Key="IconPackage">M21 16V8A2 2 0 0 0 20 6.27L13 2.27A2 2 0 0 0 11 2.27L4 6.27A2 2 0 0 0 3 8V16A2 2 0 0 0 4 17.73L11 21.73A2 2 0 0 0 13 21.73L20 17.73A2 2 0 0 0 21 16zM3.27 6.96L12 12.01L20.73 6.96M12 22.08V12</StreamGeometry>
+
+      <!-- star (filled, used for CORTEX sparkle) -->
+      <StreamGeometry x:Key="IconStar">M12 2L14.4 9.4H22L16 14L18.3 21.4L12 17L5.7 21.4L8 14L2 9.4H9.6L12 2z</StreamGeometry>
+
+      <!-- settings -->
+      <StreamGeometry x:Key="IconSettings">M12 15A3 3 0 1 0 12 9A3 3 0 0 0 12 15zM19.4 15A1.65 1.65 0 0 0 19.73 16.82L19.79 16.88A2 2 0 0 1 17 19.71A2 2 0 0 1 16.93 19.71L16.87 19.65A1.65 1.65 0 0 0 15.05 19.32A1.65 1.65 0 0 0 14 20.83V21A2 2 0 0 1 10 21V20.91A1.65 1.65 0 0 0 9 19.4A1.65 1.65 0 0 0 7.18 19.73L7.12 19.79A2 2 0 0 1 4.29 17L4.35 16.94A1.65 1.65 0 0 0 4.68 15.12A1.65 1.65 0 0 0 3.17 14H3A2 2 0 0 1 3 10H3.09A1.65 1.65 0 0 0 4.6 9A1.65 1.65 0 0 0 4.27 7.18L4.21 7.12A2 2 0 0 1 7 4.29L7.06 4.35A1.65 1.65 0 0 0 8.88 4.68A1.65 1.65 0 0 0 10 3.17V3A2 2 0 0 1 14 3V3.09A1.65 1.65 0 0 0 15 4.6A1.65 1.65 0 0 0 16.82 4.27L16.88 4.21A2 2 0 0 1 19.71 7L19.65 7.06A1.65 1.65 0 0 0 19.32 8.88V9A1.65 1.65 0 0 0 20.83 10H21A2 2 0 0 1 21 14H20.91A1.65 1.65 0 0 0 19.4 15z</StreamGeometry>
+
+      <!-- target (prediction) -->
+      <StreamGeometry x:Key="IconTarget">M12 22A10 10 0 1 1 12 2A10 10 0 1 1 12 22zM12 18A6 6 0 1 1 12 6A6 6 0 1 1 12 18zM12 14A2 2 0 1 1 12 10A2 2 0 1 1 12 14z</StreamGeometry>
+
+      <!-- trending-up (pattern learned) -->
+      <StreamGeometry x:Key="IconTrendingUp">M3 3V21H21M7 14L10 9L14 12L19 5</StreamGeometry>
+
+      <!-- alert-triangle -->
+      <StreamGeometry x:Key="IconAlertTriangle">M10.29 3.86L1.82 18A2 2 0 0 0 3.53 21H20.47A2 2 0 0 0 22.18 18L13.71 3.86A2 2 0 0 0 10.29 3.86zM12 9V13M12 17L12.01 17</StreamGeometry>
+
+      <!-- arrow-right -->
+      <StreamGeometry x:Key="IconArrowRight">M5 12H19M12 5L19 12L12 19</StreamGeometry>
+
+      <!-- trash-2 -->
+      <StreamGeometry x:Key="IconTrash">M3 6H21M19 6V20A2 2 0 0 1 17 22H7A2 2 0 0 1 5 20V6M8 6V4A2 2 0 0 1 10 2H14A2 2 0 0 1 16 4V6M10 11V17M14 11V17</StreamGeometry>
+
+      <!-- user -->
+      <StreamGeometry x:Key="IconUser">M20 21V19A4 4 0 0 0 16 15H8A4 4 0 0 0 4 19V21M12 11A4 4 0 1 1 12 3A4 4 0 0 1 12 11z</StreamGeometry>
+
+      <!-- check -->
+      <StreamGeometry x:Key="IconCheck">M20 6L9 17L4 12</StreamGeometry>
+
+      <!-- chevron-down -->
+      <StreamGeometry x:Key="IconChevronDown">M6 9L12 15L18 9</StreamGeometry>
+
+      <!-- x -->
+      <StreamGeometry x:Key="IconX">M18 6L6 18M6 6L18 18</StreamGeometry>
+
+      <!-- eye -->
+      <StreamGeometry x:Key="IconEye">M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12zM12 15A3 3 0 1 1 12 9A3 3 0 1 1 12 15z</StreamGeometry>
+
+      <!-- activity -->
+      <StreamGeometry x:Key="IconActivity">M22 12H18L15 21L9 3L6 12H2</StreamGeometry>
+
+      <!-- droplet -->
+      <StreamGeometry x:Key="IconDroplet">M12 2.69L17.66 8.35A8 8 0 1 1 6.34 8.35z</StreamGeometry>
+
+      <!-- clock -->
+      <StreamGeometry x:Key="IconClock">M12 22A10 10 0 1 1 12 2A10 10 0 1 1 12 22zM12 6V12L16 14</StreamGeometry>
+
+      <!-- database -->
+      <StreamGeometry x:Key="IconDatabase">M12 8A9 3 0 1 0 12 2A9 3 0 0 0 12 8zM3 5V19A9 3 0 0 0 21 19V5M3 12A9 3 0 0 0 21 12</StreamGeometry>
+
+      <!-- wifi -->
+      <StreamGeometry x:Key="IconWifi">M5 12.55A11 11 0 0 1 19 12.55M1.42 9A16 16 0 0 1 22.58 9M8.53 16.11A6 6 0 0 1 15.47 16.11M12 20L12.01 20</StreamGeometry>
+
+      <!-- sparkles (filled) - AI Features Insights -->
+      <StreamGeometry x:Key="IconSparklesFilled">M12 3l1.91 5.8L19 10.5l-5.09 1.7L12 18l-1.91-5.8L5 10.5l5.09-1.7L12 3z M5 3L5.8 4.8L7.5 5.5L5.8 6.2L5 8L4.2 6.2L2.5 5.5L4.2 4.8L5 3z M19 13l.8 1.8L21.5 15.5L19.8 16.2L19 18L18.2 16.2L16.5 15.5L18.2 14.8L19 13z</StreamGeometry>
+
+      <!-- lightbulb - AI Recommendations -->
+      <StreamGeometry x:Key="IconLightbulb">M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5 M9 18h6 M10 22h4</StreamGeometry>
+
+      <!-- calendar-clock - Smart Schedule -->
+      <StreamGeometry x:Key="IconCalendarClock">M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5 M16 2v4 M8 2v4 M3 10h5 M17.5 17.5L16 16.25V14 M22 16a6 6 0 1 1-12 0 6 6 0 0 1 12 0z</StreamGeometry>
+
+      <!-- message-square - AI Chat -->
+      <StreamGeometry x:Key="IconMessageSquare">M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z</StreamGeometry>
+
+      <!-- download - Model download -->
+      <StreamGeometry x:Key="IconDownload">M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3</StreamGeometry>
+
+      <!-- triangle-alert (filled) - Experimental warnings -->
+      <StreamGeometry x:Key="IconWarningTriangleFilled">M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01</StreamGeometry>
+
+      <!-- lock - Tier locking -->
+      <StreamGeometry x:Key="IconLock">M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z M7 11V7a5 5 0 0 1 10 0v4</StreamGeometry>
+
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

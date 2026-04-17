@@ -9,12 +9,25 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="NSubstitute" Version="5.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="Avalonia" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="11.2.7" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.7" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\UI\AuraCore.UI.Avalonia\AuraCore.UI.Avalonia.csproj" />
     <ProjectReference Include="../../src/Core/AuraCore.Application/AuraCore.Application.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Configuration/AuraCore.Platform.Configuration.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Update/AuraCore.Platform.Update.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Telemetry/AuraCore.Platform.Telemetry.csproj" />
     <ProjectReference Include="../../src/Platform/AuraCore.Platform.Diagnostics/AuraCore.Platform.Diagnostics.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure\AuraCore.Infrastructure.PrivilegeIpc\AuraCore.Infrastructure.PrivilegeIpc.csproj" />
+    <ProjectReference Include="../../src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
+    <ProjectReference Include="..\..\src\Service\AuraCore.PrivHelper.Linux\AuraCore.PrivHelper.Linux.csproj" />
+    <ProjectReference Include="..\..\src\Service\AuraCore.PrivHelper.MacOS\AuraCore.PrivHelper.MacOS.csproj" />
+    <ProjectReference Include="..\..\src\Service\AuraCore.PrivilegedService.Ops\AuraCore.PrivilegedService.Ops.csproj" />
   </ItemGroup>
 </Project>

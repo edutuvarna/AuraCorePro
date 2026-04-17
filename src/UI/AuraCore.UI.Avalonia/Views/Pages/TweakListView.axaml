@@ -1,87 +1,93 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.TweakListView">
-  <Grid RowDefinitions="Auto,Auto,*,Auto">
+  <ScrollViewer>
+    <StackPanel Spacing="16">
 
-    <!-- Header -->
-    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Tweaks" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="PageSubtitle" Text="Toggle system tweaks"
-                   FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+      <!-- Header -->
+      <controls:ModuleHeader Title="Tweaks"
+                             Subtitle="Toggle system tweaks">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click"
+                    VerticalAlignment="Center" Padding="14,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized/module name -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+            <!-- PageSubtitle: invisible, code-behind writes subtitle -->
+            <TextBlock x:Name="PageSubtitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Info banner: Explorer restart notice (not a warning — just heads-up) -->
+      <Border CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource InfoBgBrush}"
+              BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1"
+              Padding="14,10">
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <TextBlock Text="&#x2139;"
+                     FontSize="{DynamicResource FontSizeBody}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     VerticalAlignment="Center"/>
+          <TextBlock Text="Applying tweaks will restart Windows Explorer so the UI changes take effect. Any open Explorer windows will briefly close and reopen."
+                     FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource AccentBlueBrush}"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Hidden bridge TextBlocks — code-behind writes stat counts via .Text -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="TotalCount"    Text="--"/>
+        <TextBlock x:Name="AppliedCount"  Text="--"/>
+        <TextBlock x:Name="AvailableCount" Text="--"/>
       </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click"
-              VerticalAlignment="Center" Padding="14,8">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <TextBlock Text="&#x1F504;" FontSize="12"/>
-          <TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/>
-        </StackPanel>
-      </Button>
-    </Grid>
 
-    <!-- Stats -->
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}"
-            BorderThickness="1" Padding="16,10" Margin="0,0,0,12">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid ColumnDefinitions="*,*,*">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center">
-            <Border.Background>
-              <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
-            </Border.Background>
-            <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#3B82F6"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-          </Border>
-          <TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="#3B82F6" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Applied:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="AppliedCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Available:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="AvailableCount" Text="--" FontSize="13" FontWeight="Bold"
-                     Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
-        </StackPanel>
+      <!-- Stats row -->
+      <controls:StatRow>
+        <controls:StatCard Label="TOTAL"
+                           Value="{Binding #TotalCount.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard Label="APPLIED"
+                           Value="{Binding #AppliedCount.Text}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard Label="AVAILABLE"
+                           Value="{Binding #AvailableCount.Text}"
+                           ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
+      </controls:StatRow>
+
+      <!-- Tweak list card -->
+      <controls:GlassCard>
+        <ScrollViewer>
+          <StackPanel x:Name="TweakPanel" Spacing="2"/>
+        </ScrollViewer>
+      </controls:GlassCard>
+
+      <!-- Apply row -->
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="StatusText" Text=""
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+        <Button Grid.Column="1" x:Name="ApplyBtn" Click="Apply_Click"
+                Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
+                Padding="20,10" CornerRadius="{StaticResource RadiusMd}"
+                FontWeight="Bold" FontSize="{DynamicResource FontSizeBodySmall}" IsEnabled="False">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBodySmall}"/>
+            <TextBlock x:Name="ApplyLabel" Text="Apply Selected"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"/>
+          </StackPanel>
+        </Button>
       </Grid>
-    </Border>
 
-    <!-- Tweak List -->
-    <Border Grid.Row="2" CornerRadius="{StaticResource RadiusLg}"
-            BorderThickness="1" Padding="4">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <ScrollViewer>
-        <StackPanel x:Name="TweakPanel" Spacing="2"/>
-      </ScrollViewer>
-    </Border>
-
-    <!-- Apply Button -->
-    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
-      <TextBlock x:Name="StatusText" Text="" FontSize="11"
-                 Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-      <Button Grid.Column="1" x:Name="ApplyBtn" Click="Apply_Click"
-              Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
-              Padding="20,10" CornerRadius="{StaticResource RadiusMd}"
-              FontWeight="Bold" FontSize="12" IsEnabled="False">
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="&#x26A1;" FontSize="12"/>
-          <TextBlock x:Name="ApplyLabel" Text="Apply Selected" FontSize="12" FontWeight="Bold"/>
-        </StackPanel>
-      </Button>
-    </Grid>
-  </Grid>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

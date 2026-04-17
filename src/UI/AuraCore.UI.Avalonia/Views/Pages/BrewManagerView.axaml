@@ -1,78 +1,74 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.BrewManagerView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Brew Manager" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Manage Homebrew packages, casks, and cleanup cache"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <controls:ModuleHeader Title="Brew Manager"
+                             Subtitle="Manage Homebrew packages, casks, and cleanup cache">
+        <controls:ModuleHeader.Actions>
+          <TextBlock x:Name="PageTitle" IsVisible="False"/>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden TextBlocks that code-behind populates via .Text = ... -->
+      <StackPanel IsVisible="False" Height="0">
+        <TextBlock x:Name="FormulaCount"  Text="--"/>
+        <TextBlock x:Name="CaskCount"     Text="--"/>
+        <TextBlock x:Name="OutdatedCount" Text="--"/>
       </StackPanel>
-      <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Formulae" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="FormulaCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Casks" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="CaskCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Outdated" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="OutdatedCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+
+      <!-- Stat counters -->
+      <controls:StatRow>
+        <controls:StatCard Label="FORMULAE"
+                           Value="{Binding #FormulaCount.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="CASKS"
+                           Value="{Binding #CaskCount.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard Label="OUTDATED"
+                           Value="{Binding #OutdatedCount.Text}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+      </controls:StatRow>
+
+      <!-- Installed packages list -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto,Auto">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                <TextBlock Text="&#x25A0;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                <TextBlock Text="&#x25A0;"
+                           FontSize="{DynamicResource FontSizeLabel}"
+                           Foreground="{DynamicResource AccentPrimaryBrush}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Installed Packages" FontSize="11" FontWeight="SemiBold"
+              <TextBlock Text="Installed Packages"
+                         FontSize="{DynamicResource FontSizeLabel}"
+                         FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Scan" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8" Margin="0,0,8,0"/>
-            <Button Content="Cleanup Cache" Click="Cleanup_Click" Grid.Column="2" Padding="12,8"
-                    Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
+            <Button Content="Scan"
+                    Click="Scan_Click"
+                    Grid.Column="1"
+                    Classes="action-btn"
+                    Padding="16,8"
+                    Margin="0,0,8,0"/>
+            <Button Content="Cleanup Cache"
+                    Click="Cleanup_Click"
+                    Grid.Column="2"
+                    Padding="12,8"
+                    Background="#12FFFFFF"
+                    CornerRadius="{StaticResource RadiusSm}"/>
           </Grid>
-          <TextBlock x:Name="SubText" Text="Click Scan to list Homebrew packages (macOS only)" FontSize="12"
+          <TextBlock x:Name="SubText"
+                     Text="Click Scan to list Homebrew packages (macOS only)"
+                     FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="PkgList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

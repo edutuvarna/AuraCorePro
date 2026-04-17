@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AuraCore.UI.Avalonia.Views.Dialogs.TierUpgradePlaceholderDialog"
+        Width="420" Height="220"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="Feature locked">
+
+  <Border Background="{DynamicResource BgSurfaceBrush}"
+          BorderBrush="{DynamicResource BorderEmphasisBrush}"
+          BorderThickness="1" CornerRadius="12">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+      <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+        <PathIcon Data="{DynamicResource IconLock}" Width="18" Height="18"
+                  Foreground="{DynamicResource AccentAmberBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="Feature locked" FontSize="16" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
+      </StackPanel>
+      <TextBlock Grid.Row="1" Margin="0,12,0,0"
+                 x:Name="BodyText"
+                 Text=""
+                 FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
+                 TextWrapping="Wrap" />
+      <Button Grid.Row="2" Content="Close"
+              Classes="primary"
+              Click="OnCloseClick"
+              HorizontalAlignment="Right" Padding="16,8" />
+    </Grid>
+  </Border>
+</Window>

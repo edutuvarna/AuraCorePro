@@ -1,0 +1,255 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
+             xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
+             x:Class="AuraCore.UI.Avalonia.Views.Pages.PurgeableSpaceManagerView"
+             x:DataType="vm:PurgeableSpaceManagerViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="16" Margin="20,16">
+
+      <!-- Hidden localization bridge (theme-independent lookup for tests / sidebar language changes) -->
+      <TextBlock x:Name="PageTitle" IsVisible="False" Height="0"/>
+
+      <!-- Header: NO Scan button (auto-scan on Loaded — user-directed hero UX) -->
+      <controls:ModuleHeader x:Name="Header"/>
+
+      <!-- Disk Space Breakdown card — the hero visualization -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="BreakdownHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <!-- Stacked horizontal bar chart: 3 side-by-side Borders whose
+                 owning Grid has its ColumnDefinitions re-applied from
+                 code-behind whenever VM.ColumnDefinitions changes. -->
+            <Border CornerRadius="{DynamicResource RadiusSm}"
+                    ClipToBounds="True"
+                    Height="24">
+              <Grid x:Name="BreakdownBar" ColumnDefinitions="1*,0*,0*">
+                <Border Grid.Column="0"
+                        Background="{DynamicResource TextMutedBrush}"
+                        Opacity="0.5"/>
+                <Border Grid.Column="1"
+                        Background="{DynamicResource StatusWarningBrush}"
+                        Opacity="0.7"/>
+                <Border Grid.Column="2"
+                        Background="{DynamicResource StatusSuccessBrush}"
+                        Opacity="0.7"/>
+              </Grid>
+            </Border>
+
+            <!-- Legend row: three swatch + label + byte + percent entries -->
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Width="10" Height="10"
+                        CornerRadius="2"
+                        Background="{DynamicResource TextMutedBrush}"
+                        Opacity="0.5"/>
+                <TextBlock x:Name="UsedLabel"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding UsedDisplay}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding UsedPercentDisplay, StringFormat='({0})'}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Width="10" Height="10"
+                        CornerRadius="2"
+                        Background="{DynamicResource StatusWarningBrush}"
+                        Opacity="0.7"/>
+                <TextBlock x:Name="PurgeableLegendLabel"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding PurgeableDisplay}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource StatusWarningBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding PurgeablePercentDisplay, StringFormat='({0})'}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border Width="10" Height="10"
+                        CornerRadius="2"
+                        Background="{DynamicResource StatusSuccessBrush}"
+                        Opacity="0.7"/>
+                <TextBlock x:Name="FreeLabel"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding FreeDisplay}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource StatusSuccessBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding FreePercentDisplay, StringFormat='({0})'}"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Two stat cards: Purgeable + Local Snapshots -->
+      <controls:StatRow>
+        <controls:StatCard x:Name="PurgeableStatCard"
+                           Value="{Binding PurgeableDisplay}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+        <controls:StatCard x:Name="SnapshotsStatCard"
+                           Value="{Binding SnapshotCountDisplay}"/>
+      </controls:StatRow>
+
+      <!-- Education card: what is purgeable space? -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <TextBlock x:Name="EducationHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="EducationBody1"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="EducationBody2"
+                       FontSize="{DynamicResource FontSizeBodySmall}"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       TextWrapping="Wrap"/>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Cleanup Actions card: safety-tiered -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="14">
+            <TextBlock x:Name="ActionsHeading"
+                       FontSize="{DynamicResource FontSizeLabel}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+            <!-- Safe actions row -->
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,5,0">
+                <Button x:Name="CleanCachesBtn"
+                        Classes="action-btn"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Padding="14,10"
+                        Command="{Binding CleanUserCachesCommand}"/>
+                <TextBlock x:Name="CleanCachesHint"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="4" Margin="5,0,0,0">
+                <Button x:Name="RunPeriodicBtn"
+                        Classes="action-btn"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Padding="14,10"
+                        Command="{Binding RunPeriodicCommand}"/>
+                <TextBlock x:Name="RunPeriodicHint"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"/>
+              </StackPanel>
+            </Grid>
+
+            <!-- Aggressive action block (warning-tinted border) -->
+            <Border CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusWarningBrush}"
+                    BorderThickness="1"
+                    Padding="14,12">
+              <StackPanel Spacing="8">
+                <TextBlock x:Name="ThinSnapshotsDescription"
+                           FontSize="{DynamicResource FontSizeBodySmall}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           TextWrapping="Wrap"/>
+                <Button x:Name="ThinSnapshotsBtn"
+                        Classes="action-btn"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Padding="14,10"
+                        Command="{Binding ThinSnapshotsCommand}"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Status + Progress + Cancel -->
+      <controls:GlassCard>
+        <controls:GlassCard.CardContent>
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock x:Name="StatusBlock"
+                         Grid.Column="0"
+                         Text="{Binding StatusText}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         VerticalAlignment="Center"/>
+              <Button x:Name="CancelBtn"
+                      Grid.Column="1"
+                      Classes="action-btn"
+                      Padding="12,6"
+                      Command="{Binding CancelCommand}"
+                      IsVisible="{Binding IsBusy}"/>
+            </Grid>
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Value="{Binding ProgressPercent}"
+                         IsVisible="{Binding IsBusy}"/>
+            <Border x:Name="ErrorBanner"
+                    CornerRadius="{DynamicResource RadiusSm}"
+                    Background="{DynamicResource BgCardBrush}"
+                    BorderBrush="{DynamicResource StatusErrorBrush}"
+                    BorderThickness="1"
+                    Padding="10,8"
+                    IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}"
+                         FontSize="{DynamicResource FontSizeBodySmall}"
+                         Foreground="{DynamicResource StatusErrorBrush}"
+                         TextWrapping="Wrap"/>
+            </Border>
+          </StackPanel>
+        </controls:GlassCard.CardContent>
+      </controls:GlassCard>
+
+      <!-- Privilege / info card (always visible) -->
+      <Border CornerRadius="{DynamicResource RadiusLg}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource StatusWarningBrush}"
+              BorderThickness="1"
+              Padding="16">
+        <TextBlock x:Name="PrivilegeWarning"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource StatusWarningBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -3,6 +3,7 @@ using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 
@@ -16,6 +17,13 @@ namespace AuraCore.Module.GrubManager;
 /// </summary>
 public sealed class GrubManagerModule : IOptimizationModule
 {
+    private readonly IShellCommandService _shell;
+
+    public GrubManagerModule(IShellCommandService shell)
+    {
+        _shell = shell ?? throw new ArgumentNullException(nameof(shell));
+    }
+
     public string Id => "grub-manager";
     public string DisplayName => "GRUB Bootloader Manager";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
@@ -185,7 +193,9 @@ public sealed class GrubManagerModule : IOptimizationModule
         if (!File.Exists(GrubBackupPath))
             return;
 
-        // Restore backup: sudo cp /etc/default/grub.bak.auracore /etc/default/grub
+        // TODO(phase-5.2.1): migrate to IShellCommandService once a "restore-etc-grub"
+        // sub-action is added to GrubArgvValidator (current restore-backup hardcodes
+        // /boot/grub/grub.cfg as destination; /etc/default/grub needs its own action).
         var copyResult = await ProcessRunner.RunAsync("sudo",
             $"-n cp {GrubBackupPath} {GrubConfigPath}", ct, timeoutSeconds: 30);
 
@@ -290,9 +300,9 @@ public sealed class GrubManagerModule : IOptimizationModule
 
     /// <summary>
     /// Create backup of /etc/default/grub (if not already backed up) and modify a key.
-    /// Uses sudo -n sed -i for atomic in-place editing.
+    /// The sed in-place edit uses IShellCommandService (action "grub", sub-action "edit-config").
     /// </summary>
-    private static async Task<bool> BackupAndSetGrubValue(string key, string value, CancellationToken ct)
+    private async Task<bool> BackupAndSetGrubValue(string key, string value, CancellationToken ct)
     {
         // Sanitize key: only allow uppercase letters and underscores
         if (!key.All(c => char.IsLetterOrDigit(c) || c == '_'))
@@ -303,6 +313,8 @@ public sealed class GrubManagerModule : IOptimizationModule
             return false;
 
         // Backup before first modification
+        // TODO(phase-5.2.1): migrate to IShellCommandService once a "backup-etc-grub"
+        // sub-action is added to GrubArgvValidator (no cp sub-action for /etc/default/grub exists yet).
         if (!File.Exists(GrubBackupPath))
         {
             var backup = await ProcessRunner.RunAsync("sudo",
@@ -314,14 +326,20 @@ public sealed class GrubManagerModule : IOptimizationModule
             }
         }
 
-        // Use sed to replace the value in-place
+        // Use IShellCommandService with action "grub", sub-action "edit-config"
+        // argv: ["edit-config", sedExpression, configFilePath]
         var sedPattern = $"s/^{key}=.*/{key}={value}/";
-        var result = await ProcessRunner.RunAsync("sudo",
-            $"-n sed -i '{sedPattern}' {GrubConfigPath}", ct, timeoutSeconds: 30);
+        var result = await _shell.RunPrivilegedAsync(
+            new PrivilegedCommand(
+                Id: "grub",
+                Executable: "/bin/sed",
+                Arguments: new[] { "edit-config", sedPattern, GrubConfigPath },
+                TimeoutSeconds: 30),
+            ct);
 
         if (!result.Success)
         {
-            Debug.WriteLine($"[grub-manager] sed failed for {key}: {result.Stderr}");
+            Debug.WriteLine($"[grub-manager] edit-config failed for {key}: {result.Stderr}");
             return false;
         }
 
@@ -329,18 +347,29 @@ public sealed class GrubManagerModule : IOptimizationModule
     }
 
     /// <summary>
-    /// Regenerate grub.cfg using update-grub or grub-mkconfig.
+    /// Regenerate grub.cfg using update-grub (via IShellCommandService) or grub-mkconfig (deferred).
     /// </summary>
-    private static async Task RegenerateGrubConfigAsync(CancellationToken ct)
+    private async Task RegenerateGrubConfigAsync(CancellationToken ct)
     {
         if (await ProcessRunner.CommandExistsAsync("update-grub", ct))
         {
-            var result = await ProcessRunner.RunAsync("sudo", "-n update-grub", ct, timeoutSeconds: 120);
+            // argv: ["update-grub"]  → daemon runs /usr/sbin/update-grub with no args
+            var result = await _shell.RunPrivilegedAsync(
+                new PrivilegedCommand(
+                    Id: "grub",
+                    Executable: "/usr/sbin/update-grub",
+                    Arguments: new[] { "update-grub" },
+                    TimeoutSeconds: 120),
+                ct);
             if (!result.Success)
                 Debug.WriteLine($"[grub-manager] update-grub failed: {result.Stderr}");
         }
         else if (await ProcessRunner.CommandExistsAsync("grub-mkconfig", ct))
         {
+            // TODO(phase-5.2.1): migrate to IShellCommandService once a "grub-mkconfig"
+            // sub-action is added to GrubArgvValidator (current validator only supports
+            // update-grub, edit-config, restore-backup; grub-mkconfig with -o flag needs
+            // its own whitelist entry to avoid the sh -c pipeline metacharacter reject).
             var result = await ProcessRunner.RunAsync("sudo",
                 "-n grub-mkconfig -o /boot/grub/grub.cfg", ct, timeoutSeconds: 120);
             if (!result.Success)

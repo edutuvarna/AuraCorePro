@@ -1,67 +1,134 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.ServiceManagerView">
-  <Grid RowDefinitions="Auto,Auto,Auto,*">
-    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Service Manager" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="SubText" Text="View and manage Windows services" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-      </StackPanel>
-      <Button Grid.Column="1" Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
-        <StackPanel Orientation="Horizontal" Spacing="6"><TextBlock Text="&#x1F50D;" FontSize="12"/><TextBlock x:Name="ScanLabel" Text="Scan" FontSize="11" FontWeight="SemiBold"/></StackPanel>
-      </Button>
-    </Grid>
-    <Border Grid.Row="1" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16,10" Margin="0,0,0,8">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <Grid ColumnDefinitions="*,*,*,*">
-        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="Total:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="TotalSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/></StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"><TextBlock Text="Running:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="RunningSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/></StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"><TextBlock Text="Stopped:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="StoppedSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/></StackPanel>
-        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8"><TextBlock Text="Auto:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
-          <TextBlock x:Name="AutoSvc" Text="--" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/></StackPanel>
-      </Grid>
-    </Border>
-    <TextBox Grid.Row="2" x:Name="SearchBox" Watermark="Search services..." Background="#FFFFFF0A" Foreground="{DynamicResource TextPrimaryBrush}"
-             BorderBrush="{DynamicResource BorderCardBrush}" CornerRadius="8" Padding="12,8" Margin="0,0,0,8" TextChanged="Search_Changed"/>
-    <Border Grid.Row="3" CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="4">
-      <Border.Background>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-      </Border.Background>
-      <Border.BorderBrush>
-        <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-      </Border.BorderBrush>
-      <ScrollViewer>
-        <ItemsControl x:Name="SvcList">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
-              <Border Padding="12,6" Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1">
-                <Border.Background>
-                  <SolidColorBrush Color="#FFFFFF" Opacity="0.02"/>
-                </Border.Background>
-                <Border.BorderBrush>
-                  <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
-                </Border.BorderBrush>
-                <Grid ColumnDefinitions="*,100,80,80">
-                  <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding DisplayName}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{Binding ServiceName}" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/></StackPanel>
-                  <TextBlock Grid.Column="1" Text="{Binding StartType}" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                  <Border Grid.Column="2" CornerRadius="8" Padding="6,2" Background="{Binding StatusBg}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Status}" FontSize="9" FontWeight="SemiBold" Foreground="{Binding StatusFg}"/></Border>
-                  <TextBlock Grid.Column="3" Text="{Binding Pid}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" TextAlignment="Center"/>
-                </Grid>
-              </Border>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-      </ScrollViewer>
-    </Border>
-  </Grid>
+  <ScrollViewer>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Service Manager"
+                             Subtitle="View and manage Windows services">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text="Scan"
+                           FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+              </StackPanel>
+            </Button>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
+          </StackPanel>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Hidden subtitle bridge for code-behind -->
+      <TextBlock x:Name="SubText"
+                 Text="View and manage Windows services"
+                 FontSize="{DynamicResource FontSizeBodySmall}"
+                 Foreground="{DynamicResource TextMutedBrush}"
+                 IsVisible="False"/>
+
+      <!-- Operation status banner (code-behind shows/hides) -->
+      <Border x:Name="StatusBanner"
+              IsVisible="False"
+              CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1" Padding="12,8">
+        <TextBlock x:Name="StatusBannerText"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
+      <!-- Stats row -->
+      <controls:StatRow>
+        <controls:StatCard Label="TOTAL"
+                           Value="{Binding #TotalSvc.Text}"
+                           ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
+        <controls:StatCard Label="RUNNING"
+                           Value="{Binding #RunningSvc.Text}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+        <controls:StatCard Label="STOPPED"
+                           Value="{Binding #StoppedSvc.Text}"
+                           ValueBrush="{DynamicResource StatusWarningBrush}"/>
+        <controls:StatCard Label="AUTO"
+                           Value="{Binding #AutoSvc.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+      </controls:StatRow>
+
+      <!-- Hidden stat TextBlocks — code-behind writes .Text directly -->
+      <TextBlock x:Name="TotalSvc"   Text="--" IsVisible="False"/>
+      <TextBlock x:Name="RunningSvc" Text="--" IsVisible="False"/>
+      <TextBlock x:Name="StoppedSvc" Text="--" IsVisible="False"/>
+      <TextBlock x:Name="AutoSvc"    Text="--" IsVisible="False"/>
+
+      <!-- Search box -->
+      <TextBox x:Name="SearchBox" Watermark="Search services..."
+               Background="{DynamicResource BgCardBrush}"
+               Foreground="{DynamicResource TextPrimaryBrush}"
+               BorderBrush="{DynamicResource BorderSubtleBrush}"
+               CornerRadius="8" Padding="12,8"
+               TextChanged="Search_Changed"/>
+
+      <!-- Service list card -->
+      <controls:GlassCard>
+        <ScrollViewer>
+          <ItemsControl x:Name="SvcList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Padding="12,6" Margin="0,0,0,4" CornerRadius="{StaticResource RadiusMd}"
+                        BorderThickness="1"
+                        Background="{DynamicResource BgCardBrush}"
+                        BorderBrush="{DynamicResource BorderSubtleBrush}">
+                  <Border.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Start"   Click="ServiceStart_Click"/>
+                      <MenuItem Header="Stop"    Click="ServiceStop_Click"/>
+                      <MenuItem Header="Restart" Click="ServiceRestart_Click"/>
+                      <Separator/>
+                      <MenuItem Header="Startup type">
+                        <MenuItem Header="Automatic" Click="ServiceStartupAuto_Click"/>
+                        <MenuItem Header="Manual"    Click="ServiceStartupManual_Click"/>
+                        <MenuItem Header="Disabled"  Click="ServiceStartupDisabled_Click"/>
+                      </MenuItem>
+                    </ContextMenu>
+                  </Border.ContextMenu>
+                  <Grid ColumnDefinitions="*,100,80,80">
+                    <StackPanel VerticalAlignment="Center">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Text="{Binding ServiceName}"
+                                 FontSize="{DynamicResource FontSizeLabel}"
+                                 Foreground="{DynamicResource TextMutedBrush}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding StartType}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                    <Border Grid.Column="2" CornerRadius="8" Padding="6,2"
+                            Background="{Binding StatusBg}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}"
+                                 FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+                                 Foreground="{Binding StatusFg}"/>
+                    </Border>
+                    <TextBlock Grid.Column="3" Text="{Binding Pid}"
+                               FontSize="{DynamicResource FontSizeLabel}"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               VerticalAlignment="Center" TextAlignment="Center"/>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </controls:GlassCard>
+
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

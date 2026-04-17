@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.Controls.StatCard"
+             x:Name="Root">
+  <Border CornerRadius="{DynamicResource RadiusMd}"
+          Background="{DynamicResource BgCardBrush}"
+          BorderBrush="{DynamicResource BorderSubtleBrush}"
+          BorderThickness="1"
+          Padding="12,10">
+    <StackPanel Spacing="4">
+      <TextBlock Text="{Binding #Root.Label}"
+                 FontSize="{DynamicResource FontSizeLabel}"
+                 FontWeight="SemiBold"
+                 LetterSpacing="0.5"
+                 Foreground="{DynamicResource TextMutedBrush}" />
+      <TextBlock Text="{Binding #Root.Value}"
+                 FontSize="{DynamicResource FontSizeDisplay}"
+                 FontWeight="Bold"
+                 Foreground="{Binding #Root.ValueBrush}" />
+    </StackPanel>
+  </Border>
+</UserControl>

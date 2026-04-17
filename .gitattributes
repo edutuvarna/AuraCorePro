@@ -1,0 +1,4 @@
+# Shell scripts must keep LF line endings on all platforms.
+# git autocrlf=true would convert them to CRLF on Windows checkout,
+# breaking bash execution on Linux. This override prevents that.
+*.sh text eol=lf

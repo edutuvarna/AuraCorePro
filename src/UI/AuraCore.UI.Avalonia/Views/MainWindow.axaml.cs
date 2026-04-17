@@ -1,11 +1,19 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
 using global::Avalonia.Threading;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Desktop.Services.Navigation;
+using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Domain.Enums;
+using AuraCore.UI.Avalonia.Views.Banners;
 using AuraCore.UI.Avalonia.Views.Dialogs;
 using AuraCore.UI.Avalonia.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,68 +22,83 @@ namespace AuraCore.UI.Avalonia.Views;
 
 public sealed partial class MainWindow : Window
 {
-    private Button? _activeNav;
     private readonly Dictionary<string, IOptimizationModule> _moduleMap = new();
+    private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm;
 
-    // Category display order + labels (localization keys)
-    private static readonly (string LabelKey, OptimizationCategory[] Cats)[] Sections = new[]
-    {
-        ("nav.overview", new[] { OptimizationCategory.SystemHealth }),
-        ("nav.optimization", new[] {
-            OptimizationCategory.DiskCleanup,
-            OptimizationCategory.MemoryOptimization,
-            OptimizationCategory.StorageCompression,
-            OptimizationCategory.RegistryOptimization,
-            OptimizationCategory.BloatwareRemoval,
-            OptimizationCategory.Privacy
-        }),
-        ("nav.performance", new[] {
-            OptimizationCategory.NetworkOptimization,
-            OptimizationCategory.GamingPerformance
-        }),
-        ("nav.customization", new[] {
-            OptimizationCategory.ShellCustomization,
-            OptimizationCategory.ApplicationManagement
-        }),
-        ("nav.advancedTools", new[] {
-            OptimizationCategory.AutorunManagement,
-            OptimizationCategory.ProcessManagement,
-            OptimizationCategory.NetworkTools
-        }),
-    };
+    // Phase 5.2.0 Task 11: privilege helper availability banner
+    private readonly IHelperAvailabilityService? _helperAvailability;
 
-    // Category -> icon mapping
-    // Segoe Fluent Icons (Windows) / fallback ASCII symbols
-    private static string CatIcon(OptimizationCategory c) => c switch
-    {
-        OptimizationCategory.SystemHealth        => "\u2661",  // ♡ heart outline
-        OptimizationCategory.DiskCleanup         => "\u2737",  // ✷ star burst (clean)
-        OptimizationCategory.MemoryOptimization  => "\u2B1A",  // ⬚ dotted square
-        OptimizationCategory.RegistryOptimization=> "\u2692",  // ⚒ hammer & pick
-        OptimizationCategory.StorageCompression  => "\u2B21",  // ⬡ hexagon
-        OptimizationCategory.BloatwareRemoval    => "\u2716",  // ✖ heavy X
-        OptimizationCategory.NetworkOptimization => "\u25C9",  // ◉ fisheye
-        OptimizationCategory.GamingPerformance   => "\u2B50",  // ⭐ star
-        OptimizationCategory.ShellCustomization  => "\u2699",  // ⚙ gear
-        OptimizationCategory.ApplicationManagement=> "\u25A3", // ▣ white square with small black square
-        OptimizationCategory.Privacy             => "\u2616",  // ☖ white shogi piece (shield-like)
-        OptimizationCategory.AutorunManagement   => "\u26A1",  // ⚡ lightning
-        OptimizationCategory.ProcessManagement   => "\u2630",  // ☰ trigram (list)
-        OptimizationCategory.NetworkTools        => "\u2301",  // ⌁ electric arrow
-        _ => "\u2699"
-    };
+    // Phase 5.3 Task 6: responsive narrow-mode service
+    private readonly INarrowModeService? _narrowMode;
+
+    // Phase 5.4 Task 11: navigation service for deep-links (e.g. Dashboard Smart Optimize)
+    private readonly INavigationService? _nav;
+    private EventHandler<NavigationRequestedEventArgs>? _navSectionRequestedHandler;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // Platform label
-        PlatformLabel.Text = OperatingSystem.IsLinux() ? "Linux"
-                           : OperatingSystem.IsMacOS() ? "macOS" : "Windows";
+        // Resolve SidebarViewModel from DI (registered in App.axaml.cs Phase 3 block)
+        try
+        {
+            _sidebarVm = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SidebarViewModel>();
+        }
+        catch
+        {
+            // Design-time / test fallback: construct directly with default (Free) tier
+            _sidebarVm = new AuraCore.UI.Avalonia.ViewModels.SidebarViewModel();
+        }
+
+        // Populate module map for view resolution (TweakListView / CategoryCleanView need IOptimizationModule)
+        try
+        {
+            foreach (var m in App.Services.GetServices<IOptimizationModule>())
+                _moduleMap[m.Id] = m;
+        }
+        catch { /* DI not available during design time */ }
+
+        // Phase 5.2.0 Task 11: resolve helper availability service and wire banner visibility
+        try
+        {
+            _helperAvailability = App.Services.GetRequiredService<IHelperAvailabilityService>();
+            SyncBannerVisibility();
+            _helperAvailability.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName is nameof(IHelperAvailabilityService.IsBannerVisible) or null)
+                    Dispatcher.UIThread.Post(SyncBannerVisibility);
+            };
+        }
+        catch { /* DI / design-time fallback — banner stays hidden */ }
+
+        // Phase 5.3 Task 6: resolve narrow-mode service and subscribe to window Bounds changes
+        try
+        {
+            _narrowMode = App.Services?.GetService<INarrowModeService>();
+            // Subscribe to Bounds changes — BoundsProperty is AvaloniaProperty<Rect> on Visual/Window.
+            // Use GetObservable + a typed IObserver<Rect> wrapper (avoids hard System.Reactive dep).
+            this.GetObservable(BoundsProperty)
+                .Subscribe(new BoundsObserver(OnWindowBoundsChanged));
+            // Push initial width (may be zero before first render; subsequent emissions will correct it)
+            if (_narrowMode is NarrowModeService concreteInit)
+                concreteInit.UpdateWidth(Bounds.Width);
+        }
+        catch { /* DI / design-time fallback — narrow mode stays at default wide state */ }
+
+        // Phase 5.4 Task 11: subscribe to navigation service for Smart Optimize deep-link
+        try
+        {
+            _nav = App.Services?.GetService<INavigationService>();
+            if (_nav is not null)
+            {
+                _navSectionRequestedHandler = OnNavigationSectionRequested;
+                _nav.SectionRequested += _navSectionRequestedHandler;
+            }
+        }
+        catch { /* DI / design-time fallback — navigation deep-links unavailable */ }
 
         BuildNavigation();
-        UpdateTierBadge();
-        ApplyTierLocking();
+        RefreshUserChip();
 
         // Show onboarding on first run, otherwise Dashboard
         if (!OnboardingView.IsCompleted)
@@ -104,24 +127,36 @@ public sealed partial class MainWindow : Window
             ContentArea.Content = new DashboardView();
         }
 
-        // Localize settings button
-        SettingsNavLabel.Text = LocalizationService._("nav.settings");
-
         // Rebuild sidebar on language change
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
-                NavPanel.Children.Clear();
-                _activeNav = null;
-                BuildNavigation();
-                UpdateTierBadge();
-                ApplyTierLocking();
-                SettingsNavLabel.Text = LocalizationService._("nav.settings");
+                RebuildSidebar();
+                RefreshUserChip();
             });
 
-        // ── Status bar wiring ────────────────────────────
+        // Status bar wiring — transient status from StatusBarService overrides
+        // the CORTEX baseline; when the transient clears we fall back to
+        // ambient state ("✦ Cortex · Active · Learning day N" / "Paused" / "Ready to start").
         StatusBarService.StatusChanged += text =>
-            Dispatcher.UIThread.Post(() => GlobalStatusText.Text = text);
+            Dispatcher.UIThread.Post(() =>
+            {
+                GlobalStatusText.Text = string.IsNullOrEmpty(text)
+                    ? FormatCortexStatus()
+                    : text;
+            });
+
+        // Phase 3 Task 33: bind status bar baseline to CortexAmbientService
+        try
+        {
+            if (App.Services.GetService<AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService>() is { } ambient)
+            {
+                GlobalStatusText.Text = ambient.FormattedStatusText;
+                ambient.PropertyChanged += (_, _) =>
+                    Dispatcher.UIThread.Post(() => GlobalStatusText.Text = ambient.FormattedStatusText);
+            }
+        }
+        catch { /* DI / design-time fallback — leaves hardcoded "Ready" */ }
 
         StatusBarService.ProgressChanged += (op, fraction) =>
             Dispatcher.UIThread.Post(() =>
@@ -164,307 +199,429 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void BuildNavigation()
+    // ─── NAVIGATION (SidebarViewModel-driven) ────────────────────────
+
+    // Phase 5.4 Task 11: INavigationService subscription handler + cleanup
+
+    private void OnNavigationSectionRequested(object? sender, NavigationRequestedEventArgs e)
     {
-        // Modules merged into other views (hide from sidebar)
-        var hiddenModules = new HashSet<string> { "network-monitor", "dns-benchmark" };
-        var modules = App.Services.GetServices<IOptimizationModule>()
-            .Where(m => !hiddenModules.Contains(m.Id)).ToList();
-        foreach (var m in modules) _moduleMap[m.Id] = m;
-
-        // Dashboard button (always first)
-        var dashBtn = MakeNavButton("dashboard", "\u25C6", LocalizationService._("nav.dashboard"));
-        dashBtn.Classes.Add("active");
-        _activeNav = dashBtn;
-        NavPanel.Children.Add(dashBtn);
-
-        // Group modules by section
-        var placed = new HashSet<string>();
-        foreach (var (labelKey, cats) in Sections)
+        if (e.SectionId.StartsWith("ai-", StringComparison.Ordinal))
         {
-            var sectionModules = modules
-                .Where(m => cats.Contains(m.Category) && !placed.Contains(m.Id))
-                .ToList();
-            if (sectionModules.Count == 0) continue;
+            var subId = e.SectionId.Substring("ai-".Length);
+            // Navigate to the AI features page (mirrors the sidebar click path)
+            NavigateToModule("ai-features");
+            // Forward the sub-section to the view that is now active in ContentArea
+            if (ContentArea.Content is Pages.AIFeaturesView aiView)
+                aiView.ShowSection(subId);
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[MainWindow.OnNavigationSectionRequested] unhandled section id: {e.SectionId}");
+        }
+    }
 
-            // Section header
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._(labelKey).ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
+    protected override void OnClosed(EventArgs e)
+    {
+        if (_nav is not null && _navSectionRequestedHandler is not null)
+            _nav.SectionRequested -= _navSectionRequestedHandler;
+        base.OnClosed(e);
+    }
 
-            foreach (var m in sectionModules)
+    /// <summary>Public entry so other components (e.g., Dashboard) can navigate.</summary>
+    public void NavigateToModule(string moduleId)
+    {
+        _sidebarVm.NavigateTo(moduleId);
+        SetActiveContent(moduleId);
+        RebuildSidebar();
+    }
+
+    private void BuildNavigation() => RebuildSidebar();
+
+    private void RebuildSidebar()
+    {
+        NavPanel.Children.Clear();
+
+        // Dashboard pinned at top
+        NavPanel.Children.Add(CreateNavItem("nav.dashboard", "IconDashboard", null,
+            isActive: _sidebarVm.ActiveModuleId == "dashboard",
+            trailingChipText: null,
+            onClick: () => { _sidebarVm.NavigateTo("dashboard"); SetActiveContent("dashboard"); RebuildSidebar(); }));
+
+        foreach (var cat in _sidebarVm.VisibleCategories())
+        {
+            var catIdCapture = cat.Id;
+            var isExpanded = _sidebarVm.ExpandedCategoryId == cat.Id;
+            var accent = cat.HasBadge
+                ? FindBrush("AccentPurpleBrush", global::Avalonia.Media.Brushes.MediumPurple)
+                : FindBrush("AccentTealBrush", global::Avalonia.Media.Brushes.Teal);
+
+            NavPanel.Children.Add(CreateNavItem(cat.LocalizationKey, cat.Icon, accent,
+                isActive: false,
+                trailingChipText: cat.HasBadge ? cat.Badge : null,
+                onClick: () => { _sidebarVm.ToggleCategory(catIdCapture); RebuildSidebar(); }));
+
+            if (isExpanded)
             {
-                var icon = CatIcon(m.Category);
-                NavPanel.Children.Add(MakeNavButton(m.Id, icon, m.DisplayName));
-                placed.Add(m.Id);
+                foreach (var module in cat.Modules)
+                {
+                    var moduleIdCapture = module.Id;
+                    var isLockedCapture = module.IsLocked;
+                    NavPanel.Children.Add(CreateNavItem("  " + LocalizationService._(module.LocalizationKey), null, accent,
+                        isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
+                        trailingChipText: null,
+                        isLocked: isLockedCapture,
+                        onClick: () => OnSidebarItemClick(moduleIdCapture),
+                        isLiteralLabel: true));
+                }
             }
         }
 
-        // Any uncategorized modules
-        var remaining = modules.Where(m => !placed.Contains(m.Id)).ToList();
-        if (remaining.Count > 0)
+        NavPanel.Children.Add(new Controls.SidebarSectionDivider { Label = LocalizationService._("nav.categoryAdvanced") });
+        foreach (var item in _sidebarVm.VisibleAdvancedItems())
         {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.other").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            foreach (var m in remaining)
-                NavPanel.Children.Add(MakeNavButton(m.Id, "\u2699", m.DisplayName));
-        }
-
-        // Standalone pages (not DI modules)
-        NavPanel.Children.Add(new TextBlock
-        {
-            Text = LocalizationService._("nav.tools").ToUpper(), FontSize = 8,
-            FontWeight = global::Avalonia.Media.FontWeight.Bold,
-            Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-            Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-        });
-        NavPanel.Children.Add(MakeNavButton("disk-health", "\u2661", LocalizationService._("nav.diskHealth")));
-        NavPanel.Children.Add(MakeNavButton("space-analyzer", "\u25C9", LocalizationService._("nav.spaceAnalyzer")));
-        NavPanel.Children.Add(MakeNavButton("startup-optimizer", "\u26A1", LocalizationService._("nav.startupOptimizer")));
-        NavPanel.Children.Add(MakeNavButton("service-manager", "\u2699", LocalizationService._("nav.serviceManager")));
-        NavPanel.Children.Add(MakeNavButton("scheduler", "\u25F4", LocalizationService._("nav.autoSchedule")));
-        NavPanel.Children.Add(MakeNavButton("recommendations", "\u2726", LocalizationService._("nav.aiRecommendations")));
-        NavPanel.Children.Add(MakeNavButton("ai-insights", "\u25C8", LocalizationService._("nav.aiInsights")));
-        NavPanel.Children.Add(MakeNavButton("ai-chat", "\u2756", LocalizationService._("nav.aiChat")));
-
-        // ISO Builder (Windows-only)
-        if (OperatingSystem.IsWindows())
-        {
-            NavPanel.Children.Add(MakeNavButton("iso-builder", "\u25CE", LocalizationService._("nav.isoBuilder")));
-        }
-
-        // Linux-only tools
-        if (OperatingSystem.IsLinux())
-        {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.linuxTools").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            NavPanel.Children.Add(MakeNavButton("systemd-manager", "\u2699", LocalizationService._("nav.systemdManager")));
-            NavPanel.Children.Add(MakeNavButton("package-cleaner", "\u267B", LocalizationService._("nav.packageCleaner")));
-            NavPanel.Children.Add(MakeNavButton("swap-optimizer", "\u26A1", LocalizationService._("nav.swapOptimizer")));
-            NavPanel.Children.Add(MakeNavButton("cron-manager", "\u23F0", LocalizationService._("nav.cronManager")));
-        }
-
-        // macOS-only tools
-        if (OperatingSystem.IsMacOS())
-        {
-            NavPanel.Children.Add(new TextBlock
-            {
-                Text = LocalizationService._("nav.macosTools").ToUpper(), FontSize = 8,
-                FontWeight = global::Avalonia.Media.FontWeight.Bold,
-                Foreground = new SolidColorBrush(Color.Parse("#3A3A50")),
-                Margin = new global::Avalonia.Thickness(12, 12, 0, 4)
-            });
-            NavPanel.Children.Add(MakeNavButton("defaults-optimizer", "\u2699", LocalizationService._("nav.defaultsOptimizer")));
-            NavPanel.Children.Add(MakeNavButton("launchagent-manager", "\u26A1", LocalizationService._("nav.launchAgentManager")));
-            NavPanel.Children.Add(MakeNavButton("brew-manager", "\u267B", LocalizationService._("nav.brewManager")));
-            NavPanel.Children.Add(MakeNavButton("timemachine-manager", "\u23F0", LocalizationService._("nav.timeMachineManager")));
-        }
-
-        // Admin Panel (admin only)
-        if (SessionState.IsAdmin)
-        {
-            NavPanel.Children.Add(MakeNavButton("admin-panel", "\u2692", LocalizationService._("nav.adminPanel")));
+            var moduleIdCapture = item.Id;
+            var isLockedCapture = item.IsLocked;
+            NavPanel.Children.Add(CreateNavItem(item.LocalizationKey, null,
+                FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray),
+                isActive: _sidebarVm.ActiveModuleId == moduleIdCapture,
+                trailingChipText: null,
+                isLocked: isLockedCapture,
+                onClick: () => OnSidebarItemClick(moduleIdCapture)));
         }
     }
 
-    private Button MakeNavButton(string tag, string icon, string label)
+    private Controls.SidebarNavItem CreateNavItem(
+        string labelOrKey,
+        string? iconResourceKey,
+        global::Avalonia.Media.IBrush? accent,
+        bool isActive,
+        string? trailingChipText,
+        Action onClick,
+        bool isLiteralLabel = false,
+        bool isLocked = false)
     {
-        var btn = new Button { Tag = tag };
-        btn.Classes.Add("nav-item");
-        btn.Click += Nav_Click;
-
-        var stack = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 8 };
-        stack.Children.Add(new TextBlock
+        var item = new Controls.SidebarNavItem
         {
-            Text = icon, FontSize = 12, Width = 16,
-            TextAlignment = global::Avalonia.Media.TextAlignment.Center,
-            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
-            Opacity = 0.6
-        });
-        stack.Children.Add(new TextBlock
+            Label = isLiteralLabel ? labelOrKey : LocalizationService._(labelOrKey),
+            IsActive = isActive,
+            IsLocked = isLocked,
+            TrailingChipText = trailingChipText ?? string.Empty,
+            Command = new RelayCommand(onClick),
+        };
+        if (iconResourceKey is not null)
         {
-            Text = label, FontSize = 11,
-            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center
-        });
-        btn.Content = stack;
-        return btn;
+            var iconGeo = FindGeometry(iconResourceKey);
+            if (iconGeo is not null) item.Icon = iconGeo;
+        }
+        if (accent is not null)
+            item.AccentBrush = accent;
+        return item;
     }
 
-    private void Nav_Click(object? sender, RoutedEventArgs e)
+    /// <summary>
+    /// Resolves a brush resource across theme variants + style dictionaries.
+    /// Theme-scoped brushes (under ThemeDictionaries.Dark) aren't found by the default
+    /// FindResource which assumes ThemeVariant.Default. Falls back to a safe brush.
+    /// </summary>
+    private global::Avalonia.Media.IBrush FindBrush(string key, global::Avalonia.Media.IBrush fallback)
     {
-        if (sender is not Button btn) return;
-        var tag = btn.Tag?.ToString();
+        // Prefer this window's actual theme variant; fall back to Dark (the app is dark-only in v1)
+        var variant = this.ActualThemeVariant ?? global::Avalonia.Styling.ThemeVariant.Dark;
+        if (this.TryFindResource(key, variant, out var v) && v is global::Avalonia.Media.IBrush b)
+            return b;
+        if (this.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v2) && v2 is global::Avalonia.Media.IBrush b2)
+            return b2;
+        if (global::Avalonia.Application.Current is { } app &&
+            app.TryFindResource(key, global::Avalonia.Styling.ThemeVariant.Dark, out var v3) && v3 is global::Avalonia.Media.IBrush b3)
+            return b3;
+        return fallback;
+    }
 
-        // Update active state
-        if (_activeNav is not null) _activeNav.Classes.Remove("active");
-        btn.Classes.Add("active");
-        _activeNav = btn;
-
-        // Navigate to appropriate view
-        if (tag == "dashboard")
+    /// <summary>
+    /// CORTEX status bar baseline string. Re-resolves the ambient each call
+    /// (cheap — singleton) so MainWindow doesn't need to cache a field.
+    /// Used by StatusBarService.StatusChanged fallback when the transient clears.
+    /// </summary>
+    private string FormatCortexStatus()
+    {
+        try
         {
-            ContentArea.Content = new DashboardView();
-            return;
+            var ambient = App.Services.GetService<AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService>();
+            return ambient?.FormattedStatusText ?? "Ready";
         }
+        catch { return "Ready"; }
+    }
 
-        if (tag == "settings")
-        {
-            ContentArea.Content = new SettingsView();
-            return;
-        }
+    /// <summary>Resolves a Geometry resource (icons are theme-independent, in shared resources).</summary>
+    private global::Avalonia.Media.Geometry? FindGeometry(string key)
+    {
+        if (this.TryFindResource(key, null, out var v) && v is global::Avalonia.Media.Geometry g)
+            return g;
+        if (global::Avalonia.Application.Current is { } app &&
+            app.TryFindResource(key, null, out var v2) && v2 is global::Avalonia.Media.Geometry g2)
+            return g2;
+        return null;
+    }
 
-        // Standalone pages (not DI modules)
-        switch (tag)
-        {
-            case "disk-health":        ContentArea.Content = new DiskHealthView(); return;
-            case "space-analyzer":     ContentArea.Content = new SpaceAnalyzerView(); return;
-            case "startup-optimizer":  ContentArea.Content = new StartupOptimizerView(); return;
-            case "service-manager":    ContentArea.Content = new ServiceManagerView(); return;
-            case "scheduler":          ContentArea.Content = new SchedulerView(); return;
-            case "recommendations":    ContentArea.Content = new RecommendationsView(); return;
-            case "ai-insights":        ContentArea.Content = new AIInsightsView(); return;
-            case "ai-chat":            ContentArea.Content = new AIChatView(); return;
-            case "iso-builder":        ContentArea.Content = new IsoBuilderView(); return;
-            case "admin-panel":        ContentArea.Content = new AdminPanelView(); return;
-        }
+    // ─── LOCKED ITEM CLICK HANDLER ───────────────────────────────────
 
-        // Module views
-        if (_moduleMap.TryGetValue(tag!, out var module))
+    private async void OnSidebarItemClick(string moduleKey)
+    {
+        // Find the module across both categories and advanced items
+        var module = _sidebarVm.Categories
+            .SelectMany(c => c.Modules)
+            .Concat(_sidebarVm.AdvancedItems)
+            .FirstOrDefault(m => m.Id == moduleKey);
+
+        if (module?.IsLocked == true)
         {
-            // Tier check — redirect to upgrade if locked
-            var userTier = GetCurrentTier();
-            if (tag != null && !TierFeatures.IsModuleAllowed(tag, userTier))
+            try
             {
-                ContentArea.Content = new UpgradeView(tag, module.DisplayName);
-                return;
+                var tierService = App.Services.GetRequiredService<AuraCore.UI.Avalonia.Services.AI.ITierService>();
+                var required = tierService.GetRequiredTier(moduleKey);
+                var dialog = new Views.Dialogs.TierUpgradePlaceholderDialog(moduleKey, required);
+                await dialog.ShowDialog(this);
             }
-
-            ContentArea.Content = tag switch
+            catch
             {
-                // Dedicated views
-                "system-health"      => new SystemHealthView(),
-                "process-monitor"    => new ProcessMonitorView(),
-                "hosts-editor"       => new HostsEditorView(),
-                "autorun-manager"    => new AutorunManagerView(),
-                "gaming-mode"        => new GamingModeView(),
-                "driver-updater"     => new DriverUpdaterView(),
-                "bloatware-removal"  => new BloatwareRemovalView(),
-                "ram-optimizer"      => new RamOptimizerView(),
-                "defender-manager"   => new DefenderManagerView(),
-                "network-optimizer"  => new NetworkOptimizerView(),
-                "registry-optimizer" => new RegistryOptimizerView(),
-                "battery-optimizer"  => new BatteryOptimizerView(),
-                // New modules (Session 18)
-                "environment-variables" => new EnvironmentVariablesView(),
-                "firewall-rules"     => new FirewallRulesView(),
-                "symlink-manager"    => new SymlinkManagerView(),
-                "file-shredder"      => new FileShredderView(),
-                // Linux-only modules
-                "systemd-manager"    => new SystemdManagerView(),
-                "package-cleaner"    => new PackageCleanerView(),
-                "swap-optimizer"     => new SwapOptimizerView(),
-                "cron-manager"       => new CronManagerView(),
-                // macOS-only modules
-                "defaults-optimizer" => new DefaultsOptimizerView(),
-                "launchagent-manager"=> new LaunchAgentManagerView(),
-                "brew-manager"       => new BrewManagerView(),
-                "timemachine-manager"=> new TimeMachineManagerView(),
-                // New Windows modules
-                "font-manager"       => new FontManagerView(),
-                "wake-on-lan"        => new WakeOnLanView(),
-                // App Installer (dedicated view)
-                "app-installer"      => new AppInstallerView(),
-                // Tweak toggle list (shared view)
-                "context-menu"       => new TweakListView(module),
-                "taskbar-tweaks"     => new TweakListView(module),
-                "explorer-tweaks"    => new TweakListView(module),
-                // Category cleanup (shared view)
-                "junk-cleaner"       => new CategoryCleanView(module),
-                "disk-cleanup"       => new CategoryCleanView(module),
-                "privacy-cleaner"    => new CategoryCleanView(module),
-                // Smart generic (StorageCompression, AppInstaller, etc)
-                _ => new ScanOptimizeView(module)
-            };
+                // Silently swallow if DI not available (design time / tests)
+            }
+            return;
         }
+
+        _sidebarVm.NavigateTo(moduleKey);
+        SetActiveContent(moduleKey);
+        RebuildSidebar();
     }
 
-    // ── TIER BADGE + LOCKING ──────────────────────────────
+    private void SetActiveContent(string moduleId)
+    {
+        ContentArea.Content = moduleId switch
+        {
+            "dashboard" => new Pages.DashboardView(),
+            "ai-features" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView>(),
+            _ => CreateModuleView(moduleId),
+        };
+    }
 
-    private void UpdateTierBadge()
+    private UserControl CreateModuleView(string moduleId)
+    {
+        return moduleId switch
+        {
+            "ram-optimizer" => new Pages.RamOptimizerView(),
+            "startup-optimizer" => new Pages.StartupOptimizerView(),
+            "network-optimizer" => new Pages.NetworkOptimizerView(),
+            "battery-optimizer" => new Pages.BatteryOptimizerView(),
+            "junk-cleaner" => CreateCategoryCleanView("junk-cleaner"),
+            "disk-cleanup" => CreateCategoryCleanView("disk-cleanup"),
+            "privacy-cleaner" => CreateCategoryCleanView("privacy-cleaner"),
+            "registry-cleaner" => new Pages.RegistryOptimizerView(),
+            "bloatware-removal" => new Pages.BloatwareRemovalView(),
+            "app-installer" => new Pages.AppInstallerView(),
+            "gaming-mode" => new Pages.GamingModeView(),
+            "defender-manager" => new Pages.DefenderManagerView(),
+            "firewall-rules" => new Pages.FirewallRulesView(),
+            "file-shredder" => new Pages.FileShredderView(),
+            "hosts-editor" => new Pages.HostsEditorView(),
+            "driver-updater" => new Pages.DriverUpdaterView(),
+            "service-manager" => new Pages.ServiceManagerView(),
+            "iso-builder" => new Pages.IsoBuilderView(),
+            "disk-health" => new Pages.DiskHealthView(),
+            "space-analyzer" => new Pages.SpaceAnalyzerView(),
+            "registry-deep" => new Pages.RegistryOptimizerView(),
+            "environment-variables" => new Pages.EnvironmentVariablesView(),
+            "symlink-manager" => new Pages.SymlinkManagerView(),
+            "process-monitor" => new Pages.ProcessMonitorView(),
+            // Phase 5.1.10: font-manager soft-hidden; falls through to Dashboard default.
+            "context-menu" => CreateTweakListView("context-menu"),
+            "taskbar-tweaks" => CreateTweakListView("taskbar-tweaks"),
+            "explorer-tweaks" => CreateTweakListView("explorer-tweaks"),
+            "autorun-manager" => new Pages.AutorunManagerView(),
+            "wake-on-lan" => new Pages.WakeOnLanView(),
+            "system-health" => new Pages.SystemHealthView(),
+            "admin-panel" => new Pages.AdminPanelView(),
+            "storage-compression" => new Pages.GenericModuleView(), // placeholder — feature dev deferred
+            "journal-cleaner" => CreateJournalCleanerView(),
+            "snap-flatpak-cleaner" => CreateSnapFlatpakCleanerView(),
+            "docker-cleaner" => CreateDockerCleanerView(),
+            "kernel-cleaner" => CreateKernelCleanerView(),
+            "linux-app-installer" => CreateLinuxAppInstallerView(),
+            "grub-manager" => CreateGrubManagerView(),
+            "dns-flusher" => CreateDnsFlusherView(),
+            "purgeable-space-manager" => CreatePurgeableSpaceView(),
+            "spotlight-manager" => CreateSpotlightManagerView(),
+            "xcode-cleaner" => CreateXcodeCleanerView(),
+            "mac-app-installer" => CreateMacAppInstallerView(),
+            _ => new Pages.DashboardView(),
+        };
+    }
+
+    private UserControl CreateCategoryCleanView(string moduleId)
+    {
+        _moduleMap.TryGetValue(moduleId, out var module);
+        return new Pages.CategoryCleanView(module);
+    }
+
+    private UserControl CreateJournalCleanerView()
+    {
+        var v = new Pages.JournalCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.JournalCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateSnapFlatpakCleanerView()
+    {
+        var v = new Pages.SnapFlatpakCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SnapFlatpakCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateDockerCleanerView()
+    {
+        var v = new Pages.DockerCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.DockerCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateKernelCleanerView()
+    {
+        var v = new Pages.KernelCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.KernelCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateLinuxAppInstallerView()
+    {
+        var v = new Pages.LinuxAppInstallerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.LinuxAppInstallerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateGrubManagerView()
+    {
+        var v = new Pages.GrubManagerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.GrubManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateDnsFlusherView()
+    {
+        var v = new Pages.DnsFlusherView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.DnsFlusherViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreatePurgeableSpaceView()
+    {
+        var v = new Pages.PurgeableSpaceManagerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.PurgeableSpaceManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateSpotlightManagerView()
+    {
+        var v = new Pages.SpotlightManagerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.SpotlightManagerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateXcodeCleanerView()
+    {
+        var v = new Pages.XcodeCleanerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.XcodeCleanerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateMacAppInstallerView()
+    {
+        var v = new Pages.MacAppInstallerView();
+        try
+        {
+            v.DataContext = App.Services.GetRequiredService<AuraCore.UI.Avalonia.ViewModels.MacAppInstallerViewModel>();
+        }
+        catch { /* design-time fallback: Loaded handler will try again */ }
+        return v;
+    }
+
+    private UserControl CreateTweakListView(string moduleId)
+    {
+        return _moduleMap.TryGetValue(moduleId, out var module)
+            ? new Pages.TweakListView(module)
+            : new Pages.TweakListView();
+    }
+
+    private void Settings_Click(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _sidebarVm.NavigateTo("settings");
+        ContentArea.Content = new Pages.SettingsView();
+        RebuildSidebar();
+    }
+
+    // ─── USER CHIP / SESSION REFRESH ─────────────────────────────────
+
+    private void RefreshUserChip()
     {
         var email = SessionState.UserEmail;
         var tier = (SessionState.UserTier ?? "free").ToUpper();
         var isAdmin = SessionState.IsAdmin;
+        var tierText = isAdmin ? "ADMIN" : tier;
 
-        UserEmailLabel.Text = string.IsNullOrEmpty(email) ? "Guest" : email;
+        UserChipHost.Email = string.IsNullOrEmpty(email) ? "Guest" : email;
+        UserChipHost.Role = tierText;
+        UserChipHost.StatusText = SessionState.IsAuthenticated ? "Signed in" : "Not signed in";
 
-        // Update avatar initials
-        if (!string.IsNullOrEmpty(email) && email.Length > 0)
+        if (!string.IsNullOrEmpty(email))
         {
             var parts = email.Split('@')[0].Split('.');
             var initials = parts.Length >= 2
                 ? $"{char.ToUpper(parts[0][0])}{char.ToUpper(parts[1][0])}"
                 : $"{char.ToUpper(parts[0][0])}";
-            UserAvatarInitials.Text = initials;
+            UserChipHost.AvatarInitial = initials;
         }
         else
         {
-            UserAvatarInitials.Text = "G";
-        }
-
-        UserStatusLabel.Text = SessionState.IsAuthenticated ? "Signed in" : "Not signed in";
-
-        var tierText = isAdmin ? "ADMIN" : tier;
-        TierBadgeText.Text = tierText;
-
-        var (color, bg) = tierText switch
-        {
-            "ADMIN"      => ("#F59E0B", "#20F59E0B"),
-            "ENTERPRISE" => ("#8B5CF6", "#208B5CF6"),
-            "PRO"        => ("#00D4AA", "#2000D4AA"),
-            _            => ("#8888A0", "#208888A0")
-        };
-        TierBadgeText.Foreground = new SolidColorBrush(Color.Parse(color));
-        TierBadge.Background = new SolidColorBrush(Color.Parse(bg));
-    }
-
-    private void ApplyTierLocking()
-    {
-        var userTier = GetCurrentTier();
-        foreach (var child in NavPanel.Children)
-        {
-            if (child is not Button btn) continue;
-            var tag = btn.Tag?.ToString();
-            if (string.IsNullOrEmpty(tag) || tag == "dashboard") continue;
-
-            if (!TierFeatures.IsModuleAllowed(tag, userTier))
-            {
-                btn.Opacity = 0.5;
-                // Add lock icon to label
-                if (btn.Content is StackPanel sp && sp.Children.Count >= 2
-                    && sp.Children[1] is TextBlock tb && !tb.Text!.EndsWith(" \u26BF"))
-                {
-                    tb.Text += " \u26BF"; // lock symbol
-                }
-            }
-            else
-            {
-                btn.Opacity = 1.0;
-            }
+            UserChipHost.AvatarInitial = "G";
         }
     }
 
@@ -472,10 +629,77 @@ public sealed partial class MainWindow : Window
         => Enum.TryParse<SubscriptionTier>(SessionState.UserTier, true, out var t)
             ? t : SubscriptionTier.Free;
 
-    /// <summary>Called after login/upgrade to refresh UI</summary>
+    /// <summary>Called after login/upgrade to refresh UI.</summary>
     public void RefreshSession()
     {
-        UpdateTierBadge();
-        ApplyTierLocking();
+        RefreshUserChip();
+        RebuildSidebar();
+    }
+
+    // ─── RESPONSIVE NARROW MODE (Phase 5.3 Task 6) ──────────────────
+
+    private void OnWindowBoundsChanged(Rect bounds)
+    {
+        if (_narrowMode is NarrowModeService concrete)
+            concrete.UpdateWidth(bounds.Width);
+    }
+
+    // ─── PRIVILEGE BANNER HANDLERS (Phase 5.2.0 Task 11) ────────────
+
+    private void SyncBannerVisibility()
+    {
+        if (this.FindControl<PrivilegeHelperMissingBanner>("PrivilegeMissingBanner") is { } banner)
+            banner.IsVisible = _helperAvailability?.IsBannerVisible ?? false;
+    }
+
+    private async void OnPrivilegeInstallNowClicked(object? sender, EventArgs e)
+    {
+        // Phase 5.2.1 Task 22: resolve installer (may be null on Windows/macOS — coordinator handles it)
+        var installer = App.Services?.GetService<AuraCore.Infrastructure.PrivilegeIpc.Linux.PrivHelperInstaller>();
+        var availability = App.Services?.GetService<IHelperAvailabilityService>();
+
+        if (availability is null)
+        {
+            System.Diagnostics.Debug.WriteLine("[privilege] IHelperAvailabilityService not resolvable; aborting install");
+            return;
+        }
+
+        var outcome = await PrivilegeInstallCoordinator.RunInstallFlowAsync(installer, availability);
+        if (outcome.Success)
+        {
+            System.Diagnostics.Debug.WriteLine("[privilege] install succeeded: " + outcome.Stdout.Trim());
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"[privilege] install failed (exit={outcome.ExitCode}): {outcome.Stderr.Trim()}");
+        }
+    }
+
+    private void OnPrivilegeDismissClicked(object? sender, EventArgs e)
+    {
+        _helperAvailability?.DismissBanner();
+    }
+
+    private sealed class RelayCommand : System.Windows.Input.ICommand
+    {
+        private readonly Action _action;
+        public RelayCommand(Action action) => _action = action;
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _action();
+    }
+
+    /// <summary>
+    /// Minimal IObserver&lt;Rect&gt; wrapper so we can subscribe to
+    /// GetObservable(BoundsProperty) without a System.Reactive dependency.
+    /// </summary>
+    private sealed class BoundsObserver : IObserver<Rect>
+    {
+        private readonly Action<Rect> _onNext;
+        public BoundsObserver(Action<Rect> onNext) => _onNext = onNext;
+        public void OnNext(Rect value) => _onNext(value);
+        public void OnError(Exception error) { /* no-op */ }
+        public void OnCompleted() { /* no-op */ }
     }
 }

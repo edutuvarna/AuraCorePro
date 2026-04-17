@@ -1,74 +1,59 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:AuraCore.UI.Avalonia.Views.Controls"
              x:Class="AuraCore.UI.Avalonia.Views.Pages.NetworkMonitorView">
   <ScrollViewer>
-    <StackPanel Spacing="20">
-      <StackPanel Spacing="4">
-        <TextBlock x:Name="PageTitle" Text="Network Monitor" FontSize="16" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock Text="Real-time network interface statistics and per-adapter bandwidth"
-                   FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
-      </StackPanel>
-      <Grid ColumnDefinitions="*,*,*">
-        <Border Margin="0,0,8,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Interfaces" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="IfaceCount" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+    <StackPanel Spacing="16">
+
+      <!-- Header -->
+      <controls:ModuleHeader Title="Network Monitor"
+                             Subtitle="Real-time network interface statistics and per-adapter bandwidth">
+        <controls:ModuleHeader.Actions>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Refresh" Click="Scan_Click" Classes="action-btn" Padding="14,8"
+                    VerticalAlignment="Center"/>
+            <!-- PageTitle: invisible, code-behind writes localized string -->
+            <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
-        </Border>
-        <Border Margin="4,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Total Sent" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="TotalSent" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-          </StackPanel>
-        </Border>
-        <Border Margin="8,0,0,0" CornerRadius="{StaticResource RadiusMd}" BorderThickness="1" Padding="16">
-          <Border.Background>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-          </Border.Background>
-          <Border.BorderBrush>
-            <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-          </Border.BorderBrush>
-          <StackPanel Spacing="4">
-            <TextBlock Text="Total Received" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock x:Name="TotalRecv" Text="--" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
-          </StackPanel>
-        </Border>
-      </Grid>
-      <Border CornerRadius="{StaticResource RadiusLg}" BorderThickness="1" Padding="16">
-        <Border.Background>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.025"/>
-        </Border.Background>
-        <Border.BorderBrush>
-          <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
-        </Border.BorderBrush>
+        </controls:ModuleHeader.Actions>
+      </controls:ModuleHeader>
+
+      <!-- Stats row -->
+      <controls:StatRow>
+        <controls:StatCard Label="INTERFACES"
+                           Value="{Binding #IfaceCount.Text}"
+                           ValueBrush="{DynamicResource TextPrimaryBrush}"/>
+        <controls:StatCard Label="TOTAL SENT"
+                           Value="{Binding #TotalSent.Text}"
+                           ValueBrush="{DynamicResource AccentBlueBrush}"/>
+        <controls:StatCard Label="TOTAL RECEIVED"
+                           Value="{Binding #TotalRecv.Text}"
+                           ValueBrush="{DynamicResource StatusSuccessBrush}"/>
+      </controls:StatRow>
+
+      <!-- Hidden stat TextBlocks — code-behind writes .Text directly -->
+      <TextBlock x:Name="IfaceCount" Text="--" IsVisible="False"/>
+      <TextBlock x:Name="TotalSent"  Text="--" IsVisible="False"/>
+      <TextBlock x:Name="TotalRecv"  Text="--" IsVisible="False"/>
+
+      <!-- Network interfaces list card -->
+      <controls:GlassCard>
         <StackPanel Spacing="12">
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                <TextBlock Text="&#x25C9;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
-              <TextBlock Text="Network Interfaces" FontSize="11" FontWeight="SemiBold"
-                         Foreground="{DynamicResource TextSecondaryBrush}"/>
-            </StackPanel>
-            <Button Content="Refresh" Click="Scan_Click" Grid.Column="1" Classes="action-btn" Padding="16,8"/>
-          </Grid>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Border Width="20" Height="20" CornerRadius="6"
+                    Background="{DynamicResource BgCardBrush}">
+              <TextBlock Text="&#x25C9;" FontSize="{DynamicResource FontSizeLabel}"
+                         Foreground="{DynamicResource AccentPrimaryBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock Text="Network Interfaces"
+                       FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+          </StackPanel>
           <ItemsControl x:Name="IfaceList"/>
         </StackPanel>
-      </Border>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -1,511 +1,556 @@
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using global::Avalonia.Controls;
-using global::Avalonia.Controls.Shapes;
-using global::Avalonia.Interactivity;
-using global::Avalonia.Media;
 using global::Avalonia.Threading;
+using global::Avalonia.VisualTree;
+using AuraCore.Application;
 using AuraCore.Application.Interfaces.Engines;
+using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
+using AuraCore.Module.BloatwareRemoval;
+using AuraCore.Module.JunkCleaner;
+using AuraCore.Module.RamOptimizer;
+using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Services.AI;
+using AuraCore.UI.Avalonia.ViewModels;
+using AuraCore.UI.Avalonia.Views.Controls;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class DashboardView : UserControl
 {
+    // Resolve ambient + settings from DI so DashboardViewModel receives the
+    // same singletons that AIFeaturesViewModel mutates — ripple properties
+    // (ShowCortexInsightsCard, CortexChipLabel, SmartOptimizeEnabled) react
+    // when the user toggles a feature from AI Features page. Falls back to
+    // parameterless ctor in design-time / early-lifecycle paths where
+    // App.Services isn't available yet (throws NullRef in xaml designer).
+    private readonly DashboardViewModel _vm = CreateVM();
+
+    private static DashboardViewModel CreateVM()
+    {
+        try
+        {
+            var provider = App.Services;
+            if (provider is null) return new DashboardViewModel();
+            var ambient = provider.GetService<ICortexAmbientService>();
+            var settings = provider.GetService<AppSettings>();
+            return new DashboardViewModel(ambient, settings);
+        }
+        catch
+        {
+            return new DashboardViewModel();
+        }
+    }
+
     private DispatcherTimer? _timer;
-    private TimeSpan _prevCpuTime;
-    private DateTime _prevSampleTime;
-    private bool _firstSample = true;
-    private bool _initialized;
-
-    // Sparkline history (last 30 data points = 60 seconds at 2s intervals)
-    private readonly Queue<double> _cpuHistory = new(30);
-    private readonly Queue<double> _ramHistory = new(30);
-
-    // AI Engine integration
     private IAIAnalyzerEngine? _aiEngine;
-    private int _aiTickCounter;
-    private float _lastCpuPct;
-    private float _lastRamPct;
-    private float _lastDiskUsedPct;
+    private bool _initialized;
+    private bool _narrow;
+
+    // GPU polling runs on background thread to avoid blocking UI with typeperf process spawn.
+    // Cached value is read synchronously per tick; fresh sample kicked off periodically.
+    private double _cachedGpuUsage = 0;
+    private DateTime _lastGpuSampleUtc = DateTime.MinValue;
+    private int _gpuSampleInFlight = 0; // 0 = free, 1 = busy (Interlocked)
+    private static readonly TimeSpan GpuSampleInterval = TimeSpan.FromSeconds(2);
+
+    // CPU polling via Windows PerformanceCounter (fast, ~microseconds per NextValue).
+    // Linux uses /proc/stat delta; both give real system CPU% not per-process time.
+    private global::System.Diagnostics.PerformanceCounter? _cpuCounter;
+    private (ulong Total, ulong Idle)? _lastProcStatSnapshot;
 
     public DashboardView()
     {
         InitializeComponent();
+        DataContext = _vm;
         Loaded += (s, e) =>
         {
             if (_initialized) return;
             _initialized = true;
-
-            // Initialize AI engine
             try { _aiEngine = App.Services.GetService<IAIAnalyzerEngine>(); } catch { }
-            if (_aiEngine != null)
-                _aiEngine.AnalysisCompleted += OnAIAnalysisCompleted;
-
-            LoadData(); StartLiveMonitoring(); ApplyLocalization();
+            DetectGpu();
+            LoadStaticSystemInfo();
+            StartPolling();
+            HookHeroButton();
+            HookResponsiveBreakpoint();
+            InitQuickActionsFromDI();
+            InitDiskHealthCard();
         };
-        Unloaded += (s, e) =>
-        {
-            StopLiveMonitoring();
-            if (_aiEngine != null)
-                _aiEngine.AnalysisCompleted -= OnAIAnalysisCompleted;
-        };
-        LocalizationService.LanguageChanged += () =>
-            Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) => StopPolling();
     }
 
-    private void ApplyLocalization()
+    private void DetectGpu()
     {
-        HeroTitle.Text = "Dashboard";
-        WelcomeLabel.Text = "AI Powered System Intelligence";
-        StatusLabel.Text = "LIVE";
-        CpuLabel.Text = "CPU";
-        RamLabel.Text = "RAM";
-        DiskLabel.Text = OperatingSystem.IsWindows() ? "Disk (C:)" : "Disk (/)";
-        UptimeLabel.Text = "Uptime";
-        QuickActionsLabel.Text = "Quick Actions";
-
-        // AI badges
-        CpuAnomalyText.Text = "\u26A0 " + LocalizationService._("ai.badge.cpuAnomaly");
-        RamAnomalyText.Text = "\u26A0 " + LocalizationService._("ai.badge.ramAnomaly");
-    }
-
-    private void StartLiveMonitoring()
-    {
-        // Take initial CPU sample
-        _prevCpuTime = Process.GetCurrentProcess().TotalProcessorTime;
-        try
+        var info = GpuInfoHelper.Detect();
+        _vm.SetGpuInfo(info);
+        if (info is not null)
         {
-            var allProcs = Process.GetProcesses();
-            try
-            {
-                _prevCpuTime = TimeSpan.Zero;
-                foreach (var p in allProcs)
-                {
-                    try { _prevCpuTime += p.TotalProcessorTime; } catch { }
-                }
-            }
-            finally
-            {
-                foreach (var p in allProcs) try { p.Dispose(); } catch { }
-            }
+            GpuGauge.IsVisible = true;
+            // Name goes in the footer Insight slot so it doesn't overflow the gauge ring center.
+            // Keep SubLabel empty to avoid cluttering the center.
+            GpuGauge.SubLabel = "%";
+            GpuGauge.Insight = TruncateForDisplay(info.Name, 22);
         }
-        catch { }
-        _prevSampleTime = DateTime.UtcNow;
-
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        _timer.Tick += (s, e) => UpdateLiveStats();
-        _timer.Start();
-    }
-
-    private void StopLiveMonitoring()
-    {
-        if (_timer is not null)
+        else
         {
-            _timer.Stop();
-            _timer = null;
+            // No GPU detected: hide the GpuGauge AND collapse its column
+            // so remaining gauges evenly fill the row (no awkward empty slot).
+            GpuGauge.IsVisible = false;
+            if (GaugeRow.ColumnDefinitions.Count >= 3)
+                GaugeRow.ColumnDefinitions[2].Width = new global::Avalonia.Controls.GridLength(0);
         }
+
+        // Update SystemInfo GPU row (may have been called before LoadStaticSystemInfo)
+        if (GpuText is not null)
+            GpuText.Text = _vm.GpuInfo is not null ? _vm.GpuInfo.Name : "—";
     }
 
-    private void UpdateLiveStats()
+    private void LoadStaticSystemInfo()
+    {
+        _vm.OsName = GetOsName();
+        _vm.CpuName = GetCpuName();
+        _vm.RamTotalGb = GetTotalRamGb();
+
+        // Populate the multi-row SYSTEM card
+        OsText.Text = _vm.OsName;
+        CpuText.Text = _vm.CpuName;
+        GpuText.Text = _vm.GpuInfo is not null ? _vm.GpuInfo.Name : "—";
+        RamText.Text = $"{_vm.RamTotalGb:0.#} GB";
+        UpdateUptime();
+    }
+
+    private void UpdateUptime()
     {
         try
         {
-            // CPU: delta-based measurement across all processes
-            var totalCpu = TimeSpan.Zero;
-            var allProcs = Process.GetProcesses();
-            try
-            {
-                foreach (var p in allProcs)
+            var ts = TimeSpan.FromMilliseconds(Environment.TickCount64);
+            UptimeText.Text = ts.TotalHours >= 1
+                ? $"{(int)ts.TotalHours}h {ts.Minutes}m"
+                : $"{ts.Minutes}m";
+        }
+        catch { UptimeText.Text = "—"; }
+    }
+
+    private static string TruncateForDisplay(string s, int max)
+    {
+        if (string.IsNullOrEmpty(s) || s.Length <= max) return s;
+        return s.Substring(0, max - 1) + "…";
+    }
+
+    private void HookHeroButton()
+    {
+        HeroCta.PrimaryCommand = new RelayCommand(NavigateToAIFeatures);
+    }
+
+    private void InitQuickActionsFromDI()
+    {
+        try
+        {
+            var services = App.Services;
+            if (services is null) return;
+
+            var modules = services.GetServices<IOptimizationModule>().ToList();
+            var junkModule    = modules.OfType<JunkCleanerModule>().FirstOrDefault();
+            var ramModule     = modules.OfType<RamOptimizerModule>().FirstOrDefault();
+            var bloatModule   = modules.OfType<BloatwareRemovalModule>().FirstOrDefault();
+
+            _vm.InitQuickActions(
+                quickCleanup: async () =>
                 {
-                    try { totalCpu += p.TotalProcessorTime; } catch { }
-                }
-            }
-            finally
-            {
-                foreach (var p in allProcs) try { p.Dispose(); } catch { }
-            }
-            var now = DateTime.UtcNow;
-            var elapsed = (now - _prevSampleTime).TotalMilliseconds;
-            if (elapsed > 0 && !_firstSample)
-            {
-                var cpuDelta = (totalCpu - _prevCpuTime).TotalMilliseconds;
-                var cpuPct = cpuDelta / elapsed / Environment.ProcessorCount * 100.0;
-                cpuPct = Math.Clamp(cpuPct, 0, 100);
-                _lastCpuPct = (float)cpuPct;
-                CpuValue.Text = $"{cpuPct:F0}";
-                if (CpuBar.Parent is Border cpuParent && cpuParent.Bounds.Width > 0)
-                    CpuBar.Width = cpuParent.Bounds.Width * cpuPct / 100.0;
-
-                // Sparkline: enqueue CPU value
-                if (_cpuHistory.Count >= 30) _cpuHistory.Dequeue();
-                _cpuHistory.Enqueue(cpuPct);
-                UpdateSparkline(CpuSparkCanvas, CpuSparkLine, _cpuHistory);
-            }
-            _prevCpuTime = totalCpu;
-            _prevSampleTime = now;
-            _firstSample = false;
-
-            // RAM — real system memory via P/Invoke (Windows) or /proc/meminfo (Linux)
-            double totalGb = 0, usedGb = 0;
-            int ramPct = 0;
-            if (OperatingSystem.IsWindows())
-            {
-                var mem = new MEMORYSTATUSEX();
-                if (GlobalMemoryStatusEx(ref mem))
-                {
-                    totalGb = mem.ullTotalPhys / (1024.0 * 1024 * 1024);
-                    var availGb = mem.ullAvailPhys / (1024.0 * 1024 * 1024);
-                    usedGb = totalGb - availGb;
-                    ramPct = (int)mem.dwMemoryLoad;
-                }
-            }
-            else if (OperatingSystem.IsLinux())
-            {
-                // Linux: read /proc/meminfo
-                try
-                {
-                    long totalKb = 0, availKb = 0;
-                    foreach (var line in File.ReadLines("/proc/meminfo"))
-                    {
-                        if (line.StartsWith("MemTotal:"))
-                            totalKb = ParseMemKb(line);
-                        else if (line.StartsWith("MemAvailable:"))
-                            availKb = ParseMemKb(line);
-                    }
-                    totalGb = totalKb / (1024.0 * 1024);
-                    var availGb = availKb / (1024.0 * 1024);
-                    usedGb = totalGb - availGb;
-                    ramPct = totalGb > 0 ? (int)(usedGb / totalGb * 100) : 0;
-                }
-                catch { }
-            }
-            else
-            {
-                // macOS/other fallback
-                var gcInfo = GC.GetGCMemoryInfo();
-                totalGb = gcInfo.TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024);
-                usedGb = totalGb * 0.5;
-                ramPct = 50;
-            }
-            _lastRamPct = totalGb > 0 ? (float)(usedGb / totalGb * 100.0) : 0f;
-            RamValue.Text = $"{usedGb:F1}";
-            RamTotal.Text = $"/ {totalGb:F1} GB";
-            if (RamBar.Parent is Border ramParent && ramParent.Bounds.Width > 0 && totalGb > 0)
-                RamBar.Width = ramParent.Bounds.Width * ramPct / 100.0;
-
-            // Sparkline: enqueue RAM value
-            if (_ramHistory.Count >= 30) _ramHistory.Dequeue();
-            _ramHistory.Enqueue(ramPct);
-            UpdateSparkline(RamSparkCanvas, RamSparkLine, _ramHistory);
-
-            // Uptime
-            var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-            UptimeValue.Text = uptime.Days > 0
-                ? $"{uptime.Days}d {uptime.Hours}h"
-                : $"{uptime.Hours}h {uptime.Minutes}m";
-
-            // ── AI Engine: push metrics (reuse allProcs from CPU section) ──
-            if (_aiEngine != null)
-            {
-                try
-                {
-                    // Collect top 10 processes by working set — reuse the snapshot
-                    // We re-enumerate because allProcs was already disposed above.
-                    // Use a single call and extract both CPU + top-process data.
-                    var aiProcs = Process.GetProcesses();
-                    var topProcs = new List<AIProcessMetric>();
+                    if (junkModule is null) return;
                     try
                     {
-                        topProcs = aiProcs
-                            .Select(p => { try { return new { p.ProcessName, p.WorkingSet64 }; } catch { return null; } })
-                            .Where(x => x != null)
-                            .OrderByDescending(x => x!.WorkingSet64)
-                            .Take(10)
-                            .Select(x => new AIProcessMetric(x!.ProcessName, x.WorkingSet64))
-                            .ToList();
+                        // Scan first, then clean all categories ("all" sentinel = clean everything)
+                        await junkModule.ScanAsync(new ScanOptions());
+                        if (junkModule.LastReport is not null && junkModule.LastReport.TotalFiles > 0)
+                            await junkModule.OptimizeAsync(
+                                new OptimizationPlan(junkModule.Id, new[] { "all" }));
                     }
-                    finally
-                    {
-                        foreach (var p in aiProcs) try { p.Dispose(); } catch { }
-                    }
-
-                    // Compute disk used percent for the sample
-                    float diskUsedPct = _lastDiskUsedPct;
+                    catch { /* fire-and-forget; suppress all errors in the quick action */ }
+                },
+                optimizeRam: async () =>
+                {
+                    if (ramModule is null) return;
                     try
                     {
-                        var root = OperatingSystem.IsWindows()
-                            ? (DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady)?.Name ?? "C:\\")
-                            : "/";
-                        var drv = new DriveInfo(root);
-                        diskUsedPct = (float)((drv.TotalSize - drv.AvailableFreeSpace) * 100.0 / drv.TotalSize);
-                        _lastDiskUsedPct = diskUsedPct;
+                        // RamOptimizer.OptimizeAsync ignores SelectedItemIds and iterates all processes
+                        await ramModule.OptimizeAsync(
+                            new OptimizationPlan(ramModule.Id, System.Array.Empty<string>()));
                     }
                     catch { }
+                },
+                removeBloat: async () =>
+                {
+                    if (bloatModule is null) return;
+                    try { await bloatModule.RemoveDefaultPresetAsync(); }
+                    catch { }
+                });
+        }
+        catch { /* DI unavailable — tiles remain with no-op stubs */ }
+    }
 
-                    var sample = new AIMetricSample(
-                        DateTimeOffset.UtcNow,
-                        _lastCpuPct,
-                        _lastRamPct,
-                        diskUsedPct,
-                        topProcs);
+    private void InitDiskHealthCard()
+    {
+        // Phase 5.5.2.2.1: Wire real disk data into Dashboard widget.
+        // Step 1 — initialise card with placeholders immediately so Dashboard
+        //          Loaded returns fast (no blocking).
+        // Step 2 — fire background scan; post result back to UI thread when done.
+        try
+        {
+            var nav = App.Services?.GetService<INavigationService>();
+            DiskHealthCard?.Initialize(nav, "—", "—", "—");
+        }
+        catch { /* DI unavailable — card stays with placeholder strings */ }
 
-                    _aiEngine.Push(sample);
+        // Fire-and-forget: run scan on background thread, update card on UI thread.
+        _ = RunDiskHealthScanAsync();
+    }
 
-                    // Every 30 ticks (60 seconds) trigger analysis
-                    _aiTickCounter++;
-                    if (_aiTickCounter >= 30)
-                    {
-                        _aiTickCounter = 0;
-                        _ = _aiEngine.AnalyzeAsync().ContinueWith(t =>
-                        {
-                            if (t.IsFaulted) System.Diagnostics.Debug.WriteLine($"AI analysis error: {t.Exception?.InnerException?.Message}");
-                        }, TaskContinuationOptions.OnlyOnFaulted);
-                    }
-                }
-                catch { }
+    private async Task RunDiskHealthScanAsync()
+    {
+        try
+        {
+            var result = await DiskHealthScanner.ScanAsync().ConfigureAwait(false);
+            Dispatcher.UIThread.Post(() =>
+            {
+                try { DiskHealthCard?.ApplyScanResult(result); }
+                catch { /* card may have been unloaded — ignore */ }
+            });
+        }
+        catch
+        {
+            // Graceful degradation: card stays at placeholders, no crash.
+            System.Diagnostics.Debug.WriteLine("[DashboardView] DiskHealthScanner failed silently.");
+        }
+    }
+
+    private void NavigateToAIFeatures()
+    {
+        // Phase 5.4 Task 11: route through INavigationService so MainWindow can
+        // deep-link into the Recommendations section instead of just landing on
+        // the overview. Falls back to direct navigation if DI is unavailable.
+        var nav = App.Services?.GetService<INavigationService>();
+        if (nav is not null)
+        {
+            nav.NavigateTo("ai-recommendations");
+        }
+        else if (this.GetVisualRoot() is Window w && w is Views.MainWindow main)
+        {
+            main.NavigateToModule("ai-features");
+        }
+    }
+
+    private void HookResponsiveBreakpoint()
+    {
+        if (this.GetVisualRoot() is not Window win) return;
+        win.SizeChanged += (_, e) => ApplyResponsiveLayout(e.NewSize.Width);
+        ApplyResponsiveLayout(win.Width);
+    }
+
+    private void ApplyResponsiveLayout(double width)
+    {
+        var narrow = width < 1000;
+        if (narrow == _narrow) return;
+        _narrow = narrow;
+
+        SystemInfoCard.IsVisible = !narrow;
+        MonitoringText.Text = narrow
+            ? LocalizationService.Get("dash.cortex.monitoring.subtitle")
+            : LocalizationService.Get("dash.cortex.monitoring.subtitle.wide");
+
+        // In narrow mode, Quick Actions card expands to fill the full bottom row
+        // (since SystemInfoCard is hidden, we avoid a lonely Quick Actions on the right).
+        var quickActionsCard = SystemInfoCard.GetVisualParent() is global::Avalonia.Controls.Grid bottomRow
+            && bottomRow.Children.Count > 1
+                ? bottomRow.Children[1] as global::Avalonia.Controls.Border
+                : null;
+        if (quickActionsCard is not null)
+        {
+            global::Avalonia.Controls.Grid.SetColumnSpan(quickActionsCard, narrow ? 2 : 1);
+            global::Avalonia.Controls.Grid.SetColumn(quickActionsCard, narrow ? 0 : 1);
+            quickActionsCard.Margin = narrow
+                ? new global::Avalonia.Thickness(0)
+                : new global::Avalonia.Thickness(8, 0, 0, 0);
+        }
+    }
+
+    private void StartPolling()
+    {
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+        _timer.Tick += (_, _) => TickOnce();
+        _timer.Start();
+        TickOnce();
+    }
+
+    private void StopPolling()
+    {
+        if (_timer is null) return;
+        _timer.Stop();
+        _timer = null;
+    }
+
+    private void TickOnce()
+    {
+        try
+        {
+            _vm.CpuPercent = SampleCpu();
+            _vm.RamPercent = SampleRamPercent();
+            _vm.DiskPercent = SampleDiskPercent();
+            if (_vm.GpuVisible)
+            {
+                // Read cached GPU value (instant) and trigger background refresh if stale.
+                _vm.GpuPercent = _cachedGpuUsage;
+                GpuGauge.Value = _cachedGpuUsage;
+                MaybeRefreshGpuInBackground();
             }
+            _vm.HealthScore = ComputeHealth(_vm.CpuPercent, _vm.RamPercent, _vm.DiskPercent);
+            _vm.HealthLabel = _vm.HealthScore >= 85 ? "Excellent" : _vm.HealthScore >= 60 ? "Good" : "Needs attention";
+
+            CpuGauge.Value = _vm.CpuPercent;
+            RamGauge.Value = _vm.RamPercent;
+            DiskGauge.Value = _vm.DiskPercent;
+            HealthGauge.Value = _vm.HealthScore;
+            HealthGauge.Insight = _vm.HealthLabel;
+            UpdateUptime();
         }
         catch { }
     }
 
-    private void LoadData()
+    /// <summary>
+    /// Kicks off a background GPU usage sample if the cached value is stale and no sample is in flight.
+    /// GpuInfoHelper.GetCurrentUsage spawns `typeperf` on Windows which can block 100-2000ms — MUST NOT
+    /// run on the UI thread. Caller (TickOnce) keeps rendering at full 500ms cadence without hitching.
+    /// </summary>
+    private void MaybeRefreshGpuInBackground()
     {
-        // System info card
-        SysOsText.Text = RuntimeInformation.OSDescription;
-        SysCpuText.Text = $"{Environment.ProcessorCount} cores | {RuntimeInformation.OSArchitecture}";
+        if (DateTime.UtcNow - _lastGpuSampleUtc < GpuSampleInterval) return;
+        // Interlocked guard: single in-flight sample at a time
+        if (global::System.Threading.Interlocked.Exchange(ref _gpuSampleInFlight, 1) == 1) return;
 
-        // Uptime
-        var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-        var uptimeStr = uptime.Days > 0
-            ? $"{uptime.Days}d {uptime.Hours}h"
-            : $"{uptime.Hours}h {uptime.Minutes}m";
-        UptimeValue.Text = uptimeStr;
-        SysUptimeText.Text = uptimeStr;
+        _ = global::System.Threading.Tasks.Task.Run(() =>
+        {
+            double usage = 0;
+            try { usage = GpuInfoHelper.GetCurrentUsage(); } catch { }
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                _cachedGpuUsage = usage;
+                _lastGpuSampleUtc = DateTime.UtcNow;
+                global::System.Threading.Interlocked.Exchange(ref _gpuSampleInFlight, 0);
+            });
+        });
+    }
 
-        OsLabel.Text = OperatingSystem.IsWindows() ? "\u2B22 Windows"
-                     : OperatingSystem.IsLinux() ? "\u2B22 Linux"
-                     : OperatingSystem.IsMacOS() ? "\u2B22 macOS" : "Unknown";
+    private double SampleCpu()
+    {
+        if (OperatingSystem.IsWindows()) return SampleCpuWindows();
+        if (OperatingSystem.IsLinux()) return SampleCpuLinux();
+        return 0;
+    }
 
-        OsLabel.Foreground = OperatingSystem.IsWindows()
-            ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#0080FF"))
-            : OperatingSystem.IsLinux()
-            ? new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#F59E0B"))
-            : new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#8B5CF6"));
+    [global::System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private double SampleCpuWindows()
+    {
+        try
+        {
+            if (_cpuCounter is null)
+            {
+                _cpuCounter = new global::System.Diagnostics.PerformanceCounter(
+                    "Processor", "% Processor Time", "_Total", readOnly: true);
+                _cpuCounter.NextValue(); // first call always returns 0 — prime it
+                return 0;
+            }
+            return Math.Clamp(_cpuCounter.NextValue(), 0, 100);
+        }
+        catch
+        {
+            _cpuCounter = null; // reset; retry on next tick
+            return 0;
+        }
+    }
 
-        // RAM info — real used/total
+    [global::System.Runtime.Versioning.SupportedOSPlatform("linux")]
+    private double SampleCpuLinux()
+    {
+        try
+        {
+            // /proc/stat line "cpu  user nice system idle iowait irq softirq steal ..."
+            // CPU% = 100 * (delta_total - delta_idle) / delta_total between two samples.
+            var firstLine = File.ReadLines("/proc/stat").First();
+            var parts = firstLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 5 || parts[0] != "cpu") return 0;
+
+            ulong user = ulong.Parse(parts[1]);
+            ulong nice = ulong.Parse(parts[2]);
+            ulong system = ulong.Parse(parts[3]);
+            ulong idle = ulong.Parse(parts[4]);
+            ulong iowait = parts.Length > 5 ? ulong.Parse(parts[5]) : 0;
+            ulong irq = parts.Length > 6 ? ulong.Parse(parts[6]) : 0;
+            ulong softirq = parts.Length > 7 ? ulong.Parse(parts[7]) : 0;
+            ulong steal = parts.Length > 8 ? ulong.Parse(parts[8]) : 0;
+
+            ulong total = user + nice + system + idle + iowait + irq + softirq + steal;
+            ulong totalIdle = idle + iowait;
+
+            if (_lastProcStatSnapshot is null)
+            {
+                _lastProcStatSnapshot = (total, totalIdle);
+                return 0;
+            }
+
+            var (prevTotal, prevIdle) = _lastProcStatSnapshot.Value;
+            ulong dTotal = total - prevTotal;
+            ulong dIdle = totalIdle - prevIdle;
+            _lastProcStatSnapshot = (total, totalIdle);
+
+            if (dTotal == 0) return 0;
+            return Math.Clamp(100.0 * (dTotal - dIdle) / dTotal, 0, 100);
+        }
+        catch { return 0; }
+    }
+
+    private double SampleRamPercent()
+    {
         if (OperatingSystem.IsWindows())
         {
-            var mem = new MEMORYSTATUSEX();
-            if (GlobalMemoryStatusEx(ref mem))
-            {
-                var total = mem.ullTotalPhys / (1024.0 * 1024 * 1024);
-                var avail = mem.ullAvailPhys / (1024.0 * 1024 * 1024);
-                RamValue.Text = $"{total - avail:F1}";
-                RamTotal.Text = $"/ {total:F1} GB";
-                SysRamText.Text = $"{total - avail:F1} / {total:F1} GB";
-            }
+            var ms = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+            if (GlobalMemoryStatusEx(ref ms))
+                return 100.0 * (ms.ullTotalPhys - ms.ullAvailPhys) / Math.Max(ms.ullTotalPhys, 1UL);
+            return 0;
         }
-        else if (OperatingSystem.IsLinux())
+        if (OperatingSystem.IsLinux())
         {
             try
             {
-                long totalKb = 0, availKb = 0;
-                foreach (var line in File.ReadLines("/proc/meminfo"))
+                var lines = File.ReadAllLines("/proc/meminfo");
+                ulong total = 0, avail = 0;
+                foreach (var l in lines)
                 {
-                    if (line.StartsWith("MemTotal:")) totalKb = ParseMemKb(line);
-                    else if (line.StartsWith("MemAvailable:")) availKb = ParseMemKb(line);
+                    if (l.StartsWith("MemTotal:")) total = ParseKb(l);
+                    else if (l.StartsWith("MemAvailable:")) avail = ParseKb(l);
                 }
-                var total = totalKb / (1024.0 * 1024);
-                var avail = availKb / (1024.0 * 1024);
-                RamValue.Text = $"{total - avail:F1}";
-                RamTotal.Text = $"/ {total:F1} GB";
-                SysRamText.Text = $"{total - avail:F1} / {total:F1} GB";
+                if (total > 0) return 100.0 * (total - avail) / total;
             }
-            catch { RamValue.Text = "N/A"; }
+            catch { }
         }
-        else
-        {
-            var gcInfo = GC.GetGCMemoryInfo();
-            var total = gcInfo.TotalAvailableMemoryBytes / (1024.0 * 1024 * 1024);
-            RamValue.Text = $"{total:F1}";
-            RamTotal.Text = "GB (total)";
-            SysRamText.Text = $"{total:F1} GB (total)";
-        }
+        return 0;
+    }
 
-        // Disk info
+    private double SampleDiskPercent()
+    {
         try
         {
-            var root = OperatingSystem.IsWindows()
-                ? (DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady)?.Name ?? "C:\\")
-                : "/";
-            var drive = new DriveInfo(root);
-            var freeGb = drive.AvailableFreeSpace / (1024.0 * 1024 * 1024);
-            var totalDiskGb = drive.TotalSize / (1024.0 * 1024 * 1024);
-            DiskValue.Text = $"{freeGb:F0}";
-            var pct = (totalDiskGb - freeGb) / totalDiskGb;
-            if (DiskBar.Parent is Border parent && parent.Bounds.Width > 0)
-                DiskBar.Width = parent.Bounds.Width * pct;
+            var root = OperatingSystem.IsWindows() ? "C:\\" : "/";
+            var di = new DriveInfo(root);
+            if (di.TotalSize > 0)
+                return 100.0 * (di.TotalSize - di.AvailableFreeSpace) / di.TotalSize;
         }
-        catch { DiskValue.Text = "N/A"; }
-
-        CpuValue.Text = "--";
-
-        // OS-aware Quick Actions
-        BuildQuickActions();
+        catch { }
+        return 0;
     }
 
-    private void BuildQuickActions()
+    private static ulong ParseKb(string memInfoLine)
     {
-        QuickActionsPanel.Children.Clear();
+        var parts = memInfoLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 && ulong.TryParse(parts[1], out var v) ? v * 1024 : 0;
+    }
 
-        // Common action - Full System Scan
-        QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Full System Scan", "Analyze all modules", ScanAll_Click));
+    private static double ComputeHealth(double cpu, double ram, double disk)
+    {
+        var score = 100.0;
+        if (cpu > 80) score -= 15;
+        if (ram > 85) score -= 15;
+        if (disk > 90) score -= 10;
+        return Math.Clamp(score, 0, 100);
+    }
 
+    private static string GetOsName() =>
+        RuntimeInformation.OSDescription ?? Environment.OSVersion.ToString();
+
+    private static string GetCpuName()
+    {
         if (OperatingSystem.IsWindows())
         {
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Clean Junk Files", "Temp, cache, logs cleanup", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Optimize RAM", "Free up working set memory", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u2692", "Registry Clean", "Scan for registry issues", null));
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Clean Package Cache", "APT/pip/npm cache cleanup", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Systemd Status", "Check failed services", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Swap Status", "Monitor swap usage", null));
-        }
-        else if (OperatingSystem.IsMacOS())
-        {
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u267B", "Brew Cleanup", "Clean Homebrew cache", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u2699", "Defaults Tweaks", "Apply macOS optimizations", null));
-            QuickActionsPanel.Children.Add(MakeQuickAction("\u26A1", "Launch Agents", "Manage startup items", null));
-        }
-    }
-
-    private static Button MakeQuickAction(string icon, string title, string subtitle, EventHandler<RoutedEventArgs>? handler)
-    {
-        var btn = new Button();
-        btn.Classes.Add("action-btn");
-        if (handler != null) btn.Click += handler;
-        btn.Content = new StackPanel
-        {
-            Orientation = global::Avalonia.Layout.Orientation.Horizontal,
-            Spacing = 10,
-            Children =
+            try
             {
-                new TextBlock { Text = icon, FontSize = 16, VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center },
-                new StackPanel
+                using var p = Process.Start(new ProcessStartInfo
                 {
-                    Children =
-                    {
-                        new TextBlock { Text = title, FontSize = 12, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
-                        new TextBlock { Text = subtitle, FontSize = 10,
-                            Foreground = new global::Avalonia.Media.SolidColorBrush(global::Avalonia.Media.Color.Parse("#8888A0")) }
-                    }
+                    FileName = "wmic", Arguments = "cpu get name",
+                    RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true
+                });
+                if (p is not null)
+                {
+                    var o = p.StandardOutput.ReadToEnd();
+                    p.WaitForExit(2000);
+                    var lines = o.Split('\n').Select(l => l.Trim()).Where(l => !string.IsNullOrEmpty(l) && l != "Name").ToList();
+                    if (lines.Count > 0) return lines[0];
                 }
             }
-        };
-        return btn;
-    }
-
-    private void ScanAll_Click(object? sender, RoutedEventArgs e)
-    {
-        // TODO: trigger full scan across all modules
-    }
-
-    // ── AI Analysis event handler (fires on background thread) ──
-    private void OnAIAnalysisCompleted(AIAnalysisResult result)
-    {
-        Dispatcher.UIThread.Post(() => UpdateAIBadges(result));
-    }
-
-    private void UpdateAIBadges(AIAnalysisResult result)
-    {
-        // CPU anomaly badge
-        CpuAnomalyBadge.IsVisible = result.CpuAnomaly;
-
-        // RAM anomaly badge
-        RamAnomalyBadge.IsVisible = result.RamAnomaly;
-
-        // Memory leak badge
-        if (result.MemoryLeaks.Count > 0)
-        {
-            var leak = result.MemoryLeaks[0];
-            RamLeakBadge.IsVisible = true;
-            RamLeakText.Text = "\U0001F50D " + string.Format(LocalizationService._("ai.badge.memoryLeak"), leak.ProcessName);
+            catch { }
         }
-        else
+        if (OperatingSystem.IsLinux())
         {
-            RamLeakBadge.IsVisible = false;
+            try
+            {
+                var lines = File.ReadAllLines("/proc/cpuinfo");
+                foreach (var l in lines)
+                    if (l.StartsWith("model name"))
+                        return l.Split(':', 2)[1].Trim();
+            }
+            catch { }
         }
-
-        // Disk prediction badge
-        if (result.DiskPrediction is { } dp)
-        {
-            DiskPredictionBadge.IsVisible = true;
-            DiskPredictionText.Text = "\U0001F4C8 " + string.Format(LocalizationService._("ai.badge.diskPrediction"), dp.DaysUntilFull);
-
-            // Color based on days remaining
-            string color;
-            if (dp.DaysUntilFull > 90)
-                color = "#22C55E"; // green
-            else if (dp.DaysUntilFull > 30)
-                color = "#F59E0B"; // yellow
-            else
-                color = "#EF4444"; // red
-
-            var parsedColor = Color.Parse(color);
-            DiskPredictionText.Foreground = new SolidColorBrush(parsedColor);
-            DiskPredictionBadge.Background = new SolidColorBrush(parsedColor) { Opacity = 0.15 };
-            DiskPredictionBadge.BorderBrush = new SolidColorBrush(parsedColor) { Opacity = 0.3 };
-        }
-        else
-        {
-            DiskPredictionBadge.IsVisible = false;
-        }
+        return $"{Environment.ProcessorCount} cores";
     }
 
-    private void UpdateSparkline(Canvas canvas, Polyline line, Queue<double> history)
+    private static double GetTotalRamGb()
     {
-        if (history.Count < 2) return;
-        var w = canvas.Bounds.Width > 0 ? canvas.Bounds.Width : 100;
-        var h = canvas.Bounds.Height > 0 ? canvas.Bounds.Height : 20;
-        var pts = new global::Avalonia.Collections.AvaloniaList<global::Avalonia.Point>();
-        var arr = history.ToArray();
-        for (int i = 0; i < arr.Length; i++)
+        if (OperatingSystem.IsWindows())
         {
-            var x = w * i / (arr.Length - 1);
-            var y = h - (h * Math.Clamp(arr[i], 0, 100) / 100.0);
-            pts.Add(new global::Avalonia.Point(x, y));
+            var ms = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+            if (GlobalMemoryStatusEx(ref ms)) return ms.ullTotalPhys / (1024.0 * 1024 * 1024);
         }
-        line.Points = pts;
+        if (OperatingSystem.IsLinux())
+        {
+            try
+            {
+                var lines = File.ReadAllLines("/proc/meminfo");
+                foreach (var l in lines)
+                    if (l.StartsWith("MemTotal:")) return ParseKb(l) / (1024.0 * 1024 * 1024);
+            }
+            catch { }
+        }
+        return 0;
     }
 
-    private static long ParseMemKb(string line)
-    {
-        var parts = line.Split(':', StringSplitOptions.TrimEntries);
-        if (parts.Length < 2) return 0;
-        var numStr = parts[1].Replace("kB", "").Trim();
-        return long.TryParse(numStr, out var kb) ? kb : 0;
-    }
-
-    // P/Invoke for real system memory on Windows
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     private struct MEMORYSTATUSEX
     {
-        internal uint dwLength;
-        internal uint dwMemoryLoad;
-        internal ulong ullTotalPhys;
-        internal ulong ullAvailPhys;
-        internal ulong ullTotalPageFile;
-        internal ulong ullAvailPageFile;
-        internal ulong ullTotalVirtual;
-        internal ulong ullAvailVirtual;
-        internal ulong ullAvailExtendedVirtual;
-        public MEMORYSTATUSEX() { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>(); }
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
     }
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
+
+    private sealed class RelayCommand : System.Windows.Input.ICommand
+    {
+        private readonly Action _action;
+        public RelayCommand(Action action) => _action = action;
+        public event EventHandler? CanExecuteChanged;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _action();
+    }
 }

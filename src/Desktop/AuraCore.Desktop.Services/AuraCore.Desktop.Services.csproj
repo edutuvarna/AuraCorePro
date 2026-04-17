@@ -5,8 +5,11 @@
   <ItemGroup>
     <ProjectReference Include="../../Core/AuraCore.Application/AuraCore.Application.csproj" />
     <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.Windows/AuraCore.Infrastructure.Windows.csproj" />
+    <ProjectReference Include="../../Infrastructure/AuraCore.Infrastructure.PrivilegeIpc/AuraCore.Infrastructure.PrivilegeIpc.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
   </ItemGroup>
 </Project>

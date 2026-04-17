@@ -2,6 +2,8 @@ using System.Diagnostics;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
+using AuraCore.Module.SymlinkManager;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -13,6 +15,12 @@ public partial class SymlinkManagerView : UserControl
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+    }
+
+    private static SymlinkManagerModule? GetModule()
+    {
+        try { return App.Services.GetService<SymlinkManagerModule>(); }
+        catch { return null; }
     }
 
     private async void CreateLink_Click(object? sender, RoutedEventArgs e)
@@ -30,6 +38,25 @@ public partial class SymlinkManagerView : UserControl
         try
         {
             StatusText.Text = "Creating link...";
+
+            // On Linux: route through the privileged module for proper polkit elevation
+            if (OperatingSystem.IsLinux() && (type == "file" || type == "dir"))
+            {
+                var module = GetModule();
+                if (module is not null)
+                {
+                    // source = link name (linkPath), target = what it points to (targetPath)
+                    var outcome = await module.CreateSymlinkAsync(linkPath, targetPath);
+                    StatusText.Text = outcome.Success
+                        ? $"OK: Created symlink {linkPath} -> {targetPath}"
+                        : $"Error: {outcome.Error}";
+                    if (outcome.Success)
+                        NotificationService.Instance.Post("Symlink Manager",
+                            $"Created {linkPath} -> {targetPath}", NotificationType.Success);
+                    return;
+                }
+            }
+
             var result = await Task.Run(() =>
             {
                 try
@@ -57,7 +84,7 @@ public partial class SymlinkManagerView : UserControl
                     }
                     else
                     {
-                        // Linux/macOS: ln -s
+                        // Linux/macOS fallback (no privilege helper): ln -s
                         File.CreateSymbolicLink(linkPath, targetPath);
                         return $"OK: Created symlink {linkPath} -> {targetPath}";
                     }

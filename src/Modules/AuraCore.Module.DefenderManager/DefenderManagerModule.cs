@@ -14,6 +14,15 @@ namespace AuraCore.Module.DefenderManager;
 /// </summary>
 public sealed class DefenderManagerModule : IOptimizationModule
 {
+    private readonly AuraCore.Application.Interfaces.Platform.IShellCommandService? _shellCommandService;
+
+    public DefenderManagerModule() { }
+
+    public DefenderManagerModule(AuraCore.Application.Interfaces.Platform.IShellCommandService shellCommandService)
+    {
+        _shellCommandService = shellCommandService;
+    }
+
     public string Id => "defender-manager";
     public string DisplayName => "Defender Manager";
     public OptimizationCategory Category => OptimizationCategory.SystemHealth;
@@ -611,11 +620,58 @@ public sealed class DefenderManagerModule : IOptimizationModule
         if (v.ValueKind == System.Text.Json.JsonValueKind.Number) return v.GetInt64();
         return 0;
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // Privileged write capability (Phase 5.5)
+    // ═══════════════════════════════════════════════════════════
+
+    public sealed record DefenderOperationOutcome(bool Success, string Output, bool HelperMissing, string? Error = null);
+
+    public Task<DefenderOperationOutcome> UpdateSignaturesAsync(CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.update-signatures", System.Array.Empty<string>(), 180, ct);
+
+    public Task<DefenderOperationOutcome> QuickScanAsync(CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.scan-quick", System.Array.Empty<string>(), 900, ct);
+
+    public Task<DefenderOperationOutcome> FullScanAsync(CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.scan-full", System.Array.Empty<string>(), 7200, ct);
+
+    public Task<DefenderOperationOutcome> SetRealtimeAsync(bool enabled, CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.set-realtime", new[] { enabled ? "enable" : "disable" }, 30, ct);
+
+    public Task<DefenderOperationOutcome> AddExclusionAsync(string path, CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.add-exclusion", new[] { path }, 30, ct);
+
+    public Task<DefenderOperationOutcome> RemoveExclusionAsync(string path, CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.remove-exclusion", new[] { path }, 30, ct);
+
+    public Task<DefenderOperationOutcome> RemoveThreatAsync(string threatId, CancellationToken ct = default)
+        => DispatchPrivilegedAsync("defender.remove-threat", new[] { threatId }, 60, ct);
+
+    private async Task<DefenderOperationOutcome> DispatchPrivilegedAsync(
+        string id, string[] args, int timeoutSeconds, CancellationToken ct)
+    {
+        if (_shellCommandService is null)
+            return new DefenderOperationOutcome(false, "", true, "shell command service not wired");
+
+        var result = await _shellCommandService.RunPrivilegedAsync(
+            new AuraCore.Application.Interfaces.Platform.PrivilegedCommand(
+                id, "powershell", args, timeoutSeconds),
+            ct);
+        return new DefenderOperationOutcome(
+            result.Success,
+            result.Stdout,
+            result.AuthResult == AuraCore.Application.Interfaces.Platform.PrivilegeAuthResult.HelperMissing,
+            result.Success ? null : result.Stderr);
+    }
 }
 
 public static class DefenderManagerRegistration
 {
-    public static IServiceCollection AddDefenderManagerModule(
-        this IServiceCollection services)
-        => services.AddSingleton<IOptimizationModule, DefenderManagerModule>();
+    public static IServiceCollection AddDefenderManagerModule(this IServiceCollection services)
+        => services.AddSingleton<IOptimizationModule, DefenderManagerModule>(sp =>
+        {
+            var shell = sp.GetService<AuraCore.Application.Interfaces.Platform.IShellCommandService>();
+            return shell is not null ? new DefenderManagerModule(shell) : new DefenderManagerModule();
+        });
 }

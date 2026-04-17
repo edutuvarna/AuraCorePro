@@ -182,6 +182,24 @@
         </StackPanel>
       </controls:GlassCard>
 
+      <!-- Actions Card (Phase 5.5) -->
+      <controls:GlassCard>
+        <StackPanel Spacing="12">
+          <TextBlock Text="Actions" FontWeight="SemiBold"
+                     FontSize="{DynamicResource FontSizeBody}"/>
+          <WrapPanel>
+            <Button Classes="action-btn" x:Name="UpdateSigsBtn" Click="UpdateSigs_Click"
+                    Content="Update signatures" Margin="0,0,8,8"/>
+            <Button Classes="action-btn" x:Name="QuickScanBtn"  Click="QuickScan_Click"
+                    Content="Quick scan" Margin="0,0,8,8"/>
+            <Button Classes="action-btn" x:Name="FullScanBtn"   Click="FullScan_Click"
+                    Content="Full scan" Margin="0,0,8,8"/>
+          </WrapPanel>
+          <TextBlock x:Name="DefActionStatus" FontSize="{DynamicResource FontSizeBodySmall}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </controls:GlassCard>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

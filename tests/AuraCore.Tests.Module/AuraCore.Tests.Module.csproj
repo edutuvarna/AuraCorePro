@@ -39,5 +39,6 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.SnapFlatpakCleaner\AuraCore.Module.SnapFlatpakCleaner.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.GrubManager\AuraCore.Module.GrubManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DriverUpdater\AuraCore.Module.DriverUpdater.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DefenderManager\AuraCore.Module.DefenderManager.csproj" />
   </ItemGroup>
 </Project>

@@ -33,9 +33,15 @@ logger.LogInformation(
 // ---------------------------------------------------------------------------
 try
 {
-    var audit   = new AuditLogger(loggerFactory.CreateLogger<AuditLogger>());
-    var peer    = new PeerVerifier(stubMode: false, loggerFactory.CreateLogger<PeerVerifier>());
-    var handler = new StubActionHandler();   // Task 27 replaces this with the real ActionWhitelist impl.
+    var audit     = new AuditLogger(loggerFactory.CreateLogger<AuditLogger>());
+    var peer      = new PeerVerifier(stubMode: false, loggerFactory.CreateLogger<PeerVerifier>());
+    var whitelist = new ActionWhitelist();
+    var invoker   = new ProcessInvoker();
+    var handler   = new ActionWhitelistHandler(
+        whitelist,
+        invoker,
+        audit,
+        loggerFactory.CreateLogger<ActionWhitelistHandler>());
     var xpcDelegate = new AuracorePrivHelperDelegate(
         peer,
         handler,

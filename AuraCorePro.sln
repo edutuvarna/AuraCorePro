@@ -187,6 +187,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{D407
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivHelper.Linux", "src\Service\AuraCore.PrivHelper.Linux\AuraCore.PrivHelper.Linux.csproj", "{99231017-A429-48A1-8283-8C4338345110}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuraCore.PrivHelper.MacOS", "src\Service\AuraCore.PrivHelper.MacOS\AuraCore.PrivHelper.MacOS.csproj", "{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1241,6 +1243,18 @@ Global
 		{99231017-A429-48A1-8283-8C4338345110}.Release|x64.Build.0 = Release|Any CPU
 		{99231017-A429-48A1-8283-8C4338345110}.Release|x86.ActiveCfg = Release|Any CPU
 		{99231017-A429-48A1-8283-8C4338345110}.Release|x86.Build.0 = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|x64.Build.0 = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Debug|x86.Build.0 = Debug|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|x64.ActiveCfg = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|x64.Build.0 = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|x86.ActiveCfg = Release|Any CPU
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1279,5 +1293,6 @@ Global
 		{8E71CEAA-7D38-452F-BC05-8BA6738060C1} = {9048EB7F-3875-A59E-E36B-5BD4C6F2A282}
 		{D40739C2-B365-88A5-00D6-6C74FD5CFB3F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{99231017-A429-48A1-8283-8C4338345110} = {D40739C2-B365-88A5-00D6-6C74FD5CFB3F}
+		{5A39B774-82B8-46FB-A0BD-200CA8C1EBE5} = {D40739C2-B365-88A5-00D6-6C74FD5CFB3F}
 	EndGlobalSection
 EndGlobal

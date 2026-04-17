@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AuraCore.PrivilegedService.IPC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+792b72cff0b675aea4aee7e22ad85cf4ef37ea9d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdce30b68327afc689fbbcf30137871e795b2d90")]
 [assembly: System.Reflection.AssemblyProductAttribute("AuraCore.PrivilegedService.IPC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AuraCore.PrivilegedService.IPC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

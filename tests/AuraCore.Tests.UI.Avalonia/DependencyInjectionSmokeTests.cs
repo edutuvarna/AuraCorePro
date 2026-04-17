@@ -276,7 +276,9 @@ public class DependencyInjectionSmokeTests
     public void SpotlightManagerViewModel_ResolvesFromContainer()
     {
         var sc = new ServiceCollection();
-        // Mirror App.axaml.cs Phase 4.4.3 block
+        // Mirror App.axaml.cs Phase 4.4.3 block.
+        // IShellCommandService is required since Phase 5.2.2.7b migration.
+        sc.AddSingleton<IShellCommandService>(_ => new StubShellCommandService());
         sc.AddSingleton<SpotlightManagerModule>();
         sc.AddSingleton<IOptimizationModule>(sp => sp.GetRequiredService<SpotlightManagerModule>());
         sc.AddTransient<SpotlightManagerViewModel>();

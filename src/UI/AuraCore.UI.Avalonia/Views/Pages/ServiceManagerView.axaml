@@ -30,6 +30,19 @@
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
 
+      <!-- Operation status banner (code-behind shows/hides) -->
+      <Border x:Name="StatusBanner"
+              IsVisible="False"
+              CornerRadius="{StaticResource RadiusMd}"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1" Padding="12,8">
+        <TextBlock x:Name="StatusBannerText"
+                   FontSize="{DynamicResource FontSizeBodySmall}"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   TextWrapping="Wrap"/>
+      </Border>
+
       <!-- Stats row -->
       <controls:StatRow>
         <controls:StatCard Label="TOTAL"
@@ -70,6 +83,19 @@
                         BorderThickness="1"
                         Background="{DynamicResource BgCardBrush}"
                         BorderBrush="{DynamicResource BorderSubtleBrush}">
+                  <Border.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Start"   Click="ServiceStart_Click"/>
+                      <MenuItem Header="Stop"    Click="ServiceStop_Click"/>
+                      <MenuItem Header="Restart" Click="ServiceRestart_Click"/>
+                      <Separator/>
+                      <MenuItem Header="Startup type">
+                        <MenuItem Header="Automatic" Click="ServiceStartupAuto_Click"/>
+                        <MenuItem Header="Manual"    Click="ServiceStartupManual_Click"/>
+                        <MenuItem Header="Disabled"  Click="ServiceStartupDisabled_Click"/>
+                      </MenuItem>
+                    </ContextMenu>
+                  </Border.ContextMenu>
                   <Grid ColumnDefinitions="*,100,80,80">
                     <StackPanel VerticalAlignment="Center">
                       <TextBlock Text="{Binding DisplayName}"

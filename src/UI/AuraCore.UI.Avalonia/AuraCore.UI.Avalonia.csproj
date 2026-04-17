@@ -90,5 +90,6 @@
     <ProjectReference Include="..\..\Modules\AuraCore.Module.MacAppInstaller\AuraCore.Module.MacAppInstaller.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.SnapFlatpakCleaner\AuraCore.Module.SnapFlatpakCleaner.csproj" />
     <ProjectReference Include="..\..\Modules\AuraCore.Module.GrubManager\AuraCore.Module.GrubManager.csproj" />
+    <ProjectReference Include="..\..\Modules\AuraCore.Module.ServiceManager\AuraCore.Module.ServiceManager.csproj" />
   </ItemGroup>
 </Project>

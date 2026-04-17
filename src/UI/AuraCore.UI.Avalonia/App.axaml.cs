@@ -5,6 +5,7 @@ using AuraCore.Desktop.Services.Navigation;
 using AuraCore.Desktop.Services.PrivilegeIpc;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
+using AuraCore.Module.ServiceManager;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -75,6 +76,8 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.DnsBenchmark.DnsBenchmarkRegistration.AddDnsBenchmarkModule(sc);
             AuraCore.Module.FontManager.FontManagerRegistration.AddFontManagerModule(sc);
             AuraCore.Module.WakeOnLan.WakeOnLanRegistration.AddWakeOnLanModule(sc);
+            // ── Phase 5.5 Task 10: Service Manager ──
+            sc.AddServiceManager();
         }
 
         // ── Linux-only modules (Faz 2+) ──

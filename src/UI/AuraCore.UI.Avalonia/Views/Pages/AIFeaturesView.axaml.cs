@@ -132,6 +132,18 @@ public partial class AIFeaturesView : UserControl
         {
             card.NavigateToDetail = vm.NavigateToSection;
         }
+
+        // Apply localization to back button
+        ApplyLocalization();
+    }
+
+    /// <summary>
+    /// Applies localized strings to UI elements.
+    /// </summary>
+    private void ApplyLocalization()
+    {
+        if (PART_BackToOverviewBtn is not null)
+            PART_BackToOverviewBtn.Content = LocalizationService.Get("ai.backToOverview");
     }
 
     /// <summary>

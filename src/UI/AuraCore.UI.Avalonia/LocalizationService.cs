@@ -1448,6 +1448,7 @@ public static class LocalizationService
         ["aiFeatures.section.paused.message"] = "This feature is paused",
         ["aiFeatures.section.paused.enableButton"] = "Enable",
         ["aiFeatures.chat.warningBanner"] = "⚠ Experimental — CORTEX Chat may produce inaccurate outputs. Verify before applying any suggestion.",
+        ["ai.backToOverview"] = "← Back to Overview",
 
         ["chatOptIn.step1.title"] = "CORTEX Chat — Experimental",
         ["chatOptIn.step1.body"] = "CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system.\n\nThis feature is under active development.",
@@ -2916,6 +2917,7 @@ public static class LocalizationService
         ["aiFeatures.section.paused.message"] = "Bu özellik duraklatıldı",
         ["aiFeatures.section.paused.enableButton"] = "Etkinleştir",
         ["aiFeatures.chat.warningBanner"] = "⚠ Deneysel — CORTEX Sohbet hatalı yanıtlar üretebilir. Herhangi bir öneri uygulamadan önce doğrulayın.",
+        ["ai.backToOverview"] = "← Genel Bakış'a Dön",
 
         ["chatOptIn.step1.title"] = "CORTEX Sohbet — Deneysel",
         ["chatOptIn.step1.body"] = "CORTEX Sohbet yerel bir AI modeli kullanır ve hatalı veya yanıltıcı çıktılar üretebilir. Sisteminize uygulamadan önce tüm önerileri doğrulayın.\n\nBu özellik aktif geliştirme aşamasındadır.",

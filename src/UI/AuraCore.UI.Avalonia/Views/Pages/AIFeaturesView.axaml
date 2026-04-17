@@ -93,7 +93,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" x:Name="PART_SectionNav" Spacing="2" Margin="0,8,8,0">
-          <Button Content="Overview" Classes="section-nav-item"
+          <Button x:Name="PART_BackToOverviewBtn" Content="← Back to Overview" Classes="section-nav-item"
                   Command="{Binding NavigateToOverview}" />
           <Button Content="Insights" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"

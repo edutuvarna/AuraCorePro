@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using AuraCore.UI.Avalonia;
 
 namespace AuraCore.UI.Avalonia.Services.AI;
 
@@ -86,9 +87,9 @@ public sealed class CortexAmbientService : ICortexAmbientService
 
     private string ComputeStatusText() => _activeness switch
     {
-        CortexActiveness.Active => $"Active · Learning day {Math.Max(1, _learningDay)}",
-        CortexActiveness.Paused => "Paused",
-        _ => "Ready to start",
+        CortexActiveness.Active => $"{LocalizationService.Get("cortex.status.active")} · Learning day {Math.Max(1, _learningDay)}",
+        CortexActiveness.Paused => LocalizationService.Get("cortex.status.paused"),
+        _ => LocalizationService.Get("cortex.status.ready"),
     };
 
     private void Fire([CallerMemberName] string? propertyName = null) =>

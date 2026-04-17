@@ -1521,6 +1521,11 @@ public static class LocalizationService
         ["privilege.missing.banner_text"] = "Privilege helper is not installed. Some modules can't perform system changes.",
         ["privilege.missing.btn_install_now"] = "Install now",
         ["privilege.missing.btn_dismiss"] = "Dismiss",
+
+        // ── Cortex Status ──
+        ["cortex.status.active"] = "Active",
+        ["cortex.status.paused"] = "Paused",
+        ["cortex.status.ready"] = "Ready to start",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -2982,6 +2987,11 @@ public static class LocalizationService
         ["privilege.missing.banner_text"] = "Ayrıcalık yardımcısı yüklü değil. Bazı modüller sistem değişikliği yapamayabilir.",
         ["privilege.missing.btn_install_now"] = "Şimdi yükle",
         ["privilege.missing.btn_dismiss"] = "Kapat",
+
+        // ── Cortex Durumu ──
+        ["cortex.status.active"] = "Aktif",
+        ["cortex.status.paused"] = "Duraklatıldı",
+        ["cortex.status.ready"] = "Başlamaya Hazır",
     };
 
     private static void Save()

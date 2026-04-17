@@ -6,6 +6,7 @@ using AuraCore.Desktop.Services.PrivilegeIpc;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
 using AuraCore.Module.ServiceManager;
+using AuraCore.UI.Avalonia.Helpers;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -78,6 +79,13 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.WakeOnLan.WakeOnLanRegistration.AddWakeOnLanModule(sc);
             // ── Phase 5.5 Task 10: Service Manager ──
             sc.AddServiceManager();
+
+            // ── Task A2: Windows named-pipe privileged helper installer ──
+            sc.AddSingleton<IPipeProbe>(new NamedPipeProbe("AuraCorePro"));
+            sc.AddSingleton<PrivilegedHelperInstaller>(sp =>
+                new PrivilegedHelperInstaller(
+                    sp.GetRequiredService<IPipeProbe>(),
+                    PrivilegedHelperInstaller.DefaultElevatorInvoke));
         }
 
         // ── Linux-only modules (Faz 2+) ──

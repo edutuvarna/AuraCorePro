@@ -1,5 +1,9 @@
 using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 using AuraCore.Module.ServiceManager;
+using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -84,10 +88,32 @@ public partial class ServiceManagerView : UserControl
         return null;
     }
 
+    private async Task<bool> EnsurePrivilegedHelperInstalledAsync()
+    {
+        var installer = App.Services?.GetService<PrivilegedHelperInstaller>();
+        if (installer is null) return true; // DI not wired (tests/design-time) — don't block
+
+        if (await installer.IsInstalledAsync(CancellationToken.None))
+            return true;
+
+        // Prompt for consent + install
+        var topWindow = TopLevel.GetTopLevel(this) as Window;
+        if (topWindow is null) return false;
+
+        var dialog = new PrivilegedHelperInstallDialog(installer);
+        await dialog.ShowDialog(topWindow);
+        return dialog.Outcome == PrivilegedHelperInstallOutcome.Success;
+    }
+
     private async void ServiceStart_Click(object? sender, RoutedEventArgs e)
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.StartAsync(item.ServiceName), $"Starting {item.DisplayName}…");
     }
 
@@ -95,6 +121,11 @@ public partial class ServiceManagerView : UserControl
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.StopAsync(item.ServiceName), $"Stopping {item.DisplayName}…");
     }
 
@@ -102,6 +133,11 @@ public partial class ServiceManagerView : UserControl
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.RestartAsync(item.ServiceName), $"Restarting {item.DisplayName}…");
     }
 
@@ -109,6 +145,11 @@ public partial class ServiceManagerView : UserControl
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "auto"),
             $"Setting {item.DisplayName} startup to Automatic…");
     }
@@ -117,6 +158,11 @@ public partial class ServiceManagerView : UserControl
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "demand"),
             $"Setting {item.DisplayName} startup to Manual…");
     }
@@ -125,6 +171,11 @@ public partial class ServiceManagerView : UserControl
     {
         var item = GetContextItem(sender);
         if (item is null || _engine is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
+            return;
+        }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "disabled"),
             $"Setting {item.DisplayName} startup to Disabled…");
     }

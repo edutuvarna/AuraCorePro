@@ -1458,6 +1458,10 @@ public static class LocalizationService
         ["chatOptIn.step2.title"] = "Choose your AI model",
         ["chatOptIn.step2.subtitle"] = "Please select a model to download. Models are pulled from AuraCore cloud. You can switch or download more later from the Chat header.",
         ["chatOptIn.stepIndicator"] = "Step {0} of {1}",
+        ["chatOptIn.progress.step1"] = "Consent",
+        ["chatOptIn.progress.step2"] = "Choose model",
+        ["chatOptIn.recommended.badge"] = "Recommended",
+        ["chatOptIn.recommended.defaultRationale"] = "Optimized for system maintenance tasks",
 
         ["modelManager.title.optIn"] = "Choose your AI model",
         ["modelManager.title.manage"] = "Manage AI Models",
@@ -2928,6 +2932,10 @@ public static class LocalizationService
         ["chatOptIn.step2.title"] = "AI modelini seç",
         ["chatOptIn.step2.subtitle"] = "İndirmek için bir model seçin. Modeller AuraCore bulutundan çekilir. Daha sonra Sohbet başlığından model değiştirebilir veya yeni modeller indirebilirsiniz.",
         ["chatOptIn.stepIndicator"] = "Adım {0}/{1}",
+        ["chatOptIn.progress.step1"] = "Onay",
+        ["chatOptIn.progress.step2"] = "Model seç",
+        ["chatOptIn.recommended.badge"] = "Önerilen",
+        ["chatOptIn.recommended.defaultRationale"] = "Sistem bakım görevleri için optimize edildi",
 
         ["modelManager.title.optIn"] = "AI modelini seç",
         ["modelManager.title.manage"] = "AI Modellerini Yönet",

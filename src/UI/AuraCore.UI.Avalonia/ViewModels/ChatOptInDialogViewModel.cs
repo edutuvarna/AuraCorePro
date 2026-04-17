@@ -28,11 +28,44 @@ public sealed class ChatOptInDialogViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsStep1));
             OnPropertyChanged(nameof(IsStep2));
+            OnPropertyChanged(nameof(IsNotStep1));
+            OnPropertyChanged(nameof(IsNotStep2));
         }
     }
 
     public bool IsStep1 => _currentStep == 1;
     public bool IsStep2 => _currentStep == 2;
+    public bool IsNotStep1 => _currentStep != 1;
+    public bool IsNotStep2 => _currentStep != 2;
+
+    private string? _recommendedId;
+    public string? RecommendedId
+    {
+        get => _recommendedId;
+        set
+        {
+            if (_recommendedId == value) return;
+            _recommendedId = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(RecommendedDisplayName));
+        }
+    }
+
+    /// <summary>
+    /// Display name of the recommended model, set by MountStep2 after catalog is loaded.
+    /// Used by the hero card in Step 2.
+    /// </summary>
+    private string? _recommendedDisplayName;
+    public string? RecommendedDisplayName
+    {
+        get => _recommendedDisplayName;
+        set
+        {
+            if (_recommendedDisplayName == value) return;
+            _recommendedDisplayName = value;
+            OnPropertyChanged();
+        }
+    }
 
     public ICommand ContinueFromStep1 { get; }
     public ICommand CancelFromStep1 { get; }

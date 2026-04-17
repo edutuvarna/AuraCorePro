@@ -14,6 +14,7 @@ public partial class ChatOptInDialog : Window
     public ChatOptInDialog()
     {
         InitializeComponent();
+        ApplyLocalization();
     }
 
     public ChatOptInDialog(ChatOptInDialogViewModel vm) : this()
@@ -58,6 +59,18 @@ public partial class ChatOptInDialog : Window
                 }
             };
 
+            // Populate hero card data from catalog (before recommended model selection by user).
+            if (DataContext is ChatOptInDialogViewModel outerVm)
+            {
+                var recommendedItem = managerVm.Models.FirstOrDefault(m => m.IsRecommended)
+                                     ?? managerVm.Models.FirstOrDefault();
+                if (recommendedItem is not null)
+                {
+                    outerVm.RecommendedId = recommendedItem.Model.Id;
+                    outerVm.RecommendedDisplayName = recommendedItem.Model.DisplayName;
+                }
+            }
+
             _managerDialog = new ModelManagerDialog(managerVm);
             var host = this.FindControl<ContentControl>("PART_Step2Host");
             if (host is not null) host.Content = _managerDialog;
@@ -66,6 +79,25 @@ public partial class ChatOptInDialog : Window
         {
             // DI not available in design-time / test — ignore
         }
+    }
+
+    private void ApplyLocalization()
+    {
+        var step1Label = this.FindControl<TextBlock>("Step1Label");
+        if (step1Label is not null)
+            step1Label.Text = LocalizationService.Get("chatOptIn.progress.step1");
+
+        var step2Label = this.FindControl<TextBlock>("Step2Label");
+        if (step2Label is not null)
+            step2Label.Text = LocalizationService.Get("chatOptIn.progress.step2");
+
+        var recommendedBadge = this.FindControl<TextBlock>("RecommendedBadge");
+        if (recommendedBadge is not null)
+            recommendedBadge.Text = LocalizationService.Get("chatOptIn.recommended.badge");
+
+        var heroRationale = this.FindControl<TextBlock>("HeroRationale");
+        if (heroRationale is not null)
+            heroRationale.Text = LocalizationService.Get("chatOptIn.recommended.defaultRationale");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

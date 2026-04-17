@@ -13,6 +13,12 @@ namespace AuraCore.Tests.UI.Avalonia.Views;
 /// </summary>
 public class StatusBarTests
 {
+    // Phase 5.4.1.2 (commit ecb312c) wired CortexAmbientService.ComputeStatusText
+    // through LocalizationService.Get, so state-labels now vary by active locale
+    // (EN "Active" / TR "Aktif", EN "Paused" / TR "Duraklatıldı", EN "Ready to start"
+    // / TR "Başlamaya Hazır"). Tests now pull the expected label from
+    // LocalizationService at assert-time, which keeps them green on any locale.
+
     [Fact]
     public void FormattedStatusText_PrefixesWithCortex_WhenAnyFeatureEnabled()
     {
@@ -20,7 +26,7 @@ public class StatusBarTests
         var ambient = new CortexAmbientService(settings);
 
         Assert.StartsWith("\u2728 Cortex \u00B7", ambient.FormattedStatusText);
-        Assert.Contains("Active", ambient.FormattedStatusText);
+        Assert.Contains(LocalizationService.Get("cortex.status.active"), ambient.FormattedStatusText);
     }
 
     [Fact]
@@ -40,7 +46,7 @@ public class StatusBarTests
         var ambient = new CortexAmbientService(settings);
 
         Assert.StartsWith("\u2728 Cortex \u00B7", ambient.FormattedStatusText);
-        Assert.Contains("Paused", ambient.FormattedStatusText);
+        Assert.Contains(LocalizationService.Get("cortex.status.paused"), ambient.FormattedStatusText);
     }
 
     [Fact]
@@ -58,7 +64,7 @@ public class StatusBarTests
         var ambient = new CortexAmbientService(settings);
 
         Assert.StartsWith("\u2728 Cortex \u00B7", ambient.FormattedStatusText);
-        Assert.Contains("Ready", ambient.FormattedStatusText, System.StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(LocalizationService.Get("cortex.status.ready"), ambient.FormattedStatusText);
     }
 
     [Fact]
@@ -74,18 +80,18 @@ public class StatusBarTests
         var ambient = new CortexAmbientService(settings);
 
         // Ready initially (never activated)
-        Assert.Contains("Ready", ambient.FormattedStatusText, System.StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(LocalizationService.Get("cortex.status.ready"), ambient.FormattedStatusText);
 
         settings.InsightsEnabled = true;
         ambient.Refresh();
 
-        Assert.Contains("Active", ambient.FormattedStatusText);
+        Assert.Contains(LocalizationService.Get("cortex.status.active"), ambient.FormattedStatusText);
 
         settings.InsightsEnabled = false;
         ambient.Refresh();
 
         // After any feature was ever on, off means Paused (not Ready) —
         // Refresh stamps AIFirstEnabledAt on first transition to enabled.
-        Assert.Contains("Paused", ambient.FormattedStatusText);
+        Assert.Contains(LocalizationService.Get("cortex.status.paused"), ambient.FormattedStatusText);
     }
 }

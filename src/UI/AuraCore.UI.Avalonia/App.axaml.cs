@@ -14,6 +14,13 @@ public partial class App : global::Avalonia.Application
     private static ServiceProvider? _services;
     public static IServiceProvider Services => _services!;
 
+    /// <summary>
+    /// Phase 5.3 Task 9: App-level singleton accessor for the narrow-mode service.
+    /// Resolved after DI build; null-safe when DI is not initialized (test harness).
+    /// StatRow subscribes to this via code-behind INPC to reflow Columns 4→2→1.
+    /// </summary>
+    public static INarrowModeService? NarrowMode { get; private set; }
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -267,6 +274,9 @@ public partial class App : global::Avalonia.Application
         // ── end Phase 3 ──
 
         _services = sc.BuildServiceProvider();
+
+        // Phase 5.3 Task 9: expose the narrow-mode service for StatRow code-behind binding.
+        NarrowMode = _services.GetService<INarrowModeService>();
 
         // Initialize theme (loads saved preference)
         ThemeService.Initialize();

@@ -9,6 +9,7 @@ using AuraCore.Module.JunkCleaner;
 using AuraCore.Module.JunkCleaner.Models;
 using AuraCore.Module.DiskCleanup;
 using AuraCore.Module.PrivacyCleaner;
+using AuraCore.UI.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
@@ -37,14 +38,17 @@ public partial class CategoryCleanView : UserControl
         PageTitle.Text = module.DisplayName;
         PageSubtitle.Text = module.Id switch
         {
-            "junk-cleaner"    => "Find and remove temporary files, caches, and system junk",
-            "disk-cleanup"    => "Deep clean Windows system files and caches",
-            "privacy-cleaner" => "Remove browser history, cookies, and telemetry traces",
+            "junk-cleaner"    => LocalizationService._("junk.subtitle"),
+            "disk-cleanup"    => LocalizationService._("dc.subtitle"),
+            "privacy-cleaner" => LocalizationService._("priv.subtitle"),
             _ => "Scan and clean"
         };
 
         // Show exclude-list button only for junk-cleaner
         ExcludeListBtn.IsVisible = IsJunkCleaner;
+
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
 
         Loaded += async (s, e) =>
         {
@@ -54,6 +58,18 @@ public partial class CategoryCleanView : UserControl
                 CheckDiskPressure();
             }
             await RunScan();
+        };
+    }
+
+    private void ApplyLocalization()
+    {
+        if (_module is null) return;
+        PageSubtitle.Text = _module.Id switch
+        {
+            "junk-cleaner"    => LocalizationService._("junk.subtitle"),
+            "disk-cleanup"    => LocalizationService._("dc.subtitle"),
+            "privacy-cleaner" => LocalizationService._("priv.subtitle"),
+            _ => "Scan and clean"
         };
     }
 

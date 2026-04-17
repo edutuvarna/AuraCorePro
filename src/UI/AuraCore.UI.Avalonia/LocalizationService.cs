@@ -168,7 +168,7 @@ public static class LocalizationService
         ["health.subtitle"] = "Real-time system diagnostics",
         // ── Junk Cleaner ──
         ["junk.title"] = "Junk Cleaner",
-        ["junk.subtitle"] = "Find and remove temporary files, caches, and other junk",
+        ["junk.subtitle"] = "Cross-platform quick cleanup — temp + browser caches + trash",
         ["junk.scan"] = "Scan for Junk",
         ["junk.clean"] = "Clean Selected ({0})",
         ["junk.totalSize"] = "Total size",
@@ -454,7 +454,7 @@ public static class LocalizationService
         ["svc.found"] = "Found {0} services - {1} running",
         // -- Disk Cleanup Pro --
         ["dc.title"] = "Disk Cleanup Pro",
-        ["dc.subtitle"] = "Deep system cleanup - finds hidden caches Windows tools miss",
+        ["dc.subtitle"] = "Windows deep clean — system caches + duplicates + empty folders",
         ["dc.adminWarningTitle"] = "Some categories require admin privileges",
         ["dc.adminWarningMsg"] = "Run AuraCore Pro as administrator for full cleanup capabilities.",
         ["dc.scanBtn"] = "Deep Scan",
@@ -1658,7 +1658,7 @@ public static class LocalizationService
         ["health.subtitle"] = "Gerçek zamanlı sistem tanılama",
         // ── Gereksiz Dosya Temizleyici ──
         ["junk.title"] = "Gereksiz Dosya Temizleyici",
-        ["junk.subtitle"] = "Geçici dosyaları, önbellekleri ve diğer gereksiz dosyaları bulun ve temizleyin",
+        ["junk.subtitle"] = "Çapraz platform hızlı temizlik — geçici + tarayıcı önbelleği + çöp",
         ["junk.scan"] = "Gereksiz Dosya Tara",
         ["junk.clean"] = "Seçilenleri Temizle ({0})",
         ["junk.totalSize"] = "Toplam boyut",
@@ -1928,7 +1928,7 @@ public static class LocalizationService
         ["pdf.startupPrograms"] = "Başlangıç Programları ({0})",
         // -- Disk Cleanup Pro --
         ["dc.title"] = "Disk Temizleme Pro",
-        ["dc.subtitle"] = "Kapsamlı sistem temizliği - Windows araçlarının bulamadığı gizli önbellekleri bulur",
+        ["dc.subtitle"] = "Windows derin temizlik — sistem önbelleği + kopya dosya + boş klasör",
         ["dc.adminWarningTitle"] = "Bazı kategoriler yönetici yetkisi gerektirir",
         ["dc.adminWarningMsg"] = "Tam temizlik için AuraCore Pro'yu yönetici olarak çalıştırın.",
         ["dc.scanBtn"] = "Kapsamlı Tarama",

@@ -67,7 +67,7 @@ public partial class DefaultsOptimizerView : UserControl
 
     private async void Apply_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS()) { SubText.Text = "macOS only"; return; }
+        if (!OperatingSystem.IsMacOS()) { SubText.Text = LocalizationService._("defaults.macOsOnly"); return; }
 
         // Collect indices of checked tweaks from the UI
         var checkedIndices = new List<int>();
@@ -85,7 +85,7 @@ public partial class DefaultsOptimizerView : UserControl
             }
         }
 
-        if (checkedIndices.Count == 0) { SubText.Text = "No tweaks selected."; return; }
+        if (checkedIndices.Count == 0) { SubText.Text = LocalizationService._("defaults.noTweaksSelected"); return; }
 
         int applied = 0;
         foreach (var idx in checkedIndices)
@@ -106,15 +106,15 @@ public partial class DefaultsOptimizerView : UserControl
                 catch { }
             }
         }
-        SubText.Text = $"Applied {applied}/{checkedIndices.Count} selected tweaks. Some may require logout/restart.";
+        SubText.Text = $"{LocalizationService._("defaults.applied")} {applied}/{checkedIndices.Count}. {LocalizationService._("defaults.requiresRestart")}";
     }
 
     private async void ReadDefault_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS()) { ReadResult.Text = "macOS only"; return; }
+        if (!OperatingSystem.IsMacOS()) { ReadResult.Text = LocalizationService._("defaults.macOsOnly"); return; }
         var domain = DomainBox.Text?.Trim()?.Replace(";", "").Replace("&", "").Replace("|", "").Replace("`", "").Replace("$", "").Replace("(", "").Replace(")", "").Replace("\n", "").Replace("\r", "").Replace(">", "").Replace("<", "") ?? "";
         var key = KeyBox.Text?.Trim()?.Replace(";", "").Replace("&", "").Replace("|", "").Replace("`", "").Replace("$", "").Replace("(", "").Replace(")", "").Replace("\n", "").Replace("\r", "").Replace(">", "").Replace("<", "") ?? "";
-        if (string.IsNullOrEmpty(domain)) { ReadResult.Text = "Enter a domain"; return; }
+        if (string.IsNullOrEmpty(domain)) { ReadResult.Text = LocalizationService._("defaults.enterDomain"); return; }
         try
         {
             var args = string.IsNullOrEmpty(key) ? $"read {domain}" : $"read {domain} {key}";
@@ -124,10 +124,22 @@ public partial class DefaultsOptimizerView : UserControl
             var output = proc?.StandardOutput.ReadToEnd() ?? "";
             var error = proc?.StandardError.ReadToEnd() ?? "";
             proc?.WaitForExit(5000);
-            ReadResult.Text = string.IsNullOrEmpty(error) ? output.Trim() : $"Error: {error.Trim()}";
+            ReadResult.Text = string.IsNullOrEmpty(error) ? output.Trim() : $"{LocalizationService._("common.errorPrefix")}{error.Trim()}";
         }
-        catch (Exception ex) { ReadResult.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { ReadResult.Text = $"{LocalizationService._("common.errorPrefix")}{ex.Message}"; }
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.defaultsOptimizer"); }
+    private void ApplyLocalization()
+    {
+        PageTitle.Text          = LocalizationService._("nav.defaultsOptimizer");
+        PageHeader.Title        = LocalizationService._("defaults.title");
+        PageHeader.Subtitle     = LocalizationService._("defaults.subtitle");
+        QuickTweaksTitle.Text   = LocalizationService._("defaults.quickTweaks");
+        SubText.Text            = LocalizationService._("defaults.subtitle");
+        ApplyBtn.Content        = LocalizationService._("defaults.applySelected");
+        CustomDefaultsTitle.Text = LocalizationService._("defaults.customRead");
+        DomainBox.Watermark     = LocalizationService._("defaults.domainPlaceholder");
+        KeyBox.Watermark        = LocalizationService._("defaults.keyPlaceholder");
+        ReadBtn.Content         = LocalizationService._("defaults.readBtn");
+    }
 }

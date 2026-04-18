@@ -5,8 +5,8 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Defaults Optimizer"
-                             Subtitle="Read and write macOS system preferences via defaults command">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <TextBlock x:Name="PageTitle" IsVisible="False" />
         </controls:ModuleHeader.Actions>
@@ -15,16 +15,16 @@
       <!-- Quick Tweaks -->
       <controls:GlassCard>
         <StackPanel Spacing="12">
-          <TextBlock Text="Quick Tweaks"
+          <TextBlock x:Name="QuickTweaksTitle" Text=""
                      FontSize="{DynamicResource FontSizeBody}"
                      FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <TextBlock x:Name="SubText"
-                     Text="macOS-only optimizations via defaults command"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="TweakList"/>
-          <Button Content="Apply Selected"
+          <Button x:Name="ApplyBtn" Content=""
                   Click="Apply_Click"
                   Classes="action-btn"
                   Padding="16,8"
@@ -35,14 +35,14 @@
       <!-- Custom Defaults Read -->
       <controls:GlassCard>
         <StackPanel Spacing="12">
-          <TextBlock Text="Custom Defaults Read"
+          <TextBlock x:Name="CustomDefaultsTitle" Text=""
                      FontSize="{DynamicResource FontSizeBody}"
                      FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBox x:Name="DomainBox" Watermark="Domain (e.g. com.apple.dock)" Width="300"/>
-            <TextBox x:Name="KeyBox" Watermark="Key (e.g. autohide)" Width="200"/>
-            <Button Content="Read"
+            <TextBox x:Name="DomainBox" Watermark="" Width="300"/>
+            <TextBox x:Name="KeyBox" Watermark="" Width="200"/>
+            <Button x:Name="ReadBtn" Content=""
                     Click="ReadDefault_Click"
                     Padding="12,8"
                     Background="#12FFFFFF"

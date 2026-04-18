@@ -6,23 +6,23 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Battery Optimizer"
-                             Subtitle="Monitor battery health and optimize power usage">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="BatteryReport_Click"
                     Padding="14,8" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F4CA;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock Text="Battery Report"
+                <TextBlock Text="📊" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="BatteryReportLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
             <Button Classes="action-btn" Click="Scan_Click"
                     Padding="14,8" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock Text="🔍" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -34,7 +34,7 @@
 
       <!-- Hidden bridge for code-behind subtitle writes -->
       <TextBlock x:Name="SubText"
-                 Text="Monitor battery health and optimize power usage"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
@@ -55,14 +55,14 @@
           </StackPanel>
           <Grid Grid.Column="1" RowDefinitions="*,*" ColumnDefinitions="*,*">
             <StackPanel Spacing="2">
-              <TextBlock Text="Health"
+              <TextBlock x:Name="HealthLabel" Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource TextMutedBrush}"/>
               <TextBlock x:Name="HealthGrade" Text="--"
                          FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Spacing="2">
-              <TextBlock Text="Wear"
+              <TextBlock x:Name="WearLabel" Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource TextMutedBrush}"/>
               <TextBlock x:Name="WearPct" Text="--%"
@@ -70,7 +70,7 @@
                          Foreground="{DynamicResource StatusWarningBrush}"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Spacing="2">
-              <TextBlock Text="Design"
+              <TextBlock x:Name="DesignLabel" Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource TextMutedBrush}"/>
               <TextBlock x:Name="DesignCap" Text="--"
@@ -78,7 +78,7 @@
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2">
-              <TextBlock Text="Full Charge"
+              <TextBlock x:Name="FullChargeLabel" Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource TextMutedBrush}"/>
               <TextBlock x:Name="FullCap" Text="--"
@@ -95,11 +95,11 @@
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Border Width="20" Height="20" CornerRadius="6"
                     Background="{DynamicResource StatusSuccessBgBrush}">
-              <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock Text="⚡" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource StatusSuccessBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Power Plans"
+            <TextBlock x:Name="PowerPlansLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
@@ -132,11 +132,11 @@
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Border Width="20" Height="20" CornerRadius="6"
                     Background="{DynamicResource AccentBgBrush}">
-              <TextBlock Text="&#x1F50B;" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock Text="🔋" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="High Drain Apps"
+            <TextBlock x:Name="HighDrainLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>

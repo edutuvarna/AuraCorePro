@@ -39,7 +39,7 @@ public partial class BloatwareRemovalView : UserControl
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
@@ -71,8 +71,8 @@ public partial class BloatwareRemovalView : UserControl
             BuildAppListUI();
             RemoveBtn.IsEnabled = _currentItems.Any(i => i.CanRemove);
         }
-        catch { SubText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { SubText.Text = LocalizationService._("bloat.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("bloat.scanBtn"); }
     }
 
     private void BuildAppListUI()
@@ -167,12 +167,13 @@ public partial class BloatwareRemovalView : UserControl
             // Reinstall button (shown for removed apps, or hidden)
             var reinstallBtn = new Button
             {
-                Content = "Reinstall", FontSize = 9,
+                Content = LocalizationService._("bloat.reinstall"), FontSize = 9,
                 Padding = new Thickness(6, 2),
                 VerticalAlignment = VerticalAlignment.Center,
                 Tag = item.PkgName,
                 IsVisible = _removedAppIds.Contains(item.PkgName)
             };
+            reinstallBtn.Content = LocalizationService._("bloat.reinstall");
             reinstallBtn.Click += ReinstallBtn_Click;
             Grid.SetColumn(reinstallBtn, 5);
             grid.Children.Add(reinstallBtn);
@@ -309,7 +310,7 @@ public partial class BloatwareRemovalView : UserControl
         if (string.IsNullOrEmpty(pkgName)) return;
 
         btn.IsEnabled = false;
-        btn.Content = "Reinstalling...";
+        btn.Content = LocalizationService._("bloat.reinstalling");
 
         // Derive a search-friendly name from the package family/full name
         var searchName = pkgName.Split('_')[0]; // e.g., "Microsoft.BingWeather"
@@ -334,10 +335,10 @@ public partial class BloatwareRemovalView : UserControl
                 await proc.WaitForExitAsync();
                 if (proc.ExitCode == 0)
                 {
-                    btn.Content = "Reinstalled";
+                    btn.Content = LocalizationService._("bloat.reinstalled");
                     _removedAppIds.Remove(pkgName);
-                    StatusText.Text = $"{searchName} reinstalled successfully";
-                    StatusBarService.SetStatus($"{searchName} reinstalled");
+                    StatusText.Text = $"{searchName} {LocalizationService._("bloat.reinstalledSuccess")}";
+                    StatusBarService.SetStatus($"{searchName} {LocalizationService._("bloat.reinstalledSuccess")}");
                 }
                 else
                 {
@@ -357,17 +358,17 @@ public partial class BloatwareRemovalView : UserControl
                         await proc2.WaitForExitAsync();
                         if (proc2.ExitCode == 0)
                         {
-                            btn.Content = "Reinstalled";
+                            btn.Content = LocalizationService._("bloat.reinstalled");
                             _removedAppIds.Remove(pkgName);
-                            StatusText.Text = $"{searchName} reinstalled from Store";
-                            StatusBarService.SetStatus($"{searchName} reinstalled");
+                            StatusText.Text = $"{searchName} {LocalizationService._("bloat.reinstalledFromStore")}";
+                            StatusBarService.SetStatus($"{searchName} {LocalizationService._("bloat.reinstalledSuccess")}");
                         }
                         else
                         {
-                            btn.Content = "Failed";
+                            btn.Content = LocalizationService._("appInstall.failed");
                             btn.IsEnabled = true;
-                            StatusText.Text = $"Failed to reinstall {searchName}";
-                            StatusBarService.SetStatus($"Failed to reinstall {searchName}");
+                            StatusText.Text = $"{LocalizationService._("bloat.failedReinstall")} {searchName}";
+                            StatusBarService.SetStatus($"{LocalizationService._("bloat.failedReinstall")} {searchName}");
                         }
                     }
                 }
@@ -375,15 +376,28 @@ public partial class BloatwareRemovalView : UserControl
         }
         catch
         {
-            btn.Content = "Failed";
+            btn.Content = LocalizationService._("appInstall.failed");
             btn.IsEnabled = true;
-            StatusText.Text = $"Reinstall failed for {searchName}";
-            StatusBarService.SetStatus($"Reinstall failed");
+            StatusText.Text = $"{LocalizationService._("bloat.failedReinstall")} {searchName}";
+            StatusBarService.SetStatus(LocalizationService._("bloat.failedReinstall"));
         }
     }
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.bloatware");
+        PageTitle.Text          = LocalizationService._("nav.bloatware");
+        PageHeader.Title        = LocalizationService._("bloat.title");
+        PageHeader.Subtitle     = LocalizationService._("bloat.subtitle");
+        ScanLabel.Text          = LocalizationService._("bloat.scanBtn");
+        RemoveBtnLabel.Text     = LocalizationService._("bloat.removeSelected");
+        BlockReturnLabel.Text   = LocalizationService._("bloat.blockReturnLabel");
+        BlockWarningText.Text   = LocalizationService._("bloat.blockWarning");
+        ColAppName.Text         = LocalizationService._("bloat.colAppName");
+        ColCategory.Text        = LocalizationService._("bloat.colCategory");
+        ColSize.Text            = LocalizationService._("bloat.colSize");
+        ColRisk.Text            = LocalizationService._("bloat.colRisk");
+        StatTotal.Label         = LocalizationService._("bloat.statTotal");
+        StatRemovable.Label     = LocalizationService._("bloat.statRemovable");
+        StatSpace.Label         = LocalizationService._("bloat.statSpace");
     }
 }

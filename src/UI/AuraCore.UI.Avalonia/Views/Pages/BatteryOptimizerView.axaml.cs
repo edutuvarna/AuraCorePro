@@ -27,12 +27,17 @@ public partial class BatteryOptimizerView : UserControl
 }
     private async Task RunScan()
     {
-        if (_module is null) return; ScanLabel.Text = "Scanning...";
+        if (_module is null) return;
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
             var b = _module.LastStatus;
-            if (b is null || !b.HasBattery) { SubText.Text = b?.Error ?? "No battery detected"; return; }
+            if (b is null || !b.HasBattery)
+            {
+                SubText.Text = b?.Error ?? LocalizationService._("battery.noBattery");
+                return;
+            }
             ChargePct.Text = $"{b.ChargePercent}%";
             ChargeStatus.Text = b.ChargeStatus;
             EstRemaining.Text = b.EstRemainingDisplay;
@@ -41,13 +46,15 @@ public partial class BatteryOptimizerView : UserControl
             WearPct.Text = $"{b.WearPercent}%";
             DesignCap.Text = b.DesignCapacityDisplay;
             FullCap.Text = b.FullChargeCapacityDisplay;
+            var activeLabel = LocalizationService._("battery.active");
             PlanList.ItemsSource = _module.LastPowerPlans.Select(p => new PowerPlanItem(
-                p.Name, p.IsActive ? "Active" : "", new SolidColorBrush(Color.Parse(p.IsActive ? "#22C55E" : "#555570")))).ToList();
+                p.Name, p.IsActive ? activeLabel : "", new SolidColorBrush(Color.Parse(p.IsActive ? "#22C55E" : "#555570")))).ToList();
             DrainList.ItemsSource = _module.LastDrainApps.Select(d => new DrainAppItem(
                 d.Name, $"{d.CpuPercent:F1}%", d.Impact,
                 new SolidColorBrush(Color.Parse(d.Impact == "High" ? "#EF4444" : d.Impact == "Medium" ? "#F59E0B" : "#22C55E")))).ToList();
         }
-        catch { SubText.Text = "Scan failed"; } finally { ScanLabel.Text = "Scan"; }
+        catch { SubText.Text = LocalizationService._("battery.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("battery.scanBtn"); }
 }
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();
 
@@ -75,12 +82,23 @@ public partial class BatteryOptimizerView : UserControl
         }
         catch (Exception ex)
         {
-            SubText.Text = $"Report failed: {ex.Message}";
+            SubText.Text = $"{LocalizationService._("battery.reportFailed")}: {ex.Message}";
         }
     }
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.batteryOptimizer");
+        PageTitle.Text         = LocalizationService._("nav.batteryOptimizer");
+        PageHeader.Title       = LocalizationService._("battery.title");
+        PageHeader.Subtitle    = LocalizationService._("battery.subtitle");
+        ScanLabel.Text         = LocalizationService._("battery.scanBtn");
+        BatteryReportLabel.Text = LocalizationService._("battery.reportBtn");
+        SubText.Text           = LocalizationService._("battery.subtitle");
+        HealthLabel.Text       = LocalizationService._("battery.healthLabel");
+        WearLabel.Text         = LocalizationService._("battery.wearLabel");
+        DesignLabel.Text       = LocalizationService._("battery.designLabel");
+        FullChargeLabel.Text   = LocalizationService._("battery.fullChargeLabel");
+        PowerPlansLabel.Text   = LocalizationService._("battery.powerPlans");
+        HighDrainLabel.Text    = LocalizationService._("battery.highDrainApps");
     }
 }

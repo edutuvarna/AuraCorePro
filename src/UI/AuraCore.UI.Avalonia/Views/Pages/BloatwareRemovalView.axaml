@@ -6,14 +6,14 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Bloatware Removal"
-                             Subtitle="Remove pre-installed apps you don't need">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock Text="🔍" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -22,8 +22,8 @@
                     Padding="14,8" CornerRadius="{StaticResource RadiusMd}" VerticalAlignment="Center"
                     FontWeight="Bold" FontSize="{DynamicResource FontSizeBodySmall}">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x2716;" FontSize="{DynamicResource FontSizeBodySmall}"/>
-                <TextBlock x:Name="RemoveBtnLabel" Text="Remove Selected"
+                <TextBlock Text="✖" FontSize="{DynamicResource FontSizeBodySmall}"/>
+                <TextBlock x:Name="RemoveBtnLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"/>
               </StackPanel>
             </Button>
@@ -44,13 +44,13 @@
 
       <!-- Stats row -->
       <controls:StatRow>
-        <controls:StatCard Label="TOTAL"
+        <controls:StatCard x:Name="StatTotal"
                            Value="{Binding #TotalApps.Text}"
                            ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
-        <controls:StatCard Label="REMOVABLE"
+        <controls:StatCard x:Name="StatRemovable"
                            Value="{Binding #RemovableApps.Text}"
                            ValueBrush="{DynamicResource StatusWarningBrush}"/>
-        <controls:StatCard Label="SPACE"
+        <controls:StatCard x:Name="StatSpace"
                            Value="{Binding #TotalSize.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
       </controls:StatRow>
@@ -61,7 +61,7 @@
         <Border.Background>
           <SolidColorBrush Color="#F59E0B" Opacity="0.06"/>
         </Border.Background>
-        <TextBlock Text="Removed apps will also be blocked from reinstalling on Windows updates (registry policy)."
+        <TextBlock x:Name="BlockWarningText" Text=""
                    FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B" TextWrapping="Wrap"/>
       </Border>
 
@@ -73,7 +73,7 @@
             <StackPanel Orientation="Horizontal" Spacing="16">
               <CheckBox x:Name="BlockReturnCheck" FontSize="{DynamicResource FontSizeLabel}"
                         VerticalAlignment="Center">
-                <TextBlock Text="Block removed apps from returning"
+                <TextBlock x:Name="BlockReturnLabel" Text=""
                            FontSize="{DynamicResource FontSizeLabel}"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
               </CheckBox>
@@ -84,15 +84,15 @@
             <Grid ColumnDefinitions="40,2*,100,80,80">
               <TextBlock Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock Grid.Column="1" Text="APP NAME" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="ColAppName" Grid.Column="1" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock Grid.Column="2" Text="CATEGORY" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="ColCategory" Grid.Column="2" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
                          TextAlignment="Center"/>
-              <TextBlock Grid.Column="3" Text="SIZE" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="ColSize" Grid.Column="3" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
                          TextAlignment="Right"/>
-              <TextBlock Grid.Column="4" Text="RISK" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="ColRisk" Grid.Column="4" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"
                          TextAlignment="Center"/>
             </Grid>

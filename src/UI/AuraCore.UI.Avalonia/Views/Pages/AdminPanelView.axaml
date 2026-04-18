@@ -6,8 +6,8 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Admin Panel"
-                             Subtitle="Server administration and analytics">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <!-- PageTitle: invisible, no localization key but preserve slot -->
@@ -19,9 +19,9 @@
       <!-- Quick Access card -->
       <controls:GlassCard>
         <StackPanel Spacing="12">
-          <TextBlock Text="Quick Access" FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+          <TextBlock x:Name="QuickAccessTitle" Text="" FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="The full admin panel runs in your browser with charts, user management, audit logs, and more."
+          <TextBlock x:Name="QuickAccessDesc" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}" Foreground="{DynamicResource TextSecondaryBrush}"
                      TextWrapping="Wrap"/>
           <Button x:Name="OpenAdminBtn" Click="OpenAdmin_Click"
@@ -29,11 +29,11 @@
                   Padding="20,12" CornerRadius="{StaticResource RadiusMd}"
                   HorizontalAlignment="Left" FontWeight="SemiBold" Cursor="Hand">
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="&#x1F310;" FontSize="{DynamicResource FontSizeBody}" VerticalAlignment="Center"/>
-              <TextBlock Text="Open Admin Panel in Browser" VerticalAlignment="Center"/>
+              <TextBlock Text="🌐" FontSize="{DynamicResource FontSizeBody}" VerticalAlignment="Center"/>
+              <TextBlock x:Name="OpenAdminLabel" Text="" VerticalAlignment="Center"/>
             </StackPanel>
           </Button>
-          <TextBlock x:Name="AdminUrlText" Text="https://admin.auracore.pro"
+          <TextBlock x:Name="AdminUrlText" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
@@ -42,38 +42,38 @@
       <!-- Server Status card -->
       <controls:GlassCard>
         <StackPanel Spacing="12">
-          <TextBlock Text="Server Status" FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
+          <TextBlock x:Name="ServerStatusTitle" Text="" FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
-            <TextBlock Text="API" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="ApiLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,8"/>
-            <TextBlock x:Name="ApiStatusText" Grid.Column="1" Text="Checking..."
+            <TextBlock x:Name="ApiStatusText" Grid.Column="1" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Grid.Column="2" Text="Version" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="VersionLabel" Grid.Column="2" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,16,8"/>
             <TextBlock x:Name="ApiVersionText" Grid.Column="3" Text="--"
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
 
-            <TextBlock Grid.Row="1" Text="Uptime" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="UptimeLabel" Grid.Row="1" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,8"/>
             <TextBlock x:Name="UptimeText" Grid.Row="1" Grid.Column="1" Text="--"
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Memory" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="MemoryLabel" Grid.Row="1" Grid.Column="2" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="16,0,16,8"/>
             <TextBlock x:Name="MemoryText" Grid.Row="1" Grid.Column="3" Text="--"
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
 
-            <TextBlock Grid.Row="2" Text="Environment" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="EnvLabel" Grid.Row="2" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,16,0"/>
             <TextBlock x:Name="EnvText" Grid.Row="2" Grid.Column="1" Text="--"
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </Grid>
-          <Button x:Name="RefreshStatusBtn" Click="RefreshStatus_Click" Content="Refresh"
+          <Button x:Name="RefreshStatusBtn" Click="RefreshStatus_Click" Content=""
                   Padding="12,6" Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"
                   HorizontalAlignment="Left" FontSize="{DynamicResource FontSizeBodySmall}" Cursor="Hand"/>
         </StackPanel>
@@ -82,7 +82,7 @@
       <!-- Admin-only notice -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}"
               Padding="16,12" BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
-        <TextBlock Text="Admin Panel is only accessible to users with the admin role."
+        <TextBlock x:Name="AdminNoticeText" Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}" Foreground="#F59E0B"/>
       </Border>
 

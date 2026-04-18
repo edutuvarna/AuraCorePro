@@ -22,15 +22,8 @@ public class HardcodedStringScannerTests
     private static readonly HashSet<string> GrandfatheredFiles = new(StringComparer.OrdinalIgnoreCase)
     {
         // Current-state offenders (2026-04-18 baseline). Remove each entry once the module is localized.
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/AdminPanelView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/AppInstallerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/AutorunManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/BatteryOptimizerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/BloatwareRemovalView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/BrewManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/CategoryCleanView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/CronManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/DefaultsOptimizerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/DefenderManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/DiskHealthView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/DnsBenchmarkView.axaml",

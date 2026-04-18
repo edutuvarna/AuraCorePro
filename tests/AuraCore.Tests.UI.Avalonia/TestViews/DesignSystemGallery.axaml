@@ -1,0 +1,160 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="using:AuraCore.UI.Avalonia.Views.Controls"
+             x:Class="AuraCore.Tests.UI.Avalonia.TestViews.DesignSystemGallery"
+             Background="{DynamicResource BgDeepBrush}">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+    <StackPanel Margin="24" Spacing="18">
+
+      <!-- Header -->
+      <StackPanel>
+        <TextBlock Text="AuraCore Design System"
+                   FontSize="{DynamicResource FontSizeDisplay}"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+        <TextBlock Text="Pixel-regression reference surface — Phase 6.2"
+                   FontSize="{DynamicResource FontSizeBody}"
+                   Foreground="{DynamicResource TextMutedBrush}"/>
+      </StackPanel>
+
+      <!-- Typography -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}">
+        <StackPanel Spacing="4">
+          <TextBlock Text="TYPOGRAPHY"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"
+                     Margin="0,0,0,6"/>
+          <TextBlock Text="Display · 24" FontSize="24" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Heading · 18" FontSize="18" Foreground="{DynamicResource TextPrimaryBrush}"/>
+          <TextBlock Text="Subheading · 14" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}"/>
+          <TextBlock Text="Body · 12 — the quick brown fox jumps over the lazy dog"
+                     FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+          <TextBlock Text="Label · 10 — THE QUICK BROWN FOX"
+                     FontSize="10" Foreground="{DynamicResource TextMutedBrush}"/>
+          <TextBlock Text="Caption · 9" FontSize="9" Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Colors -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="ACCENTS"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Border Width="72" Height="40" Background="{DynamicResource AccentTealBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource AccentPurpleBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource AccentAmberBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource AccentPinkBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+          </StackPanel>
+          <TextBlock Text="SEMANTIC"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"
+                     Margin="0,6,0,0"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Border Width="72" Height="40" Background="{DynamicResource StatusSuccessBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource StatusWarningBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource StatusErrorBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="72" Height="40" Background="{DynamicResource StatusInfoBrush}" CornerRadius="{DynamicResource RadiusSm}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Status chips & badges -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="CHIPS &amp; BADGES"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <ctl:StatusChip Label="LIVE" AccentBrush="{DynamicResource AccentTealBrush}"/>
+            <ctl:StatusChip Label="OFF" AccentBrush="{DynamicResource TextMutedBrush}" ShowDot="False"/>
+            <ctl:StatusChip Label="ACTIVE" AccentBrush="{DynamicResource AccentPurpleBrush}"/>
+            <ctl:StatusChip Label="WARNING" AccentBrush="{DynamicResource AccentAmberBrush}"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <ctl:AccentBadge Label="NEW" AccentBrush="{DynamicResource AccentPinkBrush}"/>
+            <ctl:AccentBadge Label="BETA" AccentBrush="{DynamicResource AccentPurpleBrush}"/>
+            <ctl:AccentBadge Label="PRO" AccentBrush="{DynamicResource AccentTealBrush}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Corner radii -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="CORNER RADII"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Border Width="64" Height="40" Background="{DynamicResource AccentTealDimBrush}" BorderBrush="{DynamicResource AccentTealBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusXs}"/>
+            <Border Width="64" Height="40" Background="{DynamicResource AccentTealDimBrush}" BorderBrush="{DynamicResource AccentTealBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}"/>
+            <Border Width="64" Height="40" Background="{DynamicResource AccentTealDimBrush}" BorderBrush="{DynamicResource AccentTealBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusMd}"/>
+            <Border Width="64" Height="40" Background="{DynamicResource AccentTealDimBrush}" BorderBrush="{DynamicResource AccentTealBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusLg}"/>
+            <Border Width="64" Height="40" Background="{DynamicResource AccentTealDimBrush}" BorderBrush="{DynamicResource AccentTealBrush}" BorderThickness="1" CornerRadius="{DynamicResource RadiusXl}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Tinted status surfaces -->
+      <Border Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1"
+              CornerRadius="{DynamicResource RadiusLg}"
+              Padding="{DynamicResource SpacingCardPadding}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="TINTED STATUS SURFACES"
+                     FontSize="{DynamicResource FontSizeLabel}"
+                     Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Border Width="120" Height="44"
+                    Background="{DynamicResource SuccessBgBrush}"
+                    BorderBrush="{DynamicResource SuccessBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}">
+              <TextBlock Text="SUCCESS" FontSize="10" Foreground="{DynamicResource StatusSuccessBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Border>
+            <Border Width="120" Height="44"
+                    Background="{DynamicResource WarningBgBrush}"
+                    BorderBrush="{DynamicResource WarningBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}">
+              <TextBlock Text="WARNING" FontSize="10" Foreground="{DynamicResource StatusWarningBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Border>
+            <Border Width="120" Height="44"
+                    Background="{DynamicResource ErrorBgBrush}"
+                    BorderBrush="{DynamicResource ErrorBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}">
+              <TextBlock Text="ERROR" FontSize="10" Foreground="{DynamicResource StatusErrorBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Border>
+            <Border Width="120" Height="44"
+                    Background="{DynamicResource InfoBgBrush}"
+                    BorderBrush="{DynamicResource InfoBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}">
+              <TextBlock Text="INFO" FontSize="10" Foreground="{DynamicResource StatusInfoBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,4 +1,6 @@
+using System;
 using Avalonia;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.BloatwareRemoval;
@@ -15,6 +17,21 @@ public class AvaloniaTestApplication : global::Avalonia.Application
     public override void Initialize()
     {
         Styles.Add(new FluentTheme());
+
+        // Phase 6.2: load the full AuraCore design system so pixel-regression
+        // snapshots reflect real tokens (colors, spacing, shadows). Without
+        // these, views fall back to Fluent defaults and goldens diverge from
+        // production look.
+        Styles.Add(new StyleInclude(new Uri("avares://AuraCore.Tests.UI.Avalonia/"))
+        {
+            Source = new Uri("avares://AuraCore.Pro/Themes/AuraCoreThemeV2.axaml"),
+        });
+        Styles.Add(new StyleInclude(new Uri("avares://AuraCore.Tests.UI.Avalonia/"))
+        {
+            Source = new Uri("avares://AuraCore.Pro/Themes/Icons.axaml"),
+        });
+
+        RequestedThemeVariant = global::Avalonia.Styling.ThemeVariant.Dark;
 
         // Register converters as static resources for UI tests.
         // Phase 5.3/5.4 narrow-mode + text-transform converters.

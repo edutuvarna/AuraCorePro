@@ -30,7 +30,7 @@
                          TextWrapping="Wrap"/>
               <Button x:Name="RollbackBtn"
                       Grid.Column="1"
-                      Content="Rollback to Backup"
+                      Content=""
                       Classes="action-btn"
                       Padding="16,8"
                       Command="{Binding RollbackCommand}"
@@ -98,12 +98,12 @@
                       IsSnapToTickEnabled="True"
                       Value="{Binding PendingTimeout, Mode=TwoWay}"/>
               <Grid ColumnDefinitions="*,*">
-                <TextBlock Grid.Column="0"
-                           Text="0s"
+                <TextBlock x:Name="TimeoutMinLabel" Grid.Column="0"
+                           Text=""
                            FontSize="10"
                            Foreground="{DynamicResource TextMutedBrush}"/>
-                <TextBlock Grid.Column="1"
-                           Text="30s"
+                <TextBlock x:Name="TimeoutMaxLabel" Grid.Column="1"
+                           Text=""
                            FontSize="10"
                            HorizontalAlignment="Right"
                            Foreground="{DynamicResource TextMutedBrush}"/>
@@ -223,14 +223,14 @@
                       VerticalAlignment="Center"/>
             <Button x:Name="ResetBtn"
                     Grid.Column="1"
-                    Content="Reset"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Margin="0,0,8,0"
                     Command="{Binding ResetCommand}"/>
             <Button x:Name="ApplyChangesBtn"
                     Grid.Column="2"
-                    Content="Apply Changes"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ApplyChangesCommand}"/>
@@ -251,7 +251,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

@@ -10,9 +10,9 @@
 
       <!-- Title -->
       <StackPanel Spacing="4" HorizontalAlignment="Center">
-        <TextBlock x:Name="TitleText" Text="Upgrade Required" FontSize="16" FontWeight="Bold"
+        <TextBlock x:Name="TitleText" Text="" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}" TextAlignment="Center"/>
-        <TextBlock x:Name="SubText" Text="This module requires a Pro subscription"
+        <TextBlock x:Name="SubText" Text=""
                    FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
       </StackPanel>
 
@@ -23,22 +23,22 @@
                 Background="{DynamicResource BgCardBrush}" BorderBrush="{DynamicResource BorderCardBrush}"
                 BorderThickness="1" Padding="16">
           <StackPanel Spacing="12" HorizontalAlignment="Center">
-            <TextBlock Text="Free" FontSize="18" FontWeight="Bold"
+            <TextBlock x:Name="FreePlanTitle" Text="" FontSize="18" FontWeight="Bold"
                        Foreground="{DynamicResource TextPrimaryBrush}" TextAlignment="Center"/>
-            <TextBlock Text="$0" FontSize="24" FontWeight="Bold"
+            <TextBlock x:Name="FreePriceText" Text="" FontSize="24" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Text="Basic optimization tools" FontSize="12"
+            <TextBlock x:Name="FreeDescText" Text="" FontSize="12"
                        Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
             <StackPanel Spacing="6">
-              <TextBlock Text="&#x2714; System Health" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-              <TextBlock Text="&#x2714; Junk Cleaner" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-              <TextBlock Text="&#x2714; RAM Optimizer" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-              <TextBlock Text="&#x2714; Network Optimizer" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
-              <TextBlock Text="&#x2714; Gaming Mode" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="FreeF1" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="FreeF2" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="FreeF3" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="FreeF4" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+              <TextBlock x:Name="FreeF5" Text="" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <Border CornerRadius="{StaticResource RadiusMd}" Background="#208888A0"
                     Padding="16,8" HorizontalAlignment="Center">
-              <TextBlock Text="Current Plan" FontSize="12" FontWeight="SemiBold"
+              <TextBlock x:Name="CurrentPlanLabel" Text="" FontSize="12" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </Border>
           </StackPanel>
@@ -49,29 +49,29 @@
                 Background="#0D00D4AA" BorderBrush="{DynamicResource AccentPrimaryBrush}"
                 BorderThickness="2" Padding="16">
           <StackPanel Spacing="12" HorizontalAlignment="Center">
-            <TextBlock Text="Pro" FontSize="18" FontWeight="Bold"
+            <TextBlock x:Name="ProPlanTitle" Text="" FontSize="18" FontWeight="Bold"
                        Foreground="{DynamicResource AccentPrimaryBrush}" TextAlignment="Center"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="2">
-              <TextBlock Text="$9.99" FontSize="24" FontWeight="Bold"
+              <TextBlock x:Name="ProPriceText" Text="" FontSize="24" FontWeight="Bold"
                          Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="/mo" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
+              <TextBlock x:Name="ProPriceSuffix" Text="" FontSize="14" Foreground="{DynamicResource TextMutedBrush}"
                          VerticalAlignment="Bottom" Margin="0,0,0,6"/>
             </StackPanel>
-            <TextBlock Text="All modules unlocked" FontSize="12"
+            <TextBlock x:Name="ProDescText" Text="" FontSize="12"
                        Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center"/>
             <StackPanel Spacing="6">
-              <TextBlock Text="&#x2714; Everything in Free" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="&#x2714; Registry Optimizer" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="&#x2714; Bloatware Removal" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="&#x2714; Privacy Cleaner" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="&#x2714; ISO Builder" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
-              <TextBlock Text="&#x2714; Driver Updater" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF1" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF2" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF3" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF4" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF5" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
+              <TextBlock x:Name="ProF6" Text="" FontSize="11" Foreground="{DynamicResource AccentPrimaryBrush}"/>
             </StackPanel>
             <Button x:Name="UpgradeBtn" Click="Upgrade_Click"
                     Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
                     Padding="20,10" CornerRadius="{StaticResource RadiusMd}"
                     FontWeight="Bold" FontSize="13" HorizontalAlignment="Center"
-                    Content="Upgrade to Pro"/>
+                    Content=""/>
           </StackPanel>
         </Border>
       </Grid>
@@ -80,7 +80,7 @@
       <Border CornerRadius="{StaticResource RadiusMd}" Background="#0D8B5CF6"
               Padding="16,10" HorizontalAlignment="Center"
               BorderBrush="#208B5CF6" BorderThickness="1">
-        <TextBlock Text="Save 33% with yearly plan - $79.99/year ($6.67/mo)"
+        <TextBlock x:Name="YearlySavings" Text=""
                    FontSize="12" Foreground="#8B5CF6" TextAlignment="Center"/>
       </Border>
 

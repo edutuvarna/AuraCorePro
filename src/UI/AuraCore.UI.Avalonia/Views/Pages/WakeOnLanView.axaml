@@ -6,8 +6,8 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Wake-on-LAN"
-                             Subtitle="Wake devices on your network by sending magic packets">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <!-- PageTitle: invisible, code-behind writes localized string -->
           <TextBlock x:Name="PageTitle" IsVisible="False"/>
@@ -24,15 +24,15 @@
                          Foreground="{DynamicResource AccentBlueBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Send Magic Packet"
+            <TextBlock x:Name="SendMagicPacketLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
-          <TextBox x:Name="MacBox" Watermark="MAC Address (e.g. AA:BB:CC:DD:EE:FF)"
+          <TextBox x:Name="MacBox" Watermark=""
                    Width="350" HorizontalAlignment="Left"/>
-          <TextBox x:Name="BroadcastBox" Text="255.255.255.255" Watermark="Broadcast IP"
+          <TextBox x:Name="BroadcastBox" Text="255.255.255.255" Watermark=""
                    Width="250" HorizontalAlignment="Left"/>
-          <Button Content="Send Wake Packet" Click="Send_Click" Classes="action-btn"
+          <Button x:Name="SendBtn" Content="" Click="Send_Click" Classes="action-btn"
                   Padding="16,10" HorizontalAlignment="Left"/>
           <TextBlock x:Name="StatusText" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
@@ -50,12 +50,12 @@
                          Foreground="{DynamicResource AccentBlueBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Recent Devices"
+            <TextBlock x:Name="RecentDevicesLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <ItemsControl x:Name="HistoryList"/>
-          <TextBlock x:Name="HistoryStatus" Text="Send a packet to add device to history"
+          <TextBlock x:Name="HistoryStatus" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
@@ -65,7 +65,7 @@
       <Border CornerRadius="{StaticResource RadiusLg}"
               Background="{DynamicResource InfoBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1">
-        <TextBlock Text="The target device must have Wake-on-LAN enabled in BIOS and in the network adapter settings. Both devices must be on the same subnet."
+        <TextBlock x:Name="InfoBannerText" Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}"
                    Foreground="{DynamicResource AccentBlueBrush}"
                    TextWrapping="Wrap"/>
@@ -76,19 +76,19 @@
               Background="{DynamicResource BgCardBrush}" Padding="16,12"
               BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="1">
         <StackPanel Spacing="6">
-          <TextBlock Text="How to use"
+          <TextBlock x:Name="HowToUseLabel" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="1. Find the target device's MAC address (Settings > Network, or ipconfig /all on Windows, ifconfig on Linux/macOS)."
+          <TextBlock x:Name="Step1Text" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
-          <TextBlock Text="2. Enter the MAC address above in AA:BB:CC:DD:EE:FF format."
+          <TextBlock x:Name="Step2Text" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
-          <TextBlock Text="3. Leave the broadcast IP as 255.255.255.255 unless you know your network's broadcast address."
+          <TextBlock x:Name="Step3Text" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
-          <TextBlock Text="4. Click &quot;Send Wake Packet&quot; — the magic packet is broadcast and the target wakes within a few seconds if everything is configured correctly."
+          <TextBlock x:Name="Step4Text" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
         </StackPanel>

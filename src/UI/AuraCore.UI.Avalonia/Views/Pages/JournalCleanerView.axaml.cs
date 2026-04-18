@@ -1,6 +1,7 @@
 using AuraCore.Module.JournalCleaner;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
+using global::Avalonia.Interactivity;
 using global::Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public partial class JournalCleanerView : UserControl
     {
         InitializeComponent();
         ApplyLocalizedTexts();
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
         Loaded += (_, _) =>
         {
             if (DataContext is null)
@@ -24,6 +27,14 @@ public partial class JournalCleanerView : UserControl
                 catch { /* design-time / tests without DI */ }
             }
         };
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private void ApplyLocalizedTexts()
@@ -42,6 +53,8 @@ public partial class JournalCleanerView : UserControl
             fc.Label = LocalizationService._("journalCleaner.stat.files");
         if (this.FindControl<Controls.StatCard>("OldestCard") is { } oc)
             oc.Label = LocalizationService._("journalCleaner.stat.oldest");
+        if (this.FindControl<TextBlock>("VacuumHeading") is { } vh)
+            vh.Text = LocalizationService._("journalCleaner.vacuum.heading");
         if (this.FindControl<Button>("ScanBtn") is { } sb)
             sb.Content = LocalizationService._("journalCleaner.action.scan");
         if (this.FindControl<Button>("CancelBtn") is { } cb)

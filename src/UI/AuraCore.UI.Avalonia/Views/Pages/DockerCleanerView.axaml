@@ -16,7 +16,7 @@
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
             <Button x:Name="ScanBtn"
-                    Content="Scan"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ScanCommand}"
@@ -55,7 +55,7 @@
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        TextWrapping="Wrap"/>
             <Button x:Name="PruneSafeBtn"
-                    Content="Prune Safe"
+                    Content=""
                     Classes="action-btn"
                     HorizontalAlignment="Right"
                     Padding="16,8"
@@ -75,7 +75,7 @@
             <Grid ColumnDefinitions="*,8,*,8,*">
               <Button x:Name="PruneImagesBtn"
                       Grid.Column="0"
-                      Content="Prune Images"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -83,7 +83,7 @@
                       Command="{Binding PruneImagesCommand}"/>
               <Button x:Name="PruneContainersBtn"
                       Grid.Column="2"
-                      Content="Prune Containers"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -91,7 +91,7 @@
                       Command="{Binding PruneContainersCommand}"/>
               <Button x:Name="PruneBuildCacheBtn"
                       Grid.Column="4"
-                      Content="Prune Build Cache"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -124,7 +124,7 @@
                       VerticalAlignment="Center"/>
             <Button x:Name="PruneVolumesBtn"
                     Grid.Column="1"
-                    Content="Prune Volumes"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding PruneVolumesCommand}"
@@ -146,7 +146,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

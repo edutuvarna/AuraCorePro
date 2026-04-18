@@ -24,20 +24,13 @@ public class HardcodedStringScannerTests
         // Current-state offenders (2026-04-18 baseline). Remove each entry once the module is localized.
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/BrewManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/CronManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/DockerCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/GrubManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/JournalCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/KernelCleanerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/LaunchAgentManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/LinuxAppInstallerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/MacAppInstallerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/PackageCleanerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SnapFlatpakCleanerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SpotlightManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SystemdManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/TimeMachineManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/UpgradeView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/WakeOnLanView.axaml",
     };
 
     private static readonly string[] ScannedAttributes =

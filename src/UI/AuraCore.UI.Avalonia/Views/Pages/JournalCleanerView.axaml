@@ -16,7 +16,7 @@
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
             <Button x:Name="ScanBtn"
-                    Content="Scan"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ScanCommand}"
@@ -43,7 +43,7 @@
         <controls:GlassCard.CardContent>
           <StackPanel Spacing="12">
             <TextBlock x:Name="VacuumHeading"
-                       Text="Vacuum Actions"
+                       Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
@@ -51,7 +51,7 @@
             <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,10,Auto">
               <Button x:Name="Vacuum500Btn"
                       Grid.Row="0" Grid.Column="0"
-                      Content="Vacuum to 500 MB"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -61,7 +61,7 @@
                       IsEnabled="{Binding !IsBusy}"/>
               <Button x:Name="Vacuum1GBtn"
                       Grid.Row="0" Grid.Column="2"
-                      Content="Vacuum to 1 GB"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -71,7 +71,7 @@
                       IsEnabled="{Binding !IsBusy}"/>
               <Button x:Name="Vacuum7DaysBtn"
                       Grid.Row="2" Grid.Column="0"
-                      Content="Last 7 days only"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -81,7 +81,7 @@
                       IsEnabled="{Binding !IsBusy}"/>
               <Button x:Name="Vacuum30DaysBtn"
                       Grid.Row="2" Grid.Column="2"
-                      Content="Last 30 days only"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -101,7 +101,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

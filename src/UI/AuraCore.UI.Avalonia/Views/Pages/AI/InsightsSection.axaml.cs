@@ -147,12 +147,12 @@ public partial class InsightsSection : UserControl
             if (dp.DaysUntilFull < 30)
             {
                 score -= 20;
-                penalties.Add("Disk <30 gun (-20)");
+                penalties.Add(LocalizationService._("ai.penalty.diskCritical"));
             }
             else if (dp.DaysUntilFull < 90)
             {
                 score -= 10;
-                penalties.Add("Disk 30-90 gun (-10)");
+                penalties.Add(LocalizationService._("ai.penalty.diskWarning"));
             }
         }
 
@@ -384,7 +384,7 @@ public partial class InsightsSection : UserControl
         {
             MemoryProcessPanel.Children.Add(new TextBlock
             {
-                Text = "Proses verisi alinamadi",
+                Text = LocalizationService._("ai.memory.unavailable"),
                 FontSize = 10,
                 Foreground = new SolidColorBrush(Color.Parse("#666680"))
             });

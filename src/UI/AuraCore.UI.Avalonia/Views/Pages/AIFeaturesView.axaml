@@ -38,7 +38,7 @@
     <Border DockPanel.Dock="Top" Classes="cortex-hero">
       <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
         <TextBlock Grid.Row="0" Grid.Column="0"
-                   Text="✦ CORTEX"
+                   x:Name="PART_HeroKicker"
                    FontSize="10"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource AccentPurpleBrush}" />
@@ -49,14 +49,13 @@
 
         <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                    x:Name="PART_HeroTitle"
-                   Text="AI Features"
                    FontSize="22"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource TextPrimaryBrush}"
                    Margin="0,6,0,0" />
 
         <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                   Text="Intelligent monitoring, predictions, and automation"
+                   x:Name="PART_HeroTagline"
                    FontSize="11"
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    Margin="0,4,0,0" />
@@ -93,18 +92,18 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" x:Name="PART_SectionNav" Spacing="2" Margin="0,8,8,0">
-          <Button x:Name="PART_BackToOverviewBtn" Content="← Back to Overview" Classes="section-nav-item"
+          <Button x:Name="PART_BackToOverviewBtn" Classes="section-nav-item"
                   Command="{Binding NavigateToOverview}" />
-          <Button Content="Insights" Classes="section-nav-item"
+          <Button x:Name="PART_NavInsights" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="insights" />
-          <Button Content="Recs" Classes="section-nav-item"
+          <Button x:Name="PART_NavRecs" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="recommendations" />
-          <Button Content="Schedule" Classes="section-nav-item"
+          <Button x:Name="PART_NavSchedule" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="schedule" />
-          <Button Content="Chat ⚠" Classes="section-nav-item"
+          <Button x:Name="PART_NavChat" Classes="section-nav-item"
                   Command="{Binding NavigateToSection}"
                   CommandParameter="chat" />
         </StackPanel>

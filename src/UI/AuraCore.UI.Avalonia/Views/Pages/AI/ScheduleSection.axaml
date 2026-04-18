@@ -8,7 +8,6 @@
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0"
                    x:Name="PageTitle"
-                   Text="Smart Schedule"
                    FontSize="16"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -18,10 +17,10 @@
             <Border.Background>
               <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
             </Border.Background>
-            <TextBlock Text="&#x23F0;" FontSize="9" Foreground="#F59E0B"
+            <TextBlock Text="⏰" FontSize="9" Foreground="#F59E0B"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
           </Border>
-          <TextBlock Text="SCHEDULED TASKS" FontSize="10" FontWeight="SemiBold"
+          <TextBlock x:Name="ScheduledTasksLabel" FontSize="10" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
         </StackPanel>
       </Grid>
@@ -32,7 +31,7 @@
       <StackPanel Spacing="10" Margin="0,0,0,24">
 
         <!-- Subtitle -->
-        <TextBlock Text="Schedule automatic optimization tasks" FontSize="12"
+        <TextBlock x:Name="ScheduleSubtitle" FontSize="12"
                    Foreground="{DynamicResource TextMutedBrush}"/>
 
         <!-- Task cards container (populated in code-behind via x:Name="TaskList") -->
@@ -46,8 +45,7 @@
           <Border.BorderBrush>
             <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
           </Border.BorderBrush>
-          <TextBlock Text="Tasks run automatically in the background when enabled. Select an interval and toggle on to activate."
-                     FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap"/>
+          <TextBlock x:Name="ScheduleInfoBanner" FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap"/>
         </Border>
 
       </StackPanel>

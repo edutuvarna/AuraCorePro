@@ -15,7 +15,7 @@
         <PathIcon Data="{DynamicResource IconWarningTriangleFilled}"
                   Width="14" Height="14"
                   Foreground="{DynamicResource AccentAmberBrush}" />
-        <TextBlock Text="⚠ Experimental — CORTEX Chat may produce inaccurate outputs. Verify before applying any suggestion."
+        <TextBlock x:Name="TopWarningText"
                    FontSize="10"
                    Foreground="{DynamicResource AccentAmberBrush}"
                    TextWrapping="Wrap"
@@ -25,11 +25,11 @@
 
     <!-- Section header with model chip placeholder -->
     <Grid ColumnDefinitions="*,Auto,Auto" DockPanel.Dock="Top" Margin="0,4,0,12">
-      <TextBlock Grid.Column="0" Text="✦ CORTEX Chat" FontSize="14" FontWeight="SemiBold"
+      <TextBlock Grid.Column="0" x:Name="ChatHeaderTitle" FontSize="14" FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
       <SplitButton Grid.Column="1"
                    x:Name="ModelChip"
-                   Content="⚙ No model selected ▾"
+                   Content=""
                    FontSize="10"
                    Background="Transparent"
                    BorderBrush="{DynamicResource BorderSubtleBrush}"
@@ -55,10 +55,9 @@
         <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
       </Border.BorderBrush>
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="&#x26A0;" FontSize="13" Foreground="#F59E0B"
+        <TextBlock Text="⚠" FontSize="13" Foreground="#F59E0B"
                    VerticalAlignment="Top" Margin="0,1,0,0"/>
         <TextBlock x:Name="WarningText"
-                   Text="This feature is experimental. Responses may be inaccurate."
                    FontSize="11" Foreground="#F59E0B" TextWrapping="Wrap"
                    Opacity="0.9"/>
       </StackPanel>
@@ -74,7 +73,6 @@
           <SolidColorBrush Color="#FFFFFF" Opacity="0.08"/>
         </Border.BorderBrush>
         <TextBox x:Name="InputBox"
-                 Watermark="Type a message..."
                  FontSize="12"
                  AcceptsReturn="False"
                  TextWrapping="Wrap"
@@ -89,7 +87,7 @@
         <Button.Background>
           <SolidColorBrush Color="#8B5CF6" Opacity="0.15"/>
         </Button.Background>
-        <TextBlock Text="&#x27A4;" FontSize="14" Foreground="#8B5CF6"
+        <TextBlock Text="➤" FontSize="14" Foreground="#8B5CF6"
                    VerticalAlignment="Center" HorizontalAlignment="Center"/>
       </Button>
     </Grid>

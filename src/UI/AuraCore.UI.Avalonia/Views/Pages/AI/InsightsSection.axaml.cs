@@ -66,6 +66,18 @@ public partial class InsightsSection : UserControl
         // Footer
         AutoRefreshText.Text = LocalizationService._("ai.status.autoRefresh");
 
+        // Recent Activity section
+        if (RecentActivityLabel is not null)
+            RecentActivityLabel.Text = LocalizationService.Get("insights.recentActivity");
+        // Only set the default placeholder if no real activity text has been set yet
+        if (RecentActivityText is not null)
+        {
+            var current = RecentActivityText.Text;
+            if (string.IsNullOrEmpty(current) || current == LocalizationService._("insights.noRecentActivity")
+                || current == "No recent optimizations. Run Smart Optimize or Clean Junk to see activity here.")
+                RecentActivityText.Text = LocalizationService.Get("insights.noRecentActivity");
+        }
+
         // Defaults for waiting states (if no result yet)
         if (HealthBadgeText.Text == "" || HealthBadgeText.Text == null)
             HealthBadgeText.Text = LocalizationService._("ai.health.waiting");

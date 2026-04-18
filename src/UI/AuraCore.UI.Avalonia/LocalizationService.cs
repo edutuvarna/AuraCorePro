@@ -1486,6 +1486,37 @@ public static class LocalizationService
         ["aiFeatures.chat.warningBanner"] = "⚠ Experimental — CORTEX Chat may produce inaccurate outputs. Verify before applying any suggestion.",
         ["ai.backToOverview"] = "← Back to Overview",
 
+        // ── Batch 2: Dashboard new keys ──
+        ["dash.gaugeHealth"] = "HEALTH",
+        ["dash.heroTitle"] = "Smart Optimize Now",
+        ["dash.insightsPaused"] = "AI Insights paused",
+        ["dash.insightsEnable"] = "Enable Insights in AI Features",
+        ["dash.systemLabel"] = "SYSTEM",
+
+        // ── Batch 2: AI Features view keys ──
+        ["ai.cortexKicker"] = "✦ CORTEX",
+        ["ai.sectionInsights"] = "Insights",
+        ["ai.sectionRecs"] = "Recs",
+        ["ai.sectionSchedule"] = "Schedule",
+        ["ai.sectionChat"] = "Chat ⚠",
+
+        // ── Batch 2: Chat section keys ──
+        ["chat.headerTitle"] = "✦ CORTEX Chat",
+
+        // ── Batch 2: Insights section keys ──
+        ["insights.recentActivity"] = "RECENT ACTIVITY",
+        ["insights.noRecentActivity"] = "No recent optimizations. Run Smart Optimize or Clean Junk to see activity here.",
+
+        // ── Batch 2: Recommendations section keys ──
+        ["recs.analyzeButton"] = "Analyze",
+        ["recs.subtitle"] = "Smart suggestions based on your system analysis",
+        ["recs.badgeLabel"] = "RECOMMENDATIONS",
+
+        // ── Batch 2: Schedule section keys ──
+        ["schedule.tasksLabel"] = "SCHEDULED TASKS",
+        ["schedule.subtitle"] = "Schedule automatic optimization tasks",
+        ["schedule.infoBanner"] = "Tasks run automatically in the background when enabled. Select an interval and toggle on to activate.",
+
         ["chatOptIn.step1.title"] = "CORTEX Chat — Experimental",
         ["chatOptIn.step1.body"] = "CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system.\n\nThis feature is under active development.",
         ["chatOptIn.step1.continueButton"] = "I understand, continue",
@@ -3006,6 +3037,37 @@ public static class LocalizationService
         ["aiFeatures.section.paused.enableButton"] = "Etkinleştir",
         ["aiFeatures.chat.warningBanner"] = "⚠ Deneysel — CORTEX Sohbet hatalı yanıtlar üretebilir. Herhangi bir öneri uygulamadan önce doğrulayın.",
         ["ai.backToOverview"] = "← Genel Bakış'a Dön",
+
+        // ── Batch 2: Dashboard new keys ──
+        ["dash.gaugeHealth"] = "SAĞLIK",
+        ["dash.heroTitle"] = "Akıllı Optimizasyon",
+        ["dash.insightsPaused"] = "Yapay Zekâ İçgörüleri duraklatıldı",
+        ["dash.insightsEnable"] = "Yapay Zekâ Özelliklerinde İçgörüleri etkinleştirin",
+        ["dash.systemLabel"] = "SİSTEM",
+
+        // ── Batch 2: AI Features view keys ──
+        ["ai.cortexKicker"] = "✦ CORTEX",
+        ["ai.sectionInsights"] = "İçgörüler",
+        ["ai.sectionRecs"] = "Öneriler",
+        ["ai.sectionSchedule"] = "Zamanlayıcı",
+        ["ai.sectionChat"] = "Sohbet ⚠",
+
+        // ── Batch 2: Chat section keys ──
+        ["chat.headerTitle"] = "✦ CORTEX Sohbet",
+
+        // ── Batch 2: Insights section keys ──
+        ["insights.recentActivity"] = "SON AKTİVİTE",
+        ["insights.noRecentActivity"] = "Son optimizasyon yok. Aktivite görmek için Akıllı Optimizasyon veya Çöp Temizle'yi çalıştırın.",
+
+        // ── Batch 2: Recommendations section keys ──
+        ["recs.analyzeButton"] = "Analiz Et",
+        ["recs.subtitle"] = "Sistem analizinize dayalı akıllı öneriler",
+        ["recs.badgeLabel"] = "ÖNERİLER",
+
+        // ── Batch 2: Schedule section keys ──
+        ["schedule.tasksLabel"] = "ZAMANLANMIŞ GÖREVLER",
+        ["schedule.subtitle"] = "Optimizasyon görevlerini otomatik olarak zamanlayın",
+        ["schedule.infoBanner"] = "Görevler etkinleştirildiğinde arka planda otomatik çalışır. Aralık seçin ve etkinleştirmek için geçiş yapın.",
 
         ["chatOptIn.step1.title"] = "CORTEX Sohbet — Deneysel",
         ["chatOptIn.step1.body"] = "CORTEX Sohbet yerel bir AI modeli kullanır ve hatalı veya yanıltıcı çıktılar üretebilir. Sisteminize uygulamadan önce tüm önerileri doğrulayın.\n\nBu özellik aktif geliştirme aşamasındadır.",

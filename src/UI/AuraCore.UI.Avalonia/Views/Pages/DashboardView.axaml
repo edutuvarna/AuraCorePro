@@ -9,7 +9,7 @@
       <!-- Header -->
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Spacing="2">
-          <TextBlock Text="Dashboard"
+          <TextBlock x:Name="DashboardTitle"
                      Foreground="{DynamicResource TextPrimaryBrush}"
                      FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="SemiBold"/>
@@ -50,7 +50,6 @@
                         InsightBrush="{DynamicResource AccentPurpleBrush}"
                         Margin="6,0,0,0"/>
         <controls:Gauge Grid.Column="4" x:Name="HealthGauge"
-                        Label="HEALTH"
                         RingBrush="{DynamicResource AccentTealBrush}"
                         InsightBrush="{DynamicResource AccentTealBrush}"
                         Margin="6,0,0,0"/>
@@ -60,16 +59,11 @@
       <Grid x:Name="HeroRow" ColumnDefinitions="1.3*,1*">
         <controls:HeroCTA x:Name="HeroCta"
                           Kicker="CORTEX RECOMMENDS"
-                          Title="Smart Optimize Now"
-                          Body="Personalized optimization is a click away."
-                          PrimaryButtonText="Optimize"
-                          SecondaryButtonText="Review"
                           IsEnabled="{Binding SmartOptimizeEnabled}"/>
         <!-- Cortex Insights swaps with a "paused" placeholder when InsightsEnabled is false -->
         <Panel Grid.Column="1" Margin="8,0,0,0">
           <controls:InsightCard x:Name="InsightCard"
                                 IsVisible="{Binding ShowCortexInsightsCard}"
-                                Title="Cortex Insights"
                                 UpdatedAt="Updated 2m ago"
                                 Rows="{Binding Insights}"/>
           <Border x:Name="InsightsPausedPlaceholder"
@@ -80,11 +74,11 @@
                   CornerRadius="{DynamicResource RadiusLg}"
                   Padding="{DynamicResource SpacingCardPadding}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
-              <TextBlock Text="AI Insights paused"
+              <TextBlock x:Name="InsightsPausedText"
                          FontWeight="SemiBold"
                          Foreground="{DynamicResource TextMutedBrush}"
                          HorizontalAlignment="Center"/>
-              <TextBlock Text="Enable Insights in AI Features"
+              <TextBlock x:Name="InsightsEnableText"
                          FontSize="{DynamicResource FontSizeBodySmall}"
                          TextWrapping="Wrap"
                          TextAlignment="Center"
@@ -103,7 +97,7 @@
                 CornerRadius="{DynamicResource RadiusLg}"
                 Padding="{DynamicResource SpacingCardPadding}">
           <StackPanel Spacing="6">
-            <TextBlock Text="SYSTEM"
+            <TextBlock x:Name="SystemLabel"
                        Foreground="{DynamicResource TextMutedBrush}"
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold"
@@ -142,7 +136,7 @@
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          FontSize="{DynamicResource FontSizeBody}"
                          Margin="0,2,0,2"/>
-              <TextBlock Grid.Row="4" Grid.Column="0" Text="Uptime"
+              <TextBlock Grid.Row="4" Grid.Column="0" x:Name="UptimeLabel"
                          Foreground="{DynamicResource TextMutedBrush}"
                          FontSize="{DynamicResource FontSizeBody}"
                          Margin="0,2,12,2"/>
@@ -161,7 +155,7 @@
                 CornerRadius="{DynamicResource RadiusLg}"
                 Padding="{DynamicResource SpacingCardPadding}">
           <StackPanel Spacing="8">
-            <TextBlock Text="QUICK ACTIONS"
+            <TextBlock x:Name="QuickActionsLabel"
                        Foreground="{DynamicResource TextMutedBrush}"
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold"

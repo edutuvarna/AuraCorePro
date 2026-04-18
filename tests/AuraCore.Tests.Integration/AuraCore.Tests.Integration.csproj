@@ -20,5 +20,6 @@
     <ProjectReference Include="../../src/Desktop/AuraCore.Desktop.Services/AuraCore.Desktop.Services.csproj" />
     <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.IPC/AuraCore.PrivilegedService.IPC.csproj" />
     <ProjectReference Include="../../src/Service/AuraCore.PrivilegedService.Ops/AuraCore.PrivilegedService.Ops.csproj" />
+    <ProjectReference Include="../../src/UI/AuraCore.UI.Avalonia/AuraCore.UI.Avalonia.csproj" />
   </ItemGroup>
 </Project>

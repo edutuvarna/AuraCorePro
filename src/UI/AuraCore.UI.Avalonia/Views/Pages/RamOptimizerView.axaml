@@ -6,23 +6,23 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="RAM Optimizer"
-                             Subtitle="Free up memory by trimming process working sets">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
             <!-- Auto-Optimize Toggle -->
             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0,0,4,0">
-              <TextBlock Text="Auto" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="AutoLabel" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
               <CheckBox x:Name="AutoOptToggle" IsChecked="False" Click="AutoOpt_Toggle"
                         VerticalAlignment="Center"
-                        ToolTip.Tip="Auto-optimize when RAM exceeds 85%"/>
+                        ToolTip.Tip=""/>
             </StackPanel>
             <!-- Scan Button -->
             <Button Classes="action-btn" Click="Scan_Click" VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -33,7 +33,7 @@
                     FontWeight="Bold" FontSize="{DynamicResource FontSizeBody}" IsEnabled="False">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="OptLabel" Text="Optimize"
+                <TextBlock x:Name="OptLabel" Text=""
                            FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"/>
               </StackPanel>
             </Button>
@@ -42,10 +42,10 @@
                     Background="{DynamicResource StatusErrorBrush}" Foreground="White"
                     Padding="18,9" CornerRadius="{StaticResource RadiusMd}"
                     FontWeight="Bold" FontSize="{DynamicResource FontSizeSubheading}"
-                    ToolTip.Tip="Aggressive: EmptyWorkingSet on ALL processes">
+                    ToolTip.Tip="">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F680;" FontSize="{DynamicResource FontSizeSubheading}"/>
-                <TextBlock x:Name="BoostLabel" Text="Boost"
+                <TextBlock x:Name="BoostLabel" Text=""
                            FontSize="{DynamicResource FontSizeSubheading}" FontWeight="Bold"/>
               </StackPanel>
             </Button>
@@ -57,7 +57,7 @@
 
       <!-- Hidden SubText — code-behind writes "Scan failed" on error -->
       <TextBlock x:Name="SubText"
-                 Text="Free up memory by trimming process working sets"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
@@ -102,7 +102,7 @@
       <controls:GlassCard>
         <Grid RowDefinitions="Auto,*" Height="66">
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,4">
-            <TextBlock Text="RAM USAGE — LAST HOUR"
+            <TextBlock x:Name="LblRamUsageHistory" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock x:Name="GraphMinMax" Text=""
@@ -129,10 +129,10 @@
                      Foreground="{DynamicResource AccentPrimaryBrush}"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <TextBlock Text="TOP MEMORY CONSUMERS"
+        <TextBlock x:Name="LblTopConsumers" Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                    Foreground="{DynamicResource TextSecondaryBrush}"/>
-        <TextBlock Text="(Click W/B to toggle whitelist/blacklist)"
+        <TextBlock x:Name="LblToggleHint" Text=""
                    FontSize="{DynamicResource FontSizeLabel}"
                    Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
       </StackPanel>
@@ -174,7 +174,7 @@
                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                             Padding="4,2" CornerRadius="4"
                             HorizontalAlignment="Center" VerticalAlignment="Center"
-                            ToolTip.Tip="Toggle whitelist (never optimize)">
+                            ToolTip.Tip="">
                       <TextBlock Text="W" FontSize="{DynamicResource FontSizeLabel}"
                                  FontWeight="Bold" Foreground="{Binding WhitelistFg}"/>
                     </Button>
@@ -184,7 +184,7 @@
                             FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                             Padding="4,2" CornerRadius="4"
                             HorizontalAlignment="Center" VerticalAlignment="Center"
-                            ToolTip.Tip="Toggle blacklist (always optimize first)">
+                            ToolTip.Tip="">
                       <TextBlock Text="B" FontSize="{DynamicResource FontSizeLabel}"
                                  FontWeight="Bold" Foreground="{Binding BlacklistFg}"/>
                     </Button>

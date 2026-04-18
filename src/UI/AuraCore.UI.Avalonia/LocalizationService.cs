@@ -2137,6 +2137,90 @@ public static class LocalizationService
         ["netMon.stat.totalSent"]       = "TOTAL SENT",
         ["netMon.stat.totalRecv"]       = "TOTAL RECEIVED",
         ["netMon.section.interfaces"]   = "Network Interfaces",
+
+        // ── Batch 7: Common additions ──
+        ["common.scan"]             = "Scan",
+        ["common.switch"]           = "Switch",
+        ["common.continue"]         = "Continue",
+        ["common.kill"]             = "Kill",
+        ["common.optimize"]         = "Optimize",
+
+        // ── Batch 7: Network Optimizer ──
+        ["netOpt.title"]            = "Network Optimizer",
+        ["netOpt.subtitle"]         = "Monitor, optimize and benchmark your network",
+        ["netOpt.benchDns"]         = "Benchmark DNS",
+        ["netOpt.bestDns"]          = "Best DNS",
+        ["netOpt.currentDns"]       = "Current DNS",
+        ["netOpt.provider"]         = "Provider",
+        ["netOpt.responseTime"]     = "Response Time",
+        ["netOpt.interfaces"]       = "Interfaces:",
+        ["netOpt.sent"]             = "\u2B06 Sent:",
+        ["netOpt.recv"]             = "\u2B07 Recv:",
+        ["netOpt.wifiSignal"]       = "Wi-Fi Signal Strength",
+        ["netOpt.channel"]          = "Channel:",
+        ["netOpt.band"]             = "Band:",
+        ["netOpt.speed"]            = "Speed:",
+        ["netOpt.dnsChangeResults"] = "DNS Change Results",
+        ["netOpt.before"]           = "Before",
+        ["netOpt.after"]            = "After",
+        ["netOpt.networkAdapters"]  = "Network Adapters",
+        ["netOpt.dnsPresets"]       = "DNS Presets",
+        ["netOpt.bandwidthByProcess"] = "Bandwidth by Process",
+        ["netOpt.dnsBenchmark"]     = "DNS Benchmark",
+        ["netOpt.bestDnsForYou"]    = "Best DNS for You",
+
+        // ── Batch 7: Payment View ──
+        ["pay.completeTitle"]       = "Complete Payment in Browser",
+        ["pay.stripeDesc"]          = "A Stripe checkout page has been opened in your default browser. Complete the payment there and this page will update automatically.",
+        ["pay.waitingDefault"]      = "Waiting for payment...",
+        ["pay.reopenCheckout"]      = "Reopen Checkout",
+        ["pay.paymentSuccess"]      = "Payment Successful!",
+        ["pay.welcomePro"]          = "Welcome to AuraCore Pro!",
+        ["pay.paymentError"]        = "Payment Error",
+        ["pay.somethingWrong"]      = "Something went wrong.",
+        ["pay.tryAgain"]            = "Try Again",
+        ["pay.goBack"]              = "Go Back",
+
+        // ── Batch 7: Process Monitor ──
+        ["procMon.title"]           = "Process Monitor",
+        ["procMon.subtitle"]        = "Monitor, kill, and manage running processes",
+        ["procMon.autoOff"]         = "Auto: OFF",
+        ["procMon.autoOn"]          = "Auto: ON",
+        ["procMon.searchPlaceholder"] = "Search processes...",
+        ["procMon.processes"]       = "Processes:",
+        ["procMon.totalCpu"]        = "Total CPU:",
+        ["procMon.totalRam"]        = "Total RAM:",
+        ["procMon.colDescription"]  = "DESCRIPTION",
+        ["procMon.colRamMb"]        = "RAM MB",
+        ["procMon.colThreads"]      = "THREADS",
+        ["procMon.colActions"]      = "ACTIONS",
+
+        // ── Batch 7: RAM Optimizer ──
+        ["ram.boost"]               = "Boost",
+        ["ram.headerSubtitle"]      = "Free up memory by trimming process working sets",
+        ["ram.autoLabel"]           = "Auto",
+        ["ram.autoTooltip"]         = "Auto-optimize when RAM exceeds 85%",
+        ["ram.aggressiveTooltip"]   = "Aggressive: EmptyWorkingSet on ALL processes",
+        ["ram.usageHistory"]        = "RAM USAGE \u2014 LAST HOUR",
+        ["ram.topConsumers"]        = "TOP MEMORY CONSUMERS",
+        ["ram.toggleHint"]          = "(Click W/B to toggle whitelist/blacklist)",
+        ["ram.whitelistTooltip"]    = "Toggle whitelist (never optimize)",
+        ["ram.blacklistTooltip"]    = "Toggle blacklist (always optimize first)",
+
+        // ── Batch 7: Registry Optimizer ──
+        ["regOpt.title"]            = "Registry Optimizer",
+        ["regOpt.subtitle"]         = "Find and fix broken registry entries",
+        ["regOpt.fixIssues"]        = "Fix Issues",
+        ["regOpt.statIssues"]       = "ISSUES",
+        ["regOpt.statCaution"]      = "CAUTION",
+
+        // ── Batch 7: Scan & Optimize ──
+        ["scanOpt.subtitle"]        = "Scan and optimize",
+        ["scanOpt.itemsFound"]      = "Items Found:",
+        ["scanOpt.space"]           = "Space:",
+        ["scanOpt.risk"]            = "Risk:",
+        ["scanOpt.clickToScan"]     = "Click Scan to analyze your system",
+        ["scanOpt.optimizing"]      = "Optimizing...",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4214,6 +4298,90 @@ public static class LocalizationService
         ["netMon.stat.totalSent"]       = "TOPLAM GÖNDERİLEN",
         ["netMon.stat.totalRecv"]       = "TOPLAM ALINAN",
         ["netMon.section.interfaces"]   = "Ağ Arabirimleri",
+
+        // ── Batch 7: Ortak eklemeler ──
+        ["common.scan"]             = "Tara",
+        ["common.switch"]           = "Değiştir",
+        ["common.continue"]         = "Devam Et",
+        ["common.kill"]             = "Sonlandır",
+        ["common.optimize"]         = "Optimize Et",
+
+        // ── Batch 7: Ağ Optimize Edici ──
+        ["netOpt.title"]            = "Ağ Optimize Edici",
+        ["netOpt.subtitle"]         = "Ağınızı izleyin, optimize edin ve kıyaslayın",
+        ["netOpt.benchDns"]         = "DNS Kıyaslama",
+        ["netOpt.bestDns"]          = "En İyi DNS",
+        ["netOpt.currentDns"]       = "Mevcut DNS",
+        ["netOpt.provider"]         = "Sağlayıcı",
+        ["netOpt.responseTime"]     = "Yanıt Süresi",
+        ["netOpt.interfaces"]       = "Arabirimler:",
+        ["netOpt.sent"]             = "\u2B06 Gönderilen:",
+        ["netOpt.recv"]             = "\u2B07 Alınan:",
+        ["netOpt.wifiSignal"]       = "Wi-Fi Sinyal Gücü",
+        ["netOpt.channel"]          = "Kanal:",
+        ["netOpt.band"]             = "Bant:",
+        ["netOpt.speed"]            = "Hız:",
+        ["netOpt.dnsChangeResults"] = "DNS Değişim Sonuçları",
+        ["netOpt.before"]           = "Önce",
+        ["netOpt.after"]            = "Sonra",
+        ["netOpt.networkAdapters"]  = "Ağ Bağdaştırıcıları",
+        ["netOpt.dnsPresets"]       = "DNS Ön Ayarları",
+        ["netOpt.bandwidthByProcess"] = "İşlem Başına Bant Genişliği",
+        ["netOpt.dnsBenchmark"]     = "DNS Kıyaslama",
+        ["netOpt.bestDnsForYou"]    = "Sizin İçin En İyi DNS",
+
+        // ── Batch 7: Ödeme Görünümü ──
+        ["pay.completeTitle"]       = "Ödemayı Tarayıcıda Tamamlayın",
+        ["pay.stripeDesc"]          = "Varsayılan tarayıcınızda bir Stripe ödeme sayfası açıldı. Ödemeyi orada tamamlayın; bu sayfa otomatik güncellenecek.",
+        ["pay.waitingDefault"]      = "Ödeme bekleniyor...",
+        ["pay.reopenCheckout"]      = "Ödemeyi Yeniden Aç",
+        ["pay.paymentSuccess"]      = "Ödeme Başarılı!",
+        ["pay.welcomePro"]          = "AuraCore Pro'ya Hoş Geldiniz!",
+        ["pay.paymentError"]        = "Ödeme Hatası",
+        ["pay.somethingWrong"]      = "Bir şeyler yanlış gitti.",
+        ["pay.tryAgain"]            = "Tekrar Dene",
+        ["pay.goBack"]              = "Geri Dön",
+
+        // ── Batch 7: İşlem Monitörü ──
+        ["procMon.title"]           = "İşlem Monitörü",
+        ["procMon.subtitle"]        = "Çalışan işlemleri izleyin, sonlandırın ve yönetin",
+        ["procMon.autoOff"]         = "Otomatik: KAPALI",
+        ["procMon.autoOn"]          = "Otomatik: AÇIK",
+        ["procMon.searchPlaceholder"] = "İşlem ara...",
+        ["procMon.processes"]       = "İşlemler:",
+        ["procMon.totalCpu"]        = "Toplam CPU:",
+        ["procMon.totalRam"]        = "Toplam RAM:",
+        ["procMon.colDescription"]  = "AÇIKLAMA",
+        ["procMon.colRamMb"]        = "RAM MB",
+        ["procMon.colThreads"]      = "İŞ PARÇACIKLARI",
+        ["procMon.colActions"]      = "İŞLEMLER",
+
+        // ── Batch 7: RAM Optimize Edici ──
+        ["ram.boost"]               = "Güçlendir",
+        ["ram.headerSubtitle"]      = "İşlem çalışma kümelerini kırparak belleği boşaltın",
+        ["ram.autoLabel"]           = "Otomatik",
+        ["ram.autoTooltip"]         = "RAM %85'i aşınca otomatik optimize et",
+        ["ram.aggressiveTooltip"]   = "Agresif: TÜM işlemlerde EmptyWorkingSet",
+        ["ram.usageHistory"]        = "RAM KULLANIMI \u2014 SON BİR SAAT",
+        ["ram.topConsumers"]        = "EN YÜKSEK BELLEK TÜKETİCİLERİ",
+        ["ram.toggleHint"]          = "(Beyaz/Kara liste değiştirmek için W/B tıklayın)",
+        ["ram.whitelistTooltip"]    = "Beyaz liste (asla optimize etme)",
+        ["ram.blacklistTooltip"]    = "Kara liste (her zaman önce optimize et)",
+
+        // ── Batch 7: Kayıt Defteri Optimize Edici ──
+        ["regOpt.title"]            = "Kayıt Defteri Optimize Edici",
+        ["regOpt.subtitle"]         = "Bozuk kayıt defteri girişlerini bulun ve düzeltin",
+        ["regOpt.fixIssues"]        = "Sorunları Düzelt",
+        ["regOpt.statIssues"]       = "SORUNLAR",
+        ["regOpt.statCaution"]      = "DİKKAT",
+
+        // ── Batch 7: Tara ve Optimize Et ──
+        ["scanOpt.subtitle"]        = "Tara ve optimize et",
+        ["scanOpt.itemsFound"]      = "Bulunan Öğeler:",
+        ["scanOpt.space"]           = "Alan:",
+        ["scanOpt.risk"]            = "Risk:",
+        ["scanOpt.clickToScan"]     = "Sisteminizi analiz etmek için Tara'ya tıklayın",
+        ["scanOpt.optimizing"]      = "Optimize ediliyor...",
     };
 
     private static void Save()

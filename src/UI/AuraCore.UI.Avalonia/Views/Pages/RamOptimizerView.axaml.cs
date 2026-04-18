@@ -33,8 +33,7 @@ public partial class RamOptimizerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
         _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<RamOptimizerModule>().FirstOrDefault();
         Loaded += async (s, e) =>
@@ -42,8 +41,10 @@ public partial class RamOptimizerView : UserControl
             await RunScan();
             StartMonitoring();
         };
-        DetachedFromVisualTree += (s, e) => StopMonitoring();
+        DetachedFromVisualTree += (s, e) => { StopMonitoring(); LocalizationService.LanguageChanged -= OnLanguageChanged; };
     }
+
+    private void OnLanguageChanged() => Dispatcher.UIThread.Post(ApplyLocalization);
 
     // ── Monitoring timer — 10-second ticks for graph + auto-optimize ──
     private void StartMonitoring()
@@ -92,7 +93,7 @@ public partial class RamOptimizerView : UserControl
             if (_autoOptimizeEnabled && r.UsagePercent > 85 && !_isOptimizing)
             {
                 _isOptimizing = true;
-                StatusText.Text = "Auto-optimizing (RAM > 85%)...";
+                StatusText.Text = LocalizationService._("common.scanning");
                 try
                 {
                     var plan = new OptimizationPlan(_module.Id, new[] { "all" });
@@ -133,7 +134,7 @@ public partial class RamOptimizerView : UserControl
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
@@ -149,7 +150,7 @@ public partial class RamOptimizerView : UserControl
             RebuildProcessList(r);
         }
         catch { SubText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private void RebuildProcessList(RamReport r)
@@ -169,7 +170,7 @@ public partial class RamOptimizerView : UserControl
     private async void Optimize_Click(object? sender, RoutedEventArgs e)
     {
         if (_module is null) return;
-        OptBtn.IsEnabled = false; OptLabel.Text = "Working...";
+        OptBtn.IsEnabled = false; OptLabel.Text = LocalizationService._("common.working");
         try
         {
             var plan = new OptimizationPlan(_module.Id, new[] { "all" });
@@ -180,13 +181,13 @@ public partial class RamOptimizerView : UserControl
             await RunScan();
         }
         catch (System.Exception ex) { StatusText.Text = ex.Message; }
-        finally { OptLabel.Text = "Optimize"; OptBtn.IsEnabled = true; }
+        finally { OptLabel.Text = LocalizationService._("common.optimize"); OptBtn.IsEnabled = true; }
     }
 
     private async void Boost_Click(object? sender, RoutedEventArgs e)
     {
         if (_module is null) return;
-        BoostBtn.IsEnabled = false; BoostLabel.Text = "Boosting...";
+        BoostBtn.IsEnabled = false; BoostLabel.Text = LocalizationService._("common.scanning");
         try
         {
             var progress = new Progress<TaskProgress>(p =>
@@ -196,15 +197,15 @@ public partial class RamOptimizerView : UserControl
             await RunScan();
         }
         catch (System.Exception ex) { StatusText.Text = ex.Message; }
-        finally { BoostLabel.Text = "Boost"; BoostBtn.IsEnabled = true; }
+        finally { BoostLabel.Text = LocalizationService._("ram.boost"); BoostBtn.IsEnabled = true; }
     }
 
     private void AutoOpt_Toggle(object? sender, RoutedEventArgs e)
     {
         _autoOptimizeEnabled = AutoOptToggle.IsChecked == true;
         StatusText.Text = _autoOptimizeEnabled
-            ? "Auto-optimize enabled (triggers at 85% RAM)"
-            : "Auto-optimize disabled";
+            ? LocalizationService._("ram.autoTooltip")
+            : LocalizationService._("common.done");
     }
 
     private async void ToggleWhitelist_Click(object? sender, RoutedEventArgs e)
@@ -227,6 +228,18 @@ public partial class RamOptimizerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.ramOptimizer");
+        var L = LocalizationService._;
+        PageTitle.Text = L("nav.ramOptimizer");
+        ModuleHdr.Title = L("nav.ramOptimizer");
+        ModuleHdr.Subtitle = L("ram.headerSubtitle");
+        AutoLabel.Text = L("ram.autoLabel");
+        global::Avalonia.Controls.ToolTip.SetTip(AutoOptToggle, L("ram.autoTooltip"));
+        ScanLabel.Text = L("common.scan");
+        global::Avalonia.Controls.ToolTip.SetTip(BoostBtn, L("ram.aggressiveTooltip"));
+        OptLabel.Text = L("common.optimize");
+        BoostLabel.Text = L("ram.boost");
+        LblRamUsageHistory.Text = L("ram.usageHistory");
+        LblTopConsumers.Text = L("ram.topConsumers");
+        LblToggleHint.Text = L("ram.toggleHint");
     }
 }

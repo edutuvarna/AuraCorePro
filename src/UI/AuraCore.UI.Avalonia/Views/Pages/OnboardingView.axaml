@@ -39,7 +39,7 @@
 
       <!-- Navigation -->
       <Grid ColumnDefinitions="*,Auto,*">
-        <Button x:Name="BackBtn" Grid.Column="0" Content="Back" Click="BackBtn_Click"
+        <Button x:Name="BackBtn" Grid.Column="0" Content="" Click="BackBtn_Click"
                 Background="{DynamicResource ActionBtnBgBrush}" Foreground="{DynamicResource TextSecondaryBrush}"
                 Padding="24,10" CornerRadius="{StaticResource RadiusMd}"
                 HorizontalAlignment="Left" IsVisible="False"/>
@@ -48,13 +48,13 @@
                    VerticalAlignment="Center" HorizontalAlignment="Center"
                    Foreground="{DynamicResource TextMutedBrush}" FontSize="13"/>
 
-        <Button x:Name="NextBtn" Grid.Column="2" Content="Next" Click="NextBtn_Click"
+        <Button x:Name="NextBtn" Grid.Column="2" Content="" Click="NextBtn_Click"
                 Classes="action-btn" Padding="24,10"
                 HorizontalAlignment="Right"/>
       </Grid>
 
       <!-- Skip -->
-      <Button x:Name="SkipBtn" Content="Skip tutorial" Click="SkipBtn_Click"
+      <Button x:Name="SkipBtn" Content="" Click="SkipBtn_Click"
               Background="Transparent" Foreground="{DynamicResource TextMutedBrush}"
               HorizontalAlignment="Center" FontSize="12"
               Padding="12,6" Cursor="Hand"/>

@@ -17,7 +17,7 @@ public partial class OnboardingView : UserControl
     private sealed record Step(string Icon, string Title, string Description, string Detail);
 
     private readonly List<Step> _steps = new()
-    {
+    { // initial build (language at startup)
         new("\u2665",
             LocalizationService._("onb.welcomeTitle"),
             LocalizationService._("onb.welcomeDesc"),
@@ -54,6 +54,26 @@ public partial class OnboardingView : UserControl
         InitializeComponent();
         BuildDots();
         ShowStep(0);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) => LocalizationService.LanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            RebuildSteps();
+            ShowStep(_currentStep);
+        });
+
+    private void RebuildSteps()
+    {
+        _steps.Clear();
+        _steps.Add(new("\u2665", LocalizationService._("onb.welcomeTitle"), LocalizationService._("onb.welcomeDesc"), LocalizationService._("onb.welcomeDetail")));
+        _steps.Add(new("\u2302", LocalizationService._("onb.dashboardTitle"), LocalizationService._("onb.dashboardDesc"), LocalizationService._("onb.dashboardDetail")));
+        _steps.Add(new("\u2702", LocalizationService._("onb.cleanTitle"), LocalizationService._("onb.cleanDesc"), LocalizationService._("onb.cleanDetail")));
+        _steps.Add(new("\u2B50", LocalizationService._("onb.gamingTitle"), LocalizationService._("onb.gamingDesc"), LocalizationService._("onb.gamingDetail")));
+        _steps.Add(new("\u2699", LocalizationService._("onb.customizeTitle"), LocalizationService._("onb.customizeDesc"), LocalizationService._("onb.customizeDetail")));
+        _steps.Add(new("\u2605", LocalizationService._("onb.smartTitle"), LocalizationService._("onb.smartDesc"), LocalizationService._("onb.smartDetail")));
     }
 
     private void BuildDots()

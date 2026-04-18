@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public record AdapterItem(string Name, string Desc, string Ip, string Speed, string Sent, string Recv);
-public record DnsPresetItem(string Name, string Servers, string Category, string ActiveLabel, ISolidColorBrush ActiveBrush);
+public record DnsPresetItem(string Name, string Servers, string Category, string ActiveLabel, ISolidColorBrush ActiveBrush, string SwitchLabel);
 public record BandwidthItem(string Rank, string ProcessName, string Details, string Connections, string Pid);
 
 public partial class NetworkOptimizerView : UserControl
@@ -37,8 +37,8 @@ public partial class NetworkOptimizerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) => LocalizationService.LanguageChanged -= OnLanguageChanged;
         _module = App.Services.GetServices<IOptimizationModule>().OfType<NetworkOptimizerModule>().FirstOrDefault();
         Loaded += async (s, e) =>
         {
@@ -50,9 +50,12 @@ public partial class NetworkOptimizerView : UserControl
         };
     }
 
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
     private async Task RunScan()
     {
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             // Module DNS scan
@@ -69,7 +72,8 @@ public partial class NetworkOptimizerView : UserControl
                     DnsPresetList.ItemsSource = r.AvailableDnsPresets.Select(p => new DnsPresetItem(
                         p.Name, $"{p.Primary} / {p.Secondary}", p.Category,
                         p.IsCurrentlyActive ? "Active" : "",
-                        new SolidColorBrush(Color.Parse(p.IsCurrentlyActive ? "#22C55E" : "#555570"))
+                        new SolidColorBrush(Color.Parse(p.IsCurrentlyActive ? "#22C55E" : "#555570")),
+                        LocalizationService._("common.switch")
                     )).ToList();
                 }
             }
@@ -102,16 +106,16 @@ public partial class NetworkOptimizerView : UserControl
             AdapterList.ItemsSource = adapterItems;
         }
         catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
-        finally { ScanLabel.Text = "Scan"; }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private async void Bench_Click(object? sender, RoutedEventArgs e)
     {
         BenchBtn.IsEnabled = false;
-        BenchLabel.Text = "Running...";
+        BenchLabel.Text = LocalizationService._("common.scanning");
         BenchHeader.IsVisible = true;
         RecommendText.IsVisible = true;
-        RecommendText.Text = "Testing 10 DNS servers...";
+        RecommendText.Text = LocalizationService._("common.scanning");
         BenchResults.Children.Clear();
 
         var results = new List<(string Name, string Ip, double Ms, bool Ok)>();
@@ -168,7 +172,7 @@ public partial class NetworkOptimizerView : UserControl
             BenchResults.Children.Add(row);
         }
         BenchBtn.IsEnabled = true;
-        BenchLabel.Text = "Benchmark DNS";
+        BenchLabel.Text = LocalizationService._("netOpt.benchDns");
     }
 
     private static Control SetCol(Control c, int col) { Grid.SetColumn(c, col); return c; }
@@ -305,10 +309,10 @@ public partial class NetworkOptimizerView : UserControl
     private async void FindBestDns_Click(object? sender, RoutedEventArgs e)
     {
         FindBestDnsBtn.IsEnabled = false;
-        FindBestDnsLabel.Text = "Testing...";
+        FindBestDnsLabel.Text = LocalizationService._("common.scanning");
         BestDnsHeader.IsVisible = true;
         BestDnsRecommend.IsVisible = true;
-        BestDnsRecommend.Text = "Pinging all DNS servers in parallel...";
+        BestDnsRecommend.Text = LocalizationService._("common.scanning");
         BestDnsResults.Children.Clear();
 
         var servers = new (string Name, string Ip)[]
@@ -423,7 +427,7 @@ public partial class NetworkOptimizerView : UserControl
         }
 
         FindBestDnsBtn.IsEnabled = true;
-        FindBestDnsLabel.Text = "Best DNS";
+        FindBestDnsLabel.Text = LocalizationService._("netOpt.bestDns");
     }
 
     private async void ApplyBestDns_Click(object? sender, RoutedEventArgs e)
@@ -800,5 +804,33 @@ public partial class NetworkOptimizerView : UserControl
         catch { return new List<BandwidthItem>(); }
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.network"); }
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        PageTitle.Text = L("nav.network");
+        ModuleHdr.Title = L("netOpt.title");
+        ModuleHdr.Subtitle = L("netOpt.subtitle");
+        ScanLabel.Text = L("common.scan");
+        BenchLabel.Text = L("netOpt.benchDns");
+        FindBestDnsLabel.Text = L("netOpt.bestDns");
+        LblCurrentDns.Text = L("netOpt.currentDns");
+        LblProvider.Text = L("netOpt.provider");
+        LblResponseTime.Text = L("netOpt.responseTime");
+        LblInterfaces.Text = L("netOpt.interfaces");
+        LblSent.Text = L("netOpt.sent");
+        LblRecv.Text = L("netOpt.recv");
+        LblWifiSignal.Text = L("netOpt.wifiSignal");
+        LblChannel.Text = L("netOpt.channel");
+        LblBand.Text = L("netOpt.band");
+        LblSpeed.Text = L("netOpt.speed");
+        LblDnsChangeResults.Text = L("netOpt.dnsChangeResults");
+        LblBefore.Text = L("netOpt.before");
+        LblAfter.Text = L("netOpt.after");
+        LblNetworkAdapters.Text = L("netOpt.networkAdapters");
+        LblDnsPresets.Text = L("netOpt.dnsPresets");
+        LblBandwidthByProcess.Text = L("netOpt.bandwidthByProcess");
+        BenchHeader.Text = L("netOpt.dnsBenchmark");
+        BestDnsHeader.Text = L("netOpt.bestDnsForYou");
+        RefreshBwBtn.Content = L("common.refresh");
+    }
 }

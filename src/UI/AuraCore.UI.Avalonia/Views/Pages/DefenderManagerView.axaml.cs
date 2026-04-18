@@ -31,12 +31,15 @@ public partial class DefenderManagerView : UserControl
         _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<DefenderManagerModule>().FirstOrDefault();
         Loaded += async (s, e) => await RunScan();
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
 }
 
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
@@ -54,12 +57,12 @@ public partial class DefenderManagerView : UserControl
             TogglePanel.Children.Clear();
             var toggles = new (string label, bool on)[]
             {
-                ("Real-Time Protection", s.RealTimeProtection),
-                ("Cloud Protection", s.CloudProtection),
-                ("Behavior Monitoring", s.BehaviorMonitoring),
-                ("PUA Protection", s.PotentiallyUnwantedApps),
-                ("Network Protection", s.NetworkProtection),
-                ("Tamper Protection", s.TamperProtection),
+                (LocalizationService._("defender.toggle.realTime"), s.RealTimeProtection),
+                (LocalizationService._("defender.toggle.cloud"), s.CloudProtection),
+                (LocalizationService._("defender.toggle.behavior"), s.BehaviorMonitoring),
+                (LocalizationService._("defender.toggle.pua"), s.PotentiallyUnwantedApps),
+                (LocalizationService._("defender.toggle.network"), s.NetworkProtection),
+                (LocalizationService._("defender.toggle.tamper"), s.TamperProtection),
             };
             foreach (var (label, on) in toggles)
             {
@@ -109,14 +112,14 @@ public partial class DefenderManagerView : UserControl
             ThreatList.ItemsSource = threats;
         }
         catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
-        finally { ScanLabel.Text = "Refresh"; }
+        finally { ScanLabel.Text = LocalizationService._("defender.action.refresh"); }
     }
 
     private static void SetFw(TextBlock tb, bool on)
     {
-        tb.Text = on ? "Enabled" : "Disabled";
+        tb.Text = on ? LocalizationService._("defender.fw.enabled") : LocalizationService._("defender.fw.disabled");
         tb.Foreground = new SolidColorBrush(Color.Parse(on ? "#22C55E" : "#EF4444"));
-}
+    }
 
     private static SolidColorBrush P(string hex) => new(Color.Parse(hex));
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
@@ -145,7 +148,7 @@ public partial class DefenderManagerView : UserControl
             DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
             return;
         }
-        await RunDefenderAction(() => _module!.UpdateSignaturesAsync(), "Updating signatures...", "Signatures updated.");
+        await RunDefenderAction(() => _module!.UpdateSignaturesAsync(), LocalizationService._("defender.status.updatingSigs"), LocalizationService._("defender.status.sigsUpdated"));
     }
 
     private async void QuickScan_Click(object? sender, RoutedEventArgs e)
@@ -155,7 +158,7 @@ public partial class DefenderManagerView : UserControl
             DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
             return;
         }
-        await RunDefenderAction(() => _module!.QuickScanAsync(), "Running quick scan...", "Quick scan started.");
+        await RunDefenderAction(() => _module!.QuickScanAsync(), LocalizationService._("defender.status.runningQuick"), LocalizationService._("defender.status.quickStarted"));
     }
 
     private async void FullScan_Click(object? sender, RoutedEventArgs e)
@@ -165,21 +168,21 @@ public partial class DefenderManagerView : UserControl
             DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
             return;
         }
-        await RunDefenderAction(() => _module!.FullScanAsync(), "Running full scan...", "Full scan started.");
+        await RunDefenderAction(() => _module!.FullScanAsync(), LocalizationService._("defender.status.runningFull"), LocalizationService._("defender.status.fullStarted"));
     }
 
     private async Task RunDefenderAction(
         System.Func<System.Threading.Tasks.Task<DefenderManagerModule.DefenderOperationOutcome>> action,
         string inProgressText, string successText)
     {
-        if (_module is null) { DefActionStatus.Text = "Module not available."; return; }
+        if (_module is null) { DefActionStatus.Text = LocalizationService._("common.moduleUnavailable"); return; }
         DefActionStatus.Text = inProgressText;
         SetActionButtonsEnabled(false);
         try
         {
             var result = await action();
             if (result.HelperMissing)
-                DefActionStatus.Text = "Privileged helper not installed — run scripts/install-privileged-service.ps1 as admin";
+                DefActionStatus.Text = LocalizationService._("privhelper.notInstalled.toast");
             else if (result.Success)
                 DefActionStatus.Text = successText;
             else
@@ -205,5 +208,26 @@ public partial class DefenderManagerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.defender");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("defender.title");
+            h.Subtitle = L("defender.subtitle");
+        }
+        ScanLabel.Text = L("defender.action.refresh");
+        ProtectionLevelLabel.Text = L("defender.stat.protectionLevel");
+        FirewallLabel.Text = L("defender.section.firewall");
+        FwDomainLabel.Text = L("defender.fw.domain");
+        FwPrivateLabel.Text = L("defender.fw.private");
+        FwPublicLabel.Text = L("defender.fw.public");
+        SignaturesLabel.Text = L("defender.section.signatures");
+        SigVerLabel.Text = L("defender.sig.version");
+        EngineVerLabel.Text = L("defender.sig.engine");
+        SigDateLabel.Text = L("defender.sig.lastUpdated");
+        RecentThreatsLabel.Text = L("defender.section.recentThreats");
+        ActionsLabel.Text = L("defender.section.actions");
+        UpdateSigsBtn.Content = L("defender.action.updateSigs");
+        QuickScanBtn.Content = L("defender.action.quickScan");
+        FullScanBtn.Content = L("defender.action.fullScan");
     }
 }

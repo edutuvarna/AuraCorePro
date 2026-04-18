@@ -12,6 +12,9 @@ public partial class EnvironmentVariablesView : UserControl
         Loaded += (s, e) => { LoadVariables(); ApplyLocalization(); };
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void LoadVariables()
@@ -19,7 +22,7 @@ public partial class EnvironmentVariablesView : UserControl
         // Load PATH entries
         var path = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? "";
         var entries = path.Split(';', StringSplitOptions.RemoveEmptyEntries);
-        PathCount.Text = $"{entries.Length} entries";
+        PathCount.Text = string.Format(LocalizationService._("envVars.path.entryCount"), entries.Length);
 
         PathList.ItemsSource = entries.Select(e => new Border
         {
@@ -96,5 +99,17 @@ public partial class EnvironmentVariablesView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.environmentVariables");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("envVars.title");
+            h.Subtitle = L("envVars.subtitle");
+        }
+        PathSectionLabel.Text = L("envVars.path.section");
+        NewPathBox.Watermark = L("envVars.path.placeholder");
+        AddPathBtn.Content = L("envVars.action.add");
+        UserVarsLabel.Text = L("envVars.section.userVars");
+        RefreshBtn.Content = L("envVars.action.refresh");
+        SearchBox.Watermark = L("envVars.search.placeholder");
     }
 }

@@ -29,12 +29,15 @@ public partial class DnsBenchmarkView : UserControl
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private async void Bench_Click(object? sender, RoutedEventArgs e)
     {
         BenchBtn.IsEnabled = false;
-        SubText.Text = "Running benchmark... (testing 10 DNS servers)";
+        SubText.Text = LocalizationService._("dnsBench.status.running");
         RecommendText.Text = "";
 
         var results = new List<(string Name, string Ip, double Ms, bool Ok)>();
@@ -57,16 +60,16 @@ public partial class DnsBenchmarkView : UserControl
         });
 
         results.Sort((a, b) => a.Ms < 0 ? 1 : b.Ms < 0 ? -1 : a.Ms.CompareTo(b.Ms));
-        SubText.Text = $"Benchmark complete - tested {DnsServers.Length} servers";
+        SubText.Text = string.Format(LocalizationService._("dnsBench.status.complete"), DnsServers.Length);
 
         var best = results.FirstOrDefault(r => r.Ok);
         if (best.Ok)
-            RecommendText.Text = $"Recommended: {best.Name} ({best.Ip}) - {best.Ms:F1}ms average";
+            RecommendText.Text = string.Format(LocalizationService._("dnsBench.status.recommended"), best.Name, best.Ip, best.Ms);
 
         DnsList.ItemsSource = results.Select((r, i) =>
         {
             var color = !r.Ok ? "#EF4444" : r.Ms < 20 ? "#22C55E" : r.Ms < 50 ? "#F59E0B" : "#EF4444";
-            var msText = r.Ok ? $"{r.Ms:F1} ms" : "Timeout";
+            var msText = r.Ok ? $"{r.Ms:F1} ms" : LocalizationService._("dnsBench.status.timeout");
             var rank = i + 1;
 
             return new Border
@@ -136,5 +139,18 @@ public partial class DnsBenchmarkView : UserControl
         return ms.ToArray();
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.dnsBenchmark"); }
+    private void ApplyLocalization()
+    {
+        PageTitle.Text = LocalizationService._("nav.dnsBenchmark");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("dnsBench.title");
+            h.Subtitle = L("dnsBench.subtitle");
+        }
+        DnsServersLabel.Text = L("dnsBench.section.dnsServers");
+        BenchBtn.Content = L("dnsBench.action.run");
+        if (string.IsNullOrEmpty(SubText.Text))
+            SubText.Text = L("dnsBench.hint");
+    }
 }

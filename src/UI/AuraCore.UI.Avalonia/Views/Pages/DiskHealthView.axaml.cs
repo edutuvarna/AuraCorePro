@@ -5,7 +5,8 @@ using global::Avalonia.Media;
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public record DiskDisplayItem(string Model, string Info, string Size, string MediaType,
-    string Interface, string Partitions, string Health, ISolidColorBrush HealthFg, ISolidColorBrush HealthBg);
+    string Interface, string Partitions, string Health, ISolidColorBrush HealthFg, ISolidColorBrush HealthBg,
+    string SizeLabel = "", string TypeLabel = "", string FormatLabel = "", string PartitionsLabel = "");
 
 public partial class DiskHealthView : UserControl
 {
@@ -15,12 +16,15 @@ public partial class DiskHealthView : UserControl
         Loaded += async (s, e) => { await RunScan(); ApplyLocalization(); };
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private async Task RunScan()
     {
-        ScanLabel.Text = "Scanning...";
-        SubText.Text = "Scanning drives...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
+        SubText.Text = LocalizationService._("diskHealth.status.scanningDrives");
         try
         {
             var rawData = await Task.Run(() =>
@@ -47,7 +51,7 @@ public partial class DiskHealthView : UserControl
 
             if (rawData.Count == 0)
             {
-                SubText.Text = "No drives found";
+                SubText.Text = LocalizationService._("diskHealth.status.noDrives");
                 return;
             }
 
@@ -59,13 +63,17 @@ public partial class DiskHealthView : UserControl
                     "Warning"  => (P("#F59E0B"), P("#20F59E0B")),
                     _          => (P("#22C55E"), P("#2022C55E"))
                 };
-                return new DiskDisplayItem(d.Name, d.Info, d.Size, d.Type, d.Format, "N/A", d.Health, fg, bg);
+                return new DiskDisplayItem(d.Name, d.Info, d.Size, d.Type, d.Format, "N/A", d.Health, fg, bg,
+                    LocalizationService._("diskHealth.col.size"),
+                    LocalizationService._("diskHealth.col.type"),
+                    LocalizationService._("diskHealth.col.format"),
+                    LocalizationService._("diskHealth.col.partitions"));
             }).ToList();
             DriveList.ItemsSource = items;
             SubText.Text = $"Found {items.Count} drive(s)";
         }
         catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
-        finally { ScanLabel.Text = "Scan"; }
+        finally { ScanLabel.Text = LocalizationService._("diskHealth.action.scan"); }
     }
 
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
@@ -74,5 +82,13 @@ public partial class DiskHealthView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.diskHealth");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("diskHealth.title");
+            h.Subtitle = L("diskHealth.subtitle");
+        }
+        ScanLabel.Text = L("diskHealth.action.scan");
+        DetectedDrivesLabel.Text = L("diskHealth.section.detectedDrives");
     }
 }

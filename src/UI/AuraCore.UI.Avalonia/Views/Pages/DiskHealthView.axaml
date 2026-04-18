@@ -6,14 +6,13 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Disk Health"
-                             Subtitle="SMART status and drive diagnostics">
+      <controls:ModuleHeader x:Name="Header">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock Text="🔍" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -25,7 +24,7 @@
 
       <!-- Hidden subtitle bridge for code-behind -->
       <TextBlock x:Name="SubText"
-                 Text="SMART status and drive diagnostics"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
@@ -36,11 +35,11 @@
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Border Width="20" Height="20" CornerRadius="6"
                     Background="{DynamicResource BgCardBrush}">
-              <TextBlock Text="&#x1F4BF;" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock Text="💿" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Detected Drives"
+            <TextBlock x:Name="DetectedDrivesLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
@@ -69,28 +68,32 @@
                     </Grid>
                     <Grid ColumnDefinitions="*,*,*,*">
                       <StackPanel Spacing="2">
-                        <TextBlock Text="Size" FontSize="{DynamicResource FontSizeLabel}"
+                        <TextBlock Text="{Binding SizeLabel}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
                                    Foreground="{DynamicResource TextMutedBrush}"/>
                         <TextBlock Text="{Binding Size}"
                                    FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextPrimaryBrush}"/>
                       </StackPanel>
                       <StackPanel Grid.Column="1" Spacing="2">
-                        <TextBlock Text="Type" FontSize="{DynamicResource FontSizeLabel}"
+                        <TextBlock Text="{Binding TypeLabel}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
                                    Foreground="{DynamicResource TextMutedBrush}"/>
                         <TextBlock Text="{Binding MediaType}"
                                    FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource AccentBlueBrush}"/>
                       </StackPanel>
                       <StackPanel Grid.Column="2" Spacing="2">
-                        <TextBlock Text="Format" FontSize="{DynamicResource FontSizeLabel}"
+                        <TextBlock Text="{Binding FormatLabel}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
                                    Foreground="{DynamicResource TextMutedBrush}"/>
                         <TextBlock Text="{Binding Interface}"
                                    FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource TextPrimaryBrush}"/>
                       </StackPanel>
                       <StackPanel Grid.Column="3" Spacing="2">
-                        <TextBlock Text="Partitions" FontSize="{DynamicResource FontSizeLabel}"
+                        <TextBlock Text="{Binding PartitionsLabel}"
+                                   FontSize="{DynamicResource FontSizeLabel}"
                                    Foreground="{DynamicResource TextMutedBrush}"/>
                         <TextBlock Text="{Binding Partitions}"
                                    FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"

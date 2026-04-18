@@ -200,6 +200,17 @@ public partial class CronManagerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.cronManager");
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.cronManager");
+        CronHeader.Title    = L("nav.cronManager");
+        CronHeader.Subtitle = L("cronManager.subtitle");
+        UserJobsStat.Label   = L("cronManager.stat.userJobs");
+        SystemCronStat.Label = L("cronManager.stat.systemCronFiles");
+        CronRefreshBtn.Content      = L("cronManager.action.refresh");
+        UserCrontabHeading.Text     = L("cronManager.heading.userCrontab");
+        SysCronDirsHeading.Text     = L("cronManager.heading.systemCronDirs");
+        SubText.Text                = L("cronManager.subtext.initial");
+        CronSyntaxTitle.Text        = L("cronManager.syntax.title");
+        CronSyntaxExamples.Text     = L("cronManager.syntax.examples");
     }
 }

@@ -1145,6 +1145,38 @@ public static class LocalizationService
         ["snapFlatpakCleaner.status.error"] = "Error: {0}",
         ["snapFlatpakCleaner.status.unavailable"] = "Neither snap nor flatpak is installed.",
         ["snapFlatpakCleaner.warning.privilege"] = "Snap removal requires sudo. Run AuraCore with privileges, or use 'sudo snap remove' directly from a terminal.",
+        ["snapFlatpakCleaner.action.cleanupActions"] = "Cleanup Actions",
+
+        // Phase 6.4 Batch10 — Package Cleaner (Linux)
+        ["packageCleaner.subtitle"] = "Clean package manager caches, orphaned packages, and old kernels",
+        ["packageCleaner.stat.aptCache"] = "APT CACHE",
+        ["packageCleaner.stat.snapCache"] = "SNAP CACHE",
+        ["packageCleaner.stat.pipCache"] = "PIP CACHE",
+        ["packageCleaner.heading.cacheCategories"] = "Cache Categories",
+        ["packageCleaner.action.scan"] = "Scan",
+        ["packageCleaner.subtext.initial"] = "Click Scan to analyze package caches (Linux only)",
+        ["packageCleaner.warning.privilege"] = "Cleaning package caches requires sudo privileges. Use 'sudo apt clean' or 'sudo dnf clean all' from terminal for full cleanup.",
+
+        // Phase 6.4 Batch10 — Systemd Manager (Linux)
+        ["systemdManager.subtitle"] = "List, start, stop, restart and manage systemd services",
+        ["systemdManager.stat.total"] = "TOTAL",
+        ["systemdManager.stat.running"] = "RUNNING",
+        ["systemdManager.stat.failed"] = "FAILED",
+        ["systemdManager.stat.enabled"] = "ENABLED",
+        ["systemdManager.search.watermark"] = "Search services...",
+        ["systemdManager.action.scan"] = "Scan Services",
+        ["systemdManager.subtext.initial"] = "Click Scan to load systemd services (Linux only)",
+
+        // Phase 6.4 Batch10 — Cron Manager (macOS/Linux)
+        ["cronManager.subtitle"] = "View and manage scheduled cron jobs",
+        ["cronManager.stat.userJobs"] = "USER JOBS",
+        ["cronManager.stat.systemCronFiles"] = "SYSTEM CRON FILES",
+        ["cronManager.action.refresh"] = "Refresh",
+        ["cronManager.heading.userCrontab"] = "User Crontab",
+        ["cronManager.heading.systemCronDirs"] = "System Cron Directories",
+        ["cronManager.subtext.initial"] = "Click Refresh to load cron jobs",
+        ["cronManager.syntax.title"] = "Cron Syntax: MIN HOUR DAY MONTH WEEKDAY COMMAND",
+        ["cronManager.syntax.examples"] = "Examples: '0 */6 * * * /usr/bin/backup.sh' (every 6h) | '30 2 * * 0 apt update' (Sun 2:30am)",
 
         // Phase 4.3.3 Docker Cleaner (Linux / macOS)
         ["dockerCleaner.subtitle"] = "Reclaim disk space from unused Docker resources",
@@ -1422,6 +1454,34 @@ public static class LocalizationService
         ["nav.launchAgentManager"] = "Launch Agent Manager",
         ["nav.brewManager"] = "Brew Manager",
         ["nav.timeMachineManager"] = "Time Machine Manager",
+
+        // Phase 6.4 Batch10 — Launch Agent Manager (macOS)
+        ["launchAgentManager.subtitle"] = "Manage macOS LaunchAgents and LaunchDaemons (startup services)",
+        ["launchAgentManager.stat.userAgents"] = "USER AGENTS",
+        ["launchAgentManager.stat.systemAgents"] = "SYSTEM AGENTS",
+        ["launchAgentManager.stat.daemons"] = "DAEMONS",
+        ["launchAgentManager.action.scan"] = "Scan",
+        ["launchAgentManager.heading.launchItems"] = "Launch Items",
+        ["launchAgentManager.subtext.initial"] = "Click Scan to list LaunchAgents/Daemons (macOS only)",
+
+        // Phase 6.4 Batch10 — Brew Manager (macOS)
+        ["brewManager.subtitle"] = "Manage Homebrew packages, casks, and cleanup cache",
+        ["brewManager.stat.formulae"] = "FORMULAE",
+        ["brewManager.stat.casks"] = "CASKS",
+        ["brewManager.stat.outdated"] = "OUTDATED",
+        ["brewManager.action.scan"] = "Scan",
+        ["brewManager.action.cleanupCache"] = "Cleanup Cache",
+        ["brewManager.heading.installedPackages"] = "Installed Packages",
+        ["brewManager.subtext.initial"] = "Click Scan to list Homebrew packages (macOS only)",
+
+        // Phase 6.4 Batch10 — Time Machine Manager (macOS)
+        ["timeMachineManager.subtitle"] = "Monitor Time Machine backups, status, and exclusions",
+        ["timeMachineManager.stat.lastBackup"] = "LAST BACKUP",
+        ["timeMachineManager.stat.status"] = "STATUS",
+        ["timeMachineManager.action.refresh"] = "Refresh",
+        ["timeMachineManager.heading.details"] = "Time Machine Details",
+        ["timeMachineManager.subtext.initial"] = "Click Refresh to check Time Machine status (macOS only)",
+        ["timeMachineManager.heading.exclusions"] = "Exclusions",
 
         // ── New Windows Modules (Session 18) ──
         ["nav.networkMonitor"] = "Network Monitor",
@@ -3458,6 +3518,38 @@ public static class LocalizationService
         ["snapFlatpakCleaner.status.error"] = "Hata: {0}",
         ["snapFlatpakCleaner.status.unavailable"] = "Snap veya flatpak kurulu değil.",
         ["snapFlatpakCleaner.warning.privilege"] = "Snap kaldırma işlemi sudo gerektirir. AuraCore'u yetkili kullanıcı olarak çalıştırın veya terminalden 'sudo snap remove' komutunu kullanın.",
+        ["snapFlatpakCleaner.action.cleanupActions"] = "Temizleme İşlemleri",
+
+        // Phase 6.4 Batch10 — Package Cleaner (Linux) TR
+        ["packageCleaner.subtitle"] = "Paket yöneticisi önbelleklerini, sahipsiz paketleri ve eski çekirdekleri temizle",
+        ["packageCleaner.stat.aptCache"] = "APT ÖNB.",
+        ["packageCleaner.stat.snapCache"] = "SNAP ÖNB.",
+        ["packageCleaner.stat.pipCache"] = "PIP ÖNB.",
+        ["packageCleaner.heading.cacheCategories"] = "Önbellek Kategorileri",
+        ["packageCleaner.action.scan"] = "Tara",
+        ["packageCleaner.subtext.initial"] = "Paket önbelleklerini analiz etmek için Tara'ya tıklayın (yalnızca Linux)",
+        ["packageCleaner.warning.privilege"] = "Paket önbelleklerini temizlemek sudo yetkisi gerektirir. Tam temizlik için terminalden 'sudo apt clean' veya 'sudo dnf clean all' komutunu kullanın.",
+
+        // Phase 6.4 Batch10 — Systemd Manager (Linux) TR
+        ["systemdManager.subtitle"] = "Systemd servislerini listele, başlat, durdur, yeniden başlat ve yönet",
+        ["systemdManager.stat.total"] = "TOPLAM",
+        ["systemdManager.stat.running"] = "ÇALIŞIYOR",
+        ["systemdManager.stat.failed"] = "BAŞARISIZ",
+        ["systemdManager.stat.enabled"] = "ETKİN",
+        ["systemdManager.search.watermark"] = "Servis ara...",
+        ["systemdManager.action.scan"] = "Servisleri Tara",
+        ["systemdManager.subtext.initial"] = "Systemd servislerini yüklemek için Tara'ya tıklayın (yalnızca Linux)",
+
+        // Phase 6.4 Batch10 — Cron Manager (macOS/Linux) TR
+        ["cronManager.subtitle"] = "Zamanlanmış cron işlerini görüntüle ve yönet",
+        ["cronManager.stat.userJobs"] = "KULLANICI İŞLERİ",
+        ["cronManager.stat.systemCronFiles"] = "SİSTEM CRON DOSYALARI",
+        ["cronManager.action.refresh"] = "Yenile",
+        ["cronManager.heading.userCrontab"] = "Kullanıcı Crontab'ı",
+        ["cronManager.heading.systemCronDirs"] = "Sistem Cron Dizinleri",
+        ["cronManager.subtext.initial"] = "Cron işlerini yüklemek için Yenile'ye tıklayın",
+        ["cronManager.syntax.title"] = "Cron Sözdizimi: DAK SAAT GÜN AY HAFTAICI KOMUT",
+        ["cronManager.syntax.examples"] = "Örnekler: '0 */6 * * * /usr/bin/backup.sh' (her 6 saatte) | '30 2 * * 0 apt update' (Paz 02:30)",
 
         // Phase 4.3.3 Docker Cleaner (Linux / macOS)
         ["dockerCleaner.subtitle"] = "Kullanılmayan Docker kaynaklarından disk alanı geri kazan",
@@ -3735,6 +3827,34 @@ public static class LocalizationService
         ["nav.launchAgentManager"] = "Launch Agent Yoneticisi",
         ["nav.brewManager"] = "Brew Yoneticisi",
         ["nav.timeMachineManager"] = "Time Machine Yoneticisi",
+
+        // Phase 6.4 Batch10 — Launch Agent Manager (macOS) TR
+        ["launchAgentManager.subtitle"] = "macOS LaunchAgent'ları ve LaunchDaemon'ları yönet (başlangıç servisleri)",
+        ["launchAgentManager.stat.userAgents"] = "KULLANICI ARAÇLARI",
+        ["launchAgentManager.stat.systemAgents"] = "SİSTEM ARAÇLARI",
+        ["launchAgentManager.stat.daemons"] = "DAEMON'LAR",
+        ["launchAgentManager.action.scan"] = "Tara",
+        ["launchAgentManager.heading.launchItems"] = "Başlatma Öğeleri",
+        ["launchAgentManager.subtext.initial"] = "LaunchAgent/Daemon'ları listelemek için Tara'ya tıklayın (yalnızca macOS)",
+
+        // Phase 6.4 Batch10 — Brew Manager (macOS) TR
+        ["brewManager.subtitle"] = "Homebrew paketlerini, cask'larını ve önbelleğini temizle ve yönet",
+        ["brewManager.stat.formulae"] = "FORMULA",
+        ["brewManager.stat.casks"] = "CASK",
+        ["brewManager.stat.outdated"] = "GÜNCELLENEBİLİR",
+        ["brewManager.action.scan"] = "Tara",
+        ["brewManager.action.cleanupCache"] = "Önbelleği Temizle",
+        ["brewManager.heading.installedPackages"] = "Yüklü Paketler",
+        ["brewManager.subtext.initial"] = "Homebrew paketlerini listelemek için Tara'ya tıklayın (yalnızca macOS)",
+
+        // Phase 6.4 Batch10 — Time Machine Manager (macOS) TR
+        ["timeMachineManager.subtitle"] = "Time Machine yedeklerini, durumunu ve dışlamaları izle",
+        ["timeMachineManager.stat.lastBackup"] = "SON YEDEKLEME",
+        ["timeMachineManager.stat.status"] = "DURUM",
+        ["timeMachineManager.action.refresh"] = "Yenile",
+        ["timeMachineManager.heading.details"] = "Time Machine Ayrıntıları",
+        ["timeMachineManager.subtext.initial"] = "Time Machine durumunu kontrol etmek için Yenile'ye tıklayın (yalnızca macOS)",
+        ["timeMachineManager.heading.exclusions"] = "Dışlamalar",
 
         // ── New Windows Modules (Session 18) ──
         ["nav.networkMonitor"] = "Ağ İzleyici",

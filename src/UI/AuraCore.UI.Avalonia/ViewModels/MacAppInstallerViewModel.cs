@@ -121,6 +121,9 @@ public sealed class MacAppVM : INotifyPropertyChanged
     /// <summary>True if this is a not-installed BrewCask app (orange/warn pill).</summary>
     public bool IsCaskPillVisible => !_isInstalled && PackageSource == MacPackageSource.BrewCask;
 
+    /// <summary>Localized installed badge text for the installed pill.</summary>
+    public string InstalledBadgeText => LocalizationService._("macAppInstaller.app.installed");
+
     public event Action? SelectionChanged;
     public event Action? InstalledChanged;
 

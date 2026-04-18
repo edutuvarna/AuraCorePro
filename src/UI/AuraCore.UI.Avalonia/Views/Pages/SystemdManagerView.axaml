@@ -5,8 +5,9 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Systemd Manager"
-                             Subtitle="List, start, stop, restart and manage systemd services">
+      <controls:ModuleHeader x:Name="SvcHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <TextBlock x:Name="PageTitle" IsVisible="False"/>
         </controls:ModuleHeader.Actions>
@@ -22,16 +23,20 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="TOTAL"
+        <controls:StatCard x:Name="TotalSvcStat"
+                           Label=""
                            Value="{Binding #TotalSvc.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="RUNNING"
+        <controls:StatCard x:Name="RunningSvcStat"
+                           Label=""
                            Value="{Binding #RunningSvc.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
-        <controls:StatCard Label="FAILED"
+        <controls:StatCard x:Name="FailedSvcStat"
+                           Label=""
                            Value="{Binding #FailedSvc.Text}"
                            ValueBrush="{DynamicResource StatusErrorBrush}"/>
-        <controls:StatCard Label="ENABLED"
+        <controls:StatCard x:Name="EnabledSvcStat"
+                           Label=""
                            Value="{Binding #EnabledSvc.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
       </controls:StatRow>
@@ -40,13 +45,13 @@
       <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBox x:Name="SearchBox" Watermark="Search services..." Width="300"
+            <TextBox x:Name="SearchBox" Watermark="" Width="300"
                      HorizontalAlignment="Left" TextChanged="Search_Changed"/>
-            <Button x:Name="ScanBtn" Content="Scan Services" Click="Scan_Click"
+            <Button x:Name="ScanBtn" Content="" Click="Scan_Click"
                     Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
           <TextBlock x:Name="SubText"
-                     Text="Click Scan to load systemd services (Linux only)"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="SvcList"/>

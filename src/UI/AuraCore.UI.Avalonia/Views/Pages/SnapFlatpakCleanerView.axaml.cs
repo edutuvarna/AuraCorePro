@@ -24,7 +24,12 @@ public partial class SnapFlatpakCleanerView : UserControl
                 catch { /* design-time / tests without DI */ }
             }
         };
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (_, _) => LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
 
     private void ApplyLocalizedTexts()
     {
@@ -52,6 +57,8 @@ public partial class SnapFlatpakCleanerView : UserControl
             cboth.Content = LocalizationService._("snapFlatpakCleaner.action.cleanBoth");
         if (this.FindControl<TextBlock>("PrivilegeWarning") is { } pw)
             pw.Text = LocalizationService._("snapFlatpakCleaner.warning.privilege");
+        if (this.FindControl<TextBlock>("CleanupHeading") is { } ch)
+            ch.Text = LocalizationService._("snapFlatpakCleaner.action.cleanupActions");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

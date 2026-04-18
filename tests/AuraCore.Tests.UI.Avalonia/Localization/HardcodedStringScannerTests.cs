@@ -21,16 +21,7 @@ public class HardcodedStringScannerTests
     // by IsWhitelistedString — don't expand this list for those.
     private static readonly HashSet<string> GrandfatheredFiles = new(StringComparer.OrdinalIgnoreCase)
     {
-        // Current-state offenders (2026-04-18 baseline). Remove each entry once the module is localized.
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/BrewManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/CronManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/LaunchAgentManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/MacAppInstallerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/PackageCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SnapFlatpakCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SpotlightManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SystemdManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/TimeMachineManagerView.axaml",
+        // Phase 6.4 Batch 10 complete — all modules localized. List is empty.
     };
 
     private static readonly string[] ScannedAttributes =

@@ -54,16 +54,16 @@
           <SolidColorBrush x:Key="StatusInfoBrush" Color="#B088FF"/>
 
           <!-- Semantic tinted backgrounds + borders (ported from V1 bridge 2026-04-16) -->
-          <SolidColorBrush x:Key="SuccessBgBrush" Color="#22C55E20"/>
-          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#22C55E30"/>
-          <SolidColorBrush x:Key="WarningBgBrush" Color="#F59E0B0D"/>
-          <SolidColorBrush x:Key="WarningBorderBrush" Color="#F59E0B33"/>
-          <SolidColorBrush x:Key="ErrorBgBrush" Color="#EF444420"/>
-          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#EF444430"/>
-          <SolidColorBrush x:Key="InfoBgBrush" Color="#3B82F60D"/>
-          <SolidColorBrush x:Key="InfoBorderBrush" Color="#3B82F620"/>
-          <SolidColorBrush x:Key="AccentBgBrush" Color="#00D4AA0D"/>
-          <SolidColorBrush x:Key="AccentBorderBrush" Color="#00D4AA20"/>
+          <SolidColorBrush x:Key="SuccessBgBrush" Color="#2022C55E"/>
+          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#3022C55E"/>
+          <SolidColorBrush x:Key="WarningBgBrush" Color="#0DF59E0B"/>
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#33F59E0B"/>
+          <SolidColorBrush x:Key="ErrorBgBrush" Color="#20EF4444"/>
+          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#30EF4444"/>
+          <SolidColorBrush x:Key="InfoBgBrush" Color="#0D3B82F6"/>
+          <SolidColorBrush x:Key="InfoBorderBrush" Color="#203B82F6"/>
+          <SolidColorBrush x:Key="AccentBgBrush" Color="#0D00D4AA"/>
+          <SolidColorBrush x:Key="AccentBorderBrush" Color="#2000D4AA"/>
 
           <!-- Action button (ported from V1 bridge 2026-04-16) -->
           <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12FFFFFF"/>

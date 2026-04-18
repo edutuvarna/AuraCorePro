@@ -18,11 +18,6 @@ public partial class SettingsView : UserControl
                                : OperatingSystem.IsLinux() ? "Linux"
                                : OperatingSystem.IsMacOS() ? "macOS" : "Unknown";
 
-            // Theme label
-            ThemeLabel.Text = ThemeService.IsDarkMode
-                ? LocalizationService._("set.dark")
-                : LocalizationService._("set.light");
-
             // Language label
             LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "T\u00FCrk\u00E7e" : "English";
 
@@ -37,6 +32,19 @@ public partial class SettingsView : UserControl
 
             // AI model management moved to AI Features → Chat (Task 14+).
 
+            // Set initial theme radio state
+            switch (ThemeService.CurrentTheme)
+            {
+                case ThemeService.AppTheme.System: ThemeSystemRb.IsChecked = true; break;
+                case ThemeService.AppTheme.Light:  ThemeLightRb.IsChecked  = true; break;
+                default:                           ThemeDarkRb.IsChecked   = true; break;
+            }
+
+            // Wire theme radio change handlers
+            ThemeSystemRb.IsCheckedChanged += (_, _) => { if (ThemeSystemRb.IsChecked == true) ThemeService.SetTheme(ThemeService.AppTheme.System); };
+            ThemeLightRb.IsCheckedChanged  += (_, _) => { if (ThemeLightRb.IsChecked  == true) ThemeService.SetTheme(ThemeService.AppTheme.Light);  };
+            ThemeDarkRb.IsCheckedChanged   += (_, _) => { if (ThemeDarkRb.IsChecked   == true) ThemeService.SetTheme(ThemeService.AppTheme.Dark);   };
+
             ApplyLocalization();
             LocalizationService.LanguageChanged += () =>
                 Dispatcher.UIThread.Post(ApplyLocalization);
@@ -49,7 +57,10 @@ public partial class SettingsView : UserControl
         HeaderSub.Text = LocalizationService._("set.subtitle");
         AppearanceLabel.Text = LocalizationService._("set.appearance");
         ThemeKeyLabel.Text = LocalizationService._("set.theme");
-        ThemeDescLabel.Text = LocalizationService._("set.themeDesc");
+        ThemeDescLabel.Text = LocalizationService._("settings.chooseTheme");
+        ThemeSystemRb.Content = LocalizationService._("settings.systemDefault");
+        ThemeLightRb.Content  = LocalizationService._("settings.light");
+        ThemeDarkRb.Content   = LocalizationService._("settings.dark");
         LangKeyLabel.Text = LocalizationService._("set.language");
         LangDescLabel.Text = LocalizationService._("set.langDesc");
         AiTelemetryLabel.Text = LocalizationService._("set.aiTelemetry");
@@ -59,21 +70,10 @@ public partial class SettingsView : UserControl
         AccountLabel.Text = LocalizationService._("set.account");
         LogoutBtn.Content = LocalizationService._("set.signOut");
 
-        ThemeLabel.Text = ThemeService.IsDarkMode
-            ? LocalizationService._("set.dark")
-            : LocalizationService._("set.light");
         LangLabel.Text = LocalizationService.CurrentLanguage == "tr" ? "T\u00FCrk\u00E7e" : "English";
 
         var email = SessionState.UserEmail;
         AccountEmail.Text = string.IsNullOrEmpty(email) ? LocalizationService._("set.notSignedIn") : email;
-    }
-
-    private void ThemeToggle_Click(object? sender, RoutedEventArgs e)
-    {
-        ThemeService.Toggle();
-        ThemeLabel.Text = ThemeService.IsDarkMode
-            ? LocalizationService._("set.dark")
-            : LocalizationService._("set.light");
     }
 
     private void LangToggle_Click(object? sender, RoutedEventArgs e)

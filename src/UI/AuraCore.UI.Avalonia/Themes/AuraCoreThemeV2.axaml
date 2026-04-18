@@ -4,56 +4,59 @@
   <!-- ══════════════════════════════════════════════════════
        AuraCore Pro V2 Design System
        Source: docs/superpowers/specs/2026-04-14-ui-rebuild-vision-document.md
-       Dark-only in v1. Modern glassmorphism, cross-platform.
+       Dark + Light as of Phase 6.3. Modern glassmorphism (dark) +
+       clean off-white surfaces (light), cross-platform.
        ══════════════════════════════════════════════════════ -->
 
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
+
+        <!-- ╔═ DARK ═══════════════════════════════════════════╗ -->
         <ResourceDictionary x:Key="Dark">
 
-          <!-- ── Backgrounds ──────────────────────────── -->
+          <!-- Backgrounds -->
           <SolidColorBrush x:Key="BgDeepBrush" Color="#0A0A10"/>
           <SolidColorBrush x:Key="BgSurfaceBrush" Color="#0E0E14"/>
           <SolidColorBrush x:Key="BgSidebarBrush" Color="#0B0B11"/>
-          <SolidColorBrush x:Key="BgCardBrush" Color="#06FFFFFF"/><!-- ~2.5% alpha white -->
-          <SolidColorBrush x:Key="BgCardElevatedBrush" Color="#0AFFFFFF"/><!-- ~4% -->
+          <SolidColorBrush x:Key="BgCardBrush" Color="#06FFFFFF"/>
+          <SolidColorBrush x:Key="BgCardElevatedBrush" Color="#0AFFFFFF"/>
 
-          <!-- ── Borders ─────────────────────────────── -->
-          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#0FFFFFFF"/><!-- ~6% -->
-          <SolidColorBrush x:Key="BorderEmphasisBrush" Color="#14FFFFFF"/><!-- ~8% -->
+          <!-- Borders -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#0FFFFFFF"/>
+          <SolidColorBrush x:Key="BorderEmphasisBrush" Color="#14FFFFFF"/>
 
-          <!-- ── Text ─────────────────────────────────── -->
+          <!-- Text -->
           <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F0F0F5"/>
           <SolidColorBrush x:Key="TextSecondaryBrush" Color="#E8E8F0"/>
           <SolidColorBrush x:Key="TextMutedBrush" Color="#888899"/>
           <SolidColorBrush x:Key="TextDisabledBrush" Color="#555570"/>
 
-          <!-- ── Accent: Teal ─────────────────────────── -->
+          <!-- Accent: Teal -->
           <SolidColorBrush x:Key="AccentTealBrush" Color="#00D4AA"/>
           <SolidColorBrush x:Key="AccentTealLightBrush" Color="#6CE0C0"/>
-          <SolidColorBrush x:Key="AccentTealDimBrush" Color="#1400D4AA"/><!-- ~8% -->
+          <SolidColorBrush x:Key="AccentTealDimBrush" Color="#1400D4AA"/>
 
-          <!-- ── Accent: Purple ───────────────────────── -->
+          <!-- Accent: Purple -->
           <SolidColorBrush x:Key="AccentPurpleBrush" Color="#B088FF"/>
           <SolidColorBrush x:Key="AccentPurpleDeepBrush" Color="#8B5CF6"/>
-          <SolidColorBrush x:Key="AccentPurpleDimBrush" Color="#0F8B5CF6"/><!-- ~6% -->
+          <SolidColorBrush x:Key="AccentPurpleDimBrush" Color="#0F8B5CF6"/>
 
-          <!-- ── Accent: Amber ────────────────────────── -->
+          <!-- Accent: Amber -->
           <SolidColorBrush x:Key="AccentAmberBrush" Color="#F59E0B"/>
-          <SolidColorBrush x:Key="AccentAmberDimBrush" Color="#14F59E0B"/><!-- ~8% -->
+          <SolidColorBrush x:Key="AccentAmberDimBrush" Color="#14F59E0B"/>
 
-          <!-- ── Accent: Pink ─────────────────────────── -->
+          <!-- Accent: Pink -->
           <SolidColorBrush x:Key="AccentPinkBrush" Color="#EC4899"/>
-          <SolidColorBrush x:Key="AccentPinkDimBrush" Color="#14EC4899"/><!-- ~8% -->
+          <SolidColorBrush x:Key="AccentPinkDimBrush" Color="#14EC4899"/>
 
-          <!-- ── Semantic ─────────────────────────────── -->
+          <!-- Semantic -->
           <SolidColorBrush x:Key="StatusSuccessBrush" Color="#00D4AA"/>
           <SolidColorBrush x:Key="StatusWarningBrush" Color="#F59E0B"/>
           <SolidColorBrush x:Key="StatusErrorBrush" Color="#EF4444"/>
           <SolidColorBrush x:Key="StatusInfoBrush" Color="#B088FF"/>
 
-          <!-- Semantic tinted backgrounds + borders (ported from V1 bridge 2026-04-16) -->
+          <!-- Tinted semantic surfaces (fixed in Phase 6.2, AARRGGBB order) -->
           <SolidColorBrush x:Key="SuccessBgBrush" Color="#2022C55E"/>
           <SolidColorBrush x:Key="SuccessBorderBrush" Color="#3022C55E"/>
           <SolidColorBrush x:Key="WarningBgBrush" Color="#0DF59E0B"/>
@@ -65,11 +68,90 @@
           <SolidColorBrush x:Key="AccentBgBrush" Color="#0D00D4AA"/>
           <SolidColorBrush x:Key="AccentBorderBrush" Color="#2000D4AA"/>
 
-          <!-- Action button (ported from V1 bridge 2026-04-16) -->
+          <!-- Action button -->
           <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12FFFFFF"/>
           <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#1500D4AA"/>
 
+          <!-- Glow shadows (per-theme — Dark is full-strength) -->
+          <BoxShadows x:Key="GlowTeal">0 0 20 0 #3300D4AA</BoxShadows>
+          <BoxShadows x:Key="GlowPurple">0 0 20 0 #33B088FF</BoxShadows>
+          <BoxShadows x:Key="GlowAmber">0 0 20 0 #2EF59E0B</BoxShadows>
+          <BoxShadows x:Key="GlowPink">0 0 20 0 #33EC4899</BoxShadows>
+          <BoxShadows x:Key="GlowHealth">0 0 28 0 #6600D4AA</BoxShadows>
+          <BoxShadows x:Key="GlowHero">0 0 32 0 #1A00D4AA</BoxShadows>
+
         </ResourceDictionary>
+
+        <!-- ╔═ LIGHT ══════════════════════════════════════════╗ -->
+        <ResourceDictionary x:Key="Light">
+
+          <!-- Backgrounds (off-white surfaces, Tailwind-aligned) -->
+          <SolidColorBrush x:Key="BgDeepBrush" Color="#F8F8FA"/>
+          <SolidColorBrush x:Key="BgSurfaceBrush" Color="#FFFFFF"/>
+          <SolidColorBrush x:Key="BgSidebarBrush" Color="#F3F3F7"/>
+          <SolidColorBrush x:Key="BgCardBrush" Color="#08000000"/>
+          <SolidColorBrush x:Key="BgCardElevatedBrush" Color="#10000000"/>
+
+          <!-- Borders (black-alpha mirrors white-alpha in dark) -->
+          <SolidColorBrush x:Key="BorderSubtleBrush" Color="#0F000000"/>
+          <SolidColorBrush x:Key="BorderEmphasisBrush" Color="#14000000"/>
+
+          <!-- Text (inverted) -->
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F0F15"/>
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#1A1A23"/>
+          <SolidColorBrush x:Key="TextMutedBrush" Color="#6B6B7A"/>
+          <SolidColorBrush x:Key="TextDisabledBrush" Color="#A0A0B0"/>
+
+          <!-- Accent: Teal (slightly darker tint for contrast on white) -->
+          <SolidColorBrush x:Key="AccentTealBrush" Color="#00D4AA"/>
+          <SolidColorBrush x:Key="AccentTealLightBrush" Color="#00A888"/>
+          <SolidColorBrush x:Key="AccentTealDimBrush" Color="#2000D4AA"/>
+
+          <!-- Accent: Purple -->
+          <SolidColorBrush x:Key="AccentPurpleBrush" Color="#8B5CF6"/>
+          <SolidColorBrush x:Key="AccentPurpleDeepBrush" Color="#6D3FE6"/>
+          <SolidColorBrush x:Key="AccentPurpleDimBrush" Color="#1A8B5CF6"/>
+
+          <!-- Accent: Amber -->
+          <SolidColorBrush x:Key="AccentAmberBrush" Color="#D97706"/>
+          <SolidColorBrush x:Key="AccentAmberDimBrush" Color="#20F59E0B"/>
+
+          <!-- Accent: Pink -->
+          <SolidColorBrush x:Key="AccentPinkBrush" Color="#DB2777"/>
+          <SolidColorBrush x:Key="AccentPinkDimBrush" Color="#20EC4899"/>
+
+          <!-- Semantic (Tailwind -600 for visibility on light bg) -->
+          <SolidColorBrush x:Key="StatusSuccessBrush" Color="#059669"/>
+          <SolidColorBrush x:Key="StatusWarningBrush" Color="#D97706"/>
+          <SolidColorBrush x:Key="StatusErrorBrush" Color="#DC2626"/>
+          <SolidColorBrush x:Key="StatusInfoBrush" Color="#8B5CF6"/>
+
+          <!-- Tinted semantic surfaces (higher alpha for light-bg visibility) -->
+          <SolidColorBrush x:Key="SuccessBgBrush" Color="#3022C55E"/>
+          <SolidColorBrush x:Key="SuccessBorderBrush" Color="#4022C55E"/>
+          <SolidColorBrush x:Key="WarningBgBrush" Color="#20F59E0B"/>
+          <SolidColorBrush x:Key="WarningBorderBrush" Color="#40F59E0B"/>
+          <SolidColorBrush x:Key="ErrorBgBrush" Color="#30EF4444"/>
+          <SolidColorBrush x:Key="ErrorBorderBrush" Color="#40EF4444"/>
+          <SolidColorBrush x:Key="InfoBgBrush" Color="#203B82F6"/>
+          <SolidColorBrush x:Key="InfoBorderBrush" Color="#303B82F6"/>
+          <SolidColorBrush x:Key="AccentBgBrush" Color="#2000D4AA"/>
+          <SolidColorBrush x:Key="AccentBorderBrush" Color="#3000D4AA"/>
+
+          <!-- Action button -->
+          <SolidColorBrush x:Key="ActionBtnBgBrush" Color="#12000000"/>
+          <SolidColorBrush x:Key="ActionBtnHoverBrush" Color="#2500D4AA"/>
+
+          <!-- Glow shadows (dimmed for light — dark glows look like smudges) -->
+          <BoxShadows x:Key="GlowTeal">0 0 20 0 #1400D4AA</BoxShadows>
+          <BoxShadows x:Key="GlowPurple">0 0 20 0 #14B088FF</BoxShadows>
+          <BoxShadows x:Key="GlowAmber">0 0 20 0 #14F59E0B</BoxShadows>
+          <BoxShadows x:Key="GlowPink">0 0 20 0 #14EC4899</BoxShadows>
+          <BoxShadows x:Key="GlowHealth">0 0 28 0 #2000D4AA</BoxShadows>
+          <BoxShadows x:Key="GlowHero">0 0 32 0 #0A00D4AA</BoxShadows>
+
+        </ResourceDictionary>
+
       </ResourceDictionary.ThemeDictionaries>
 
       <!-- ── SHARED (theme-independent) TOKENS ────── -->
@@ -104,14 +186,6 @@
       <Thickness x:Key="SpacingGapSm">0,6</Thickness>
       <Thickness x:Key="SpacingGapMd">0,10</Thickness>
       <Thickness x:Key="SpacingGapLg">0,14</Thickness>
-
-      <!-- Glow shadows (BoxShadow "offsetX offsetY blur spread color") -->
-      <BoxShadows x:Key="GlowTeal">0 0 20 0 #3300D4AA</BoxShadows>
-      <BoxShadows x:Key="GlowPurple">0 0 20 0 #33B088FF</BoxShadows>
-      <BoxShadows x:Key="GlowAmber">0 0 20 0 #2EF59E0B</BoxShadows>
-      <BoxShadows x:Key="GlowPink">0 0 20 0 #33EC4899</BoxShadows>
-      <BoxShadows x:Key="GlowHealth">0 0 28 0 #6600D4AA</BoxShadows>
-      <BoxShadows x:Key="GlowHero">0 0 32 0 #1A00D4AA</BoxShadows>
     </ResourceDictionary>
   </Styles.Resources>
 

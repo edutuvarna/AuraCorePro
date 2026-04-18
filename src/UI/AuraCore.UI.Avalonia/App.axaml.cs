@@ -24,6 +24,11 @@ public partial class App : global::Avalonia.Application
     /// </summary>
     public static INarrowModeService? NarrowMode { get; private set; }
 
+    // Phase 6.1.D — URL scheme launch-path state (stashed by Program.Main before Avalonia starts).
+    internal static string? PendingLaunchUrl { get; set; }
+    internal static AuraCore.UI.Avalonia.Helpers.InstanceMutex? SingletonLock { get; set; }
+    internal static AuraCore.UI.Avalonia.Helpers.UrlGatewayServer? UrlGateway { get; set; }
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -345,6 +350,53 @@ public partial class App : global::Avalonia.Application
 #endif
         }
 
+        // Phase 6.1.D — start URL gateway server in the primary instance.
+        if (OperatingSystem.IsWindows() && SingletonLock is not null)
+        {
+            try
+            {
+                var logger = Services?.GetService(typeof(Microsoft.Extensions.Logging.ILogger<AuraCore.UI.Avalonia.Helpers.UrlGatewayServer>))
+                    as Microsoft.Extensions.Logging.ILogger<AuraCore.UI.Avalonia.Helpers.UrlGatewayServer>
+                    ?? (Microsoft.Extensions.Logging.ILogger<AuraCore.UI.Avalonia.Helpers.UrlGatewayServer>)
+                       Microsoft.Extensions.Logging.Abstractions.NullLogger<AuraCore.UI.Avalonia.Helpers.UrlGatewayServer>.Instance;
+
+                UrlGateway = new AuraCore.UI.Avalonia.Helpers.UrlGatewayServer(logger);
+                UrlGateway.InstanceIntentReceived += OnInstanceIntentReceived;
+                UrlGateway.Start();
+            }
+            catch { /* best-effort */ }
+        }
+
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static void OnInstanceIntentReceived(object? sender, AuraCore.UI.Avalonia.Helpers.InstanceIntentEventArgs e)
+    {
+        // Marshal to UI thread, then dispatch through INavigationService.
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            try
+            {
+                AuraCore.UI.Avalonia.Helpers.Win32Interop.FocusWindowByTitle("AuraCorePro");
+
+                var nav = Services?.GetService(typeof(AuraCore.Application.Interfaces.Platform.INavigationService))
+                    as AuraCore.Application.Interfaces.Platform.INavigationService;
+                if (nav is null) return;
+
+                var knownSections = new System.Collections.Generic.HashSet<string>(System.StringComparer.Ordinal)
+                {
+                    "dashboard", "settings", "disk-health",
+                    "ai-recommendations", "ai-insights", "ai-schedule"
+                };
+
+                var intent = AuraCore.UI.Avalonia.Helpers.UrlSchemeHandler.Parse(
+                    e.Url, knownSections, AuraCore.UI.Avalonia.Helpers.ModuleIdsRegistry.All);
+                if (intent is not null)
+                {
+                    nav.NavigateTo(intent.Id);
+                }
+            }
+            catch { /* deep-link failure must not crash */ }
+        });
     }
 }

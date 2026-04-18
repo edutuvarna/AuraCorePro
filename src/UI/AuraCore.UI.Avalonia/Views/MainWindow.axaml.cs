@@ -97,6 +97,9 @@ public sealed partial class MainWindow : Window
         }
         catch { /* DI / design-time fallback — navigation deep-links unavailable */ }
 
+        // Phase 6.1.D Task 15: subscribe to Loaded event to dispatch pending launch URL
+        this.Loaded += MainWindow_Loaded;
+
         BuildNavigation();
         RefreshUserChip();
 
@@ -701,5 +704,34 @@ public sealed partial class MainWindow : Window
         public void OnNext(Rect value) => _onNext(value);
         public void OnError(Exception error) { /* no-op */ }
         public void OnCompleted() { /* no-op */ }
+    }
+
+    // ─── DEEP-LINK LAUNCH URL DISPATCH (Phase 6.1.D Task 15) ──────────
+
+    private void MainWindow_Loaded(object? sender, RoutedEventArgs e)
+    {
+        // Phase 6.1.D — dispatch pending launch-URL (if we were opened via auracore://).
+        var pendingUrl = App.PendingLaunchUrl;
+        App.PendingLaunchUrl = null; // consume once
+        if (string.IsNullOrEmpty(pendingUrl)) return;
+
+        try
+        {
+            var knownSections = new System.Collections.Generic.HashSet<string>(System.StringComparer.Ordinal)
+            {
+                "dashboard", "settings", "disk-health",
+                "ai-recommendations", "ai-insights", "ai-schedule"
+            };
+            var intent = AuraCore.UI.Avalonia.Helpers.UrlSchemeHandler.Parse(
+                pendingUrl, knownSections, AuraCore.UI.Avalonia.Helpers.ModuleIdsRegistry.All);
+
+            if (intent is not null)
+            {
+                var nav = App.Services?.GetService(typeof(AuraCore.Application.Interfaces.Platform.INavigationService))
+                    as AuraCore.Application.Interfaces.Platform.INavigationService;
+                nav?.NavigateTo(intent.Id);
+            }
+        }
+        catch { /* deep-link failure must not crash main window */ }
     }
 }

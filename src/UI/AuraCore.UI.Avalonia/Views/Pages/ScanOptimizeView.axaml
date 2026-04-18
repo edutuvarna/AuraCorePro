@@ -22,7 +22,7 @@
                     VerticalAlignment="Center" Padding="14,8" IsEnabled="False">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="OptimizeLabel" Text="Optimize"
+                <TextBlock x:Name="OptimizeLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                            Foreground="{DynamicResource AccentPrimaryBrush}"/>
               </StackPanel>

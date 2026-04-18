@@ -6,15 +6,15 @@
     <StackPanel Spacing="20">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="System Health"
-                             Subtitle="Real-time system monitoring and diagnostics">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="ExportPdf_Click"
                     VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F4C4;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock Text="Export PDF"
+                <TextBlock x:Name="ExportPdfLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -22,7 +22,7 @@
                     VerticalAlignment="Center" Padding="16,10">
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanBtnText" Text="Scan Now"
+                <TextBlock x:Name="ScanBtnText" Text=""
                            FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -35,10 +35,10 @@
       <!-- Intro Card -->
       <controls:GlassCard>
         <StackPanel Spacing="8">
-          <TextBlock x:Name="IntroTitle" Text="About System Health" FontWeight="SemiBold"
+          <TextBlock x:Name="IntroTitle" Text="" FontWeight="SemiBold"
                      FontSize="{DynamicResource FontSizeBody}"/>
           <TextBlock x:Name="IntroBody"
-                     Text="This is the deep-dive view of all system vitals — CPU, RAM, disk, battery, startup programs, running processes. For real-time gauges at a glance, see the Dashboard."
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      TextWrapping="Wrap"
                      Foreground="{DynamicResource TextMutedBrush}"/>
@@ -63,12 +63,12 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Health Score" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="HealthScoreLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        HorizontalAlignment="Center"/>
             <Border x:Name="ScoreBadge" CornerRadius="12" Padding="12,4" HorizontalAlignment="Center"
                     Background="{DynamicResource AccentBgBrush}">
-              <TextBlock x:Name="ScoreLabel" Text="Scanning..."
+              <TextBlock x:Name="ScoreLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource AccentPrimaryBrush}"/>
             </Border>
@@ -83,7 +83,7 @@
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Operating System"
+                  <TextBlock x:Name="LabelOs" Text=""
                              FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <TextBlock x:Name="OsName" Text="--"
@@ -109,7 +109,7 @@
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Processor"
+                  <TextBlock x:Name="LabelCpu" Text=""
                              FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <TextBlock x:Name="CpuName" Text="--"
@@ -135,7 +135,7 @@
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Memory"
+                  <TextBlock x:Name="LabelMemory" Text=""
                              FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
@@ -174,7 +174,7 @@
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="*,Auto">
                 <StackPanel>
-                  <TextBlock Text="Uptime"
+                  <TextBlock x:Name="LabelUptime" Text=""
                              FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                              Foreground="#666680"/>
                   <TextBlock x:Name="UptimeVal" Text="--" FontSize="22" FontWeight="Bold"
@@ -205,7 +205,7 @@
                          Foreground="#14B8A6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Storage Drives"
+            <TextBlock x:Name="LabelStorage" Text=""
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
@@ -263,7 +263,7 @@
                          Foreground="#3B82F6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="CPU Cores"
+            <TextBlock x:Name="LabelCpuCores" Text=""
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
@@ -278,7 +278,7 @@
                      Foreground="#A855F7"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
-        <TextBlock Text="Graphics"
+        <TextBlock x:Name="LabelGraphics" Text=""
                    FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                    Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
       </StackPanel>

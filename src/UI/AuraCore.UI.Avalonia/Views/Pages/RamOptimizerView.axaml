@@ -70,7 +70,7 @@
               <TextBlock x:Name="UsedRam" Text="--"
                          FontSize="{DynamicResource FontSizeDisplay}"
                          FontWeight="Bold" Foreground="{DynamicResource AccentBlueBrush}"/>
-              <TextBlock x:Name="TotalRam" Text="/ -- GB"
+              <TextBlock x:Name="TotalRam" Text=""
                          FontSize="{DynamicResource FontSizeHeading}"
                          Foreground="{DynamicResource TextMutedBrush}"
                          VerticalAlignment="Bottom" Margin="0,0,0,6"/>

@@ -6,15 +6,15 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Tweaks"
-                             Subtitle="Toggle system tweaks">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -36,7 +36,7 @@
                      FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource AccentBlueBrush}"
                      VerticalAlignment="Center"/>
-          <TextBlock Text="Applying tweaks will restart Windows Explorer so the UI changes take effect. Any open Explorer windows will briefly close and reopen."
+          <TextBlock x:Name="ExplorerRestartNote" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource AccentBlueBrush}"
                      TextWrapping="Wrap"
@@ -53,13 +53,13 @@
 
       <!-- Stats row -->
       <controls:StatRow>
-        <controls:StatCard Label="TOTAL"
+        <controls:StatCard x:Name="StatTotal" Label=""
                            Value="{Binding #TotalCount.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
-        <controls:StatCard Label="APPLIED"
+        <controls:StatCard x:Name="StatApplied" Label=""
                            Value="{Binding #AppliedCount.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
-        <controls:StatCard Label="AVAILABLE"
+        <controls:StatCard x:Name="StatAvailable" Label=""
                            Value="{Binding #AvailableCount.Text}"
                            ValueBrush="{DynamicResource AccentPrimaryBrush}"/>
       </controls:StatRow>
@@ -82,7 +82,7 @@
                 FontWeight="Bold" FontSize="{DynamicResource FontSizeBodySmall}" IsEnabled="False">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBodySmall}"/>
-            <TextBlock x:Name="ApplyLabel" Text="Apply Selected"
+            <TextBlock x:Name="ApplyLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"/>
           </StackPanel>
         </Button>

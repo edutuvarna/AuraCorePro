@@ -32,17 +32,10 @@ public class HardcodedStringScannerTests
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/LinuxAppInstallerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/MacAppInstallerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/PackageCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/ServiceManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SnapFlatpakCleanerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SpaceAnalyzerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SpotlightManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/StartupOptimizerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SwapOptimizerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SymlinkManagerView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/SystemdManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/SystemHealthView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/TimeMachineManagerView.axaml",
-        "src/UI/AuraCore.UI.Avalonia/Views/Pages/TweakListView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/UpgradeView.axaml",
         "src/UI/AuraCore.UI.Avalonia/Views/Pages/WakeOnLanView.axaml",
     };
@@ -120,6 +113,10 @@ public class HardcodedStringScannerTests
     {
         if (value.StartsWith("{", StringComparison.Ordinal)) return true;
         if (string.IsNullOrWhiteSpace(value)) return true;
+
+        // XML character entity reference for decorative icons e.g. &#x1F50D; &#x25C6;
+        // These are icon glyphs rendered in decorative TextBlocks — not user-facing text.
+        if (Regex.IsMatch(value, @"^&#x[0-9A-Fa-f]+;$", RegexOptions.None)) return true;
 
         // Pure numeric / punctuation-only / whitespace-only.
         if (value.All(c => char.IsDigit(c) || c == '.' || c == ',' || c == '/' || c == '-' || c == '+' || c == ' '))

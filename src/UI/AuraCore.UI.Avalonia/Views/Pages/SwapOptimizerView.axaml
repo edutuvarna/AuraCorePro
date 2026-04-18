@@ -6,11 +6,11 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Swap Optimizer"
-                             Subtitle="Monitor and optimize Linux swap usage and swappiness settings">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button x:Name="ScanBtn" Content="Refresh" Click="Scan_Click"
+            <Button x:Name="ScanBtn" Content="" Click="Scan_Click"
                     Classes="action-btn" Padding="16,8"/>
             <!-- PageTitle: hidden bridge, code-behind writes localized string -->
             <TextBlock x:Name="PageTitle" IsVisible="False"/>
@@ -27,13 +27,13 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="SWAP TOTAL"
+        <controls:StatCard x:Name="StatSwapTotal" Label=""
                            Value="{Binding #SwapTotal.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="SWAP USED"
+        <controls:StatCard x:Name="StatSwapUsed" Label=""
                            Value="{Binding #SwapUsed.Text}"
                            ValueBrush="{DynamicResource StatusWarningBrush}"/>
-        <controls:StatCard Label="SWAPPINESS"
+        <controls:StatCard x:Name="StatSwappiness" Label=""
                            Value="{Binding #Swappiness.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
       </controls:StatRow>
@@ -46,11 +46,11 @@
               <TextBlock Text="&#x25C6;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Swap Partitions/Files" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="SwapPartitionsHeader" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ItemsControl x:Name="SwapList"/>
-          <TextBlock x:Name="SubText" Text="Click Refresh to read swap information"
+          <TextBlock x:Name="SubText" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
@@ -64,7 +64,7 @@
               <TextBlock Text="&#x25C6;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Swappiness Recommendations" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="SwappinessHeader" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <TextBlock x:Name="RecommendationText" Text="" FontSize="{DynamicResource FontSizeBodySmall}"

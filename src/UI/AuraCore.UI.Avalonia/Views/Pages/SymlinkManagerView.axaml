@@ -6,14 +6,14 @@
     <StackPanel Spacing="16">
 
       <!-- Intro -->
-      <TextBlock Text="Find and repair broken links, or create new ones."
+      <TextBlock x:Name="IntroText" Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  Margin="0,0,0,-4"/>
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Symlink Manager"
-                             Subtitle="Create, view, and delete symbolic links and junctions">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <!-- PageTitle: hidden bridge, code-behind writes localized string -->
           <TextBlock x:Name="PageTitle" IsVisible="False"/>
@@ -31,18 +31,18 @@
               <TextBlock Text="&#x2B06;" FontSize="8" Foreground="#3B82F6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Create New Link" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="CreateHeader" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ComboBox x:Name="LinkTypeCombo" SelectedIndex="0" Width="260">
-            <ComboBoxItem Content="Symbolic Link (File)" Tag="file"/>
-            <ComboBoxItem Content="Symbolic Link (Directory)" Tag="dir"/>
-            <ComboBoxItem Content="Junction (Directory)" Tag="junction"/>
-            <ComboBoxItem Content="Hard Link (File)" Tag="hard"/>
+            <ComboBoxItem x:Name="LinkTypeFile" Content="" Tag="file"/>
+            <ComboBoxItem x:Name="LinkTypeDir" Content="" Tag="dir"/>
+            <ComboBoxItem x:Name="LinkTypeJunction" Content="" Tag="junction"/>
+            <ComboBoxItem x:Name="LinkTypeHard" Content="" Tag="hard"/>
           </ComboBox>
-          <TextBox x:Name="LinkPathBox" Watermark="Link path (where the link will be created)" Width="500"/>
-          <TextBox x:Name="TargetPathBox" Watermark="Target path (what it points to)" Width="500"/>
-          <Button Content="Create Link" Click="CreateLink_Click" Classes="action-btn" Padding="16,10"
+          <TextBox x:Name="LinkPathBox" Watermark="" Width="500"/>
+          <TextBox x:Name="TargetPathBox" Watermark="" Width="500"/>
+          <Button x:Name="CreateLinkBtn" Content="" Click="CreateLink_Click" Classes="action-btn" Padding="16,10"
                   HorizontalAlignment="Left"/>
           <TextBlock x:Name="StatusText" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
@@ -61,15 +61,15 @@
                 <TextBlock Text="&#x1F50D;" FontSize="8" Foreground="#3B82F6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Existing Links" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+              <TextBlock x:Name="ExistingHeader" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Scan Directory" Click="Scan_Click" Grid.Column="1"
+            <Button x:Name="ScanDirBtn" Content="" Click="Scan_Click" Grid.Column="1"
                     Padding="12,6" Classes="action-btn"/>
           </Grid>
-          <TextBox x:Name="ScanPathBox" Watermark="Directory to scan (e.g. C:\Users)" Width="500"/>
+          <TextBox x:Name="ScanPathBox" Watermark="" Width="500"/>
           <ItemsControl x:Name="LinkList"/>
-          <TextBlock x:Name="ScanStatus" Text="Enter a directory and click Scan"
+          <TextBlock x:Name="ScanStatus" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
@@ -78,7 +78,7 @@
       <!-- Info -->
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource WarningBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
-        <TextBlock Text="Creating symbolic links requires administrator privileges on Windows."
+        <TextBlock x:Name="AdminWarningText" Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}" Foreground="#F59E0B"/>
       </Border>
 

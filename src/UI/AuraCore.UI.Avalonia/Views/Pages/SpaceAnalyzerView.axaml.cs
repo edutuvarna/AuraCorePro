@@ -20,7 +20,7 @@ public partial class SpaceAnalyzerView : UserControl
 
     private void ShowDrives()
     {
-        PathLabel.Text = "Select a drive to analyze";
+        PathLabel.Text = LocalizationService._("spaceAnalyzer.selectDrive");
         BackBtn.IsVisible = false;
         TotalSize.Text = "--"; UsedSize.Text = "--"; FreeSize.Text = "--";
 
@@ -93,7 +93,7 @@ public partial class SpaceAnalyzerView : UserControl
     {
         PathLabel.Text = path;
         BackBtn.IsVisible = true;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
 
         try
         {
@@ -115,8 +115,8 @@ public partial class SpaceAnalyzerView : UserControl
                 DirectoryTree.ItemsSource = rootNodes;
             });
         }
-        catch { PathLabel.Text = $"Access denied: {path}"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { PathLabel.Text = string.Format(LocalizationService._("spaceAnalyzer.accessDenied"), path); }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     // -------------------------------------------------------------------------
@@ -150,6 +150,14 @@ public partial class SpaceAnalyzerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.spaceAnalyzer");
+        ModuleHdr.Title = LocalizationService._("nav.spaceAnalyzer");
+        ModuleHdr.Subtitle = LocalizationService._("spaceAnalyzer.subtitle");
+        ScanLabel.Text = LocalizationService._("common.scan");
+        BackBtn.Content = $"\u2190 {LocalizationService._("common.back")}";
+        PathLabel.Text = LocalizationService._("spaceAnalyzer.selectDrive");
+        LabelTotal.Text = LocalizationService._("spaceAnalyzer.labelTotal");
+        LabelUsed.Text = LocalizationService._("spaceAnalyzer.labelUsed");
+        LabelFree.Text = LocalizationService._("spaceAnalyzer.labelFree");
     }
 
     // -------------------------------------------------------------------------

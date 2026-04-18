@@ -100,6 +100,7 @@ public sealed partial class MainWindow : Window
         // Phase 6.1.D Task 15: subscribe to Loaded event to dispatch pending launch URL
         this.Loaded += MainWindow_Loaded;
 
+        ApplyMainWindowLocalization();
         BuildNavigation();
         RefreshUserChip();
 
@@ -134,6 +135,7 @@ public sealed partial class MainWindow : Window
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
+                ApplyMainWindowLocalization();
                 RebuildSidebar();
                 RefreshUserChip();
             });
@@ -351,9 +353,9 @@ public sealed partial class MainWindow : Window
         try
         {
             var ambient = App.Services.GetService<AuraCore.UI.Avalonia.Services.AI.ICortexAmbientService>();
-            return ambient?.FormattedStatusText ?? "Ready";
+            return ambient?.FormattedStatusText ?? LocalizationService._("main.statusReady");
         }
-        catch { return "Ready"; }
+        catch { return LocalizationService._("main.statusReady"); }
     }
 
     /// <summary>Resolves a Geometry resource (icons are theme-independent, in shared resources).</summary>
@@ -599,6 +601,16 @@ public sealed partial class MainWindow : Window
         _sidebarVm.NavigateTo("settings");
         ContentArea.Content = new Pages.SettingsView();
         RebuildSidebar();
+    }
+
+    // ─── MAIN WINDOW LOCALIZATION ────────────────────────────────────
+
+    private void ApplyMainWindowLocalization()
+    {
+        Title = LocalizationService._("login.title");
+        SettingsBtn.Content = LocalizationService._("main.settingsButton");
+        // Set baseline status text (will be overridden by CortexAmbientService if available)
+        GlobalStatusText.Text = FormatCortexStatus();
     }
 
     // ─── USER CHIP / SESSION REFRESH ─────────────────────────────────

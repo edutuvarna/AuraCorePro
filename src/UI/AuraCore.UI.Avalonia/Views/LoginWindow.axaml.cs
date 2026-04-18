@@ -6,6 +6,7 @@ using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
 using global::Avalonia.Threading;
 using AuraCore.Application;
+using AuraCore.UI.Avalonia;
 
 namespace AuraCore.UI.Avalonia.Views;
 
@@ -21,9 +22,47 @@ public partial class LoginWindow : Window
         InitializeComponent();
         Loaded += async (s, e) =>
         {
+            ApplyLocalization();
+            LocalizationService.LanguageChanged += ApplyLocalization;
             try { await TryAutoLoginAsync(); }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"AutoLogin error: {ex.Message}"); }
         };
+        Unloaded += (s, e) =>
+        {
+            LocalizationService.LanguageChanged -= ApplyLocalization;
+        };
+    }
+
+    private void ApplyLocalization()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            Title = LocalizationService._("login.title");
+            TitleText.Text        = LocalizationService._("login.title");
+            SubtitleText.Text     = LocalizationService._("login.subtitleAlt");
+            LoginTab.Content      = LocalizationService._("login.signIn");
+            RegisterTab.Content   = LocalizationService._("login.createAccount");
+
+            // Login form
+            LoginEmailLabel.Text   = LocalizationService._("login.email");
+            LoginEmail.Watermark   = LocalizationService._("login.emailPlaceholderShort");
+            LoginPasswordLabel.Text = LocalizationService._("login.password");
+            LoginPassword.Watermark = LocalizationService._("login.passwordPlaceholderShort");
+            LoginBtn.Content       = LocalizationService._("login.signIn");
+            ForgotBtn.Content      = LocalizationService._("login.forgotPassword");
+
+            // Register form
+            RegEmailLabel.Text      = LocalizationService._("login.email");
+            RegEmail.Watermark      = LocalizationService._("login.emailPlaceholderShort");
+            RegPasswordLabel.Text   = LocalizationService._("login.password");
+            RegPassword.Watermark   = LocalizationService._("login.minCharsShort");
+            RegConfirmLabel.Text    = LocalizationService._("login.confirmPassword");
+            RegConfirm.Watermark    = LocalizationService._("login.repeatPasswordShort");
+            RegisterBtn.Content     = LocalizationService._("login.createAccount");
+
+            // Offline button
+            OfflineBtn.Content = LocalizationService._("login.continueOffline");
+        });
     }
 
     // ── AUTO LOGIN ────────────────────────────────────────
@@ -336,7 +375,7 @@ public partial class LoginWindow : Window
         {
             LoginBtn.IsEnabled = !on;
             RegisterBtn.IsEnabled = !on;
-            LoginBtn.Content = on ? "Signing in..." : "Sign In";
+            LoginBtn.Content = on ? LocalizationService._("login.signingIn") : LocalizationService._("login.signIn");
         });
     }
 

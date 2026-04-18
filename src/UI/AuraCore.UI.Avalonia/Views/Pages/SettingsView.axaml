@@ -6,9 +6,9 @@
 
       <!-- Header -->
       <StackPanel Spacing="4">
-        <TextBlock x:Name="HeaderTitle" Text="Settings" FontSize="16" FontWeight="Bold"
+        <TextBlock x:Name="HeaderTitle" FontSize="16" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <TextBlock x:Name="HeaderSub" Text="Configure AuraCore Pro preferences"
+        <TextBlock x:Name="HeaderSub"
                    FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"/>
       </StackPanel>
 
@@ -26,10 +26,10 @@
               <Border.Background>
                 <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x25CF;" FontSize="8" Foreground="#14B8A6"
+              <TextBlock Text="●" FontSize="8" Foreground="#14B8A6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="13" FontWeight="SemiBold"
+            <TextBlock x:Name="AppearanceLabel" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
           <StackPanel Spacing="6">
@@ -45,14 +45,14 @@
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
-              <TextBlock x:Name="LangKeyLabel" Text="Language" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="LangDescLabel" Text="Interface language" FontSize="11"
+              <TextBlock x:Name="LangKeyLabel" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
+              <TextBlock x:Name="LangDescLabel" FontSize="11"
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
             <Button Grid.Column="1" x:Name="LangToggleBtn" Click="LangToggle_Click"
                     CornerRadius="{StaticResource RadiusMd}"
                     Background="#12FFFFFF" Padding="14,8" Cursor="Hand">
-              <TextBlock x:Name="LangLabel" Text="English" FontSize="12" FontWeight="SemiBold"
+              <TextBlock x:Name="LangLabel" FontSize="12" FontWeight="SemiBold"
                          Foreground="{DynamicResource AccentPrimaryBrush}"/>
             </Button>
           </Grid>
@@ -73,17 +73,17 @@
               <Border.Background>
                 <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x1F9E0;" FontSize="8" Foreground="#14B8A6"
+              <TextBlock Text="🧠" FontSize="8" Foreground="#14B8A6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock x:Name="AiTelemetryLabel" Text="AI Telemetry" FontSize="13" FontWeight="SemiBold"
+            <TextBlock x:Name="AiTelemetryLabel" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
-              <TextBlock x:Name="AiTelemetryDescLabel" Text="Share anonymous AI data" FontSize="12"
+              <TextBlock x:Name="AiTelemetryDescLabel" FontSize="12"
                          Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="AiTelemetryNoteLabel" Text="CPU/RAM averages, disk trends. No personal data."
+              <TextBlock x:Name="AiTelemetryNoteLabel"
                          FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
             <ToggleSwitch Grid.Column="1" x:Name="AiTelemetryToggle"
@@ -101,14 +101,14 @@
               CornerRadius="6"
               Padding="12,10">
         <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="&#x2756;"
+          <TextBlock Text="❖"
                      FontSize="14"
                      Foreground="{DynamicResource AccentPurpleBrush}"
                      VerticalAlignment="Center" />
-          <TextBlock VerticalAlignment="Center"
+          <TextBlock x:Name="AiModelNoteLabel"
+                     VerticalAlignment="Center"
                      TextWrapping="Wrap"
-                     Foreground="{DynamicResource TextSecondaryBrush}"
-                     Text="AI models are managed in AI Features &#x2192; Chat. Open Chat to download or switch models." />
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
         </StackPanel>
       </Border>
 
@@ -126,28 +126,28 @@
               <Border.Background>
                 <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x2139;" FontSize="8" Foreground="#14B8A6"
+              <TextBlock Text="ℹ" FontSize="8" Foreground="#14B8A6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock x:Name="AboutLabel" Text="About" FontSize="13" FontWeight="SemiBold"
+            <TextBlock x:Name="AboutLabel" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
           <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
-            <TextBlock Text="Version" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
+            <TextBlock x:Name="VersionKeyLabel" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                        Margin="0,0,24,8"/>
-            <TextBlock Grid.Column="1" Text="1.7.0 (Avalonia Cross-Platform)" FontSize="12"
+            <TextBlock x:Name="VersionValueLabel" Grid.Column="1" FontSize="12"
                        Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="1" Text="Runtime" FontSize="12"
+            <TextBlock x:Name="RuntimeKeyLabel" Grid.Row="1" FontSize="12"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,24,8"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="RuntimeLabel" Text=".NET 8"
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="RuntimeLabel"
                        FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="2" Text="Platform" FontSize="12"
+            <TextBlock x:Name="PlatformKeyLabel" Grid.Row="2" FontSize="12"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,24,8"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="PlatformLabel" Text="Windows"
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="PlatformLabel"
                        FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="3" Text="UI Framework" FontSize="12"
+            <TextBlock x:Name="UiFrameworkKeyLabel" Grid.Row="3" FontSize="12"
                        Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,24,0"/>
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="Avalonia 11.2" FontSize="12"
+            <TextBlock x:Name="UiFrameworkValueLabel" Grid.Row="3" Grid.Column="1" FontSize="12"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </Grid>
         </StackPanel>
@@ -167,23 +167,23 @@
               <Border.Background>
                 <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x25CB;" FontSize="8" Foreground="#14B8A6"
+              <TextBlock Text="○" FontSize="8" Foreground="#14B8A6"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock x:Name="AccountLabel" Text="Account" FontSize="13" FontWeight="SemiBold"
+            <TextBlock x:Name="AccountLabel" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
-              <TextBlock x:Name="AccountEmail" Text="Not signed in" FontSize="12"
+              <TextBlock x:Name="AccountEmail" FontSize="12"
                          Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="AccountTier" Text="Free" FontSize="11"
+              <TextBlock x:Name="AccountTier" FontSize="11"
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
             <Button Grid.Column="1" x:Name="LogoutBtn" Click="Logout_Click"
                     Background="{DynamicResource ErrorBgBrush}" Foreground="#EF4444"
                     Padding="16,8" CornerRadius="{StaticResource RadiusMd}"
-                    FontWeight="SemiBold" FontSize="12" Content="Sign Out"/>
+                    FontWeight="SemiBold" FontSize="12"/>
           </Grid>
         </StackPanel>
       </Border>
@@ -193,8 +193,8 @@
               Background="{DynamicResource AccentBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1">
         <Grid ColumnDefinitions="Auto,*">
-          <TextBlock Text="&#x1F310;" FontSize="16" VerticalAlignment="Center" Margin="0,0,12,0"/>
-          <TextBlock Grid.Column="1" Text="auracore.pro - Windows Optimization SaaS"
+          <TextBlock Text="🌐" FontSize="16" VerticalAlignment="Center" Margin="0,0,12,0"/>
+          <TextBlock x:Name="WebsiteLinkLabel" Grid.Column="1"
                      FontSize="12" Foreground="{DynamicResource AccentPrimaryBrush}"
                      VerticalAlignment="Center"/>
         </Grid>

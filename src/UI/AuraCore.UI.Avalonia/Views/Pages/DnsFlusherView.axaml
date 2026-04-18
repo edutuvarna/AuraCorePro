@@ -48,7 +48,7 @@
 
             <!-- Hero button: large, full-width, success-green -->
             <Button x:Name="FlushBtn"
-                    Content="Flush DNS Cache"
+                    Content=""
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center"
                     Padding="20,14"
@@ -73,7 +73,7 @@
             <StackPanel Spacing="6">
               <Grid ColumnDefinitions="Auto,*">
                 <TextBlock Grid.Column="0"
-                           Text="&#x2022;"
+                           Text="•"
                            FontSize="{DynamicResource FontSizeBody}"
                            Foreground="{DynamicResource TextMutedBrush}"
                            Margin="0,0,10,0"
@@ -86,7 +86,7 @@
               </Grid>
               <Grid ColumnDefinitions="Auto,*">
                 <TextBlock Grid.Column="0"
-                           Text="&#x2022;"
+                           Text="•"
                            FontSize="{DynamicResource FontSizeBody}"
                            Foreground="{DynamicResource TextMutedBrush}"
                            Margin="0,0,10,0"
@@ -99,7 +99,7 @@
               </Grid>
               <Grid ColumnDefinitions="Auto,*">
                 <TextBlock Grid.Column="0"
-                           Text="&#x2022;"
+                           Text="•"
                            FontSize="{DynamicResource FontSizeBody}"
                            Foreground="{DynamicResource TextMutedBrush}"
                            Margin="0,0,10,0"
@@ -112,7 +112,7 @@
               </Grid>
               <Grid ColumnDefinitions="Auto,*">
                 <TextBlock Grid.Column="0"
-                           Text="&#x2022;"
+                           Text="•"
                            FontSize="{DynamicResource FontSizeBody}"
                            Foreground="{DynamicResource TextMutedBrush}"
                            Margin="0,0,10,0"

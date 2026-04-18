@@ -18,28 +18,11 @@ public partial class AIConsentDialog : UserControl
 
     private void ApplyLocalization()
     {
-        var isTr = LocalizationService.CurrentLanguage == "tr";
-
-        TitleLabel.Text = isTr
-            ? "AuraCore'un \u00D6\u011Frenmesine Yard\u0131m Et"
-            : "Help AuraCore Learn";
-
-        DescriptionLabel.Text = isTr
-            ? "AuraCore Pro, sisteminizi analiz etmek i\u00E7in lokal yapay zeka kullan\u0131r. " +
-              "Yapay zekan\u0131n do\u011Frulu\u011Funu art\u0131rmak i\u00E7in anonim kullan\u0131m istatistikleri " +
-              "(CPU/RAM ortalamalar\u0131, disk trendleri) toplayabiliriz. " +
-              "Ki\u015Fisel veri toplanmaz. T\u00FCm AI analizi cihaz\u0131n\u0131zda lokal olarak \u00E7al\u0131\u015F\u0131r."
-            : "AuraCore Pro uses local AI to analyze your system. " +
-              "To improve AI accuracy, we can collect anonymous usage statistics " +
-              "(CPU/RAM averages, disk trends). No personal data is collected. " +
-              "All AI analysis runs locally on your device.";
-
-        AllowBtnText.Text = isTr ? "\u2713 \u0130zin Veriyorum" : "\u2713 Allow";
-        DeclineBtnText.Text = isTr ? "\u2717 \u0130zin Vermiyorum" : "\u2717 Decline";
-
-        NoteLabel.Text = isTr
-            ? "Bu ayar\u0131 daha sonra Ayarlar sayfas\u0131ndan de\u011Fi\u015Ftirebilirsiniz."
-            : "You can change this later in Settings.";
+        TitleLabel.Text       = LocalizationService.Get("aiConsent.title");
+        DescriptionLabel.Text = LocalizationService.Get("aiConsent.description");
+        AllowBtnText.Text     = LocalizationService.Get("aiConsent.allow");
+        DeclineBtnText.Text   = LocalizationService.Get("aiConsent.decline");
+        NoteLabel.Text        = LocalizationService.Get("aiConsent.note");
     }
 
     private void Allow_Click(object? sender, RoutedEventArgs e)

@@ -42,6 +42,12 @@ public partial class RecommendationsSection : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.aiRecommendations");
+        PageTitle.Text = LocalizationService.Get("nav.aiRecommendations");
+        if (RefreshLabel is not null)
+            RefreshLabel.Text = LocalizationService.Get("recs.analyzeButton");
+        if (RecsSubtitle is not null)
+            RecsSubtitle.Text = LocalizationService.Get("recs.subtitle");
+        if (RecsBadgeLabel is not null)
+            RecsBadgeLabel.Text = LocalizationService.Get("recs.badgeLabel");
     }
 }

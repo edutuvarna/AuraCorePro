@@ -14,11 +14,50 @@ public partial class UpgradeView : UserControl
     {
         _moduleId = moduleId;
         InitializeComponent();
+        ApplyLocalization();
         if (!string.IsNullOrEmpty(moduleName))
         {
-            TitleText.Text = $"{moduleName} - Pro Required";
-            SubText.Text = $"The {moduleName} module requires an AuraCore Pro subscription to use.";
+            TitleText.Text = $"{moduleName} - {LocalizationService._("upgrade.proRequired")}";
+            SubText.Text = string.Format(LocalizationService._("upgrade.proRequired"), moduleName);
         }
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
+    }
+
+    private void ApplyLocalization()
+    {
+        string L(string k) => LocalizationService._(k);
+        TitleText.Text = L("upgrade.required");
+        SubText.Text = L("upgrade.proRequired");
+        FreePlanTitle.Text = L("upgrade.free");
+        FreePriceText.Text = L("upgrade.freePrice");
+        FreeDescText.Text = L("upgrade.freeDesc");
+        FreeF1.Text = L("upgrade.freeFeature.systemHealth");
+        FreeF2.Text = L("upgrade.freeFeature.junkCleaner");
+        FreeF3.Text = L("upgrade.freeFeature.ramOptimizer");
+        FreeF4.Text = L("upgrade.freeFeature.networkOptimizer");
+        FreeF5.Text = L("upgrade.freeFeature.gamingMode");
+        CurrentPlanLabel.Text = L("upgrade.currentPlan");
+        ProPlanTitle.Text = L("upgrade.pro");
+        ProPriceText.Text = L("upgrade.proPrice");
+        ProPriceSuffix.Text = L("upgrade.proPriceSuffix");
+        ProDescText.Text = L("upgrade.proDesc");
+        ProF1.Text = L("upgrade.proFeature.everything");
+        ProF2.Text = L("upgrade.proFeature.registry");
+        ProF3.Text = L("upgrade.proFeature.bloatware");
+        ProF4.Text = L("upgrade.proFeature.privacy");
+        ProF5.Text = L("upgrade.proFeature.iso");
+        ProF6.Text = L("upgrade.proFeature.driver");
+        UpgradeBtn.Content = L("upgrade.upgradeToPro");
+        YearlySavings.Text = L("upgrade.yearlySavings");
     }
 
     private void Upgrade_Click(object? sender, RoutedEventArgs e)

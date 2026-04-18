@@ -6,7 +6,8 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Font Manager"
+      <controls:ModuleHeader x:Name="ModuleHdr"
+                             Title=""
                              Subtitle="Browse installed fonts with live preview">
         <controls:ModuleHeader.Actions>
           <!-- PageTitle: invisible, code-behind writes localized string -->
@@ -20,11 +21,11 @@
               BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1"
               Padding="14,10">
         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-          <TextBlock Text="&#x2139;"
+          <TextBlock Text="ℹ"
                      FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource AccentBlueBrush}"
                      VerticalAlignment="Center"/>
-          <TextBlock Text="Installing or removing fonts will restart Windows Explorer so the system font cache refreshes. Any open Explorer windows will briefly close and reopen."
+          <TextBlock x:Name="ExplorerRestartText" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource AccentBlueBrush}"
                      TextWrapping="Wrap"
@@ -36,15 +37,13 @@
       <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBox x:Name="SearchBox" Watermark="Search fonts..." TextChanged="Search_Changed"/>
+            <TextBox x:Name="SearchBox" TextChanged="Search_Changed"/>
             <TextBlock x:Name="FontCount" Grid.Column="1" Text="--"
                        FontSize="{DynamicResource FontSizeBody}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        VerticalAlignment="Center" Margin="12,0,0,0"/>
           </Grid>
-          <TextBox x:Name="PreviewText"
-                   Text="The quick brown fox jumps over the lazy dog. 0123456789"
-                   Watermark="Preview text..."/>
+          <TextBox x:Name="PreviewText" Text=""/>
         </StackPanel>
       </controls:GlassCard>
 
@@ -58,7 +57,7 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Installed Fonts"
+            <TextBlock x:Name="InstalledFontsLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>

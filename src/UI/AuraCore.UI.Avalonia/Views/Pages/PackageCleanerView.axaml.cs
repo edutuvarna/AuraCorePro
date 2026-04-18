@@ -126,6 +126,16 @@ public partial class PackageCleanerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.packageCleaner");
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.packageCleaner");
+        PkgHeader.Title    = L("nav.packageCleaner");
+        PkgHeader.Subtitle = L("packageCleaner.subtitle");
+        AptCacheStat.Label  = L("packageCleaner.stat.aptCache");
+        SnapCacheStat.Label = L("packageCleaner.stat.snapCache");
+        PipCacheStat.Label  = L("packageCleaner.stat.pipCache");
+        CacheCategHeading.Text = L("packageCleaner.heading.cacheCategories");
+        ScanBtn.Content = L("packageCleaner.action.scan");
+        SubText.Text    = L("packageCleaner.subtext.initial");
+        PrivilegeWarning.Text = L("packageCleaner.warning.privilege");
     }
 }

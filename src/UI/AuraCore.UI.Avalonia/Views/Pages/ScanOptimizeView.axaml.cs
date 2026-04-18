@@ -78,13 +78,30 @@ public partial class ScanOptimizeView : UserControl
         if (!_behavior.ShowSpaceSaved)
             SpaceSaved.Text = "N/A";
 
-        Loaded += async (s, e) => await RunScan();
+        Loaded += async (s, e) => { ApplyLocalization(); await RunScan(); };
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) => LocalizationService.LanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        ScanLabel.Text = L("common.scan");
+        LblItemsFound.Text = L("scanOpt.itemsFound");
+        LblSpace.Text = L("scanOpt.space");
+        LblRisk.Text = L("scanOpt.risk");
+        LblClickToScan.Text = L("scanOpt.clickToScan");
+        if (string.IsNullOrEmpty(ProgressText.Text))
+            ProgressText.Text = L("scanOpt.optimizing");
     }
 
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         ShowPanel("before");
 
         try
@@ -156,7 +173,7 @@ public partial class ScanOptimizeView : UserControl
             ScanDetailText.Text = ex.Message;
             ShowPanel("scan");
         }
-        finally { ScanLabel.Text = "Scan"; }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private async Task RunOptimize()
@@ -164,7 +181,7 @@ public partial class ScanOptimizeView : UserControl
         if (_lastScan is null || !_lastScan.Success || _behavior.ActionLabel is null) return;
 
         OptimizeBtn.IsEnabled = false;
-        OptimizeLabel.Text = "Working...";
+        OptimizeLabel.Text = LocalizationService._("common.working");
         ShowPanel("progress");
 
         try

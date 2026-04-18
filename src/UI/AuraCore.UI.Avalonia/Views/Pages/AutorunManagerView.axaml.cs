@@ -13,7 +13,8 @@ public record AutorunDisplayItem(
     string Name, string Command, string Location,
     string RiskLevel, ISolidColorBrush RiskFg, ISolidColorBrush RiskBg,
     string StatusText, ISolidColorBrush StatusBrush,
-    bool IsEnabled, string ToggleTag, string DeleteTag);
+    bool IsEnabled, string ToggleTag, string DeleteTag,
+    string DeleteLabel);
 
 public partial class AutorunManagerView : UserControl
 {
@@ -33,7 +34,7 @@ public partial class AutorunManagerView : UserControl
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
@@ -47,12 +48,13 @@ public partial class AutorunManagerView : UserControl
 
             RenderEntries(report);
         }
-        catch { SubtitleText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { SubtitleText.Text = LocalizationService._("autorun.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("autorun.scanBtn"); }
     }
 
     private void RenderEntries(AutorunReport report)
     {
+        var deleteLabel = LocalizationService._("common.delete");
         var items = report.Entries.Select(e =>
         {
             var (riskFg, riskBg) = e.RiskLevel switch
@@ -63,14 +65,18 @@ public partial class AutorunManagerView : UserControl
                 _        => (Parse("#8888A0"), Parse("#208888A0"))
             };
             var statusBrush = e.IsEnabled ? Parse("#22C55E") : Parse("#8888A0");
+            var statusText = e.IsEnabled
+                ? LocalizationService._("autorun.enabledStatus")
+                : LocalizationService._("autorun.disabledStatus");
 
             return new AutorunDisplayItem(
                 e.Name, e.Command, e.Location,
                 e.RiskLevel, riskFg, riskBg,
-                e.IsEnabled ? "Enabled" : "Disabled", statusBrush,
+                statusText, statusBrush,
                 e.IsEnabled,
                 $"{(e.IsEnabled ? "disable" : "enable")}:{e.Name}",
-                $"delete:{e.Name}");
+                $"delete:{e.Name}",
+                deleteLabel);
         }).ToList();
 
         AutorunList.ItemsSource = items;
@@ -112,6 +118,19 @@ public partial class AutorunManagerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.autorunManager");
+        PageTitle.Text       = LocalizationService._("nav.autorunManager");
+        PageHeader.Title     = LocalizationService._("autorun.title");
+        PageHeader.Subtitle  = LocalizationService._("autorun.subtitle");
+        ScanLabel.Text       = LocalizationService._("autorun.scanBtn");
+        SubtitleText.Text    = LocalizationService._("autorun.subtitle");
+        ColName.Text         = LocalizationService._("autorun.colName");
+        ColLocation.Text     = LocalizationService._("autorun.colLocation");
+        ColRisk.Text         = LocalizationService._("autorun.colRisk");
+        ColStatus.Text       = LocalizationService._("autorun.colStatus");
+        ColActions.Text      = LocalizationService._("autorun.colActions");
+        StatTotal.Label      = LocalizationService._("autorun.statTotal");
+        StatEnabled.Label    = LocalizationService._("autorun.statEnabled");
+        StatDisabled.Label   = LocalizationService._("autorun.statDisabled");
+        StatHighRisk.Label   = LocalizationService._("autorun.statHighRisk");
     }
 }

@@ -23,6 +23,10 @@ public partial class AIFeaturesView : UserControl
     {
         InitializeComponent();
 
+        // Apply initial localization immediately (before Loaded) so XAML-less names
+        // render correctly even in headless / design-time scenarios.
+        ApplyLocalization();
+
         // Resolve NarrowModeService from App singleton (null in test harness / design-time).
         _narrowMode = App.NarrowMode;
         if (_narrowMode is not null)
@@ -40,8 +44,13 @@ public partial class AIFeaturesView : UserControl
         if (_narrowMode is not null)
             _narrowMode.PropertyChanged -= OnNarrowModeChanged;
 
+        LocalizationService.LanguageChanged -= OnLocalizationLanguageChanged;
+
         base.OnDetachedFromVisualTree(e);
     }
+
+    private void OnLocalizationLanguageChanged()
+        => global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
 
     private void OnNarrowModeChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -133,8 +142,9 @@ public partial class AIFeaturesView : UserControl
             card.NavigateToDetail = vm.NavigateToSection;
         }
 
-        // Apply localization to back button
+        // Apply localization to nav buttons and hero
         ApplyLocalization();
+        LocalizationService.LanguageChanged += OnLocalizationLanguageChanged;
 
         // Drain any pending ShowSection call that arrived before DataContext was set.
         if (_pendingSection is not null)
@@ -150,8 +160,31 @@ public partial class AIFeaturesView : UserControl
     /// </summary>
     private void ApplyLocalization()
     {
-        if (PART_BackToOverviewBtn is not null)
-            PART_BackToOverviewBtn.Content = LocalizationService.Get("ai.backToOverview");
+        // Use FindControl (INameScope-based) since this control uses runtime XAML loading.
+        // Source-generator fields are null with AvaloniaXamlLoader.Load(this) path.
+        if (this.FindControl<Button>("PART_BackToOverviewBtn") is { } backBtn)
+            backBtn.Content = LocalizationService.Get("ai.backToOverview");
+
+        if (this.FindControl<TextBlock>("PART_HeroKicker") is { } kicker)
+            kicker.Text = LocalizationService.Get("ai.cortexKicker");
+
+        if (this.FindControl<TextBlock>("PART_HeroTitle") is { } heroTitle)
+            heroTitle.Text = LocalizationService.Get("nav.aiFeatures.title");
+
+        if (this.FindControl<TextBlock>("PART_HeroTagline") is { } tagline)
+            tagline.Text = LocalizationService.Get("aiFeatures.hero.tagline");
+
+        if (this.FindControl<Button>("PART_NavInsights") is { } navInsights)
+            navInsights.Content = LocalizationService.Get("ai.sectionInsights");
+
+        if (this.FindControl<Button>("PART_NavRecs") is { } navRecs)
+            navRecs.Content = LocalizationService.Get("ai.sectionRecs");
+
+        if (this.FindControl<Button>("PART_NavSchedule") is { } navSchedule)
+            navSchedule.Content = LocalizationService.Get("ai.sectionSchedule");
+
+        if (this.FindControl<Button>("PART_NavChat") is { } navChat)
+            navChat.Content = LocalizationService.Get("ai.sectionChat");
     }
 
     /// <summary>

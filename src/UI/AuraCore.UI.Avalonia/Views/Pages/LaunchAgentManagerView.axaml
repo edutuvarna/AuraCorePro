@@ -5,13 +5,15 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Launch Agent Manager"
-                             Subtitle="Manage macOS LaunchAgents and LaunchDaemons (startup services)">
+      <controls:ModuleHeader x:Name="AgentHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Classes="action-btn" Click="Scan_Click"
+            <Button x:Name="AgentScanBtn"
+                    Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="16,8"
-                    Content="Scan"/>
+                    Content=""/>
             <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
         </controls:ModuleHeader.Actions>
@@ -26,13 +28,16 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="USER AGENTS"
+        <controls:StatCard x:Name="UserAgentsStat"
+                           Label=""
                            Value="{Binding #UserAgents.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="SYSTEM AGENTS"
+        <controls:StatCard x:Name="SystemAgentsStat"
+                           Label=""
                            Value="{Binding #SystemAgents.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
-        <controls:StatCard Label="DAEMONS"
+        <controls:StatCard x:Name="DaemonsStat"
+                           Label=""
                            Value="{Binding #DaemonCount.Text}"
                            ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
@@ -47,13 +52,14 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Launch Items"
+            <TextBlock x:Name="LaunchItemsHeading"
+                       Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <TextBlock x:Name="SubText"
-                     Text="Click Scan to list LaunchAgents/Daemons (macOS only)"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="AgentList"/>

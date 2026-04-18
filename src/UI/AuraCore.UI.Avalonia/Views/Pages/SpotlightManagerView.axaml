@@ -114,7 +114,7 @@
                       <Button Grid.Column="6"
                               Classes="action-btn rebuild-btn"
                               Padding="12,6"
-                              Content="Rebuild"
+                              Content=""
                               Command="{Binding #RootUserControl.((vm:SpotlightManagerViewModel)DataContext).BeginRebuildCommand}"
                               CommandParameter="{Binding}"
                               VerticalAlignment="Center"/>

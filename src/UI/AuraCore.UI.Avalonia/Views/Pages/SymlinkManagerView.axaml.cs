@@ -29,7 +29,7 @@ public partial class SymlinkManagerView : UserControl
         var targetPath = TargetPathBox.Text?.Trim();
         if (string.IsNullOrEmpty(linkPath) || string.IsNullOrEmpty(targetPath))
         {
-            StatusText.Text = "Both link path and target path are required.";
+            StatusText.Text = LocalizationService._("symlink.pathRequired");
             return;
         }
 
@@ -37,7 +37,7 @@ public partial class SymlinkManagerView : UserControl
 
         try
         {
-            StatusText.Text = "Creating link...";
+            StatusText.Text = LocalizationService._("symlink.creatingLink");
 
             // On Linux: route through the privileged module for proper polkit elevation
             if (OperatingSystem.IsLinux() && (type == "file" || type == "dir"))
@@ -103,11 +103,11 @@ public partial class SymlinkManagerView : UserControl
         var scanPath = ScanPathBox.Text?.Trim();
         if (string.IsNullOrEmpty(scanPath) || !Directory.Exists(scanPath))
         {
-            ScanStatus.Text = "Please enter a valid directory path.";
+            ScanStatus.Text = LocalizationService._("symlink.validDirRequired");
             return;
         }
 
-        ScanStatus.Text = "Scanning...";
+        ScanStatus.Text = LocalizationService._("symlink.scanning");
         var links = await Task.Run(() =>
         {
             var found = new List<(string Path, string Target, string Type)>();
@@ -128,7 +128,7 @@ public partial class SymlinkManagerView : UserControl
             return found;
         });
 
-        ScanStatus.Text = $"Found {links.Count} symbolic links";
+        ScanStatus.Text = string.Format(LocalizationService._("symlink.foundLinks"), links.Count);
         LinkList.ItemsSource = links.Select(l => new Border
         {
             CornerRadius = new global::Avalonia.CornerRadius(6),
@@ -156,5 +156,22 @@ public partial class SymlinkManagerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.symlinkManager");
+        ModuleHdr.Title = LocalizationService._("nav.symlinkManager");
+        ModuleHdr.Subtitle = LocalizationService._("symlink.subtitle");
+        IntroText.Text = LocalizationService._("symlink.intro");
+        CreateHeader.Text = LocalizationService._("symlink.createHeader");
+        LinkTypeFile.Content = LocalizationService._("symlink.typeFile");
+        LinkTypeDir.Content = LocalizationService._("symlink.typeDir");
+        LinkTypeJunction.Content = LocalizationService._("symlink.typeJunction");
+        LinkTypeHard.Content = LocalizationService._("symlink.typeHard");
+        LinkPathBox.Watermark = LocalizationService._("symlink.linkPathWatermark");
+        TargetPathBox.Watermark = LocalizationService._("symlink.targetPathWatermark");
+        CreateLinkBtn.Content = LocalizationService._("symlink.createBtn");
+        ExistingHeader.Text = LocalizationService._("symlink.existingHeader");
+        ScanDirBtn.Content = LocalizationService._("symlink.scanDirBtn");
+        ScanPathBox.Watermark = LocalizationService._("symlink.scanPathWatermark");
+        if (string.IsNullOrEmpty(ScanStatus.Text))
+            ScanStatus.Text = LocalizationService._("symlink.scanHint");
+        AdminWarningText.Text = LocalizationService._("symlink.adminWarning");
     }
 }

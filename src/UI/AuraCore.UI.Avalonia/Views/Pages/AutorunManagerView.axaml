@@ -6,15 +6,15 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Autorun Manager"
-                             Subtitle="Manage programs that start with Windows">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock Text="🔍" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -29,25 +29,25 @@
       <TextBlock x:Name="EnabledCount"  Text="--" IsVisible="False"/>
       <TextBlock x:Name="DisabledCount" Text="--" IsVisible="False"/>
       <TextBlock x:Name="HighRiskCount" Text="--" IsVisible="False"/>
-      <!-- SubtitleText: code-behind writes "Scan failed" on error -->
+      <!-- SubtitleText: code-behind writes localized subtitle on error -->
       <TextBlock x:Name="SubtitleText"
-                 Text="Manage programs that start with Windows"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="TOTAL"
+        <controls:StatCard x:Name="StatTotal"
                            Value="{Binding #TotalCount.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="ENABLED"
+        <controls:StatCard x:Name="StatEnabled"
                            Value="{Binding #EnabledCount.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
-        <controls:StatCard Label="DISABLED"
+        <controls:StatCard x:Name="StatDisabled"
                            Value="{Binding #DisabledCount.Text}"
                            ValueBrush="{DynamicResource TextMutedBrush}"/>
-        <controls:StatCard Label="HIGH RISK"
+        <controls:StatCard x:Name="StatHighRisk"
                            Value="{Binding #HighRiskCount.Text}"
                            ValueBrush="{DynamicResource StatusErrorBrush}"/>
       </controls:StatRow>
@@ -62,19 +62,19 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4"
                       Background="{DynamicResource BgCardBrush}">
-                <TextBlock Text="&#x25B6;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#3B82F6"
+                <TextBlock Text="▶" FontSize="{DynamicResource FontSizeLabel}" Foreground="#3B82F6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="NAME" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+              <TextBlock x:Name="ColName" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
-            <TextBlock Grid.Column="2" Text="LOCATION" FontSize="{DynamicResource FontSizeLabel}"
+            <TextBlock x:Name="ColLocation" Grid.Column="2" Text="" FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="3" Text="RISK" FontSize="{DynamicResource FontSizeLabel}"
+            <TextBlock x:Name="ColRisk" Grid.Column="3" Text="" FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="4" Text="STATUS" FontSize="{DynamicResource FontSizeLabel}"
+            <TextBlock x:Name="ColStatus" Grid.Column="4" Text="" FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="{DynamicResource FontSizeLabel}"
+            <TextBlock x:Name="ColActions" Grid.Column="5" Text="" FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
           <ScrollViewer>
@@ -113,7 +113,7 @@
                       <Button Grid.Column="5" Tag="{Binding DeleteTag}" Classes="action-btn"
                               Padding="6,3" Click="Delete_Click"
                               FontSize="{DynamicResource FontSizeLabel}"
-                              Content="Delete" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                              Content="{Binding DeleteLabel}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
                   </Border>
                 </DataTemplate>

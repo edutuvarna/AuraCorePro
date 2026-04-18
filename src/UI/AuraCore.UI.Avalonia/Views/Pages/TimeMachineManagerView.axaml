@@ -5,11 +5,13 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Time Machine Manager"
-                             Subtitle="Monitor Time Machine backups, status, and exclusions">
+      <controls:ModuleHeader x:Name="TmHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Refresh" Click="Scan_Click"
+            <Button x:Name="TmRefreshBtn"
+                    Content="" Click="Scan_Click"
                     Classes="action-btn" Padding="16,8"/>
             <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
@@ -24,10 +26,12 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="LAST BACKUP"
+        <controls:StatCard x:Name="LastBackupStat"
+                           Label=""
                            Value="{Binding #LastBackup.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="STATUS"
+        <controls:StatCard x:Name="TmStatusStat"
+                           Label=""
                            Value="{Binding #TmStatus.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
       </controls:StatRow>
@@ -42,13 +46,14 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Time Machine Details"
+            <TextBlock x:Name="TmDetailsHeading"
+                       Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <TextBlock x:Name="SubText"
-                     Text="Click Refresh to check Time Machine status (macOS only)"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <TextBlock x:Name="DetailsText" Text=""
@@ -69,7 +74,8 @@
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Exclusions"
+            <TextBlock x:Name="ExclusionsHeading"
+                       Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>

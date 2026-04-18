@@ -1,6 +1,7 @@
 using AuraCore.Module.GrubManager;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
+using global::Avalonia.Interactivity;
 using global::Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public partial class GrubManagerView : UserControl
     {
         InitializeComponent();
         ApplyLocalizedTexts();
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
         Loaded += (_, _) =>
         {
             if (DataContext is null)
@@ -26,6 +29,14 @@ public partial class GrubManagerView : UserControl
             // Auto-scan on load (user-requested tweak: no manual Scan button).
             (DataContext as GrubManagerViewModel)?.TriggerInitialScan();
         };
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private void ApplyLocalizedTexts()
@@ -54,6 +65,8 @@ public partial class GrubManagerView : UserControl
         if (this.FindControl<Button>("ApplyChangesBtn") is { } apb) apb.Content = L("grubManager.action.apply");
         if (this.FindControl<Button>("CancelBtn") is { } cb) cb.Content = L("grubManager.action.cancel");
         if (this.FindControl<TextBlock>("BootWarning") is { } bw) bw.Text = L("grubManager.warning.bootRisk");
+        if (this.FindControl<TextBlock>("TimeoutMinLabel") is { } tml) tml.Text = L("grubManager.timeout.min");
+        if (this.FindControl<TextBlock>("TimeoutMaxLabel") is { } tmx) tmx.Text = L("grubManager.timeout.max");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

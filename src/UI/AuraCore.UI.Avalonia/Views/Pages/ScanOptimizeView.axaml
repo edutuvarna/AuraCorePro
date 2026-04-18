@@ -6,15 +6,15 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Module"
-                             Subtitle="Scan and optimize">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -22,7 +22,7 @@
                     VerticalAlignment="Center" Padding="14,8" IsEnabled="False">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="OptimizeLabel" Text="Optimize"
+                <TextBlock x:Name="OptimizeLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                            Foreground="{DynamicResource AccentPrimaryBrush}"/>
               </StackPanel>
@@ -35,7 +35,7 @@
 
       <!-- Hidden bridge for code-behind subtitle writes -->
       <TextBlock x:Name="PageSubtitle"
-                 Text="Scan and optimize"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  IsVisible="False"/>
@@ -44,7 +44,7 @@
       <controls:GlassCard>
         <Grid ColumnDefinitions="*,*,*">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Items Found:"
+            <TextBlock x:Name="LblItemsFound" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="ItemsFound" Text="--"
@@ -52,7 +52,7 @@
                        Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Space:"
+            <TextBlock x:Name="LblSpace" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="SpaceSaved" Text="--"
@@ -60,7 +60,7 @@
                        Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Risk:"
+            <TextBlock x:Name="LblRisk" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <Border CornerRadius="8" Padding="10,2"
@@ -81,7 +81,7 @@
                       VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
             <TextBlock x:Name="BeforeScanIcon" Text="&#x1F50D;"
                        FontSize="32" HorizontalAlignment="Center"/>
-            <TextBlock Text="Click Scan to analyze your system"
+            <TextBlock x:Name="LblClickToScan" Text=""
                        FontSize="{DynamicResource FontSizeBody}"
                        Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ModuleInfo" Text=""
@@ -102,7 +102,7 @@
           <!-- Progress state -->
           <StackPanel x:Name="ProgressPanel" IsVisible="False"
                       VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-            <TextBlock x:Name="ProgressText" Text="Optimizing..."
+            <TextBlock x:Name="ProgressText" Text=""
                        FontSize="{DynamicResource FontSizeHeading}" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentPrimaryBrush}" HorizontalAlignment="Center"/>
             <Border Height="6" CornerRadius="3"
@@ -121,7 +121,7 @@
                       VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
             <TextBlock Text="&#x2714;" FontSize="32" HorizontalAlignment="Center"
                        Foreground="{DynamicResource StatusSuccessBrush}"/>
-            <TextBlock x:Name="ResultTitle" Text="Optimization Complete"
+            <TextBlock x:Name="ResultTitle" Text=""
                        FontSize="{DynamicResource FontSizeSubheading}" FontWeight="Bold"
                        Foreground="{DynamicResource StatusSuccessBrush}" HorizontalAlignment="Center"/>
             <TextBlock x:Name="ResultDetail" Text=""

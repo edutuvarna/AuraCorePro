@@ -6,8 +6,7 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Environment Variables"
-                             Subtitle="View and edit system/user environment variables and PATH">
+      <controls:ModuleHeader x:Name="Header">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <!-- PageTitle: invisible, code-behind writes localized string -->
@@ -25,21 +24,21 @@
                 <Border.Background>
                   <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x2261;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
+                <TextBlock Text="≡" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="PATH Entries (User)"
+              <TextBlock x:Name="PathSectionLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <TextBlock x:Name="PathCount" Grid.Column="1" Text="0 entries"
+            <TextBlock x:Name="PathCount" Grid.Column="1" Text=""
                        FontSize="{DynamicResource FontSizeBody}"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </Grid>
           <ItemsControl x:Name="PathList"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-            <TextBox x:Name="NewPathBox" Watermark="New PATH entry..." Width="400"/>
-            <Button Content="Add" Click="AddPath_Click" Classes="action-btn" Padding="16,8"/>
+            <TextBox x:Name="NewPathBox" Watermark="" Width="400"/>
+            <Button x:Name="AddPathBtn" Content="" Click="AddPath_Click" Classes="action-btn" Padding="16,8"/>
           </StackPanel>
         </StackPanel>
       </controls:GlassCard>
@@ -53,17 +52,17 @@
                 <Border.Background>
                   <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x25A0;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
+                <TextBlock Text="■" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="User Environment Variables"
+              <TextBlock x:Name="UserVarsLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Refresh" Click="Refresh_Click" Padding="12,6" Grid.Column="1"
+            <Button x:Name="RefreshBtn" Content="" Click="Refresh_Click" Padding="12,6" Grid.Column="1"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </Grid>
-          <TextBox x:Name="SearchBox" Watermark="Search variables..." Margin="0,4,0,0"/>
+          <TextBox x:Name="SearchBox" Watermark="" Margin="0,4,0,0"/>
           <ItemsControl x:Name="VarList"/>
         </StackPanel>
       </controls:GlassCard>

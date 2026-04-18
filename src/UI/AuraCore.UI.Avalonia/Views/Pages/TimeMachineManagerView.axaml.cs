@@ -76,5 +76,17 @@ public partial class TimeMachineManagerView : UserControl
         catch { return ""; }
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.timeMachineManager"); }
+    private void ApplyLocalization()
+    {
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.timeMachineManager");
+        TmHeader.Title    = L("nav.timeMachineManager");
+        TmHeader.Subtitle = L("timeMachineManager.subtitle");
+        LastBackupStat.Label = L("timeMachineManager.stat.lastBackup");
+        TmStatusStat.Label   = L("timeMachineManager.stat.status");
+        TmRefreshBtn.Content    = L("timeMachineManager.action.refresh");
+        TmDetailsHeading.Text   = L("timeMachineManager.heading.details");
+        SubText.Text            = L("timeMachineManager.subtext.initial");
+        ExclusionsHeading.Text  = L("timeMachineManager.heading.exclusions");
+    }
 }

@@ -4,7 +4,7 @@
         Width="420" Height="220"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Title="Feature locked">
+        x:Name="TierUpgradePlaceholderDialogWindow">
 
   <Border Background="{DynamicResource BgSurfaceBrush}"
           BorderBrush="{DynamicResource BorderEmphasisBrush}"
@@ -13,7 +13,7 @@
       <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
         <PathIcon Data="{DynamicResource IconLock}" Width="18" Height="18"
                   Foreground="{DynamicResource AccentAmberBrush}" VerticalAlignment="Center" />
-        <TextBlock Text="Feature locked" FontSize="16" FontWeight="SemiBold"
+        <TextBlock x:Name="TitleText" FontSize="16" FontWeight="SemiBold"
                    Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
       </StackPanel>
       <TextBlock Grid.Row="1" Margin="0,12,0,0"
@@ -21,7 +21,7 @@
                  Text=""
                  FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
                  TextWrapping="Wrap" />
-      <Button Grid.Row="2" Content="Close"
+      <Button x:Name="CloseButton" Grid.Row="2"
               Classes="primary"
               Click="OnCloseClick"
               HorizontalAlignment="Right" Padding="16,8" />

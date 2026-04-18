@@ -45,6 +45,10 @@ public partial class AIFeatureCard : UserControl
         var affordance = this.FindControl<TextBlock>("ViewDetailsAffordance");
         if (affordance is not null)
             affordance.Text = LocalizationService.Get("aiFeatures.card.viewDetails");
+
+        var badge = this.FindControl<Controls.AccentBadge>("PART_ExperimentalBadge");
+        if (badge is not null)
+            badge.Label = LocalizationService.Get("aiFeatures.card.chat.experimentalBadge");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

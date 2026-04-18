@@ -15,7 +15,7 @@
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
             <Button x:Name="ScanBtn"
-                    Content="Scan"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ScanCommand}"
@@ -48,7 +48,7 @@
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        TextWrapping="Wrap"/>
             <Button x:Name="AutoRemoveOldBtn"
-                    Content="Auto-Remove Old"
+                    Content=""
                     Classes="action-btn"
                     HorizontalAlignment="Right"
                     Padding="16,8"
@@ -124,7 +124,7 @@
                               VerticalAlignment="Center"
                               IsVisible="{Binding IsRunning}"
                               Background="{DynamicResource BgElevatedBrush}">
-                        <TextBlock Text="● RUNNING"
+                        <TextBlock Text="{Binding RunningBadgeText}"
                                    FontSize="10"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource AccentBlueBrush}"/>
@@ -135,7 +135,7 @@
                               VerticalAlignment="Center"
                               IsVisible="{Binding IsNewestBadgeVisible}"
                               Background="{DynamicResource BgElevatedBrush}">
-                        <TextBlock Text="★ NEWEST"
+                        <TextBlock Text="{Binding NewestBadgeText}"
                                    FontSize="10"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource StatusWarningBrush}"/>
@@ -154,7 +154,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="RemoveSelectedBtn"
                       Grid.Column="1"
-                      Content="Remove Selected"
+                      Content=""
                       Classes="action-btn"
                       Padding="16,8"
                       Command="{Binding RemoveSelectedCommand}"/>
@@ -185,7 +185,7 @@
                       VerticalAlignment="Center"/>
             <Button x:Name="RemoveAllButCurrentBtn"
                     Grid.Column="1"
-                    Content="Remove All But Running"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding RemoveAllButCurrentCommand}"
@@ -207,7 +207,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

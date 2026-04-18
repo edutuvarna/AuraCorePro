@@ -16,6 +16,9 @@ public partial class FileShredderView : UserControl
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
             Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private async void AddFiles_Click(object? sender, RoutedEventArgs e)
@@ -27,7 +30,7 @@ public partial class FileShredderView : UserControl
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(
                 new global::Avalonia.Platform.Storage.FilePickerOpenOptions
                 {
-                    Title = "Select files to shred",
+                    Title = LocalizationService._("shredder.picker.title"),
                     AllowMultiple = true
                 });
             foreach (var f in files)
@@ -55,7 +58,7 @@ public partial class FileShredderView : UserControl
                     });
                 }
             }
-            FileCount.Text = $"{_files.Count} file(s) selected";
+            FileCount.Text = string.Format(LocalizationService._("shredder.file.selectedCount"), _files.Count);
         }
         catch (Exception ex) { FileCount.Text = $"Error selecting files: {ex.Message}"; }
     }
@@ -64,12 +67,12 @@ public partial class FileShredderView : UserControl
     {
         _files.Clear();
         FileList.Items.Clear();
-        FileCount.Text = "No files selected";
+        FileCount.Text = LocalizationService._("shredder.file.noFiles");
     }
 
     private async void Shred_Click(object? sender, RoutedEventArgs e)
     {
-        if (_files.Count == 0) { FileCount.Text = "No files selected!"; return; }
+        if (_files.Count == 0) { FileCount.Text = LocalizationService._("shredder.file.noFiles"); return; }
 
         var passes = Method7Pass.IsChecked == true ? 7 : Method3Pass.IsChecked == true ? 3 : 1;
         ShredBtn.IsEnabled = false;
@@ -90,8 +93,8 @@ public partial class FileShredderView : UserControl
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        ProgressLabel.Text = $"Shredding: {System.IO.Path.GetFileName(filePath)}";
-                        ProgressDetail.Text = $"File {completed + 1}/{total}, {passes} pass(es)";
+                        ProgressLabel.Text = string.Format(LocalizationService._("shredder.progress.shredding"), System.IO.Path.GetFileName(filePath));
+                        ProgressDetail.Text = string.Format(LocalizationService._("shredder.progress.detail"), completed + 1, total, passes);
                     });
 
                     // Multi-pass overwrite
@@ -140,20 +143,37 @@ public partial class FileShredderView : UserControl
         });
 
         ProgressBar.Value = 100;
-        ProgressLabel.Text = $"Shredding complete! {completed} file(s) destroyed.";
-        ProgressDetail.Text = $"{passes}-pass overwrite + filename randomization + delete";
+        ProgressLabel.Text = string.Format(LocalizationService._("shredder.progress.complete"), completed);
+        ProgressDetail.Text = string.Format(LocalizationService._("shredder.progress.completedDetail"), passes);
         ShredBtn.IsEnabled = true;
 
         _files.Clear();
         FileList.Items.Clear();
-        FileCount.Text = "No files selected";
+        FileCount.Text = LocalizationService._("shredder.file.noFiles");
 
-        NotificationService.Instance.Post("File Shredder",
-            $"{completed} file(s) securely shredded ({passes}-pass)", NotificationType.Success);
+        NotificationService.Instance.Post(LocalizationService._("nav.fileShredder"),
+            string.Format(LocalizationService._("shredder.notification.shredded"), completed, passes), NotificationType.Success);
     }
 
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.fileShredder");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("shredder.title");
+            h.Subtitle = L("shredder.subtitle");
+        }
+        MethodLabel.Text = L("shredder.method.label");
+        Method1Pass.Content = L("shredder.method.quick");
+        Method3Pass.Content = L("shredder.method.standard");
+        Method7Pass.Content = L("shredder.method.secure");
+        FilesToShredLabel.Text = L("shredder.files.label");
+        AddFilesBtn.Content = L("shredder.action.addFiles");
+        ClearAllBtn.Content = L("shredder.action.clearAll");
+        if (string.IsNullOrEmpty(FileCount.Text))
+            FileCount.Text = L("shredder.file.noFiles");
+        ShredBtn.Content = L("shredder.action.shred");
+        WarningText.Text = L("shredder.warning");
     }
 }

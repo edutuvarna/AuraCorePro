@@ -26,19 +26,18 @@
           <Border.Background>
             <SolidColorBrush Color="#14B8A6" Opacity="0.15"/>
           </Border.Background>
-          <TextBlock Text="&#x1F9E0;" FontSize="22"
+          <TextBlock Text="🧠" FontSize="22"
                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
 
         <!-- Title -->
-        <TextBlock x:Name="TitleLabel" Text="Help AuraCore Learn"
+        <TextBlock x:Name="TitleLabel"
                    FontSize="18" FontWeight="Bold"
                    Foreground="{DynamicResource TextPrimaryBrush}"
                    HorizontalAlignment="Center" TextAlignment="Center"/>
 
         <!-- Description -->
         <TextBlock x:Name="DescriptionLabel"
-                   Text="AuraCore Pro uses local AI to analyze your system. To improve AI accuracy, we can collect anonymous usage statistics (CPU/RAM averages, disk trends). No personal data is collected. All AI analysis runs locally on your device."
                    FontSize="13" TextWrapping="Wrap" LineHeight="20"
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    TextAlignment="Center"/>
@@ -50,20 +49,19 @@
                   Background="#2014B8A6" Foreground="#14B8A6"
                   Padding="16,12" CornerRadius="10"
                   FontWeight="SemiBold" FontSize="14" Cursor="Hand">
-            <TextBlock x:Name="AllowBtnText" Text="&#x2713; Allow"/>
+            <TextBlock x:Name="AllowBtnText"/>
           </Button>
           <Button x:Name="DeclineBtn" Click="Decline_Click"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                   Background="#12FFFFFF" Foreground="{DynamicResource TextSecondaryBrush}"
                   Padding="16,12" CornerRadius="10"
                   FontWeight="SemiBold" FontSize="14" Cursor="Hand">
-            <TextBlock x:Name="DeclineBtnText" Text="&#x2717; Decline"/>
+            <TextBlock x:Name="DeclineBtnText"/>
           </Button>
         </StackPanel>
 
         <!-- Bottom note -->
         <TextBlock x:Name="NoteLabel"
-                   Text="You can change this later in Settings."
                    FontSize="11" TextWrapping="Wrap"
                    Foreground="{DynamicResource TextMutedBrush}"
                    HorizontalAlignment="Center" TextAlignment="Center"

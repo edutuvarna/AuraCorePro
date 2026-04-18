@@ -30,8 +30,8 @@ public partial class ServiceManagerView : UserControl
 
     private async Task RunScan()
     {
-        if (!OperatingSystem.IsWindows()) { SubText.Text = "Windows only"; return; }
-        ScanLabel.Text = "Scanning...";
+        if (!OperatingSystem.IsWindows()) { SubText.Text = LocalizationService._("svcMgr.windowsOnly"); return; }
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             var rawData = await Task.Run(() =>
@@ -57,8 +57,8 @@ public partial class ServiceManagerView : UserControl
             StoppedSvc.Text = _allItems.Count(s => s.Status == "Stopped").ToString();
             AutoSvc.Text = _allItems.Count(s => s.StartType == "Automatic").ToString();
         }
-        catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch (System.Exception ex) { SubText.Text = $"{LocalizationService._("common.errorPrefix")}{ex.Message}"; }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private void ApplyFilter()
@@ -74,9 +74,48 @@ public partial class ServiceManagerView : UserControl
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();
     private void Search_Changed(object? s, TextChangedEventArgs e) => ApplyFilter();
 
+    private void ContextMenu_Opening(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (sender is ContextMenu menu) ServiceContextMenu_Opening(menu);
+    }
+
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.serviceManager");
+        ModuleHdr.Title = LocalizationService._("nav.serviceManager");
+        ModuleHdr.Subtitle = LocalizationService._("svcMgr.subtitle");
+        ScanLabel.Text = LocalizationService._("common.scan");
+        SearchBox.Watermark = LocalizationService._("svcMgr.searchWatermark");
+        StatTotal.Label   = LocalizationService._("common.statTotal");
+        StatRunning.Label = LocalizationService._("svcMgr.statRunning");
+        StatStopped.Label = LocalizationService._("svcMgr.statStopped");
+        StatAuto.Label    = LocalizationService._("svcMgr.statAuto");
+        // ContextMenu MenuItems are inside DataTemplate — they cannot be accessed by name
+        // from code-behind; they re-populate each time the template is applied.
+        // The Headers are set via ApplyContextMenuLocalization called from the context
+        // menu opening event wired in the item template.
+    }
+
+    /// <summary>
+    /// Called when the service item context menu opens so we can apply localized headers.
+    /// </summary>
+    private void ServiceContextMenu_Opening(ContextMenu menu)
+    {
+        if (menu.Items.Count < 4) return;
+        if (menu.Items[0] is MenuItem start)   start.Header   = LocalizationService._("common.start");
+        if (menu.Items[1] is MenuItem stop)    stop.Header    = LocalizationService._("common.stop");
+        if (menu.Items[2] is MenuItem restart) restart.Header = LocalizationService._("common.restart");
+        if (menu.Items[3] is MenuItem sep)     { /* separator */ }
+        if (menu.Items.Count > 4 && menu.Items[4] is MenuItem startupType)
+        {
+            startupType.Header = LocalizationService._("svcMgr.menu.startupType");
+            if (startupType.Items.Count >= 3)
+            {
+                if (startupType.Items[0] is MenuItem auto)     auto.Header     = LocalizationService._("svcMgr.menu.automatic");
+                if (startupType.Items[1] is MenuItem manual)   manual.Header   = LocalizationService._("svcMgr.menu.manual");
+                if (startupType.Items[2] is MenuItem disabled) disabled.Header = LocalizationService._("svcMgr.menu.disabled");
+            }
+        }
     }
 
     // ── Context menu helpers ──────────────────────────────────────────────────
@@ -114,7 +153,8 @@ public partial class ServiceManagerView : UserControl
             ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
             return;
         }
-        await DispatchOp(() => _engine.StartAsync(item.ServiceName), $"Starting {item.DisplayName}…");
+        await DispatchOp(() => _engine.StartAsync(item.ServiceName),
+            string.Format(LocalizationService._("svcMgr.starting"), item.DisplayName));
     }
 
     private async void ServiceStop_Click(object? sender, RoutedEventArgs e)
@@ -126,7 +166,8 @@ public partial class ServiceManagerView : UserControl
             ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
             return;
         }
-        await DispatchOp(() => _engine.StopAsync(item.ServiceName), $"Stopping {item.DisplayName}…");
+        await DispatchOp(() => _engine.StopAsync(item.ServiceName),
+            string.Format(LocalizationService._("svcMgr.stopping"), item.DisplayName));
     }
 
     private async void ServiceRestart_Click(object? sender, RoutedEventArgs e)
@@ -138,7 +179,8 @@ public partial class ServiceManagerView : UserControl
             ShowBanner(LocalizationService.Get("privhelper.notInstalled.toast"), isError: true);
             return;
         }
-        await DispatchOp(() => _engine.RestartAsync(item.ServiceName), $"Restarting {item.DisplayName}…");
+        await DispatchOp(() => _engine.RestartAsync(item.ServiceName),
+            string.Format(LocalizationService._("svcMgr.restarting"), item.DisplayName));
     }
 
     private async void ServiceStartupAuto_Click(object? sender, RoutedEventArgs e)
@@ -151,7 +193,7 @@ public partial class ServiceManagerView : UserControl
             return;
         }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "auto"),
-            $"Setting {item.DisplayName} startup to Automatic…");
+            string.Format(LocalizationService._("svcMgr.setStartupAuto"), item.DisplayName));
     }
 
     private async void ServiceStartupManual_Click(object? sender, RoutedEventArgs e)
@@ -164,7 +206,7 @@ public partial class ServiceManagerView : UserControl
             return;
         }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "demand"),
-            $"Setting {item.DisplayName} startup to Manual…");
+            string.Format(LocalizationService._("svcMgr.setStartupManual"), item.DisplayName));
     }
 
     private async void ServiceStartupDisabled_Click(object? sender, RoutedEventArgs e)
@@ -177,7 +219,7 @@ public partial class ServiceManagerView : UserControl
             return;
         }
         await DispatchOp(() => _engine.SetStartupAsync(item.ServiceName, "disabled"),
-            $"Setting {item.DisplayName} startup to Disabled…");
+            string.Format(LocalizationService._("svcMgr.setStartupDisabled"), item.DisplayName));
     }
 
     private async Task DispatchOp(Func<Task<ServiceOperationOutcome>> op, string progressMsg)
@@ -187,12 +229,12 @@ public partial class ServiceManagerView : UserControl
         {
             var outcome = await op();
             if (outcome.HelperMissing)
-                ShowBanner("Privileged helper not installed. Run scripts/install-privileged-service.ps1 as admin.", isError: true);
+                ShowBanner(LocalizationService._("svcMgr.helperMissing"), isError: true);
             else if (!outcome.Success)
-                ShowBanner($"Error: {outcome.Error ?? "unknown"}", isError: true);
+                ShowBanner($"{LocalizationService._("common.errorPrefix")}{outcome.Error ?? "unknown"}", isError: true);
             else
             {
-                ShowBanner("Done.", isError: false);
+                ShowBanner(LocalizationService._("svcMgr.done"), isError: false);
                 await RunScan();
             }
         }

@@ -31,8 +31,35 @@ public partial class PaymentView : UserControl
         _tier = tier;
         _plan = plan;
         InitializeComponent();
-        Loaded += async (s, e) => await StartCheckout();
-        Unloaded += (s, e) => _polling = false;
+        Loaded += async (s, e) => { ApplyLocalization(); await StartCheckout(); };
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) =>
+        {
+            _polling = false;
+            LocalizationService.LanguageChanged -= OnLanguageChanged;
+        };
+    }
+
+    private void OnLanguageChanged() =>
+        Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        WaitingTitle.Text = L("pay.completeTitle");
+        StripeDesc.Text = L("pay.stripeDesc");
+        PollStatusText.Text = L("pay.waitingDefault");
+        ReopenBtn.Content = L("pay.reopenCheckout");
+        CancelBtn.Content = L("common.cancel");
+        SuccessTitle.Text = L("pay.paymentSuccess");
+        if (string.IsNullOrEmpty(SuccessMessage.Text))
+            SuccessMessage.Text = L("pay.welcomePro");
+        ContinueBtn.Content = L("common.continue");
+        ErrorTitle.Text = L("pay.paymentError");
+        if (string.IsNullOrEmpty(ErrorText.Text))
+            ErrorText.Text = L("pay.somethingWrong");
+        TryAgainBtn.Content = L("pay.tryAgain");
+        GoBackBtn.Content = L("pay.goBack");
     }
 
     private async Task StartCheckout()
@@ -115,7 +142,7 @@ public partial class PaymentView : UserControl
             try
             {
                 Dispatcher.UIThread.Post(() =>
-                    PollStatusText.Text = $"Waiting for payment... ({attempts * 5}s)");
+                    PollStatusText.Text = string.Format(LocalizationService._("pay.waitingPayment"), attempts * 5));
 
                 var token = SessionState.AccessToken;
                 if (string.IsNullOrEmpty(token)) continue;
@@ -159,8 +186,8 @@ public partial class PaymentView : UserControl
     {
         var tierName = tier == "enterprise" ? "Enterprise" : "Pro";
         ShowScreen("success");
-        SuccessMessage.Text = $"You are now an AuraCore {tierName} member!";
-        TierUpdateText.Text = $"Your account has been upgraded to {tierName}. All features are now unlocked.";
+        SuccessMessage.Text = string.Format(LocalizationService._("pay.successMsg"), tierName);
+        TierUpdateText.Text = string.Format(LocalizationService._("pay.tierUpdated"), tierName);
     }
 
     private void ShowScreen(string screen)

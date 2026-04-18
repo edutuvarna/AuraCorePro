@@ -5,8 +5,8 @@
   <Grid RowDefinitions="Auto,Auto,Auto,*">
 
     <!-- Header -->
-    <controls:ModuleHeader Title="Process Monitor"
-                           Subtitle="Monitor, kill, and manage running processes">
+    <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                           Subtitle="">
       <controls:ModuleHeader.Actions>
         <StackPanel Orientation="Horizontal" Spacing="8">
           <!-- Auto-refresh toggle -->
@@ -15,7 +15,7 @@
                   Padding="12,8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
-              <TextBlock x:Name="AutoRefreshLabel" Text="Auto: OFF"
+              <TextBlock x:Name="AutoRefreshLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
             </StackPanel>
           </Button>
@@ -24,7 +24,7 @@
                   VerticalAlignment="Center" Padding="12,8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-              <TextBlock x:Name="ScanBtnLabel" Text="Scan"
+              <TextBlock x:Name="ScanBtnLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
             </StackPanel>
           </Button>
@@ -36,7 +36,7 @@
 
     <!-- Hidden bridge for code-behind subtitle writes -->
     <TextBlock Grid.Row="0" x:Name="SubtitleText"
-               Text="Monitor, kill, and manage running processes"
+               Text=""
                FontSize="{DynamicResource FontSizeBodySmall}"
                Foreground="{DynamicResource TextSecondaryBrush}"
                IsVisible="False"/>
@@ -53,7 +53,7 @@
           <Border.BorderBrush>
             <SolidColorBrush Color="#FFFFFF" Opacity="0.05"/>
           </Border.BorderBrush>
-          <TextBox x:Name="SearchBox" Watermark="Search processes..."
+          <TextBox x:Name="SearchBox" Watermark=""
                    Background="Transparent" BorderThickness="0"
                    Foreground="{DynamicResource TextPrimaryBrush}"
                    FontSize="{DynamicResource FontSizeBody}"
@@ -62,7 +62,7 @@
         <!-- Stats bar -->
         <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Margin="0,10,0,0">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Processes:"
+            <TextBlock x:Name="LblProcesses" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="ProcCount" Text="--"
@@ -70,7 +70,7 @@
                        Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Total CPU:"
+            <TextBlock x:Name="LblTotalCpu" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="TotalCpu" Text="--%"
@@ -78,7 +78,7 @@
                        Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Total RAM:"
+            <TextBlock x:Name="LblTotalRam" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="TotalRam" Text="-- MB"
@@ -106,19 +106,19 @@
             <TextBlock Grid.Column="1" Text="NAME"
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="2" Text="DESCRIPTION"
+            <TextBlock Grid.Column="2" x:Name="ColDescription" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
             <TextBlock Grid.Column="3" Text="CPU %"
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="4" Text="RAM MB"
+            <TextBlock Grid.Column="4" x:Name="ColRamMb" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="5" Text="THREADS"
+            <TextBlock Grid.Column="5" x:Name="ColThreads" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Right"/>
-            <TextBlock Grid.Column="6" Text="ACTIONS"
+            <TextBlock Grid.Column="6" x:Name="ColActions" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
@@ -163,7 +163,7 @@
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                       <Button Tag="{Binding KillTag}" Classes="action-btn" Padding="6,3"
                               Click="Action_Click" FontSize="{DynamicResource FontSizeLabel}"
-                              Content="Kill"/>
+                              Content="{Binding KillLabel}"/>
                       <Button Tag="{Binding SuspendTag}" Classes="action-btn" Padding="6,3"
                               Click="Action_Click" FontSize="{DynamicResource FontSizeLabel}"
                               Content="{Binding SuspendLabel}"/>

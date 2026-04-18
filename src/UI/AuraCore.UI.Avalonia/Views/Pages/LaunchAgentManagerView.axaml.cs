@@ -86,5 +86,17 @@ public partial class LaunchAgentManagerView : UserControl
         }).ToList();
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.launchAgentManager"); }
+    private void ApplyLocalization()
+    {
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.launchAgentManager");
+        AgentHeader.Title    = L("nav.launchAgentManager");
+        AgentHeader.Subtitle = L("launchAgentManager.subtitle");
+        UserAgentsStat.Label   = L("launchAgentManager.stat.userAgents");
+        SystemAgentsStat.Label = L("launchAgentManager.stat.systemAgents");
+        DaemonsStat.Label      = L("launchAgentManager.stat.daemons");
+        AgentScanBtn.Content     = L("launchAgentManager.action.scan");
+        LaunchItemsHeading.Text  = L("launchAgentManager.heading.launchItems");
+        SubText.Text             = L("launchAgentManager.subtext.initial");
+    }
 }

@@ -1,6 +1,7 @@
 using AuraCore.Module.DockerCleaner;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
+using global::Avalonia.Interactivity;
 using global::Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,8 @@ public partial class DockerCleanerView : UserControl
     {
         InitializeComponent();
         ApplyLocalizedTexts();
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
         Loaded += (_, _) =>
         {
             if (DataContext is null)
@@ -24,6 +27,14 @@ public partial class DockerCleanerView : UserControl
                 catch { /* design-time / tests without DI */ }
             }
         };
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private void ApplyLocalizedTexts()

@@ -15,6 +15,9 @@ public partial class FontManagerView : UserControl
         PreviewText.TextChanged += (s, e) => RenderFonts(_allFonts);
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void LoadFonts()
@@ -61,5 +64,15 @@ public partial class FontManagerView : UserControl
         }).ToList();
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.fontManager"); }
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        PageTitle.Text              = L("nav.fontManager");
+        ModuleHdr.Title             = L("fontMgr.title");
+        ModuleHdr.Subtitle          = L("fontMgr.subtitle");
+        ExplorerRestartText.Text    = L("fontMgr.explorerRestartNote");
+        SearchBox.Watermark         = L("fontMgr.searchWatermark");
+        PreviewText.Watermark       = L("fontMgr.previewWatermark");
+        InstalledFontsLabel.Text    = L("fontMgr.installedFonts");
+    }
 }

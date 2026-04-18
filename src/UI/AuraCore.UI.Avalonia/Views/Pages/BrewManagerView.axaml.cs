@@ -120,5 +120,18 @@ public partial class BrewManagerView : UserControl
         catch { return ""; }
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.brewManager"); }
+    private void ApplyLocalization()
+    {
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.brewManager");
+        BrewHeader.Title    = L("nav.brewManager");
+        BrewHeader.Subtitle = L("brewManager.subtitle");
+        FormulaeStat.Label = L("brewManager.stat.formulae");
+        CasksStat.Label    = L("brewManager.stat.casks");
+        OutdatedStat.Label = L("brewManager.stat.outdated");
+        InstalledPkgHeading.Text = L("brewManager.heading.installedPackages");
+        BrewScanBtn.Content    = L("brewManager.action.scan");
+        BrewCleanupBtn.Content = L("brewManager.action.cleanupCache");
+        SubText.Text = L("brewManager.subtext.initial");
+    }
 }

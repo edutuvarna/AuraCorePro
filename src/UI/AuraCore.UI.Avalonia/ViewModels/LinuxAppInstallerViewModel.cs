@@ -11,6 +11,7 @@ using System.Windows.Input;
 using AuraCore.Application;
 using AuraCore.Module.LinuxAppInstaller;
 using AuraCore.Module.LinuxAppInstaller.Models;
+using AuraCore.UI.Avalonia;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
 
@@ -114,6 +115,9 @@ public sealed class AppVM : INotifyPropertyChanged
 
     /// <summary>Source pill shows for not-installed apps (apt/snap/flatpak/dnf chip).</summary>
     public bool IsSourcePillVisible => !_isInstalled;
+
+    /// <summary>Localized badge text for the installed pill.</summary>
+    public string InstalledBadgeText => LocalizationService._("linuxAppInstaller.app.installed");
 
     public event Action? SelectionChanged;
     public event Action? InstalledChanged;

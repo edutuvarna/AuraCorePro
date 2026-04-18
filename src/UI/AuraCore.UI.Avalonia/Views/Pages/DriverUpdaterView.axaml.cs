@@ -29,13 +29,16 @@ public partial class DriverUpdaterView : UserControl
         _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<DriverUpdaterModule>().FirstOrDefault();
         Loaded += async (s, e) => await RunScan();
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
 }
 
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
-        SubText.Text = "Scanning drivers via WMI (this may take a moment)...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
+        SubText.Text = LocalizationService._("driverUpdate.status.scanning");
 
         try
         {
@@ -51,13 +54,13 @@ public partial class DriverUpdaterView : UserControl
 
             var items = report.Drivers.Select(d =>
             {
-                var (fg, bg, label) = d.HasProblem ? (Parse("#EF4444"), Parse("#20EF4444"), "Problem")
+                var (fg, bg, label) = d.HasProblem ? (Parse("#EF4444"), Parse("#20EF4444"), LocalizationService._("driverUpdate.status.problem"))
                     : d.AgeCategory switch
                     {
-                        "Current" => (Parse("#22C55E"), Parse("#2022C55E"), "Current"),
-                        "Recent"  => (Parse("#3B82F6"), Parse("#203B82F6"), "Recent"),
-                        "Aging"   => (Parse("#F59E0B"), Parse("#20F59E0B"), "Aging"),
-                        _         => (Parse("#EF4444"), Parse("#20EF4444"), "Outdated")
+                        "Current" => (Parse("#22C55E"), Parse("#2022C55E"), LocalizationService._("driverUpdate.status.current")),
+                        "Recent"  => (Parse("#3B82F6"), Parse("#203B82F6"), LocalizationService._("driverUpdate.status.recent")),
+                        "Aging"   => (Parse("#F59E0B"), Parse("#20F59E0B"), LocalizationService._("driverUpdate.status.aging")),
+                        _         => (Parse("#EF4444"), Parse("#20EF4444"), LocalizationService._("driverUpdate.status.outdated"))
                     };
                 return new DriverDisplayItem(d.DeviceName, d.DeviceClass, d.Manufacturer,
                     d.DriverVersion, d.DriverDateDisplay, label, fg, bg);
@@ -65,8 +68,8 @@ public partial class DriverUpdaterView : UserControl
 
             DriverList.ItemsSource = items;
         }
-        catch { SubText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { SubText.Text = LocalizationService._("driverUpdate.status.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("driverUpdate.action.scan"); }
     }
 
     private static SolidColorBrush Parse(string hex) => new(Color.Parse(hex));
@@ -76,17 +79,17 @@ public partial class DriverUpdaterView : UserControl
     private async void Backup_Click(object? sender, RoutedEventArgs e)
     {
         if (_module is null) return;
-        BackupLabel.Text = "Backing up...";
+        BackupLabel.Text = LocalizationService._("common.scanning");
         try
         {
             var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"AuraCore_DriverBackup_{DateTime.Now:yyyyMMdd_HHmmss}");
             var result = await _module.BackupDriversAsync(path);
             SubText.Text = result.Success
-                ? $"Backed up {result.DriversExported} drivers ({result.SizeDisplay}) to {path}"
-                : $"Backup failed: {result.Error}";
+                ? string.Format(LocalizationService._("driverUpdate.status.backupSuccess"), result.DriversExported, result.SizeDisplay, path)
+                : string.Format(LocalizationService._("driverUpdate.status.backupFailed"), result.Error);
         }
         catch (System.Exception ex) { SubText.Text = $"Backup error: {ex.Message}"; }
-        finally { BackupLabel.Text = "Backup Drivers"; }
+        finally { BackupLabel.Text = LocalizationService._("driverUpdate.action.backup"); }
     }
 
     private async void WinUpdate_Click(object? sender, RoutedEventArgs e)
@@ -124,7 +127,7 @@ public partial class DriverUpdaterView : UserControl
             SubText.Text = LocalizationService.Get("privhelper.notInstalled.toast");
             return;
         }
-        PrivScanLabel.Text = "Scanning...";
+        PrivScanLabel.Text = LocalizationService._("common.scanning");
         HelperMissingBanner.IsVisible = false;
         try
         {
@@ -132,11 +135,11 @@ public partial class DriverUpdaterView : UserControl
             if (outcome.HelperMissing)
             {
                 HelperMissingBanner.IsVisible = true;
-                SubText.Text = "Privileged helper not installed.";
+                SubText.Text = LocalizationService._("privhelper.notInstalled.toast");
             }
             else if (outcome.Success)
             {
-                SubText.Text = "Privileged device scan complete.";
+                SubText.Text = LocalizationService._("driverUpdate.status.privScanComplete");
             }
             else
             {
@@ -144,11 +147,32 @@ public partial class DriverUpdaterView : UserControl
             }
         }
         catch (System.Exception ex) { SubText.Text = $"Scan error: {ex.Message}"; }
-        finally { PrivScanLabel.Text = "Scan devices (privileged)"; }
+        finally { PrivScanLabel.Text = LocalizationService._("driverUpdate.action.privScan"); }
 }
 
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.driverUpdater");
+        var L = LocalizationService._;
+        if (this.FindControl<global::AuraCore.UI.Avalonia.Views.Controls.ModuleHeader>("Header") is { } h)
+        {
+            h.Title = L("driverUpdate.title");
+            h.Subtitle = L("driverUpdate.subtitle");
+        }
+        BackupLabel.Text = L("driverUpdate.action.backup");
+        ScanLabel.Text = L("driverUpdate.action.scan");
+        TotalLabel.Text = L("driverUpdate.stat.total");
+        CurrentLabel.Text = L("driverUpdate.stat.current");
+        OutdatedLabel.Text = L("driverUpdate.stat.outdated");
+        ProblemsLabel.Text = L("driverUpdate.stat.problems");
+        ColDevice.Text = L("driverUpdate.col.device");
+        ColManufacturer.Text = L("driverUpdate.col.manufacturer");
+        ColVersion.Text = L("driverUpdate.col.version");
+        ColDate.Text = L("driverUpdate.col.date");
+        ColStatus.Text = L("driverUpdate.col.status");
+        WinUpdateLabel.Text = L("driverUpdate.action.winUpdate");
+        DevMgrLabel.Text = L("driverUpdate.action.devMgr");
+        PrivScanLabel.Text = L("driverUpdate.action.privScan");
+        HelperMissingText.Text = L("privhelper.notInstalled.banner");
     }
 }

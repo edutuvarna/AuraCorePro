@@ -26,8 +26,8 @@ public partial class StartupOptimizerView : UserControl
 
     private async Task RunScan()
     {
-        if (!OperatingSystem.IsWindows()) { SubText.Text = "Windows only feature"; return; }
-        ScanLabel.Text = "Scanning...";
+        if (!OperatingSystem.IsWindows()) { SubText.Text = LocalizationService._("startup.windowsOnly"); return; }
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             // Collect raw data on background thread (no UI objects)
@@ -49,8 +49,8 @@ public partial class StartupOptimizerView : UserControl
             EnabledItems.Text = items.Count(i => i.IsEnabled).ToString();
             HighImpactItems.Text = items.Count(i => i.Impact == "High").ToString();
         }
-        catch (System.Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch (System.Exception ex) { SubText.Text = $"{LocalizationService._("common.errorPrefix")}{ex.Message}"; }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private static void ScanReg(List<(string, string, string, string, bool)> list, RegistryKey hive, string hiveName)
@@ -75,5 +75,11 @@ public partial class StartupOptimizerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.startupOptimizer");
+        ModuleHdr.Title = LocalizationService._("nav.startupOptimizer");
+        ModuleHdr.Subtitle = LocalizationService._("startup.subtitleShort");
+        ScanLabel.Text = LocalizationService._("common.scan");
+        StatTotal.Label      = LocalizationService._("common.statTotal");
+        StatEnabled.Label    = LocalizationService._("startup.statEnabled");
+        StatHighImpact.Label = LocalizationService._("startup.statHighImpact");
     }
 }

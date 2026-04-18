@@ -11,6 +11,7 @@ using System.Windows.Input;
 using AuraCore.Application;
 using AuraCore.Module.KernelCleaner;
 using AuraCore.Module.KernelCleaner.Models;
+using AuraCore.UI.Avalonia;
 
 namespace AuraCore.UI.Avalonia.ViewModels;
 
@@ -81,6 +82,12 @@ public sealed class KernelItemVM : INotifyPropertyChanged
 
     /// <summary>Only show the NEWEST badge when the row is newest AND not running (running takes precedence).</summary>
     public bool IsNewestBadgeVisible => IsNewest && !IsRunning;
+
+    /// <summary>Localized badge text for the running kernel pill.</summary>
+    public string RunningBadgeText => LocalizationService._("kernelCleaner.badge.running");
+
+    /// <summary>Localized badge text for the newest kernel pill.</summary>
+    public string NewestBadgeText => LocalizationService._("kernelCleaner.badge.newest");
 
     private bool _isSelected;
     public bool IsSelected

@@ -66,6 +66,18 @@ public partial class InsightsSection : UserControl
         // Footer
         AutoRefreshText.Text = LocalizationService._("ai.status.autoRefresh");
 
+        // Recent Activity section
+        if (RecentActivityLabel is not null)
+            RecentActivityLabel.Text = LocalizationService.Get("insights.recentActivity");
+        // Only set the default placeholder if no real activity text has been set yet
+        if (RecentActivityText is not null)
+        {
+            var current = RecentActivityText.Text;
+            if (string.IsNullOrEmpty(current) || current == LocalizationService._("insights.noRecentActivity")
+                || current == "No recent optimizations. Run Smart Optimize or Clean Junk to see activity here.")
+                RecentActivityText.Text = LocalizationService.Get("insights.noRecentActivity");
+        }
+
         // Defaults for waiting states (if no result yet)
         if (HealthBadgeText.Text == "" || HealthBadgeText.Text == null)
             HealthBadgeText.Text = LocalizationService._("ai.health.waiting");
@@ -135,12 +147,12 @@ public partial class InsightsSection : UserControl
             if (dp.DaysUntilFull < 30)
             {
                 score -= 20;
-                penalties.Add("Disk <30 gun (-20)");
+                penalties.Add(LocalizationService._("ai.penalty.diskCritical"));
             }
             else if (dp.DaysUntilFull < 90)
             {
                 score -= 10;
-                penalties.Add("Disk 30-90 gun (-10)");
+                penalties.Add(LocalizationService._("ai.penalty.diskWarning"));
             }
         }
 
@@ -372,7 +384,7 @@ public partial class InsightsSection : UserControl
         {
             MemoryProcessPanel.Children.Add(new TextBlock
             {
-                Text = "Proses verisi alinamadi",
+                Text = LocalizationService._("ai.memory.unavailable"),
                 FontSize = 10,
                 Foreground = new SolidColorBrush(Color.Parse("#666680"))
             });

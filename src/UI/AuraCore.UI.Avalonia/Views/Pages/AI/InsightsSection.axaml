@@ -8,7 +8,6 @@
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Grid.Column="0"
                    x:Name="PageTitle"
-                   Text="Cortex Insights"
                    FontSize="16"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -23,7 +22,7 @@
           </Border.BorderBrush>
           <StackPanel Orientation="Horizontal" Spacing="5">
             <Border Width="5" Height="5" CornerRadius="3" Background="#3B82F6"/>
-            <TextBlock x:Name="EngineStatusLabel" Text="AI ENGINE"
+            <TextBlock x:Name="EngineStatusLabel"
                        FontSize="9" FontWeight="Bold" Foreground="#3B82F6"/>
           </StackPanel>
         </Border>
@@ -35,7 +34,7 @@
       <StackPanel Spacing="10" MaxWidth="760">
 
         <!-- Hero subtitle -->
-        <TextBlock x:Name="HeroSubtitle" Text="ML-powered system analysis dashboard"
+        <TextBlock x:Name="HeroSubtitle"
                    FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
 
         <!-- SECTION 1: AI Health Score -->
@@ -49,7 +48,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#22C55E14">
-                <TextBlock Text="&#9829;" FontSize="8" Foreground="#22C55E"
+                <TextBlock Text="♥" FontSize="8" Foreground="#22C55E"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="HealthSectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -91,7 +90,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#F59E0B14">
-                <TextBlock Text="&#9888;" FontSize="8" Foreground="#F59E0B"
+                <TextBlock Text="⚠" FontSize="8" Foreground="#F59E0B"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="AlertsSectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -115,7 +114,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#3B82F614">
-                <TextBlock Text="&#9681;" FontSize="8" Foreground="#3B82F6"
+                <TextBlock Text="◑" FontSize="8" Foreground="#3B82F6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="DiskSectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -153,7 +152,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#8B5CF614">
-                <TextBlock Text="&#9783;" FontSize="8" Foreground="#8B5CF6"
+                <TextBlock Text="☷" FontSize="8" Foreground="#8B5CF6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="MemorySectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -177,7 +176,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#EC489914">
-                <TextBlock Text="&#9733;" FontSize="8" Foreground="#EC4899"
+                <TextBlock Text="★" FontSize="8" Foreground="#EC4899"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="ProfileSectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -202,7 +201,7 @@
           <StackPanel Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4" Background="#00D4AA14">
-                <TextBlock Text="&#9432;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
+                <TextBlock Text="ℹ" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <TextBlock x:Name="StatusSectionTitle" Text="" FontSize="11" FontWeight="SemiBold"
@@ -250,13 +249,12 @@
                 Padding="{DynamicResource SpacingCardPadding}"
                 Margin="0,16,0,0">
           <StackPanel Spacing="8">
-            <TextBlock Text="RECENT ACTIVITY"
+            <TextBlock x:Name="RecentActivityLabel"
                        Foreground="{DynamicResource TextMutedBrush}"
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="Bold"
                        LetterSpacing="1"/>
             <TextBlock x:Name="RecentActivityText"
-                       Text="No recent optimizations. Run Smart Optimize or Clean Junk to see activity here."
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        TextWrapping="Wrap"/>

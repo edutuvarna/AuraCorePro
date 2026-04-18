@@ -5,8 +5,9 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Brew Manager"
-                             Subtitle="Manage Homebrew packages, casks, and cleanup cache">
+      <controls:ModuleHeader x:Name="BrewHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <TextBlock x:Name="PageTitle" IsVisible="False"/>
         </controls:ModuleHeader.Actions>
@@ -21,13 +22,16 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="FORMULAE"
+        <controls:StatCard x:Name="FormulaeStat"
+                           Label=""
                            Value="{Binding #FormulaCount.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="CASKS"
+        <controls:StatCard x:Name="CasksStat"
+                           Label=""
                            Value="{Binding #CaskCount.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
-        <controls:StatCard Label="OUTDATED"
+        <controls:StatCard x:Name="OutdatedStat"
+                           Label=""
                            Value="{Binding #OutdatedCount.Text}"
                            ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
@@ -43,18 +47,21 @@
                            Foreground="{DynamicResource AccentPrimaryBrush}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Installed Packages"
+              <TextBlock x:Name="InstalledPkgHeading"
+                         Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Content="Scan"
+            <Button x:Name="BrewScanBtn"
+                    Content=""
                     Click="Scan_Click"
                     Grid.Column="1"
                     Classes="action-btn"
                     Padding="16,8"
                     Margin="0,0,8,0"/>
-            <Button Content="Cleanup Cache"
+            <Button x:Name="BrewCleanupBtn"
+                    Content=""
                     Click="Cleanup_Click"
                     Grid.Column="2"
                     Padding="12,8"
@@ -62,7 +69,7 @@
                     CornerRadius="{StaticResource RadiusSm}"/>
           </Grid>
           <TextBlock x:Name="SubText"
-                     Text="Click Scan to list Homebrew packages (macOS only)"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="PkgList"/>

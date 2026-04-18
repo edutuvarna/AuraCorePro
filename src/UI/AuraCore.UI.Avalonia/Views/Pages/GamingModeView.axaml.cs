@@ -73,7 +73,7 @@ public partial class GamingModeView : UserControl
         if (state is null) return;
 
         UpdateStatus(state.IsActive);
-        PowerPlanText.Text = $"Power Plan: {state.CurrentPowerPlan}";
+        PowerPlanText.Text = string.Format(LocalizationService._("gaming.powerPlan"), state.CurrentPowerPlan);
 
         // Toggles
         TogglePanel.Children.Clear();
@@ -115,14 +115,15 @@ public partial class GamingModeView : UserControl
     private void UpdateStatus(bool active)
     {
         var state = _module?.LastState;
+        var L = LocalizationService._;
 
         if (active)
         {
-            StatusLabel.Text = "ACTIVE - Gaming Mode On";
+            StatusLabel.Text = L("gaming.status.active");
             StatusLabel.Foreground = new SolidColorBrush(Color.Parse("#22C55E"));
             StatusDot.Background = new SolidColorBrush(Color.Parse("#22C55E"));
             StatusBorder.Background = new SolidColorBrush(Color.Parse("#0D22C55E"));
-            ActivateLabel.Text = "Deactivate";
+            ActivateLabel.Text = L("gaming.action.deactivate");
             ActivateBtn.Background = new SolidColorBrush(Color.Parse("#EF4444"));
 
             // Show active session badge
@@ -136,20 +137,20 @@ public partial class GamingModeView : UserControl
                 GpuStatusLabel.Text = state.GpuOptimized ? state.GpuStatus : state.GpuVendor;
                 GpuStatusLabel.Foreground = new SolidColorBrush(Color.Parse(state.GpuOptimized ? "#22C55E" : "#8B5CF6"));
 
-                NetworkQosLabel.Text = state.NetworkQosActive ? "QoS Active" : "Inactive";
+                NetworkQosLabel.Text = state.NetworkQosActive ? L("gaming.qos.active") : L("gaming.status.inactive");
                 NetworkQosLabel.Foreground = new SolidColorBrush(Color.Parse(state.NetworkQosActive ? "#22C55E" : "#3B82F6"));
 
-                WinUpdateLabel.Text = state.WindowsUpdatePaused ? "Paused" : "Running";
+                WinUpdateLabel.Text = state.WindowsUpdatePaused ? L("gaming.wu.paused") : L("gaming.wu.running");
                 WinUpdateLabel.Foreground = new SolidColorBrush(Color.Parse(state.WindowsUpdatePaused ? "#22C55E" : "#F59E0B"));
             }
         }
         else
         {
-            StatusLabel.Text = "Inactive";
+            StatusLabel.Text = L("gaming.status.inactive");
             StatusLabel.Foreground = new SolidColorBrush(Color.Parse("#8888A0"));
             StatusDot.Background = new SolidColorBrush(Color.Parse("#555570"));
             StatusBorder.Background = new SolidColorBrush(Color.Parse("#1A1A28"));
-            ActivateLabel.Text = "Activate";
+            ActivateLabel.Text = L("gaming.action.activate");
             ActivateBtn.Background = new SolidColorBrush(Color.Parse("#00D4AA"));
 
             // Hide active session badge
@@ -164,6 +165,7 @@ public partial class GamingModeView : UserControl
     private void StartSessionTimer()
     {
         if (_sessionTimer is not null) return;
+        SessionDurationText.Text = string.Format(LocalizationService._("gaming.session.duration"), "0:00");
         _sessionTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _sessionTimer.Tick += SessionTimerTick;
         _sessionTimer.Start();
@@ -175,7 +177,7 @@ public partial class GamingModeView : UserControl
         _sessionTimer.Tick -= SessionTimerTick;
         _sessionTimer.Stop();
         _sessionTimer = null;
-        SessionDurationText.Text = "Duration: 0:00";
+        SessionDurationText.Text = string.Format(LocalizationService._("gaming.session.duration"), "0:00");
     }
 
     private void SessionTimerTick(object? sender, EventArgs e)
@@ -183,9 +185,8 @@ public partial class GamingModeView : UserControl
         var activatedAt = _module?.LastState?.ActivatedAt;
         if (activatedAt is null) return;
         var elapsed = DateTime.UtcNow - activatedAt.Value;
-        SessionDurationText.Text = elapsed.TotalHours >= 1
-            ? $"Duration: {elapsed:h\\:mm\\:ss}"
-            : $"Duration: {elapsed:m\\:ss}";
+        var elapsedStr = elapsed.TotalHours >= 1 ? elapsed.ToString(@"h\:mm\:ss") : elapsed.ToString(@"m\:ss");
+        SessionDurationText.Text = string.Format(LocalizationService._("gaming.session.duration"), elapsedStr);
     }
 
     private async void Activate_Click(object? sender, RoutedEventArgs e)
@@ -194,7 +195,7 @@ public partial class GamingModeView : UserControl
         {
             if (_module is null) return;
             ActivateBtn.IsEnabled = false;
-            ActivateLabel.Text = "Working...";
+            ActivateLabel.Text = LocalizationService._("common.working");
 
             var isActive = _module.IsActive;
             var ids = new List<string> { isActive ? "deactivate" : "activate" };
@@ -232,6 +233,7 @@ public partial class GamingModeView : UserControl
         _gameWatchTimer.Tick += GameWatchTick;
         _gameWatchTimer.Start();
         UpdateAutoDetectUI(watching: true, gameName: null);
+        AutoDetectLabel.Text = LocalizationService._("gaming.autoDetect.on");
     }
 
     private void StopGameWatcher()
@@ -320,26 +322,27 @@ public partial class GamingModeView : UserControl
 
     private void UpdateAutoDetectUI(bool watching, string? gameName)
     {
+        var L = LocalizationService._;
         if (watching)
         {
             AutoDetectDot.Background = gameName is not null
                 ? new SolidColorBrush(Color.Parse("#22C55E"))
                 : new SolidColorBrush(Color.Parse("#A855F7"));
             AutoDetectLabel.Text = gameName is not null
-                ? $"Game Detected: {gameName}"
-                : "Watching for games...";
+                ? string.Format(L("gaming.autoDetect.detected"), gameName)
+                : L("gaming.autoDetect.watching");
             AutoDetectLabel.Foreground = gameName is not null
                 ? new SolidColorBrush(Color.Parse("#22C55E"))
                 : new SolidColorBrush(Color.Parse("#A855F7"));
             DetectedGameLabel.Text = gameName is not null
-                ? "Gaming Mode auto-activated"
+                ? L("gaming.autoDetect.autoActivated")
                 : "";
             DetectedGameLabel.IsVisible = gameName is not null;
         }
         else
         {
             AutoDetectDot.Background = new SolidColorBrush(Color.Parse("#555570"));
-            AutoDetectLabel.Text = "Auto-Detect: Off";
+            AutoDetectLabel.Text = L("gaming.autoDetect.off");
             AutoDetectLabel.Foreground = new SolidColorBrush(Color.Parse("#8888A0"));
             DetectedGameLabel.IsVisible = false;
         }
@@ -347,6 +350,23 @@ public partial class GamingModeView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.gamingMode");
+        var L = LocalizationService._;
+        PageTitle.Text          = L("nav.gamingMode");
+        ModuleHdr.Title         = L("gaming.title");
+        ModuleHdr.Subtitle      = L("gaming.subtitle");
+        GamingActiveLabel.Text  = L("gaming.activeLabel");
+        OptimizationsLabel.Text = L("gaming.section.optimizations");
+        BgProcessesLabel.Text   = L("gaming.section.bgProcesses");
+        NetworkStatLabel.Text   = L("gaming.stat.network");
+        WinUpdateStatLabel.Text = L("gaming.stat.winUpdate");
+        // Refresh state-dependent labels
+        if (_module is not null)
+            UpdateStatus(_module.IsActive);
+        else
+        {
+            ActivateLabel.Text = L("gaming.action.activate");
+            StatusLabel.Text   = L("gaming.status.inactive");
+            AutoDetectLabel.Text = L("gaming.autoDetect.off");
+        }
     }
 }

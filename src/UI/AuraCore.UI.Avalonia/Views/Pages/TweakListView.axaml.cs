@@ -28,19 +28,34 @@ public partial class TweakListView : UserControl
         _module = module;
         if (module is null) return;
         PageTitle.Text = module.DisplayName;
-        PageSubtitle.Text = module.Id switch
+        ModuleHdr.Title = module.DisplayName;
+        var subtitle = module.Id switch
         {
-            "context-menu" => "Add or remove items from your right-click menu",
-            "taskbar-tweaks" => "Customize Windows taskbar behavior and appearance",
-            "explorer-tweaks" => "Tweak File Explorer settings and behavior",
-            _ => "Toggle system tweaks"
+            "context-menu" => LocalizationService._("tweaks.subtitleContextMenu"),
+            "taskbar-tweaks" => LocalizationService._("tweaks.subtitleTaskbar"),
+            "explorer-tweaks" => LocalizationService._("tweaks.subtitleExplorer"),
+            _ => LocalizationService._("tweaks.subtitle")
         };
-        Loaded += async (s, e) => await RunScan();
+        PageSubtitle.Text = subtitle;
+        ModuleHdr.Subtitle = subtitle;
+        ScanLabel.Text = LocalizationService._("common.scan");
+        ExplorerRestartNote.Text = LocalizationService._("tweaks.explorerRestartNote");
+        ApplyLabel.Text = LocalizationService._("tweaks.applySelected");
+        Loaded += async (s, e) => { ApplyLocalization(); await RunScan(); };
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+    }
+
+    private void ApplyLocalization()
+    {
+        StatTotal.Label     = LocalizationService._("common.statTotal");
+        StatApplied.Label   = LocalizationService._("tweaks.statApplied");
+        StatAvailable.Label = LocalizationService._("tweaks.statAvailable");
     }
 
     private async Task RunScan()
     {
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions());
@@ -63,8 +78,8 @@ public partial class TweakListView : UserControl
 
             RenderTweaks();
         }
-        catch { StatusText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { StatusText.Text = LocalizationService._("tweaks.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 
     private void RenderTweaks()
@@ -148,7 +163,7 @@ public partial class TweakListView : UserControl
             // Status
             var status = new TextBlock
             {
-                Text = t.IsApplied ? "Active" : "Off", FontSize = 10, FontWeight = FontWeight.SemiBold,
+                Text = t.IsApplied ? LocalizationService._("tweaks.statusActive") : LocalizationService._("tweaks.statusOff"), FontSize = 10, FontWeight = FontWeight.SemiBold,
                 Foreground = new SolidColorBrush(Color.Parse(t.IsApplied ? "#22C55E" : "#8888A0")),
                 HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center
             };
@@ -169,7 +184,9 @@ public partial class TweakListView : UserControl
         for (int i = 0; i < _checkBoxes.Count && i < _tweaks.Count; i++)
             if (_checkBoxes[i].IsChecked != _tweaks[i].IsApplied) changes++;
         ApplyBtn.IsEnabled = changes > 0;
-        ApplyLabel.Text = changes > 0 ? $"Apply {changes} Change(s)" : "Apply Selected";
+        ApplyLabel.Text = changes > 0
+            ? string.Format(LocalizationService._("tweaks.applyChanges"), changes)
+            : LocalizationService._("tweaks.applySelected");
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
@@ -177,7 +194,7 @@ public partial class TweakListView : UserControl
     private async void Apply_Click(object? sender, RoutedEventArgs e)
     {
         ApplyBtn.IsEnabled = false;
-        ApplyLabel.Text = "Applying...";
+        ApplyLabel.Text = LocalizationService._("tweaks.applying");
         StatusText.Text = "";
 
         try
@@ -198,7 +215,7 @@ public partial class TweakListView : UserControl
 
             await RunScan(); // refresh state
         }
-        catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
-        finally { ApplyLabel.Text = "Apply Selected"; }
+        catch (Exception ex) { StatusText.Text = $"{LocalizationService._("common.errorPrefix")}{ex.Message}"; }
+        finally { ApplyLabel.Text = LocalizationService._("tweaks.applySelected"); }
     }
 }

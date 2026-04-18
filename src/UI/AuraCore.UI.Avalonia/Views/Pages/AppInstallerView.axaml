@@ -6,8 +6,8 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="App Installer"
-                             Subtitle="Search, install and update apps via winget">
+      <controls:ModuleHeader x:Name="PageHeader" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <!-- Windows-only badge -->
@@ -15,7 +15,7 @@
               <Border.Background>
                 <SolidColorBrush Color="#F59E0B" Opacity="0.1"/>
               </Border.Background>
-              <TextBlock Text="Windows only - requires winget" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock x:Name="WinOnlyBadge" Text="" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="#F59E0B" FontWeight="SemiBold"/>
             </Border>
             <!-- PageTitle: invisible, code-behind writes localized string -->
@@ -31,7 +31,7 @@
           <Border.Background>
             <SolidColorBrush Color="#00D4AA" Opacity="0.15"/>
           </Border.Background>
-          <TextBlock Text="Search" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+          <TextBlock x:Name="SearchTabLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                      Foreground="{DynamicResource AccentPrimaryBrush}"/>
         </Border>
         <Border x:Name="BundlesTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
@@ -39,7 +39,7 @@
           <Border.Background>
             <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
           </Border.Background>
-          <TextBlock Text="Bundles" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+          <TextBlock x:Name="BundlesTabLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </Border>
         <Border x:Name="InstalledTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
@@ -47,7 +47,7 @@
           <Border.Background>
             <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
           </Border.Background>
-          <TextBlock Text="Installed" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+          <TextBlock x:Name="InstalledTabLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </Border>
         <Border x:Name="UpdatesTab" CornerRadius="8" Padding="12,6" Cursor="Hand"
@@ -55,7 +55,7 @@
           <Border.Background>
             <SolidColorBrush Color="#FFFFFF" Opacity="0.04"/>
           </Border.Background>
-          <TextBlock Text="Updates" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+          <TextBlock x:Name="UpdatesTabLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </Border>
       </StackPanel>
@@ -76,15 +76,15 @@
                 <Border.Background>
                   <SolidColorBrush Color="#00D4AA" Opacity="0.2"/>
                 </Border.Background>
-                <TextBlock Text="&#x25B6;" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                <TextBlock Text="▶" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                            Foreground="#00D4AA"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock x:Name="QueueTitle" Text="Install Queue"
+              <TextBlock x:Name="QueueTitle" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button Grid.Column="1" x:Name="CancelQueueBtn" Content="Cancel"
+            <Button Grid.Column="1" x:Name="CancelQueueBtn" Content=""
                     FontSize="{DynamicResource FontSizeLabel}"
                     Padding="10,3" Click="CancelQueue_Click" IsVisible="False"/>
           </Grid>
@@ -94,7 +94,7 @@
 
       <!-- Tab 1: Search -->
       <StackPanel x:Name="SearchPanel" Spacing="12">
-        <TextBox x:Name="SearchBox" Watermark="Search winget packages..." KeyDown="SearchBox_KeyDown"/>
+        <TextBox x:Name="SearchBox" Watermark="" KeyDown="SearchBox_KeyDown"/>
 
         <controls:GlassCard>
           <StackPanel Spacing="8">
@@ -103,16 +103,16 @@
                 <Border.Background>
                   <SolidColorBrush Color="#00D4AA" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x2315;" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                <TextBlock Text="⌕" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                            Foreground="#00D4AA"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Search Results" FontSize="{DynamicResource FontSizeBodySmall}"
+              <TextBlock x:Name="SearchResultsLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                          FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
             <ItemsControl x:Name="SearchResults"/>
-            <TextBlock x:Name="SearchEmpty" Text="Type a query and press Enter to search"
+            <TextBlock x:Name="SearchEmpty" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        HorizontalAlignment="Center" Margin="0,12"/>
@@ -122,7 +122,7 @@
 
       <!-- Tab 2: Bundles -->
       <StackPanel x:Name="BundlesPanel" Spacing="12" IsVisible="False">
-        <TextBlock Text="Quick-install preset app bundles. Select a bundle, pick apps, and install them all at once."
+        <TextBlock x:Name="BundlesDesc" Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}"
                    Foreground="{DynamicResource TextMutedBrush}"/>
         <!-- Bundle cards generated in code-behind -->
@@ -134,10 +134,10 @@
               <TextBlock x:Name="BundleDetailTitle" Text=""
                          FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
                          Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-              <Button Grid.Column="1" x:Name="BundleSelectAllBtn" Content="Select All"
+              <Button Grid.Column="1" x:Name="BundleSelectAllBtn" Content=""
                       FontSize="{DynamicResource FontSizeLabel}" Padding="10,4"
                       Click="BundleSelectAll_Click" Margin="0,0,6,0"/>
-              <Button Grid.Column="2" x:Name="BundleInstallBtn" Content="Install Selected"
+              <Button Grid.Column="2" x:Name="BundleInstallBtn" Content=""
                       FontSize="{DynamicResource FontSizeLabel}" Padding="10,4"
                       Click="BundleInstall_Click" Classes="accent"/>
             </Grid>
@@ -155,11 +155,11 @@
                 <Border.Background>
                   <SolidColorBrush Color="#8B5CF6" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x25A3;" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                <TextBlock Text="▣" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                            Foreground="#8B5CF6"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Installed Apps" FontSize="{DynamicResource FontSizeBodySmall}"
+              <TextBlock x:Name="InstalledAppsLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                          FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
               <TextBlock x:Name="InstalledCount" Text=""
@@ -181,18 +181,18 @@
                   <Border.Background>
                     <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
                   </Border.Background>
-                  <TextBlock Text="&#x2B06;" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+                  <TextBlock Text="⬆" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                              Foreground="#F59E0B"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-                <TextBlock Text="Available Updates" FontSize="{DynamicResource FontSizeBodySmall}"
+                <TextBlock x:Name="AvailableUpdatesLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
                 <TextBlock x:Name="UpdateCount" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}"
                            Foreground="{DynamicResource TextMutedBrush}" Margin="6,0,0,0"/>
               </StackPanel>
-              <Button x:Name="UpdateAllBtn" Grid.Column="1" Content="Update All"
+              <Button x:Name="UpdateAllBtn" Grid.Column="1" Content=""
                       Click="UpdateAll_Click" Classes="accent" Padding="10,4"
                       FontSize="{DynamicResource FontSizeLabel}"/>
             </Grid>
@@ -203,7 +203,7 @@
 
       <!-- Status Bar -->
       <controls:GlassCard>
-        <TextBlock x:Name="StatusText" Text="Ready"
+        <TextBlock x:Name="StatusText" Text=""
                    FontSize="{DynamicResource FontSizeLabel}"
                    Foreground="{DynamicResource TextMutedBrush}"/>
       </controls:GlassCard>

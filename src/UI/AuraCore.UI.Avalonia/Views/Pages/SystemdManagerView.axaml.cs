@@ -123,6 +123,16 @@ public partial class SystemdManagerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.systemdManager");
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.systemdManager");
+        SvcHeader.Title    = L("nav.systemdManager");
+        SvcHeader.Subtitle = L("systemdManager.subtitle");
+        TotalSvcStat.Label   = L("systemdManager.stat.total");
+        RunningSvcStat.Label = L("systemdManager.stat.running");
+        FailedSvcStat.Label  = L("systemdManager.stat.failed");
+        EnabledSvcStat.Label = L("systemdManager.stat.enabled");
+        SearchBox.Watermark  = L("systemdManager.search.watermark");
+        ScanBtn.Content = L("systemdManager.action.scan");
+        SubText.Text    = L("systemdManager.subtext.initial");
     }
 }

@@ -19,7 +19,7 @@
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      IsEnabled="{Binding !IsBusy}"/>
             <Button x:Name="ScanBtn"
-                    Content="Scan"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ScanCommand}"
@@ -141,8 +141,7 @@
                                   VerticalAlignment="Center"
                                   Background="{DynamicResource BgCardBrush}"
                                   IsVisible="{Binding IsInstalled}">
-                            <TextBlock x:Name="InstalledPillText"
-                                       Text="INSTALLED"
+                            <TextBlock Text="{Binding InstalledBadgeText}"
                                        FontSize="10"
                                        FontWeight="SemiBold"
                                        Foreground="{DynamicResource StatusSuccessBrush}"/>
@@ -186,7 +185,7 @@
                      VerticalAlignment="Center"/>
           <Button x:Name="InstallSelectedBtn"
                   Grid.Column="1"
-                  Content="Install Selected"
+                  Content=""
                   Classes="action-btn"
                   Padding="16,8"
                   Command="{Binding InstallSelectedCommand}"/>
@@ -206,7 +205,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

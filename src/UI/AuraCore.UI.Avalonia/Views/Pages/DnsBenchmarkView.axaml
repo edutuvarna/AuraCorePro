@@ -5,8 +5,7 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="DNS Benchmark"
-                             Subtitle="Test DNS servers and find the fastest one for your connection">
+      <controls:ModuleHeader x:Name="Header">
         <controls:ModuleHeader.Actions>
           <TextBlock x:Name="PageTitle" IsVisible="False" />
         </controls:ModuleHeader.Actions>
@@ -15,20 +14,20 @@
       <controls:GlassCard>
         <StackPanel Spacing="12">
           <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Text="DNS Servers"
+            <TextBlock x:Name="DnsServersLabel" Text=""
                        FontSize="{DynamicResource FontSizeBody}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"
                        VerticalAlignment="Center" />
             <Button x:Name="BenchBtn"
                     Grid.Column="1"
-                    Content="Run Benchmark"
+                    Content=""
                     Click="Bench_Click"
                     Classes="action-btn"
                     Padding="16,8" />
           </Grid>
           <TextBlock x:Name="SubText"
-                     Text="Click Run Benchmark to test popular DNS servers"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource TextMutedBrush}" />
           <ItemsControl x:Name="DnsList" />

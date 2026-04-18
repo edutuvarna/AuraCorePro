@@ -53,7 +53,7 @@ public partial class SystemHealthView : UserControl
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanBtnText.Text = "Scanning...";
+        ScanBtnText.Text = LocalizationService._("sysHealth.scanning");
 
         try
         {
@@ -65,10 +65,10 @@ public partial class SystemHealthView : UserControl
             ScoreValue.Text = r.HealthScore.ToString();
             var (label, color) = r.HealthScore switch
             {
-                >= 85 => ("Excellent", "#22C55E"),
-                >= 70 => ("Good", "#00D4AA"),
-                >= 50 => ("Fair", "#F59E0B"),
-                _     => ("Needs Attention", "#EF4444")
+                >= 85 => (LocalizationService._("sysHealth.scoreExcellent"), "#22C55E"),
+                >= 70 => (LocalizationService._("sysHealth.scoreGood"), "#00D4AA"),
+                >= 50 => (LocalizationService._("sysHealth.scoreFair"), "#F59E0B"),
+                _     => (LocalizationService._("sysHealth.scoreNeedsAttn"), "#EF4444")
             };
             ScoreLabel.Text = label;
             ScoreLabel.Foreground = new SolidColorBrush(Color.Parse(color));
@@ -119,8 +119,8 @@ public partial class SystemHealthView : UserControl
                 ).ToList();
             }
         }
-        catch { ScoreValue.Text = "!"; ScoreLabel.Text = "Scan Failed"; }
-        finally { ScanBtnText.Text = "Scan Now"; }
+        catch { ScoreValue.Text = "!"; ScoreLabel.Text = LocalizationService._("sysHealth.scoreScanFailed"); }
+        finally { ScanBtnText.Text = LocalizationService._("sysHealth.scanNow"); }
 }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
@@ -136,7 +136,7 @@ public partial class SystemHealthView : UserControl
 
             var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = "Export Health Report",
+                Title = LocalizationService._("sysHealth.exportTitle"),
                 DefaultExtension = "pdf",
                 SuggestedFileName = $"HealthReport_{DateTime.Now:yyyyMMdd_HHmmss}",
                 FileTypeChoices = new[]
@@ -311,7 +311,20 @@ public partial class SystemHealthView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.systemHealth");
+        ModuleHdr.Title = LocalizationService._("nav.systemHealth");
+        ModuleHdr.Subtitle = LocalizationService._("sysHealth.subtitle");
         if (IntroTitle != null) IntroTitle.Text = LocalizationService._("systemhealth.intro.title");
         if (IntroBody != null) IntroBody.Text = LocalizationService._("systemhealth.intro.body");
+        ExportPdfLabel.Text = LocalizationService._("sysHealth.exportPdf");
+        if (ScanBtnText.Text == "" || ScanBtnText.Text == LocalizationService.Get("sysHealth.scanning"))
+            ScanBtnText.Text = LocalizationService._("sysHealth.scanNow");
+        HealthScoreLabel.Text = LocalizationService._("sysHealth.healthScore");
+        LabelOs.Text = LocalizationService._("sysHealth.labelOs");
+        LabelCpu.Text = LocalizationService._("sysHealth.labelCpu");
+        LabelMemory.Text = LocalizationService._("sysHealth.labelMemory");
+        LabelUptime.Text = LocalizationService._("sysHealth.labelUptime");
+        LabelStorage.Text = LocalizationService._("sysHealth.labelStorage");
+        LabelCpuCores.Text = LocalizationService._("sysHealth.labelCpuCores");
+        LabelGraphics.Text = LocalizationService._("sysHealth.labelGraphics");
     }
 }

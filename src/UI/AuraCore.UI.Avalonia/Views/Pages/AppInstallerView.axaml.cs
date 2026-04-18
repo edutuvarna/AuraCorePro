@@ -48,6 +48,43 @@ public partial class AppInstallerView : UserControl
         // Resolve the module from DI
         var modules = App.Services.GetServices<IOptimizationModule>();
         _module = modules.OfType<AppInstallerModule>().FirstOrDefault();
+
+        Loaded += (s, e) => ApplyLocalization();
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
+    }
+
+    private void ApplyLocalization()
+    {
+        PageTitle.Text           = LocalizationService._("nav.appInstaller");
+        PageHeader.Title         = LocalizationService._("appInstall.title");
+        PageHeader.Subtitle      = LocalizationService._("appInstall.subtitle");
+        WinOnlyBadge.Text        = LocalizationService._("appInstall.winOnlyBadge");
+        SearchTabLabel.Text      = LocalizationService._("appInstall.tabSearch");
+        BundlesTabLabel.Text     = LocalizationService._("appInstall.tabBundles");
+        InstalledTabLabel.Text   = LocalizationService._("appInstall.tabInstalled");
+        UpdatesTabLabel.Text     = LocalizationService._("appInstall.tabUpdates");
+        SearchResultsLabel.Text  = LocalizationService._("appInstall.searchResults");
+        SearchEmpty.Text         = LocalizationService._("appInstall.searchEmpty");
+        SearchBox.Watermark      = LocalizationService._("appInstall.searchPlaceholder");
+        BundlesDesc.Text         = LocalizationService._("appInstall.bundlesDesc");
+        BundleSelectAllBtn.Content = LocalizationService._("common.selectAll");
+        BundleInstallBtn.Content = LocalizationService._("appInstall.installSelected");
+        InstalledAppsLabel.Text  = LocalizationService._("appInstall.installedApps");
+        AvailableUpdatesLabel.Text = LocalizationService._("appInstall.availableUpdates");
+        UpdateAllBtn.Content     = LocalizationService._("appInstall.updateAll");
+        if (StatusText.Text == "Ready" || StatusText.Text == LocalizationService._("appInstall.ready"))
+            StatusText.Text      = LocalizationService._("appInstall.ready");
+        QueueTitle.Text          = LocalizationService._("appInstall.installQueue");
+        CancelQueueBtn.Content   = LocalizationService._("common.cancel");
     }
 
     // ── Tab switching ────────────────────────────────────────
@@ -118,7 +155,7 @@ public partial class AppInstallerView : UserControl
 
     private async Task SearchAsync(string query)
     {
-        SetStatus($"Searching for \"{query}\"...");
+        SetStatus($"{LocalizationService._("appInstall.searching")} \"{query}\"...");
         SearchEmpty.IsVisible = false;
         SearchResults.ItemsSource = null;
 
@@ -129,9 +166,9 @@ public partial class AppInstallerView : UserControl
 
             if (apps.Count == 0)
             {
-                SearchEmpty.Text = "No results found";
+                SearchEmpty.Text = LocalizationService._("appInstall.noResults");
                 SearchEmpty.IsVisible = true;
-                SetStatus("No results");
+                SetStatus(LocalizationService._("appInstall.noResults"));
                 return;
             }
 
@@ -140,13 +177,13 @@ public partial class AppInstallerView : UserControl
                 items.Add(BuildSearchResultRow(app));
 
             SearchResults.ItemsSource = items;
-            SetStatus($"{apps.Count} result(s) found");
+            SetStatus($"{apps.Count} {LocalizationService._("appInstall.resultsFound")}");
         }
         catch (Exception ex)
         {
-            SearchEmpty.Text = "Search failed - is winget installed?";
+            SearchEmpty.Text = LocalizationService._("appInstall.searchFailed");
             SearchEmpty.IsVisible = true;
-            SetStatus($"Error: {ex.Message}");
+            SetStatus($"{LocalizationService._("common.errorPrefix")}{ex.Message}");
         }
     }
 
@@ -180,7 +217,7 @@ public partial class AppInstallerView : UserControl
         // Queue button (adds to queue instead of direct install)
         var queueBtn = new Button
         {
-            Content = "Add to Queue", FontSize = 10, Padding = new Thickness(10, 4),
+            Content = LocalizationService._("appInstall.addToQueue"), FontSize = 10, Padding = new Thickness(10, 4),
             VerticalAlignment = VerticalAlignment.Center,
             Tag = $"{app.Id}|{app.Name}",
             Margin = new Thickness(6, 0, 0, 0)
@@ -190,7 +227,7 @@ public partial class AppInstallerView : UserControl
 
         var installBtn = new Button
         {
-            Content = "Install", FontSize = 10, Padding = new Thickness(10, 4),
+            Content = LocalizationService._("common.install"), FontSize = 10, Padding = new Thickness(10, 4),
             VerticalAlignment = VerticalAlignment.Center,
             Tag = app.Id,
         };
@@ -213,24 +250,24 @@ public partial class AppInstallerView : UserControl
         if (string.IsNullOrEmpty(appId)) return;
 
         btn.IsEnabled = false;
-        btn.Content = "Installing...";
+        btn.Content = LocalizationService._("appInstall.installing");
         var name = appId.Split('.').Last();
-        SetStatus($"Installing {name}...");
-        StatusBarService.SetStatus($"Installing {name}...");
+        SetStatus($"{LocalizationService._("appInstall.installing")} {name}...");
+        StatusBarService.SetStatus($"{LocalizationService._("appInstall.installing")} {name}...");
 
         try
         {
             await RunWinget($"install --id {appId} --accept-source-agreements --accept-package-agreements --silent");
-            btn.Content = "Installed";
-            SetStatus($"{name} installed successfully");
-            StatusBarService.SetStatus($"{name} installed successfully");
+            btn.Content = LocalizationService._("appInstall.installedLabel");
+            SetStatus($"{name} {LocalizationService._("appInstall.installedSuccess")}");
+            StatusBarService.SetStatus($"{name} {LocalizationService._("appInstall.installedSuccess")}");
         }
         catch
         {
-            btn.Content = "Failed";
+            btn.Content = LocalizationService._("appInstall.failed");
             btn.IsEnabled = true;
-            SetStatus($"Failed to install {name}");
-            StatusBarService.SetStatus($"Failed to install {name}");
+            SetStatus($"{LocalizationService._("appInstall.failedInstall")} {name}");
+            StatusBarService.SetStatus($"{LocalizationService._("appInstall.failedInstall")} {name}");
         }
     }
 
@@ -250,7 +287,7 @@ public partial class AppInstallerView : UserControl
         if (_installQueue.Any(q => q.AppId == appId)) return;
 
         _installQueue.Enqueue(new QueueItem(appId, appName));
-        btn.Content = "Queued";
+        btn.Content = LocalizationService._("appInstall.queued");
         btn.IsEnabled = false;
         RefreshQueueUI();
 
@@ -315,13 +352,13 @@ public partial class AppInstallerView : UserControl
         if (_queueCts.Token.IsCancellationRequested)
         {
             _installQueue.Clear();
-            SetStatus("Queue cancelled");
-            StatusBarService.SetStatus("Install queue cancelled");
+            SetStatus(LocalizationService._("appInstall.queueCancelled"));
+            StatusBarService.SetStatus(LocalizationService._("appInstall.queueCancelled"));
         }
         else
         {
-            SetStatus($"Queue complete - {processed} app(s) processed");
-            StatusBarService.SetStatus($"Installed {processed} app(s)");
+            SetStatus($"{LocalizationService._("appInstall.queueComplete")} — {processed} app(s)");
+            StatusBarService.SetStatus($"{LocalizationService._("appInstall.installedLabel")} {processed} app(s)");
         }
 
         RefreshQueueUI();
@@ -372,9 +409,9 @@ public partial class AppInstallerView : UserControl
             var (icon, color) = status switch
             {
                 "installing" => ("\u25B6", "#00D4AA"),
-                "done" => ("\u2714", "#22C55E"),
-                "failed" => ("\u2716", "#EF4444"),
-                _ => ("\u25CB", "#8888A0")  // pending
+                "done"       => ("\u2714", "#22C55E"),
+                "failed"     => ("\u2716", "#EF4444"),
+                _            => ("\u25CB", "#8888A0")  // pending
             };
 
             grid.Children.Add(new TextBlock
@@ -396,10 +433,10 @@ public partial class AppInstallerView : UserControl
             {
                 Text = status switch
                 {
-                    "installing" => "Installing...",
-                    "done" => "Installed",
-                    "failed" => "Failed",
-                    _ => "Waiting"
+                    "installing" => LocalizationService._("appInstall.installing"),
+                    "done"       => LocalizationService._("appInstall.installedLabel"),
+                    "failed"     => LocalizationService._("appInstall.failed"),
+                    _            => LocalizationService._("appInstall.waiting")
                 },
                 FontSize = 10,
                 Foreground = new SolidColorBrush(Color.Parse(color)),
@@ -448,8 +485,8 @@ public partial class AppInstallerView : UserControl
         if (neededDeps.Count > 0)
         {
             var depNames = string.Join(", ", neededDeps.Select(d => d.Split('.').Last()));
-            SetStatus($"Installing dependencies: {depNames}...");
-            StatusBarService.SetStatus($"Installing dependencies: {depNames}...");
+            SetStatus($"{LocalizationService._("appInstall.installingDeps")}: {depNames}...");
+            StatusBarService.SetStatus($"{LocalizationService._("appInstall.installingDeps")}: {depNames}...");
 
             foreach (var depId in neededDeps)
             {
@@ -460,7 +497,7 @@ public partial class AppInstallerView : UserControl
                 catch { /* continue */ }
             }
 
-            SetStatus("Dependencies installed. Proceeding with queue...");
+            SetStatus(LocalizationService._("appInstall.depsInstalled"));
         }
     }
 
@@ -576,7 +613,7 @@ public partial class AppInstallerView : UserControl
                 };
                 badge.Child = new TextBlock
                 {
-                    Text = "Installed", FontSize = 9, FontWeight = FontWeight.SemiBold,
+                    Text = LocalizationService._("appInstall.installedLabel"), FontSize = 9, FontWeight = FontWeight.SemiBold,
                     Foreground = new SolidColorBrush(Color.Parse("#22C55E"))
                 };
                 Grid.SetColumn(badge, 2);
@@ -629,7 +666,7 @@ public partial class AppInstallerView : UserControl
 
     private async Task LoadInstalledAsync()
     {
-        SetStatus("Loading installed apps...");
+        SetStatus(LocalizationService._("appInstall.loadingInstalled"));
         InstalledList.ItemsSource = null;
 
         try
@@ -644,11 +681,11 @@ public partial class AppInstallerView : UserControl
                 items.Add(BuildInstalledRow(app));
 
             InstalledList.ItemsSource = items;
-            SetStatus($"{apps.Count} installed app(s)");
+            SetStatus($"{apps.Count} {LocalizationService._("appInstall.appsInstalled")}");
         }
         catch (Exception ex)
         {
-            SetStatus($"Error loading installed apps: {ex.Message}");
+            SetStatus($"{LocalizationService._("common.errorPrefix")}{ex.Message}");
         }
     }
 
@@ -703,7 +740,7 @@ public partial class AppInstallerView : UserControl
 
     private async Task LoadUpdatesAsync()
     {
-        SetStatus("Checking for updates...");
+        SetStatus(LocalizationService._("appInstall.checkingUpdates"));
         UpdateList.ItemsSource = null;
 
         try
@@ -724,11 +761,11 @@ public partial class AppInstallerView : UserControl
                 items.Add(BuildUpdateRow(app));
 
             UpdateList.ItemsSource = items;
-            SetStatus(apps.Count > 0 ? $"{apps.Count} update(s) available" : "All apps are up to date");
+            SetStatus(apps.Count > 0 ? $"{apps.Count} {LocalizationService._("appInstall.updatesAvailable")}" : LocalizationService._("appInstall.allUpToDate"));
         }
         catch (Exception ex)
         {
-            SetStatus($"Error checking updates: {ex.Message}");
+            SetStatus($"{LocalizationService._("common.errorPrefix")}{ex.Message}");
         }
     }
 
@@ -782,7 +819,7 @@ public partial class AppInstallerView : UserControl
 
         var updateBtn = new Button
         {
-            Content = "Update", FontSize = 10, Padding = new Thickness(10, 4),
+            Content = LocalizationService._("common.update"), FontSize = 10, Padding = new Thickness(10, 4),
             VerticalAlignment = VerticalAlignment.Center,
             Tag = app.Id,
         };
@@ -814,47 +851,47 @@ public partial class AppInstallerView : UserControl
         if (string.IsNullOrEmpty(appId)) return;
 
         btn.IsEnabled = false;
-        btn.Content = "Updating...";
+        btn.Content = LocalizationService._("appInstall.updating");
         var name = appId.Split('.').Last();
-        SetStatus($"Updating {name}...");
-        StatusBarService.SetStatus($"Updating {name}...");
+        SetStatus($"{LocalizationService._("appInstall.updating")} {name}...");
+        StatusBarService.SetStatus($"{LocalizationService._("appInstall.updating")} {name}...");
 
         try
         {
             await RunWinget($"upgrade --id {appId} --accept-source-agreements --accept-package-agreements --silent");
-            btn.Content = "Done";
-            SetStatus($"{name} updated successfully");
-            StatusBarService.SetStatus($"{name} updated");
+            btn.Content = LocalizationService._("common.done");
+            SetStatus($"{name} {LocalizationService._("appInstall.updatedSuccess")}");
+            StatusBarService.SetStatus($"{name} {LocalizationService._("appInstall.updatedSuccess")}");
         }
         catch
         {
-            btn.Content = "Failed";
+            btn.Content = LocalizationService._("appInstall.failed");
             btn.IsEnabled = true;
-            SetStatus($"Failed to update {name}");
-            StatusBarService.SetStatus($"Failed to update {name}");
+            SetStatus($"{LocalizationService._("appInstall.failedUpdate")} {name}");
+            StatusBarService.SetStatus($"{LocalizationService._("appInstall.failedUpdate")} {name}");
         }
     }
 
     private async void UpdateAll_Click(object? sender, RoutedEventArgs e)
     {
         UpdateAllBtn.IsEnabled = false;
-        UpdateAllBtn.Content = "Updating all...";
-        SetStatus("Updating all apps...");
-        StatusBarService.SetStatus("Updating all apps...");
+        UpdateAllBtn.Content = LocalizationService._("appInstall.updatingAll");
+        SetStatus(LocalizationService._("appInstall.updatingAll"));
+        StatusBarService.SetStatus(LocalizationService._("appInstall.updatingAll"));
 
         try
         {
             await RunWinget("upgrade --all --accept-source-agreements --accept-package-agreements --silent");
-            UpdateAllBtn.Content = "Done";
-            SetStatus("All apps updated");
-            StatusBarService.SetStatus("All apps updated");
+            UpdateAllBtn.Content = LocalizationService._("common.done");
+            SetStatus(LocalizationService._("appInstall.allUpdated"));
+            StatusBarService.SetStatus(LocalizationService._("appInstall.allUpdated"));
         }
         catch
         {
-            UpdateAllBtn.Content = "Failed";
+            UpdateAllBtn.Content = LocalizationService._("appInstall.failed");
             UpdateAllBtn.IsEnabled = true;
-            SetStatus("Update all failed");
-            StatusBarService.SetStatus("Update all failed");
+            SetStatus(LocalizationService._("appInstall.updateAllFailed"));
+            StatusBarService.SetStatus(LocalizationService._("appInstall.updateAllFailed"));
         }
     }
 

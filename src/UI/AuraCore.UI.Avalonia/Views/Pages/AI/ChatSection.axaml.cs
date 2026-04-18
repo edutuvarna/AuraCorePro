@@ -54,6 +54,10 @@ public partial class ChatSection : UserControl
     public ChatSection()
     {
         InitializeComponent();
+        // Set initial chip placeholder here (in XAML-default is empty to avoid hardcoded scanner offender)
+        var chip = this.FindControl<SplitButton>("ModelChip");
+        if (chip is not null)
+            chip.Content = "\u2699 No model selected \u25BE";
         Loaded += OnLoaded;
     }
 
@@ -264,8 +268,14 @@ public partial class ChatSection : UserControl
 
     private void ApplyLocalization()
     {
-        InputBox.Watermark = LocalizationService._("aiChat.inputHint");
-        WarningText.Text = LocalizationService._("aiChat.experimentalWarning");
+        if (ChatHeaderTitle is not null)
+            ChatHeaderTitle.Text = LocalizationService.Get("chat.headerTitle");
+        if (TopWarningText is not null)
+            TopWarningText.Text = LocalizationService.Get("aiFeatures.chat.warningBanner");
+        if (InputBox is not null)
+            InputBox.Watermark = LocalizationService.Get("aiChat.inputHint");
+        if (WarningText is not null)
+            WarningText.Text = LocalizationService.Get("aiChat.experimentalWarning");
     }
 
     private void RestoreOrWelcome()

@@ -6,23 +6,22 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Driver Updater"
-                             Subtitle="Scan, analyze, and backup system drivers">
+      <controls:ModuleHeader x:Name="Header">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Backup_Click"
                     VerticalAlignment="Center" Padding="12,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F4BE;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="BackupLabel" Text="Backup Drivers"
+                <TextBlock Text="💾" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="BackupLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
             <Button Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="12,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock Text="🔍" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -34,7 +33,7 @@
 
       <!-- Hidden bridge for code-behind subtitle writes -->
       <TextBlock x:Name="SubText"
-                 Text="Scan, analyze, and backup system drivers"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  IsVisible="False"/>
@@ -47,10 +46,10 @@
               <Border.Background>
                 <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
               </Border.Background>
-              <TextBlock Text="&#x25CF;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
+              <TextBlock Text="●" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Total:"
+            <TextBlock x:Name="TotalLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="TotalDrivers" Text="--"
@@ -58,7 +57,7 @@
                        Foreground="#F59E0B" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Current:"
+            <TextBlock x:Name="CurrentLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="CurrentDrivers" Text="--"
@@ -66,7 +65,7 @@
                        Foreground="{DynamicResource StatusSuccessBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Outdated:"
+            <TextBlock x:Name="OutdatedLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="OutdatedDrivers" Text="--"
@@ -74,7 +73,7 @@
                        Foreground="{DynamicResource StatusWarningBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Problems:"
+            <TextBlock x:Name="ProblemsLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="ProblemDrivers" Text="--"
@@ -95,23 +94,23 @@
                   <Border.Background>
                     <SolidColorBrush Color="#F59E0B" Opacity="0.15"/>
                   </Border.Background>
-                  <TextBlock Text="&#x2699;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
+                  <TextBlock Text="⚙" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-                <TextBlock Text="DEVICE"
+                <TextBlock x:Name="ColDevice" Text=""
                            FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                            Foreground="{DynamicResource TextMutedBrush}"/>
               </StackPanel>
-              <TextBlock Grid.Column="1" Text="MANUFACTURER"
+              <TextBlock Grid.Column="1" x:Name="ColManufacturer" Text=""
                          FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}"/>
-              <TextBlock Grid.Column="2" Text="VERSION"
+              <TextBlock Grid.Column="2" x:Name="ColVersion" Text=""
                          FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-              <TextBlock Grid.Column="3" Text="DATE"
+              <TextBlock Grid.Column="3" x:Name="ColDate" Text=""
                          FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-              <TextBlock Grid.Column="4" Text="STATUS"
+              <TextBlock Grid.Column="4" x:Name="ColStatus" Text=""
                          FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
             </Grid>
@@ -167,17 +166,17 @@
         <StackPanel Spacing="8">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="WinUpdate_Click" Padding="12,8">
-              <TextBlock Text="Open Windows Update"
+              <TextBlock x:Name="WinUpdateLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
             </Button>
             <Button Classes="action-btn" Click="DevMgr_Click" Padding="12,8">
-              <TextBlock Text="Open Device Manager"
+              <TextBlock x:Name="DevMgrLabel" Text=""
                          FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
             </Button>
             <Button Classes="action-btn" Click="PrivScan_Click" Padding="12,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="PrivScanLabel" Text="Scan devices (privileged)"
+                <TextBlock Text="⚡" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="PrivScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -186,7 +185,7 @@
           <Border x:Name="HelperMissingBanner"
                   IsVisible="False"
                   Background="#20EF4444" CornerRadius="6" Padding="12,8">
-            <TextBlock Text="Privileged helper not installed — run scripts/install-privileged-service.ps1 as admin"
+            <TextBlock x:Name="HelperMissingText" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="#EF4444" TextWrapping="Wrap"/>
           </Border>

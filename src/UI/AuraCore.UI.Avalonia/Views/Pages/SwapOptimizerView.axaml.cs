@@ -31,10 +31,10 @@ public partial class SwapOptimizerView : UserControl
         try
         {
         if (_scanning) return;
-        if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
+        if (!OperatingSystem.IsLinux()) { SubText.Text = LocalizationService._("swap.linuxOnly"); return; }
         _scanning = true;
         ScanBtn.IsEnabled = false;
-        SubText.Text = "Reading swap info...";
+        SubText.Text = LocalizationService._("swap.readingInfo");
 
         var (swaps, swappiness, totalKb, usedKb) = await Task.Run(() =>
         {
@@ -77,7 +77,7 @@ public partial class SwapOptimizerView : UserControl
         SwapUsed.Text = FormatKb(usedKb);
         Swappiness.Text = swappiness.ToString();
 
-        SubText.Text = $"{swaps.Count} swap partition(s)/file(s)";
+        SubText.Text = string.Format(LocalizationService._("swap.partCount"), swaps.Count);
 
         SwapList.ItemsSource = swaps.Select(s =>
         {
@@ -132,7 +132,7 @@ public partial class SwapOptimizerView : UserControl
         {
             _scanning = false;
             global::Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-                SubText.Text = $"Error scanning swap: {ex.Message}");
+                SubText.Text = $"{LocalizationService._("common.errorPrefix")}scanning swap: {ex.Message}");
         }
     }
 
@@ -146,5 +146,13 @@ public partial class SwapOptimizerView : UserControl
     private void ApplyLocalization()
     {
         PageTitle.Text = LocalizationService._("nav.swapOptimizer");
+        ModuleHdr.Title = LocalizationService._("nav.swapOptimizer");
+        ModuleHdr.Subtitle = LocalizationService._("swap.subtitle");
+        ScanBtn.Content = LocalizationService._("common.refresh");
+        SwapPartitionsHeader.Text = LocalizationService._("swap.partitionsHeader");
+        SwappinessHeader.Text = LocalizationService._("swap.swappinessHeader");
+        StatSwapTotal.Label  = LocalizationService._("swap.statTotal");
+        StatSwapUsed.Label   = LocalizationService._("swap.statUsed");
+        StatSwappiness.Label = LocalizationService._("swap.statSwappiness");
     }
 }

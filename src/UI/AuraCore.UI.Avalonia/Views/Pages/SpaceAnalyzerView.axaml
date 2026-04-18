@@ -11,17 +11,17 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Space Analyzer"
-                             Subtitle="Visualize disk usage by folder">
+      <controls:ModuleHeader x:Name="ModuleHdr" Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button x:Name="BackBtn" Click="Back_Click" Classes="action-btn"
                     Padding="14,8" VerticalAlignment="Center" IsVisible="False"
-                    Content="&#x2190; Back"/>
+                    Content=""/>
             <Button Classes="action-btn" Click="Scan_Click" Padding="14,8" VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="&#x1F50D;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ScanLabel" Text="Scan"
+                <TextBlock x:Name="ScanLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -33,7 +33,7 @@
 
       <!-- Hidden PathLabel bridge for code-behind -->
       <TextBlock x:Name="PathLabel"
-                 Text="Select a drive to analyze"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
@@ -42,21 +42,21 @@
       <controls:GlassCard>
         <Grid ColumnDefinitions="*,*,*">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Total:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="LabelTotal" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="TotalSize" Text="--"
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
                        Foreground="{DynamicResource AccentPrimaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Used:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="LabelUsed" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="UsedSize" Text="--"
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"
                        Foreground="{DynamicResource AccentBlueBrush}" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Free:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="LabelFree" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
             <TextBlock x:Name="FreeSize" Text="--"
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"

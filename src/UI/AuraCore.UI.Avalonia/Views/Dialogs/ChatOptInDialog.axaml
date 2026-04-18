@@ -3,7 +3,7 @@
         xmlns:vm="using:AuraCore.UI.Avalonia.ViewModels"
         x:Class="AuraCore.UI.Avalonia.Views.Dialogs.ChatOptInDialog"
         x:DataType="vm:ChatOptInDialogViewModel"
-        Title="CORTEX Chat — Experimental"
+        x:Name="ChatOptInDialogWindow"
         Width="540" Height="520"
         CanResize="False"
         WindowStartupLocation="CenterOwner">
@@ -59,10 +59,10 @@
 
       <!-- Row 1: Dialog title / step header -->
       <StackPanel Grid.Row="1" Spacing="4">
-        <TextBlock Text="✦ CORTEX CHAT — STEP 1 of 2"
+        <TextBlock x:Name="StepHeaderKicker"
                    FontSize="10" FontWeight="SemiBold"
                    Foreground="{DynamicResource AccentPurpleBrush}" />
-        <TextBlock Text="⚠ Experimental Feature"
+        <TextBlock x:Name="StepHeaderTitle"
                    FontSize="18" FontWeight="SemiBold"
                    Foreground="{DynamicResource AccentAmberBrush}" />
       </StackPanel>
@@ -71,10 +71,10 @@
       <ScrollViewer Grid.Row="2" Margin="0,16"
                     IsVisible="{Binding IsStep1}">
         <StackPanel Spacing="10">
-          <TextBlock Text="CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system."
+          <TextBlock x:Name="Step1Body"
                      FontSize="12" TextWrapping="Wrap"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Text="This feature is under active development."
+          <TextBlock x:Name="Step1BodySub"
                      FontSize="12" TextWrapping="Wrap"
                      Foreground="{DynamicResource TextSecondaryBrush}" />
         </StackPanel>
@@ -122,8 +122,8 @@
       <StackPanel Grid.Row="3" Orientation="Horizontal"
                   HorizontalAlignment="Right" Spacing="10"
                   IsVisible="{Binding IsStep1}">
-        <Button Content="Cancel" Command="{Binding CancelFromStep1}" Padding="16,8" />
-        <Button Content="I understand, continue" Command="{Binding ContinueFromStep1}"
+        <Button x:Name="Step1CancelBtn" Command="{Binding CancelFromStep1}" Padding="16,8" />
+        <Button x:Name="Step1ContinueBtn" Command="{Binding ContinueFromStep1}"
                 Classes="primary" Padding="16,8" />
       </StackPanel>
     </Grid>

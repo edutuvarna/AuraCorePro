@@ -24,10 +24,7 @@ public partial class SettingsView : UserControl
             // AI Telemetry toggle
             AiTelemetryToggle.IsChecked = AIConsentSettings.IsConsentGiven();
 
-            // Account info
-            var email = SessionState.UserEmail;
-            AccountEmail.Text = string.IsNullOrEmpty(email) ? LocalizationService._("set.notSignedIn") : email;
-            AccountTier.Text = (SessionState.UserTier ?? "free").ToUpper();
+            // Account info — ApplyLocalization sets AccountEmail, AccountTier, LogoutBtn.Content
             LogoutBtn.IsVisible = SessionState.IsAuthenticated;
 
             // AI model management moved to AI Features → Chat (Task 14+).
@@ -66,7 +63,16 @@ public partial class SettingsView : UserControl
         AiTelemetryLabel.Text = LocalizationService._("set.aiTelemetry");
         AiTelemetryDescLabel.Text = LocalizationService._("set.aiTelemetryDesc");
         AiTelemetryNoteLabel.Text = LocalizationService._("set.aiTelemetryNote");
+        AiModelNoteLabel.Text = LocalizationService._("set.aiModelNote");
         AboutLabel.Text = LocalizationService._("set.about");
+        // About section static labels
+        VersionKeyLabel.Text = LocalizationService._("set.versionLabel");
+        VersionValueLabel.Text = LocalizationService._("set.versionValue");
+        RuntimeKeyLabel.Text = LocalizationService._("set.runtimeLabel");
+        PlatformKeyLabel.Text = LocalizationService._("set.platformLabel");
+        UiFrameworkKeyLabel.Text = LocalizationService._("set.uiFrameworkLabel");
+        UiFrameworkValueLabel.Text = LocalizationService._("set.uiFrameworkValue");
+        WebsiteLinkLabel.Text = LocalizationService._("set.websiteLink");
         AccountLabel.Text = LocalizationService._("set.account");
         LogoutBtn.Content = LocalizationService._("set.signOut");
 
@@ -74,6 +80,9 @@ public partial class SettingsView : UserControl
 
         var email = SessionState.UserEmail;
         AccountEmail.Text = string.IsNullOrEmpty(email) ? LocalizationService._("set.notSignedIn") : email;
+        AccountTier.Text = string.IsNullOrEmpty(SessionState.UserTier) || SessionState.UserTier == "free"
+            ? LocalizationService._("set.freeTier")
+            : (SessionState.UserTier ?? "free").ToUpper();
     }
 
     private void LangToggle_Click(object? sender, RoutedEventArgs e)

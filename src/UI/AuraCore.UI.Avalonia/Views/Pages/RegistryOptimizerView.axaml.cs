@@ -18,14 +18,17 @@ public partial class RegistryOptimizerView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) => LocalizationService.LanguageChanged -= OnLanguageChanged;
         _module = App.Services.GetServices<IOptimizationModule>().OfType<RegistryOptimizerModule>().FirstOrDefault();
         Loaded += async (s, e) => await RunScan();
-}
+    }
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
     private async Task RunScan()
     {
-        if (_module is null) return; ScanLabel.Text = "Scanning...";
+        if (_module is null) return; ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
             await _module.ScanAsync(new ScanOptions(DeepScan: true));
@@ -40,7 +43,7 @@ public partial class RegistryOptimizerView : UserControl
                 return new RegIssueItem(i.Description, i.KeyPath, i.Category, i.Risk, fg, bg);
             }).ToList();
         }
-        catch { SubText.Text = "Scan failed"; } finally { ScanLabel.Text = "Scan"; }
+        catch { SubText.Text = "Scan failed"; } finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();
@@ -60,6 +63,13 @@ public partial class RegistryOptimizerView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.registry");
+        var L = LocalizationService._;
+        PageTitle.Text = L("nav.registry");
+        ModuleHdr.Title = L("regOpt.title");
+        ModuleHdr.Subtitle = L("regOpt.subtitle");
+        ScanLabel.Text = L("common.scan");
+        FixBtn.Content = L("regOpt.fixIssues");
+        StatCardIssues.Label = L("regOpt.statIssues");
+        StatCardCaution.Label = L("regOpt.statCaution");
     }
 }

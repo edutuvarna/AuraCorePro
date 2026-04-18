@@ -16,7 +16,7 @@
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
             <Button x:Name="ScanBtn"
-                    Content="Scan"
+                    Content=""
                     Classes="action-btn"
                     Padding="16,8"
                     Command="{Binding ScanCommand}"
@@ -40,28 +40,28 @@
         <controls:GlassCard.CardContent>
           <StackPanel Spacing="12">
             <TextBlock x:Name="CleanupHeading"
-                       Text="Cleanup Actions"
+                       Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
 
             <StackPanel Spacing="8">
               <Button x:Name="CleanSnapBtn"
-                      Content="Clean disabled snaps"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
                       Padding="12,8"
                       Command="{Binding CleanSnapCommand}"/>
               <Button x:Name="CleanFlatpakBtn"
-                      Content="Clean unused flatpaks"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
                       Padding="12,8"
                       Command="{Binding CleanFlatpakCommand}"/>
               <Button x:Name="CleanBothBtn"
-                      Content="Clean both"
+                      Content=""
                       Classes="action-btn"
                       HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center"
@@ -79,7 +79,7 @@
                          VerticalAlignment="Center"/>
               <Button x:Name="CancelBtn"
                       Grid.Column="1"
-                      Content="Cancel"
+                      Content=""
                       Classes="action-btn"
                       Padding="12,6"
                       Command="{Binding CancelCommand}"

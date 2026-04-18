@@ -4,7 +4,6 @@
         xmlns:controls="clr-namespace:AuraCore.UI.Avalonia.Views.Controls"
         xmlns:banners="clr-namespace:AuraCore.UI.Avalonia.Views.Banners"
         x:Class="AuraCore.UI.Avalonia.Views.MainWindow"
-        Title="AuraCore Pro"
         Width="1000" Height="640"
         MinWidth="900" MinHeight="580"
         Background="{DynamicResource BgDeepBrush}"
@@ -43,7 +42,6 @@
         </StackPanel>
 
         <Button x:Name="SettingsBtn" DockPanel.Dock="Bottom"
-                Content="&#x2699;  Settings"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
                 Background="Transparent"
@@ -73,7 +71,7 @@
           </Border.BorderBrush>
           <Grid ColumnDefinitions="*,Auto,Auto">
             <!-- Left: Status text -->
-            <TextBlock x:Name="GlobalStatusText" Text="Ready" FontSize="10"
+            <TextBlock x:Name="GlobalStatusText" FontSize="10"
                        Foreground="{DynamicResource TextMutedBrush}"
                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
             <!-- Center: Progress info -->

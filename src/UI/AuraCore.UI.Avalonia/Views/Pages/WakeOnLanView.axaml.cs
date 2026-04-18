@@ -14,8 +14,16 @@ public partial class WakeOnLanView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += OnUnloaded;
+    }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        LocalizationService.LanguageChanged -= OnLanguageChanged;
     }
 
     private async void Send_Click(object? sender, RoutedEventArgs e)
@@ -25,7 +33,7 @@ public partial class WakeOnLanView : UserControl
 
         if (string.IsNullOrEmpty(mac))
         {
-            StatusText.Text = "Enter a MAC address.";
+            StatusText.Text = LocalizationService._("wol.error.enterMac");
             return;
         }
 
@@ -34,11 +42,11 @@ public partial class WakeOnLanView : UserControl
             var macBytes = ParseMac(mac);
             if (macBytes == null || macBytes.Length != 6)
             {
-                StatusText.Text = "Invalid MAC format. Use AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF";
+                StatusText.Text = LocalizationService._("wol.error.invalidMac");
                 return;
             }
 
-            StatusText.Text = "Sending magic packet...";
+            StatusText.Text = LocalizationService._("wol.status.sending");
 
             await Task.Run(() =>
             {
@@ -110,5 +118,23 @@ public partial class WakeOnLanView : UserControl
         catch { return null; }
     }
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.wakeOnLan"); }
+    private void ApplyLocalization()
+    {
+        string L(string k) => LocalizationService._(k);
+        PageTitle.Text = L("nav.wakeOnLan");
+        ModuleHdr.Title = L("nav.wakeOnLan");
+        ModuleHdr.Subtitle = L("wol.subtitle");
+        SendMagicPacketLabel.Text = L("wol.sendMagicPacket");
+        MacBox.Watermark = L("wol.macWatermark");
+        BroadcastBox.Watermark = L("wol.broadcastWatermark");
+        SendBtn.Content = L("wol.sendBtn");
+        RecentDevicesLabel.Text = L("wol.recentDevices");
+        if (_history.Count == 0) HistoryStatus.Text = L("wol.historyEmpty");
+        InfoBannerText.Text = L("wol.infoBanner");
+        HowToUseLabel.Text = L("wol.howToUse");
+        Step1Text.Text = L("wol.step1");
+        Step2Text.Text = L("wol.step2");
+        Step3Text.Text = L("wol.step3");
+        Step4Text.Text = L("wol.step4");
+    }
 }

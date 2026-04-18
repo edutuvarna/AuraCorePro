@@ -12,6 +12,11 @@ public partial class DnsFlusherView : UserControl
     {
         InitializeComponent();
         ApplyLocalizedTexts();
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalizedTexts);
         Loaded += (_, _) =>
         {
             if (DataContext is null)

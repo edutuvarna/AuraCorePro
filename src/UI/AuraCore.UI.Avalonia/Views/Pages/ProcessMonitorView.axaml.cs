@@ -14,7 +14,7 @@ public record ProcessDisplayItem(
     int Pid, string Name, string Description,
     string CpuText, string RamText, string Threads,
     ISolidColorBrush CpuBrush,
-    string KillTag, string SuspendTag, string SuspendLabel);
+    string KillTag, string KillLabel, string SuspendTag, string SuspendLabel);
 
 public partial class ProcessMonitorView : UserControl
 {
@@ -29,8 +29,8 @@ public partial class ProcessMonitorView : UserControl
     {
         InitializeComponent();
         Loaded += (s, e) => ApplyLocalization();
-        LocalizationService.LanguageChanged += () =>
-            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        LocalizationService.LanguageChanged += OnLanguageChanged;
+        Unloaded += (s, e) => LocalizationService.LanguageChanged -= OnLanguageChanged;
         _module = App.Services.GetServices<IOptimizationModule>()
             .OfType<ProcessMonitorModule>().FirstOrDefault();
         Loaded += async (s, e) =>
@@ -39,14 +39,17 @@ public partial class ProcessMonitorView : UserControl
             _initialized = true;
             await RunScan();
         };
-        Unloaded += (s, e) => StopAutoRefresh();
+        Unloaded += (s, e) => { StopAutoRefresh(); LocalizationService.LanguageChanged -= OnLanguageChanged; };
     }
+
+    private void OnLanguageChanged() =>
+        global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
 
     private async Task RunScan()
     {
         if (_module is null || _isScanning) return;
         _isScanning = true;
-        ScanBtnLabel.Text = "Scanning...";
+        ScanBtnLabel.Text = LocalizationService._("common.scanning");
 
         try
         {
@@ -65,7 +68,7 @@ public partial class ProcessMonitorView : UserControl
         finally
         {
             _isScanning = false;
-            ScanBtnLabel.Text = "Scan";
+            ScanBtnLabel.Text = LocalizationService._("common.scan");
         }
     }
 
@@ -97,7 +100,8 @@ public partial class ProcessMonitorView : UserControl
                     p.Pid, p.Name, p.Description,
                     $"{p.CpuPercent:F1}", $"{p.MemoryMb:N0}", p.ThreadCount.ToString(),
                     cpuBrush,
-                    $"kill:{p.Pid}", $"suspend:{p.Pid}",
+                    $"kill:{p.Pid}", LocalizationService._("common.kill"),
+                    $"suspend:{p.Pid}",
                     p.Status == "Suspended" ? "Resume" : "Suspend");
             }).ToList();
 
@@ -111,7 +115,7 @@ public partial class ProcessMonitorView : UserControl
         _autoRefresh = !_autoRefresh;
         if (_autoRefresh)
         {
-            AutoRefreshLabel.Text = "Auto: ON";
+            AutoRefreshLabel.Text = LocalizationService._("procMon.autoOn");
             _autoTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
             _autoTimer.Tick += async (s, e) => await RunScan();
             _autoTimer.Start();
@@ -125,7 +129,7 @@ public partial class ProcessMonitorView : UserControl
     private void StopAutoRefresh()
     {
         _autoRefresh = false;
-        AutoRefreshLabel.Text = "Auto: OFF";
+        AutoRefreshLabel.Text = LocalizationService._("procMon.autoOff");
         if (_autoTimer is not null)
         {
             _autoTimer.Stop();
@@ -157,6 +161,21 @@ public partial class ProcessMonitorView : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.processMonitor");
+        var L = LocalizationService._;
+        PageTitle.Text = L("nav.processMonitor");
+        ModuleHdr.Title = L("procMon.title");
+        ModuleHdr.Subtitle = L("procMon.subtitle");
+        AutoRefreshLabel.Text = _autoRefresh ? L("procMon.autoOn") : L("procMon.autoOff");
+        ScanBtnLabel.Text = L("common.scan");
+        LblProcesses.Text = L("procMon.processes");
+        LblTotalCpu.Text = L("procMon.totalCpu");
+        LblTotalRam.Text = L("procMon.totalRam");
+        ColDescription.Text = L("procMon.colDescription");
+        ColRamMb.Text = L("procMon.colRamMb");
+        ColThreads.Text = L("procMon.colThreads");
+        ColActions.Text = L("procMon.colActions");
+        SearchBox.Watermark = L("procMon.searchPlaceholder");
+        // Re-render process list so Kill labels update
+        if (_module?.LastReport is not null) RenderProcessList(_module.LastReport);
     }
 }

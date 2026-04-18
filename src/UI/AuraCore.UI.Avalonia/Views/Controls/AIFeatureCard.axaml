@@ -28,7 +28,6 @@
         <!-- Experimental badge (chat only) -->
         <controls:AccentBadge Grid.Row="1" Grid.Column="0"
                               x:Name="PART_ExperimentalBadge"
-                              Label="EXPERIMENTAL"
                               Margin="0,4,0,0"
                               HorizontalAlignment="Left"
                               IsVisible="{Binding IsChatExperimental}" />

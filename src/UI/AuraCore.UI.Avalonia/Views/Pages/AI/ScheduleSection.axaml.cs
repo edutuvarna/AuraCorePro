@@ -265,7 +265,13 @@ public partial class ScheduleSection : UserControl
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.autoSchedule");
+        PageTitle.Text = LocalizationService.Get("nav.autoSchedule");
+        if (ScheduledTasksLabel is not null)
+            ScheduledTasksLabel.Text = LocalizationService.Get("schedule.tasksLabel");
+        if (ScheduleSubtitle is not null)
+            ScheduleSubtitle.Text = LocalizationService.Get("schedule.subtitle");
+        if (ScheduleInfoBanner is not null)
+            ScheduleInfoBanner.Text = LocalizationService.Get("schedule.infoBanner");
     }
 
     // ───────────────────────── Theme-variant-aware brush lookup ─────────────────────────

@@ -5,8 +5,9 @@
   <ScrollViewer>
     <StackPanel Spacing="16">
 
-      <controls:ModuleHeader Title="Package Cleaner"
-                             Subtitle="Clean package manager caches, orphaned packages, and old kernels">
+      <controls:ModuleHeader x:Name="PkgHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <TextBlock x:Name="PageTitle" IsVisible="False"/>
         </controls:ModuleHeader.Actions>
@@ -21,13 +22,16 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="APT CACHE"
+        <controls:StatCard x:Name="AptCacheStat"
+                           Label=""
                            Value="{Binding #AptCacheSize.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="SNAP CACHE"
+        <controls:StatCard x:Name="SnapCacheStat"
+                           Label=""
                            Value="{Binding #SnapCacheSize.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
-        <controls:StatCard Label="PIP CACHE"
+        <controls:StatCard x:Name="PipCacheStat"
+                           Label=""
                            Value="{Binding #PipCacheSize.Text}"
                            ValueBrush="{DynamicResource StatusWarningBrush}"/>
       </controls:StatRow>
@@ -43,16 +47,17 @@
                            Foreground="{DynamicResource AccentPrimaryBrush}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="Cache Categories"
+              <TextBlock x:Name="CacheCategHeading"
+                         Text=""
                          FontSize="{DynamicResource FontSizeLabel}"
                          FontWeight="SemiBold"
                          Foreground="{DynamicResource TextSecondaryBrush}"/>
             </StackPanel>
-            <Button x:Name="ScanBtn" Content="Scan" Click="Scan_Click"
+            <Button x:Name="ScanBtn" Content="" Click="Scan_Click"
                     Grid.Column="1" Classes="action-btn" Padding="16,8"/>
           </Grid>
           <TextBlock x:Name="SubText"
-                     Text="Click Scan to analyze package caches (Linux only)"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="CacheList"/>
@@ -61,7 +66,8 @@
 
       <!-- Warning notice -->
       <controls:GlassCard>
-        <TextBlock Text="Cleaning package caches requires sudo privileges. Use 'sudo apt clean' or 'sudo dnf clean all' from terminal for full cleanup."
+        <TextBlock x:Name="PrivilegeWarning"
+                   Text=""
                    FontSize="{DynamicResource FontSizeBodySmall}"
                    Foreground="{DynamicResource StatusWarningBrush}"
                    TextWrapping="Wrap"/>

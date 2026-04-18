@@ -6,11 +6,12 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Cron Manager"
-                             Subtitle="View and manage scheduled cron jobs">
+      <controls:ModuleHeader x:Name="CronHeader"
+                             Title=""
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Refresh" Click="Scan_Click" Classes="action-btn" Padding="16,8"/>
+            <Button x:Name="CronRefreshBtn" Content="" Click="Scan_Click" Classes="action-btn" Padding="16,8"/>
             <!-- PageTitle: hidden bridge, code-behind writes localized string -->
             <TextBlock x:Name="PageTitle" IsVisible="False"/>
           </StackPanel>
@@ -25,10 +26,12 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="USER JOBS"
+        <controls:StatCard x:Name="UserJobsStat"
+                           Label=""
                            Value="{Binding #UserJobCount.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="SYSTEM CRON FILES"
+        <controls:StatCard x:Name="SystemCronStat"
+                           Label=""
                            Value="{Binding #SystemJobCount.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
       </controls:StatRow>
@@ -41,10 +44,10 @@
               <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="User Crontab" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="UserCrontabHeading" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
-          <TextBlock x:Name="SubText" Text="Click Refresh to load cron jobs"
+          <TextBlock x:Name="SubText" Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="CronList"/>
@@ -59,7 +62,7 @@
               <TextBlock Text="&#x2630;" FontSize="8" Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="System Cron Directories" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="SysCronDirsHeading" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
           </StackPanel>
           <ItemsControl x:Name="SystemCronList"/>
@@ -70,10 +73,12 @@
       <Border CornerRadius="{StaticResource RadiusLg}" Background="{DynamicResource InfoBgBrush}" Padding="16,12"
               BorderBrush="{DynamicResource InfoBorderBrush}" BorderThickness="1">
         <StackPanel Spacing="6">
-          <TextBlock Text="Cron Syntax: MIN HOUR DAY MONTH WEEKDAY COMMAND"
+          <TextBlock x:Name="CronSyntaxTitle"
+                     Text=""
                      FontSize="{DynamicResource FontSizeBodySmall}"
                      FontWeight="SemiBold" Foreground="#0080FF"/>
-          <TextBlock Text="Examples: '0 */6 * * * /usr/bin/backup.sh' (every 6h) | '30 2 * * 0 apt update' (Sun 2:30am)"
+          <TextBlock x:Name="CronSyntaxExamples"
+                     Text=""
                      FontSize="{DynamicResource FontSizeLabel}" Foreground="#6699CC" TextWrapping="Wrap"/>
         </StackPanel>
       </Border>

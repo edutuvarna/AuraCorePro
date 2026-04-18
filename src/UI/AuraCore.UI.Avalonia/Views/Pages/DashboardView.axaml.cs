@@ -70,6 +70,8 @@ public partial class DashboardView : UserControl
     {
         InitializeComponent();
         DataContext = _vm;
+        // Apply initial localization before first layout so named elements render correctly.
+        ApplyLocalization();
         Loaded += (s, e) =>
         {
             if (_initialized) return;
@@ -82,8 +84,43 @@ public partial class DashboardView : UserControl
             HookResponsiveBreakpoint();
             InitQuickActionsFromDI();
             InitDiskHealthCard();
+            LocalizationService.LanguageChanged += OnLanguageChanged;
         };
-        Unloaded += (s, e) => StopPolling();
+        Unloaded += (s, e) =>
+        {
+            StopPolling();
+            LocalizationService.LanguageChanged -= OnLanguageChanged;
+        };
+    }
+
+    private void OnLanguageChanged()
+        => global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+
+    private void ApplyLocalization()
+    {
+        if (DashboardTitle is not null)
+            DashboardTitle.Text = LocalizationService.Get("dash.title");
+        if (HealthGauge is not null)
+            HealthGauge.Label = LocalizationService.Get("dash.gaugeHealth");
+        if (HeroCta is not null)
+        {
+            HeroCta.Title = LocalizationService.Get("dash.heroTitle");
+            HeroCta.Body = "Personalized optimization is a click away.";
+            HeroCta.PrimaryButtonText = "Optimize";
+            HeroCta.SecondaryButtonText = "Review";
+        }
+        if (InsightCard is not null)
+            InsightCard.Title = LocalizationService.Get("aiFeatures.card.insights.title");
+        if (InsightsPausedText is not null)
+            InsightsPausedText.Text = LocalizationService.Get("dash.insightsPaused");
+        if (InsightsEnableText is not null)
+            InsightsEnableText.Text = LocalizationService.Get("dash.insightsEnable");
+        if (SystemLabel is not null)
+            SystemLabel.Text = LocalizationService.Get("dash.systemLabel");
+        if (UptimeLabel is not null)
+            UptimeLabel.Text = LocalizationService.Get("dash.uptime");
+        if (QuickActionsLabel is not null)
+            QuickActionsLabel.Text = LocalizationService.Get("dash.quickActions");
     }
 
     private void DetectGpu()

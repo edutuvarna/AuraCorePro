@@ -6,15 +6,16 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Firewall Rules"
+      <controls:ModuleHeader x:Name="ModuleHdr"
+                             Title=""
                              Subtitle="Manage Windows Firewall inbound and outbound rules">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button x:Name="ScanBtn" Classes="action-btn" Click="Scan_Click"
                     VerticalAlignment="Center" Padding="14,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F6E1;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock Text="Scan Rules"
+                <TextBlock Text="🛡" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ScanRulesLabel" Text=""
                            FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
@@ -33,13 +34,13 @@
 
       <!-- Stat counters -->
       <controls:StatRow>
-        <controls:StatCard Label="TOTAL"
+        <controls:StatCard x:Name="StatTotal"
                            Value="{Binding #TotalRules.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="ENABLED"
+        <controls:StatCard x:Name="StatEnabled"
                            Value="{Binding #EnabledRules.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
-        <controls:StatCard Label="BLOCKED"
+        <controls:StatCard x:Name="StatBlocked"
                            Value="{Binding #BlockedRules.Text}"
                            ValueBrush="{DynamicResource StatusErrorBrush}"/>
       </controls:StatRow>
@@ -53,13 +54,13 @@
                 <Border.Background>
                   <SolidColorBrush Color="#EF4444" Opacity="0.15"/>
                 </Border.Background>
-                <TextBlock Text="&#x26D4;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#EF4444"
+                <TextBlock Text="⛔" FontSize="{DynamicResource FontSizeLabel}" Foreground="#EF4444"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBox x:Name="SearchBox" Watermark="Search rules..." Width="300" HorizontalAlignment="Left"/>
+              <TextBox x:Name="SearchBox" Width="300" HorizontalAlignment="Left"/>
             </StackPanel>
           </Grid>
-          <TextBlock x:Name="SubText" Text="Click Scan to load firewall rules (requires admin)"
+          <TextBlock x:Name="SubText" Text=""
                      FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <ItemsControl x:Name="RulesList"/>

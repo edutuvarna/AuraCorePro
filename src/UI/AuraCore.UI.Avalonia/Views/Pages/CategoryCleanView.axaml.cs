@@ -64,13 +64,25 @@ public partial class CategoryCleanView : UserControl
     private void ApplyLocalization()
     {
         if (_module is null) return;
-        PageSubtitle.Text = _module.Id switch
+        var subText = _module.Id switch
         {
             "junk-cleaner"    => LocalizationService._("junk.subtitle"),
             "disk-cleanup"    => LocalizationService._("dc.subtitle"),
             "privacy-cleaner" => LocalizationService._("priv.subtitle"),
-            _ => "Scan and clean"
+            _ => LocalizationService._("catClean.subtitle")
         };
+        PageSubtitle.Text        = subText;
+        PageHeader.Subtitle      = subText;
+        ScanLabel.Text           = LocalizationService._("catClean.scanBtn");
+        ExcludeListLabel.Text    = LocalizationService._("catClean.excludes");
+        global::Avalonia.Controls.ToolTip.SetTip(ExcludeListBtn, LocalizationService._("catClean.excludesTooltip"));
+        CatCountLabel.Text       = LocalizationService._("catClean.categories");
+        FileCountLabel.Text      = LocalizationService._("catClean.files");
+        TotalSizeLabel.Text      = LocalizationService._("catClean.totalSize");
+        SelectAllLabel.Text      = LocalizationService._("common.selectAll");
+        CleanLabel.Text          = LocalizationService._("catClean.cleanSelected");
+        HistoryExpander.Header   = LocalizationService._("catClean.cleanupHistory");
+        AiBadgeText.Text         = LocalizationService._("catClean.diskPressureHigh");
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -80,7 +92,7 @@ public partial class CategoryCleanView : UserControl
     private async Task RunScan()
     {
         if (_module is null) return;
-        ScanLabel.Text = "Scanning...";
+        ScanLabel.Text = LocalizationService._("common.scanning");
         _cats.Clear();
         try
         {
@@ -117,8 +129,8 @@ public partial class CategoryCleanView : UserControl
             if (IsJunkCleaner)
                 CheckDiskPressure();
         }
-        catch { StatusText.Text = "Scan failed"; }
-        finally { ScanLabel.Text = "Scan"; }
+        catch { StatusText.Text = LocalizationService._("catClean.scanFailed"); }
+        finally { ScanLabel.Text = LocalizationService._("catClean.scanBtn"); }
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -185,7 +197,7 @@ public partial class CategoryCleanView : UserControl
             if (cat.NeedAdmin)
                 meta.Children.Add(new TextBlock
                 {
-                    Text = "Admin required", FontSize = 10,
+                    Text = LocalizationService._("catClean.adminRequired"), FontSize = 10,
                     Foreground = new SolidColorBrush(Color.Parse("#F59E0B"))
                 });
             info.Children.Add(meta);
@@ -325,7 +337,7 @@ public partial class CategoryCleanView : UserControl
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            ToolTip.SetTip(excludeBtn, "Add to exclude list");
+            ToolTip.SetTip(excludeBtn, LocalizationService._("catClean.addToExclude"));
             var capturedPath = file.FullPath;
             excludeBtn.Click += (s, e) =>
             {
@@ -411,7 +423,7 @@ public partial class CategoryCleanView : UserControl
         {
             HistoryPanel.Children.Add(new TextBlock
             {
-                Text = "No cleanup history yet.",
+                Text = LocalizationService._("catClean.noHistory"),
                 FontSize = 10, FontStyle = FontStyle.Italic,
                 Foreground = new SolidColorBrush(Color.Parse("#555570")),
                 Margin = new Thickness(4)
@@ -481,14 +493,14 @@ public partial class CategoryCleanView : UserControl
         var header = new Grid { ColumnDefinitions = ColumnDefinitions.Parse("*,Auto"), Margin = new Thickness(4, 4) };
         header.Children.Add(new TextBlock
         {
-            Text = "Exclude List - these paths are skipped during scan",
+            Text = LocalizationService._("catClean.excludeListTitle"),
             FontSize = 12, FontWeight = FontWeight.SemiBold,
             Foreground = new SolidColorBrush(Color.Parse("#E8E8F0")),
             VerticalAlignment = VerticalAlignment.Center
         });
         var backBtn = new Button
         {
-            Content = new TextBlock { Text = "Back", FontSize = 10, FontWeight = FontWeight.SemiBold },
+            Content = new TextBlock { Text = LocalizationService._("catClean.back"), FontSize = 10, FontWeight = FontWeight.SemiBold },
             Classes = { "action-btn" }, Padding = new Thickness(12, 4)
         };
         backBtn.Click += (s, ev) =>
@@ -504,7 +516,7 @@ public partial class CategoryCleanView : UserControl
         {
             CategoryPanel.Children.Add(new TextBlock
             {
-                Text = "No exclusions configured. Use the \u2716 button next to individual files to add exclusions.",
+                Text = LocalizationService._("catClean.noExclusions"),
                 FontSize = 11, FontStyle = FontStyle.Italic,
                 Foreground = new SolidColorBrush(Color.Parse("#555570")),
                 Margin = new Thickness(4, 12)
@@ -526,7 +538,7 @@ public partial class CategoryCleanView : UserControl
 
             var removeBtn = new Button
             {
-                Content = new TextBlock { Text = "Remove", FontSize = 9, Foreground = new SolidColorBrush(Color.Parse("#EF4444")) },
+                Content = new TextBlock { Text = LocalizationService._("common.remove"), FontSize = 9, Foreground = new SolidColorBrush(Color.Parse("#EF4444")) },
                 Padding = new Thickness(8, 2),
                 Background = new SolidColorBrush(Color.Parse("#20EF4444")),
                 BorderThickness = new Thickness(0),
@@ -564,7 +576,9 @@ public partial class CategoryCleanView : UserControl
             selected = _catCheckBoxes.Count(cb => cb.IsChecked == true);
         }
         CleanBtn.IsEnabled = selected > 0;
-        CleanLabel.Text = selected > 0 ? $"Clean {selected} Category(s)" : "Clean Selected";
+        CleanLabel.Text = selected > 0
+            ? $"{LocalizationService._("catClean.cleanCount")} {selected}"
+            : LocalizationService._("catClean.cleanSelected");
     }
 
     private void SelectAll_Click(object? sender, RoutedEventArgs e)
@@ -584,7 +598,7 @@ public partial class CategoryCleanView : UserControl
                         entry.CheckBox.IsChecked = !allChecked;
         }
 
-        SelectAllLabel.Text = allChecked ? "Select All" : "Deselect All";
+        SelectAllLabel.Text = allChecked ? LocalizationService._("common.selectAll") : LocalizationService._("common.deselectAll");
         UpdateCleanButton();
     }
 
@@ -594,7 +608,7 @@ public partial class CategoryCleanView : UserControl
     {
         if (_module is null) return;
         CleanBtn.IsEnabled = false;
-        CleanLabel.Text = "Cleaning...";
+        CleanLabel.Text = LocalizationService._("catClean.cleaning");
         try
         {
             // Build selected category list
@@ -616,7 +630,7 @@ public partial class CategoryCleanView : UserControl
 
             StatusText.Text = result.Success
                 ? $"Cleaned {result.ItemsProcessed} items. Freed {FormatBytes(result.BytesFreed)} in {result.Duration.TotalSeconds:F1}s"
-                : "Clean failed. Try running as administrator.";
+                : LocalizationService._("catClean.cleanFailed");
 
             // Log to history (junk-cleaner only)
             if (IsJunkCleaner && result.Success)
@@ -635,7 +649,7 @@ public partial class CategoryCleanView : UserControl
             await RunScan(); // refresh
         }
         catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
-        finally { CleanLabel.Text = "Clean Selected"; }
+        finally { CleanLabel.Text = LocalizationService._("catClean.cleanSelected"); }
     }
 
     private static string FormatBytes(long b) => b switch

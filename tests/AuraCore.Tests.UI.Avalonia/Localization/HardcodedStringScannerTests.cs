@@ -58,6 +58,25 @@ public class HardcodedStringScannerTests
         Assert.True(issues.Count == 0, string.Join(Environment.NewLine, issues));
     }
 
+    /// <summary>
+    /// Phase 6.4 shipped with every UI XAML file localizable — the grandfather
+    /// list is empty and should stay empty. Adding entries here to bypass the
+    /// main scanner would silently re-introduce the regression the sweep fixed.
+    /// If there's a genuine reason to re-introduce a grandfather list (e.g., a
+    /// large import from an external project with hundreds of literals), delete
+    /// this test along with that justification.
+    /// </summary>
+    [Fact]
+    public void GrandfatheredFiles_is_empty_per_phase_6_4_commitment()
+    {
+        Assert.True(
+            GrandfatheredFiles.Count == 0,
+            $"GrandfatheredFiles has {GrandfatheredFiles.Count} entries. Phase 6.4 TR Completion Sweep " +
+            "committed to zero grandfathering — every UI XAML must be localizable. Don't silence the " +
+            "main scanner by adding files here; localize the file's literals instead. If you truly " +
+            "need to re-introduce a grandfather list, delete this test with a written justification.");
+    }
+
     private static IEnumerable<string> ScanViewsForOffenders()
     {
         var viewsRoot = FindViewsRoot();

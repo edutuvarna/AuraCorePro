@@ -6,7 +6,8 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Gaming Mode"
+      <controls:ModuleHeader x:Name="ModuleHdr"
+                             Title=""
                              Subtitle="Boost gaming performance with one click">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
@@ -16,8 +17,8 @@
                     FontWeight="Bold" FontSize="{DynamicResource FontSizeBody}"
                     VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="&#x26A1;" FontSize="{DynamicResource FontSizeSubheading}"/>
-                <TextBlock x:Name="ActivateLabel" Text="Activate"
+                <TextBlock Text="⚡" FontSize="{DynamicResource FontSizeSubheading}"/>
+                <TextBlock x:Name="ActivateLabel" Text=""
                            FontSize="{DynamicResource FontSizeBody}" FontWeight="Bold"/>
               </StackPanel>
             </Button>
@@ -29,7 +30,7 @@
 
       <!-- Hidden bridge for code-behind subtitle writes -->
       <TextBlock x:Name="SubText"
-                 Text="Boost gaming performance with one click"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  IsVisible="False"/>
@@ -47,7 +48,7 @@
           <Border Width="10" Height="10" CornerRadius="5" x:Name="AutoDetectDot"
                   Background="#555570" VerticalAlignment="Center" Margin="0,0,12,0"/>
           <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-            <TextBlock x:Name="AutoDetectLabel" Text="Auto-Detect: Off"
+            <TextBlock x:Name="AutoDetectLabel" Text=""
                        FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
             <TextBlock x:Name="DetectedGameLabel" Text=""
@@ -66,7 +67,7 @@
         <Grid ColumnDefinitions="Auto,*,Auto">
           <Border Width="10" Height="10" CornerRadius="5" x:Name="StatusDot"
                   Background="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-          <TextBlock Grid.Column="1" x:Name="StatusLabel" Text="Inactive"
+          <TextBlock Grid.Column="1" x:Name="StatusLabel" Text=""
                      FontSize="{DynamicResource FontSizeBody}" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           <TextBlock Grid.Column="2" x:Name="PowerPlanText" Text=""
@@ -88,14 +89,14 @@
           <Border Width="8" Height="8" CornerRadius="4" Background="#22C55E"
                   VerticalAlignment="Center" Margin="0,0,10,0"/>
           <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
-            <TextBlock Text="GAMING MODE ACTIVE"
+            <TextBlock x:Name="GamingActiveLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="Bold"
                        Foreground="#22C55E"/>
-            <TextBlock x:Name="SessionDurationText" Text="Duration: 0:00"
+            <TextBlock x:Name="SessionDurationText" Text=""
                        FontSize="{DynamicResource FontSizeLabel}"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>
-          <TextBlock Grid.Column="2" x:Name="ActiveBadgeIcon" Text="&#x1F3AE;"
+          <TextBlock Grid.Column="2" x:Name="ActiveBadgeIcon" Text="🎮"
                      FontSize="{DynamicResource FontSizeHeading}" VerticalAlignment="Center"/>
         </Grid>
       </Border>
@@ -131,7 +132,7 @@
             <SolidColorBrush Color="#3B82F6" Opacity="0.12"/>
           </Border.BorderBrush>
           <StackPanel Spacing="2" HorizontalAlignment="Center">
-            <TextBlock Text="NETWORK"
+            <TextBlock x:Name="NetworkStatLabel" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
             <TextBlock x:Name="NetworkQosLabel" Text="--"
@@ -150,7 +151,7 @@
             <SolidColorBrush Color="#F59E0B" Opacity="0.12"/>
           </Border.BorderBrush>
           <StackPanel Spacing="2" HorizontalAlignment="Center">
-            <TextBlock Text="WIN UPDATE"
+            <TextBlock x:Name="WinUpdateStatLabel" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center"/>
             <TextBlock x:Name="WinUpdateLabel" Text="--"
@@ -169,10 +170,10 @@
               <Border.Background>
                 <SolidColorBrush Color="#A855F7" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x2699;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
+              <TextBlock Text="⚙" FontSize="{DynamicResource FontSizeLabel}" Foreground="#A855F7"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="OPTIMIZATIONS"
+            <TextBlock x:Name="OptimizationsLabel" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>
@@ -188,10 +189,10 @@
               <Border.Background>
                 <SolidColorBrush Color="#EC4899" Opacity="0.15"/>
               </Border.Background>
-              <TextBlock Text="&#x25A0;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#EC4899"
+              <TextBlock Text="◼" FontSize="{DynamicResource FontSizeLabel}" Foreground="#EC4899"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="BACKGROUND PROCESSES"
+            <TextBlock x:Name="BgProcessesLabel" Text=""
                        FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>

@@ -6,8 +6,8 @@
   <Grid ColumnDefinitions="240,1,*" RowDefinitions="0,*,Auto">
 
     <!-- Hidden ModuleHeader (row 0 height=0) satisfies Phase 4 shell contract -->
-    <controls:ModuleHeader Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0"
-                           Title="ISO Builder" Subtitle="Build a custom Windows ISO"
+    <controls:ModuleHeader x:Name="ModuleHdr" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0"
+                           Title="" Subtitle=""
                            IsVisible="False">
       <controls:ModuleHeader.Actions>
         <!-- PageTitle: invisible, code-behind writes localized string -->
@@ -19,9 +19,9 @@
     <Border Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Background="{DynamicResource BgCardBrush}">
       <Grid RowDefinitions="Auto,*,Auto">
         <StackPanel Grid.Row="0" Margin="20,20,20,12" Spacing="4">
-          <TextBlock Text="ISO Builder" FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+          <TextBlock x:Name="SidebarTitle" Text="" FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock x:Name="StepIndicator" Text="Step 1 of 12"
+          <TextBlock x:Name="StepIndicator" Text=""
                      FontSize="{DynamicResource FontSizeBody}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
         </StackPanel>
@@ -33,25 +33,25 @@
             <TextBlock x:Name="AdminStatusText" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Margin="0,8,0,0"
                        TextWrapping="Wrap" Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Text="TEMPLATES" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="TemplatesLabel" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Opacity="0.35" Margin="0,4,0,2"/>
-            <ComboBox x:Name="TemplateCombo" PlaceholderText="Load Template..."
+            <ComboBox x:Name="TemplateCombo" PlaceholderText=""
                       HorizontalAlignment="Stretch" FontSize="{DynamicResource FontSizeBody}">
-              <ComboBoxItem Content="Gaming PC" Tag="gaming"/>
-              <ComboBoxItem Content="Office PC" Tag="office"/>
-              <ComboBoxItem Content="Privacy PC" Tag="privacy"/>
-              <ComboBoxItem Content="Developer PC" Tag="developer"/>
-              <ComboBoxItem Content="Minimal (Clean)" Tag="minimal"/>
+              <ComboBoxItem x:Name="TmplGaming" Content="" Tag="gaming"/>
+              <ComboBoxItem x:Name="TmplOffice" Content="" Tag="office"/>
+              <ComboBoxItem x:Name="TmplPrivacy" Content="" Tag="privacy"/>
+              <ComboBoxItem x:Name="TmplDeveloper" Content="" Tag="developer"/>
+              <ComboBoxItem x:Name="TmplMinimal" Content="" Tag="minimal"/>
             </ComboBox>
             <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
               <Button x:Name="ImportBtn" Click="ImportConfig_Click" Padding="8,4"
                       Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}" Cursor="Hand">
-                <TextBlock Text="Import" FontSize="{DynamicResource FontSizeBodySmall}"
+                <TextBlock x:Name="ImportLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
               </Button>
               <Button x:Name="ExportBtn" Click="ExportConfig_Click" Padding="8,4"
                       Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}" Cursor="Hand">
-                <TextBlock Text="Export" FontSize="{DynamicResource FontSizeBodySmall}"
+                <TextBlock x:Name="ExportLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
               </Button>
             </StackPanel>
@@ -68,13 +68,13 @@
       <Grid>
         <!-- Panel 0: Select ISO -->
         <StackPanel x:Name="Panel_0" IsVisible="True" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Select Windows ISO" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P0Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Choose a Windows 10 or 11 ISO file to customize."
+          <TextBlock x:Name="P0Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
-            <Button Content="Browse ISO File..." Click="BrowseIso_Click" Classes="action-btn" Padding="16,10"/>
-            <TextBlock x:Name="IsoPathText" Text="No file selected" VerticalAlignment="Center"
+            <Button x:Name="BrowseIsoBtn" Content="" Click="BrowseIso_Click" Classes="action-btn" Padding="16,10"/>
+            <TextBlock x:Name="IsoPathText" Text="" VerticalAlignment="Center"
                        Foreground="{DynamicResource TextMutedBrush}"/>
           </StackPanel>
           <controls:GlassCard x:Name="IsoInfoPanel" IsVisible="False">
@@ -91,67 +91,67 @@
 
         <!-- Panel 1: User Account -->
         <StackPanel x:Name="Panel_1" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="User Account" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P1Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Configure the default user account for Windows."
+          <TextBlock x:Name="P1Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-          <RadioButton x:Name="LocalAccountRadio" Content="Local Account (no Microsoft account)"
+          <RadioButton x:Name="LocalAccountRadio" Content=""
                        IsChecked="True" GroupName="account" Margin="0,8,0,0"/>
-          <RadioButton x:Name="MsAccountRadio" Content="Microsoft Account (standard setup)" GroupName="account"/>
+          <RadioButton x:Name="MsAccountRadio" Content="" GroupName="account"/>
           <StackPanel x:Name="LocalAccountPanel" Spacing="12" Margin="28,8,0,0">
-            <TextBox x:Name="UsernameBox" Watermark="e.g. Admin" Width="320"/>
-            <TextBox x:Name="PasswordBox" Watermark="Leave empty for no password" PasswordChar="*" Width="320"/>
-            <CheckBox x:Name="AutoLoginCheck" Content="Auto-login (skip password screen)" IsChecked="True"/>
+            <TextBox x:Name="UsernameBox" Width="320"/>
+            <TextBox x:Name="PasswordBox" PasswordChar="*" Width="320"/>
+            <CheckBox x:Name="AutoLoginCheck" Content="" IsChecked="True"/>
           </StackPanel>
         </StackPanel>
 
         <!-- Panel 2: OOBE Settings -->
         <StackPanel x:Name="Panel_2" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="OOBE Settings" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P2Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Skip Windows setup screens and pre-configure regional settings."
+          <TextBlock x:Name="P2Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-          <CheckBox x:Name="SkipOobeCheck" Content="Skip all OOBE screens" IsChecked="True"/>
-          <CheckBox x:Name="SkipEulaCheck" Content="Auto-accept EULA" IsChecked="True"/>
-          <CheckBox x:Name="DisableTelemetryCheck" Content="Disable telemetry and data collection" IsChecked="True"/>
-          <CheckBox x:Name="DisableCortanaCheck" Content="Disable Cortana" IsChecked="True"/>
-          <CheckBox x:Name="DisableOneDriveCheck" Content="Prevent OneDrive auto-install" IsChecked="True"/>
-          <TextBox x:Name="ComputerNameBox" Watermark="Leave empty for random" Width="320" MaxLength="15" Margin="0,8,0,0"/>
+          <CheckBox x:Name="SkipOobeCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="SkipEulaCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="DisableTelemetryCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="DisableCortanaCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="DisableOneDriveCheck" Content="" IsChecked="True"/>
+          <TextBox x:Name="ComputerNameBox" Width="320" MaxLength="15" Margin="0,8,0,0"/>
           <ComboBox x:Name="LanguageCombo" Width="280" SelectedIndex="0" Margin="0,4,0,0">
-            <ComboBoxItem Content="English (US)" Tag="en-US"/>
-            <ComboBoxItem Content="Turkish" Tag="tr-TR"/>
-            <ComboBoxItem Content="German" Tag="de-DE"/>
-            <ComboBoxItem Content="French" Tag="fr-FR"/>
-            <ComboBoxItem Content="Spanish" Tag="es-ES"/>
-            <ComboBoxItem Content="Russian" Tag="ru-RU"/>
+            <ComboBoxItem x:Name="LangEnUs" Content="" Tag="en-US"/>
+            <ComboBoxItem x:Name="LangTrTr" Content="" Tag="tr-TR"/>
+            <ComboBoxItem x:Name="LangDeDe" Content="" Tag="de-DE"/>
+            <ComboBoxItem x:Name="LangFrFr" Content="" Tag="fr-FR"/>
+            <ComboBoxItem x:Name="LangEsEs" Content="" Tag="es-ES"/>
+            <ComboBoxItem x:Name="LangRuRu" Content="" Tag="ru-RU"/>
           </ComboBox>
           <ComboBox x:Name="TimezoneCombo" Width="320" SelectedIndex="0">
-            <ComboBoxItem Content="UTC" Tag="UTC"/>
-            <ComboBoxItem Content="Eastern (US)" Tag="Eastern Standard Time"/>
-            <ComboBoxItem Content="Pacific (US)" Tag="Pacific Standard Time"/>
-            <ComboBoxItem Content="CET" Tag="Central European Standard Time"/>
-            <ComboBoxItem Content="Turkey" Tag="Turkey Standard Time"/>
-            <ComboBoxItem Content="Moscow" Tag="Russian Standard Time"/>
+            <ComboBoxItem x:Name="TzUtc"     Content="" Tag="UTC"/>
+            <ComboBoxItem x:Name="TzEastern" Content="" Tag="Eastern Standard Time"/>
+            <ComboBoxItem x:Name="TzPacific" Content="" Tag="Pacific Standard Time"/>
+            <ComboBoxItem x:Name="TzCet"     Content="" Tag="Central European Standard Time"/>
+            <ComboBoxItem x:Name="TzTurkey"  Content="" Tag="Turkey Standard Time"/>
+            <ComboBoxItem x:Name="TzMoscow"  Content="" Tag="Russian Standard Time"/>
           </ComboBox>
         </StackPanel>
 
         <!-- Panel 3: WiFi -->
         <StackPanel x:Name="Panel_3" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="WiFi Auto-Connect" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P3Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Pre-configure WiFi so Windows connects right after installation."
+          <TextBlock x:Name="P3Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-          <CheckBox x:Name="EnableWifiCheck" Content="Enable WiFi Auto-Connect"/>
+          <CheckBox x:Name="EnableWifiCheck" Content=""/>
           <StackPanel x:Name="WifiPanel" IsVisible="False" Spacing="12" Margin="28,0,0,0">
-            <TextBox x:Name="WifiSsidBox" Watermark="e.g. MyHomeWiFi" Width="320"/>
-            <TextBox x:Name="WifiPasswordBox" Watermark="WiFi Password" PasswordChar="*" Width="320"/>
+            <TextBox x:Name="WifiSsidBox" Width="320"/>
+            <TextBox x:Name="WifiPasswordBox" PasswordChar="*" Width="320"/>
             <ComboBox x:Name="WifiSecurityCombo" Width="260" SelectedIndex="0">
-              <ComboBoxItem Content="WPA2-Personal" Tag="WPA2PSK"/>
-              <ComboBoxItem Content="WPA3-Personal" Tag="WPA3SAE"/>
-              <ComboBoxItem Content="WPA-Personal (legacy)" Tag="WPAPSK"/>
-              <ComboBoxItem Content="Open (no password)" Tag="open"/>
+              <ComboBoxItem x:Name="WifiSec1" Content="" Tag="WPA2PSK"/>
+              <ComboBoxItem x:Name="WifiSec2" Content="" Tag="WPA3SAE"/>
+              <ComboBoxItem x:Name="WifiSec3" Content="" Tag="WPAPSK"/>
+              <ComboBoxItem x:Name="WifiSec4" Content="" Tag="open"/>
             </ComboBox>
-            <TextBlock Text="Note: WiFi password is stored in plain text."
+            <TextBlock x:Name="WifiPlainTextNote" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"/>
           </StackPanel>
@@ -159,30 +159,30 @@
 
         <!-- Panel 4: Win11 Bypass -->
         <StackPanel x:Name="Panel_4" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Win11 Bypass" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P4Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusSm}" Padding="12"
                   BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
-            <TextBlock Text="Advanced: Only use if you know what you're doing! May cause stability issues on unsupported hardware."
+            <TextBlock x:Name="BypassWarning" Text=""
                        Foreground="#F59E0B" FontSize="{DynamicResource FontSizeBody}" TextWrapping="Wrap"/>
           </Border>
-          <CheckBox x:Name="BypassTpmCheck" Content="Bypass TPM 2.0" IsChecked="True"/>
-          <CheckBox x:Name="BypassSecureBootCheck" Content="Bypass Secure Boot" IsChecked="True"/>
-          <CheckBox x:Name="BypassRamCheck" Content="Bypass 4GB RAM minimum" IsChecked="True"/>
-          <CheckBox x:Name="BypassStorageCheck" Content="Bypass 64GB storage minimum" IsChecked="True"/>
-          <CheckBox x:Name="BypassCpuCheck" Content="Bypass CPU compatibility check" IsChecked="True"/>
+          <CheckBox x:Name="BypassTpmCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="BypassSecureBootCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="BypassRamCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="BypassStorageCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="BypassCpuCheck" Content="" IsChecked="True"/>
         </StackPanel>
 
         <!-- Panel 5: Bloatware Removal -->
         <StackPanel x:Name="Panel_5" IsVisible="False" Spacing="12" MaxWidth="700">
-          <TextBlock Text="Bloatware Removal" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P5Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Select pre-installed apps to remove during installation."
+          <TextBlock x:Name="P5Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Select All" Click="SelectAllBloat_Click" Padding="12,6"
+            <Button x:Name="SelectAllBtn" Content="" Click="SelectAllBloat_Click" Padding="12,6"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
-            <Button Content="Deselect All" Click="DeselectAllBloat_Click" Padding="12,6"
+            <Button x:Name="DeselectAllBtn" Content="" Click="DeselectAllBloat_Click" Padding="12,6"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </StackPanel>
           <StackPanel x:Name="BloatwareList" Spacing="4"/>
@@ -190,30 +190,30 @@
 
         <!-- Panel 6: EXE Bundler -->
         <StackPanel x:Name="Panel_6" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Custom EXE Bundler" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P6Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Add .exe/.msi installers to auto-run after first boot."
+          <TextBlock x:Name="P6Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-            <Button Content="Add Files..." Click="AddExe_Click" Classes="action-btn" Padding="16,8"/>
-            <Button Content="Clear All" Click="ClearExe_Click" Padding="12,8"
+            <Button x:Name="AddFilesBtn" Content="" Click="AddExe_Click" Classes="action-btn" Padding="16,8"/>
+            <Button x:Name="ClearAllBtn" Content="" Click="ClearExe_Click" Padding="12,8"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </StackPanel>
           <StackPanel x:Name="ExeFilesList" Spacing="4"/>
-          <TextBlock x:Name="ExeCountText" Text="No files added"
+          <TextBlock x:Name="ExeCountText" Text=""
                      Foreground="{DynamicResource TextMutedBrush}"
                      FontSize="{DynamicResource FontSizeBody}"/>
-          <CheckBox x:Name="SilentInstallCheck" Content="Attempt silent install (/S /silent /quiet)" IsChecked="True"/>
+          <CheckBox x:Name="SilentInstallCheck" Content="" IsChecked="True"/>
         </StackPanel>
 
         <!-- Panel 7: Driver Backup -->
         <StackPanel x:Name="Panel_7" IsVisible="False" Spacing="12" MaxWidth="700">
-          <TextBlock Text="Driver Backup" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P7Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Export current hardware drivers and bundle them."
+          <TextBlock x:Name="P7Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-            <Button x:Name="ScanDriversBtn" Content="Scan My Drivers" Click="ScanDrivers_Click"
+            <Button x:Name="ScanDriversBtn" Content="" Click="ScanDrivers_Click"
                     Classes="action-btn" Padding="16,8"/>
             <TextBlock x:Name="DriverScanStatus" Text="" VerticalAlignment="Center"
                        Foreground="{DynamicResource TextSecondaryBrush}"
@@ -221,23 +221,23 @@
           </StackPanel>
           <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusSm}" Padding="12"
                   BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
-            <TextBlock Text="Requires Administrator: Run AuraCore Pro as admin to scan drivers."
+            <TextBlock x:Name="DriverAdminNote" Text=""
                        Foreground="#F59E0B" FontSize="{DynamicResource FontSizeBody}" TextWrapping="Wrap"/>
           </Border>
           <StackPanel x:Name="DriverList" Spacing="4"/>
-          <CheckBox x:Name="IncludeDriversCheck" Content="Include selected drivers in build" IsChecked="True"/>
+          <CheckBox x:Name="IncludeDriversCheck" Content="" IsChecked="True"/>
         </StackPanel>
 
         <!-- Panel 8: Winget Apps -->
         <StackPanel x:Name="Panel_8" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Winget App List" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P8Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Auto-install apps via Winget after first boot (requires internet)."
+          <TextBlock x:Name="P8Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
           <StackPanel x:Name="WingetAppList" Spacing="4"/>
           <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-            <TextBox x:Name="CustomWingetBox" Watermark="Custom Winget ID (e.g. Mozilla.Firefox)" Width="320"/>
-            <Button Content="Add" Click="AddCustomWinget_Click" Padding="12,8"
+            <TextBox x:Name="CustomWingetBox" Width="320"/>
+            <Button x:Name="AddWingetBtn" Content="" Click="AddCustomWinget_Click" Padding="12,8"
                     Background="#12FFFFFF" CornerRadius="{StaticResource RadiusSm}"/>
           </StackPanel>
           <StackPanel x:Name="CustomWingetList" Spacing="4"/>
@@ -245,65 +245,65 @@
 
         <!-- Panel 9: Registry Presets -->
         <StackPanel x:Name="Panel_9" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Registry Presets" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P9Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Apply pre-built optimization presets. Multiple can be combined."
+          <TextBlock x:Name="P9Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-          <CheckBox x:Name="PresetDefaultCheck" Content="Default (Balanced) - Clean taskbar, disable ads"
+          <CheckBox x:Name="PresetDefaultCheck" Content=""
                     IsChecked="True" Margin="0,8,0,0"/>
-          <CheckBox x:Name="PresetGamingCheck" Content="Gaming PC - Disable Game DVR, High Performance"/>
-          <CheckBox x:Name="PresetPrivacyCheck" Content="Privacy - Disable telemetry, ad tracking"/>
-          <CheckBox x:Name="PresetDevCheck" Content="Developer - File extensions, long paths, hidden files"/>
-          <CheckBox x:Name="PresetOfficeCheck" Content="Office - Dark mode, clean taskbar"/>
+          <CheckBox x:Name="PresetGamingCheck" Content=""/>
+          <CheckBox x:Name="PresetPrivacyCheck" Content=""/>
+          <CheckBox x:Name="PresetDevCheck" Content=""/>
+          <CheckBox x:Name="PresetOfficeCheck" Content=""/>
         </StackPanel>
 
         <!-- Panel 10: Post-Install -->
         <StackPanel x:Name="Panel_10" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Post-Install Actions" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P10Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-          <TextBlock Text="Additional tweaks applied after Windows first login."
+          <TextBlock x:Name="P10Desc" Text=""
                      Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-          <CheckBox x:Name="InstallWingetCheck" Content="Install Winget package manager" IsChecked="True" Margin="0,4,0,0"/>
-          <CheckBox x:Name="EnableDarkModeCheck" Content="Enable Dark Mode" IsChecked="True"/>
-          <CheckBox x:Name="ShowFileExtCheck" Content="Show file extensions in Explorer" IsChecked="True"/>
-          <CheckBox x:Name="ShowHiddenFilesCheck" Content="Show hidden files"/>
-          <CheckBox x:Name="DisableWebSearchCheck" Content="Disable web search in Start Menu" IsChecked="True"/>
-          <CheckBox x:Name="ClassicRightClickCheck" Content="Classic right-click context menu (Win11)" IsChecked="True"/>
-          <CheckBox x:Name="DisableWidgetsCheck" Content="Disable Widgets" IsChecked="True"/>
-          <CheckBox x:Name="DisableCopilotCheck" Content="Disable Copilot" IsChecked="True"/>
-          <CheckBox x:Name="TaskbarLeftCheck" Content="Align taskbar to left (Win11)"/>
+          <CheckBox x:Name="InstallWingetCheck" Content="" IsChecked="True" Margin="0,4,0,0"/>
+          <CheckBox x:Name="EnableDarkModeCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="ShowFileExtCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="ShowHiddenFilesCheck" Content=""/>
+          <CheckBox x:Name="DisableWebSearchCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="ClassicRightClickCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="DisableWidgetsCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="DisableCopilotCheck" Content="" IsChecked="True"/>
+          <CheckBox x:Name="TaskbarLeftCheck" Content=""/>
         </StackPanel>
 
         <!-- Panel 11: Review and Build -->
         <StackPanel x:Name="Panel_11" IsVisible="False" Spacing="12" MaxWidth="600">
-          <TextBlock Text="Review and Build" FontSize="{DynamicResource FontSizeHeading}"
+          <TextBlock x:Name="P11Title" Text="" FontSize="{DynamicResource FontSizeHeading}"
                      FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
           <controls:GlassCard>
             <StackPanel Spacing="12">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                  <TextBlock Text="&#x2139;" FontSize="{DynamicResource FontSizeLabel}"
+                  <TextBlock Text="ℹ" FontSize="{DynamicResource FontSizeLabel}"
                              Foreground="{DynamicResource AccentPrimaryBrush}"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-                <TextBlock Text="Output Format" FontSize="{DynamicResource FontSizeBodySmall}"
+                <TextBlock x:Name="OutputFormatLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
               </StackPanel>
-              <RadioButton x:Name="OutputUnattendOnly" Content="Generate files only (save to folder)"
+              <RadioButton x:Name="OutputUnattendOnly" Content=""
                            IsChecked="True" GroupName="output"/>
-              <RadioButton x:Name="OutputStandaloneIso" Content="Create standalone ISO" GroupName="output"/>
+              <RadioButton x:Name="OutputStandaloneIso" Content="" GroupName="output"/>
             </StackPanel>
           </controls:GlassCard>
           <controls:GlassCard>
             <StackPanel Spacing="8">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <Border Width="16" Height="16" CornerRadius="4" Background="{DynamicResource AccentBgBrush}">
-                  <TextBlock Text="&#x2139;" FontSize="{DynamicResource FontSizeLabel}"
+                  <TextBlock Text="ℹ" FontSize="{DynamicResource FontSizeLabel}"
                              Foreground="{DynamicResource AccentPrimaryBrush}"
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
-                <TextBlock Text="Build Summary" FontSize="{DynamicResource FontSizeBodySmall}"
+                <TextBlock x:Name="BuildSummaryLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"/>
               </StackPanel>
@@ -318,10 +318,10 @@
           <Border Background="{DynamicResource WarningBgBrush}" CornerRadius="{StaticResource RadiusMd}" Padding="16"
                   BorderBrush="{DynamicResource WarningBorderBrush}" BorderThickness="1">
             <StackPanel Spacing="8">
-              <TextBlock Text="By clicking Build, you acknowledge that AuraCore Pro modifies Windows installation files. You are responsible for ensuring compatibility."
+              <TextBlock x:Name="DisclaimerText" Text=""
                          Foreground="{DynamicResource TextMutedBrush}"
                          FontSize="{DynamicResource FontSizeBodySmall}" TextWrapping="Wrap"/>
-              <CheckBox x:Name="DisclaimerCheck" Content="I understand the risks and accept responsibility"
+              <CheckBox x:Name="DisclaimerCheck" Content=""
                         FontSize="{DynamicResource FontSizeBody}"/>
             </StackPanel>
           </Border>
@@ -333,14 +333,14 @@
     <Border Grid.Column="2" Grid.Row="2" Background="{DynamicResource BgCardBrush}"
             BorderBrush="{DynamicResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="32,12">
       <Grid ColumnDefinitions="*,Auto">
-        <Button x:Name="BackBtn" Grid.Column="0" Content="Back" Click="Back_Click"
+        <Button x:Name="BackBtn" Grid.Column="0" Content="" Click="Back_Click"
                 Padding="20,8" IsVisible="False"
                 Background="#12FFFFFF" CornerRadius="{StaticResource RadiusMd}"/>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-          <Button x:Name="NextBtn" Content="Next" Click="Next_Click"
+          <Button x:Name="NextBtn" Content="" Click="Next_Click"
                   Classes="action-btn" Padding="24,8"
                   Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"/>
-          <Button x:Name="BuildBtn" Content="Build Custom ISO" Click="Build_Click"
+          <Button x:Name="BuildBtn" Content="" Click="Build_Click"
                   IsVisible="False" IsEnabled="False"
                   Background="{DynamicResource AccentPrimaryBrush}" Foreground="#0A0A0F"
                   Padding="24,8" CornerRadius="{StaticResource RadiusMd}"/>
@@ -353,13 +353,13 @@
           Background="{DynamicResource BgDeepBrush}">
       <Grid Margin="32" MaxWidth="800" HorizontalAlignment="Center" RowDefinitions="Auto,*,Auto">
         <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,16">
-          <TextBlock x:Name="BuildingTitle" Text="Building Custom ISO..."
+          <TextBlock x:Name="BuildingTitle" Text=""
                      FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
           <ProgressBar x:Name="TerminalProgress" Value="0" Maximum="100" Height="4"
                        Foreground="{DynamicResource AccentPrimaryBrush}"/>
           <StackPanel Orientation="Horizontal" Spacing="16">
-            <TextBlock x:Name="TerminalStepText" Text="Initializing..."
+            <TextBlock x:Name="TerminalStepText" Text=""
                        FontSize="{DynamicResource FontSizeBody}"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
             <TextBlock x:Name="TerminalTimeText" Text=""
@@ -375,7 +375,7 @@
           </ScrollViewer>
         </Border>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,16,0,0" HorizontalAlignment="Right">
-          <Button x:Name="TerminalCloseBtn" Content="Close" Click="TerminalClose_Click"
+          <Button x:Name="TerminalCloseBtn" Content="" Click="TerminalClose_Click"
                   Padding="24,10" IsVisible="False"
                   Background="#12FFFFFF" CornerRadius="{StaticResource RadiusMd}"/>
         </StackPanel>

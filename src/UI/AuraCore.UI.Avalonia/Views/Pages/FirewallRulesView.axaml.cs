@@ -13,13 +13,17 @@ public partial class FirewallRulesView : UserControl
         Loaded += (s, e) => ApplyLocalization();
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsWindows()) { SubText.Text = "Windows only"; return; }
+        if (!OperatingSystem.IsWindows()) { _isShowingHint = false; SubText.Text = LocalizationService._("common.windowsOnly"); return; }
         ScanBtn.IsEnabled = false;
-        SubText.Text = "Scanning firewall rules...";
+        _isShowingHint = false;
+        SubText.Text = LocalizationService._("firewall.scanning");
 
         try
         {
@@ -66,7 +70,7 @@ public partial class FirewallRulesView : UserControl
             TotalRules.Text = rules.Count.ToString();
             EnabledRules.Text = rules.Count(r => r.Enabled.Contains("Yes", StringComparison.OrdinalIgnoreCase)).ToString();
             BlockedRules.Text = rules.Count(r => r.Action.Contains("Block", StringComparison.OrdinalIgnoreCase)).ToString();
-            SubText.Text = $"Found {rules.Count} rules";
+            SubText.Text = string.Format(LocalizationService._("firewall.foundRules"), rules.Count);
 
             var items = rules.Take(200).Select(r =>
             {
@@ -105,12 +109,28 @@ public partial class FirewallRulesView : UserControl
             }).ToList();
             RulesList.ItemsSource = items;
         }
-        catch (Exception ex) { SubText.Text = $"Error: {ex.Message}"; }
+        catch (Exception ex) { SubText.Text = $"{LocalizationService._("common.error")}: {ex.Message}"; }
         finally { ScanBtn.IsEnabled = true; }
     }
 
     private void ApplyLocalization()
     {
-        PageTitle.Text = LocalizationService._("nav.firewallRules");
+        var L = LocalizationService._;
+        PageTitle.Text      = L("nav.firewallRules");
+        ModuleHdr.Title     = L("firewall.title");
+        ModuleHdr.Subtitle  = L("firewall.subtitle");
+        ScanRulesLabel.Text = L("firewall.action.scan");
+        SearchBox.Watermark = L("firewall.searchWatermark");
+        StatTotal.Label     = L("firewall.stat.total");
+        StatEnabled.Label   = L("firewall.stat.enabled");
+        StatBlocked.Label   = L("firewall.stat.blocked");
+        // Only reset hint text when idle (not showing a live scan result)
+        if (string.IsNullOrEmpty(SubText.Text) || _isShowingHint)
+        {
+            SubText.Text = L("firewall.hint");
+            _isShowingHint = true;
+        }
     }
+
+    private bool _isShowingHint = true;
 }

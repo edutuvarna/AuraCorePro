@@ -22,10 +22,14 @@ public partial class IsoBuilderView : UserControl
 
     private int _currentStep;
     private const int TotalSteps = 12;
-    private static readonly string[] StepTitles = {
-        "Select ISO", "User Account", "OOBE Settings", "WiFi",
-        "Win11 Bypass", "Bloatware", "EXE Bundler", "Driver Backup",
-        "Winget Apps", "Registry Presets", "Post-Install", "Review & Build"
+    private static string[] GetStepTitles() => new[]
+    {
+        LocalizationService._("isoBuild.step.selectIso"), LocalizationService._("isoBuild.step.userAccount"),
+        LocalizationService._("isoBuild.step.oobe"),      LocalizationService._("isoBuild.step.wifi"),
+        LocalizationService._("isoBuild.step.win11Bypass"), LocalizationService._("isoBuild.step.bloatware"),
+        LocalizationService._("isoBuild.step.exeBundler"), LocalizationService._("isoBuild.step.driverBackup"),
+        LocalizationService._("isoBuild.step.winget"),    LocalizationService._("isoBuild.step.registry"),
+        LocalizationService._("isoBuild.step.postInstall"), LocalizationService._("isoBuild.step.review"),
     };
     private readonly List<Button> _stepButtons = new();
 
@@ -33,12 +37,18 @@ public partial class IsoBuilderView : UserControl
     {
         InitializeComponent();
         Loaded += OnLoaded;
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         try
         {
+            ApplyLocalization();
             BuildStepper();
             ShowStep(0);
             PopulateBloatware();
@@ -63,11 +73,158 @@ public partial class IsoBuilderView : UserControl
     // WIZARD NAVIGATION
     // ══════════════════════════════════════════
 
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        PageTitle.Text              = L("nav.isoBuilder");
+        ModuleHdr.Title             = L("isoBuild.title");
+        ModuleHdr.Subtitle          = L("isoBuild.subtitle");
+        SidebarTitle.Text           = L("isoBuild.title");
+        TemplatesLabel.Text         = L("isoBuild.templates");
+        TemplateCombo.PlaceholderText = L("isoBuild.loadTemplate");
+        TmplGaming.Content          = L("isoBuild.tmpl.gaming");
+        TmplOffice.Content          = L("isoBuild.tmpl.office");
+        TmplPrivacy.Content         = L("isoBuild.tmpl.privacy");
+        TmplDeveloper.Content       = L("isoBuild.tmpl.developer");
+        TmplMinimal.Content         = L("isoBuild.tmpl.minimal");
+        ImportLabel.Text            = L("common.import");
+        ExportLabel.Text            = L("common.export");
+        // Panel 0
+        P0Title.Text                = L("isoBuild.s0.title");
+        P0Desc.Text                 = L("isoBuild.s0.desc");
+        BrowseIsoBtn.Content        = L("isoBuild.s0.browse");
+        if (string.IsNullOrEmpty(IsoPathText.Text))
+            IsoPathText.Text        = L("isoBuild.s0.noFile");
+        // Panel 1
+        P1Title.Text                = L("isoBuild.s1.title");
+        P1Desc.Text                 = L("isoBuild.s1.desc");
+        LocalAccountRadio.Content   = L("isoBuild.s1.localAccount");
+        MsAccountRadio.Content      = L("isoBuild.s1.msAccount");
+        UsernameBox.Watermark       = L("isoBuild.s1.usernameWatermark");
+        PasswordBox.Watermark       = L("isoBuild.s1.passwordWatermark");
+        AutoLoginCheck.Content      = L("isoBuild.s1.autoLogin");
+        // Panel 2
+        P2Title.Text                = L("isoBuild.s2.title");
+        P2Desc.Text                 = L("isoBuild.s2.desc");
+        SkipOobeCheck.Content       = L("isoBuild.s2.skipOobe");
+        SkipEulaCheck.Content       = L("isoBuild.s2.skipEula");
+        DisableTelemetryCheck.Content = L("isoBuild.s2.disableTelemetry");
+        DisableCortanaCheck.Content = L("isoBuild.s2.disableCortana");
+        DisableOneDriveCheck.Content = L("isoBuild.s2.disableOneDrive");
+        ComputerNameBox.Watermark   = L("isoBuild.s2.computerNameWatermark");
+        LangEnUs.Content            = L("isoBuild.s2.lang.enUs");
+        LangTrTr.Content            = L("isoBuild.s2.lang.trTr");
+        LangDeDe.Content            = L("isoBuild.s2.lang.deDe");
+        LangFrFr.Content            = L("isoBuild.s2.lang.frFr");
+        LangEsEs.Content            = L("isoBuild.s2.lang.esEs");
+        LangRuRu.Content            = L("isoBuild.s2.lang.ruRu");
+        TzUtc.Content               = L("isoBuild.s2.tz.utc");
+        TzEastern.Content           = L("isoBuild.s2.tz.eastern");
+        TzPacific.Content           = L("isoBuild.s2.tz.pacific");
+        TzCet.Content               = L("isoBuild.s2.tz.cet");
+        TzTurkey.Content            = L("isoBuild.s2.tz.turkey");
+        TzMoscow.Content            = L("isoBuild.s2.tz.moscow");
+        // Panel 3
+        P3Title.Text                = L("isoBuild.s3.title");
+        P3Desc.Text                 = L("isoBuild.s3.desc");
+        EnableWifiCheck.Content     = L("isoBuild.s3.enableWifi");
+        WifiSsidBox.Watermark       = L("isoBuild.s3.ssidWatermark");
+        WifiPasswordBox.Watermark   = L("isoBuild.s3.passwordWatermark");
+        WifiSec1.Content            = L("isoBuild.s3.wpa2");
+        WifiSec2.Content            = L("isoBuild.s3.wpa3");
+        WifiSec3.Content            = L("isoBuild.s3.wpaLegacy");
+        WifiSec4.Content            = L("isoBuild.s3.open");
+        WifiPlainTextNote.Text      = L("isoBuild.s3.plainTextNote");
+        // Panel 4
+        P4Title.Text                = L("isoBuild.s4.title");
+        BypassWarning.Text          = L("isoBuild.s4.warning");
+        BypassTpmCheck.Content      = L("isoBuild.s4.tpm");
+        BypassSecureBootCheck.Content = L("isoBuild.s4.secureBoot");
+        BypassRamCheck.Content      = L("isoBuild.s4.ram");
+        BypassStorageCheck.Content  = L("isoBuild.s4.storage");
+        BypassCpuCheck.Content      = L("isoBuild.s4.cpu");
+        // Panel 5
+        P5Title.Text                = L("isoBuild.s5.title");
+        P5Desc.Text                 = L("isoBuild.s5.desc");
+        SelectAllBtn.Content        = L("isoBuild.s5.selectAll");
+        DeselectAllBtn.Content      = L("isoBuild.s5.deselectAll");
+        // Panel 6
+        P6Title.Text                = L("isoBuild.s6.title");
+        P6Desc.Text                 = L("isoBuild.s6.desc");
+        AddFilesBtn.Content         = L("isoBuild.s6.addFiles");
+        ClearAllBtn.Content         = L("isoBuild.s6.clearAll");
+        SilentInstallCheck.Content  = L("isoBuild.s6.silentInstall");
+        if (string.IsNullOrEmpty(ExeCountText.Text))
+            ExeCountText.Text       = L("isoBuild.s6.noFiles");
+        // Panel 7
+        P7Title.Text                = L("isoBuild.s7.title");
+        P7Desc.Text                 = L("isoBuild.s7.desc");
+        ScanDriversBtn.Content      = L("isoBuild.s7.scanDrivers");
+        DriverAdminNote.Text        = L("isoBuild.s7.adminNote");
+        IncludeDriversCheck.Content = L("isoBuild.s7.includeDrivers");
+        // Panel 8
+        P8Title.Text                = L("isoBuild.s8.title");
+        P8Desc.Text                 = L("isoBuild.s8.desc");
+        CustomWingetBox.Watermark   = L("isoBuild.s8.customIdWatermark");
+        AddWingetBtn.Content        = L("common.add");
+        // Panel 9
+        P9Title.Text                = L("isoBuild.s9.title");
+        P9Desc.Text                 = L("isoBuild.s9.desc");
+        PresetDefaultCheck.Content  = L("iso.s10.default");
+        PresetGamingCheck.Content   = L("iso.s10.gaming");
+        PresetPrivacyCheck.Content  = L("iso.s10.privacy");
+        PresetDevCheck.Content      = L("iso.s10.dev");
+        PresetOfficeCheck.Content   = L("iso.s10.office");
+        // Panel 10
+        P10Title.Text               = L("isoBuild.s10.title");
+        P10Desc.Text                = L("isoBuild.s10.desc");
+        InstallWingetCheck.Content  = L("isoBuild.s10.installWinget");
+        EnableDarkModeCheck.Content = L("isoBuild.s10.darkMode");
+        ShowFileExtCheck.Content    = L("isoBuild.s10.fileExt");
+        ShowHiddenFilesCheck.Content = L("isoBuild.s10.hiddenFiles");
+        DisableWebSearchCheck.Content = L("isoBuild.s10.disableWebSearch");
+        ClassicRightClickCheck.Content = L("isoBuild.s10.classicRightClick");
+        DisableWidgetsCheck.Content = L("isoBuild.s10.disableWidgets");
+        DisableCopilotCheck.Content = L("isoBuild.s10.disableCopilot");
+        TaskbarLeftCheck.Content    = L("isoBuild.s10.taskbarLeft");
+        // Panel 11
+        P11Title.Text               = L("isoBuild.s11.title");
+        OutputFormatLabel.Text      = L("isoBuild.s11.outputFormat");
+        OutputUnattendOnly.Content  = L("isoBuild.s11.filesOnly");
+        OutputStandaloneIso.Content = L("isoBuild.s11.standaloneIso");
+        BuildSummaryLabel.Text      = L("isoBuild.s11.buildSummary");
+        DisclaimerText.Text         = L("isoBuild.s11.disclaimer");
+        DisclaimerCheck.Content     = L("isoBuild.s11.disclaimerAccept");
+        // Bottom nav
+        BackBtn.Content             = L("common.back");
+        NextBtn.Content             = L("common.next");
+        BuildBtn.Content            = L("isoBuild.action.build");
+        // Terminal overlay
+        BuildingTitle.Text          = L("isoBuild.terminal.title");
+        if (string.IsNullOrEmpty(TerminalStepText.Text))
+            TerminalStepText.Text   = L("isoBuild.terminal.initializing");
+        TerminalCloseBtn.Content    = L("common.close");
+        // Rebuild stepper with localized titles if already built
+        if (_stepButtons.Count > 0) RebuildStepperLabels();
+    }
+
+    private void RebuildStepperLabels()
+    {
+        var titles = GetStepTitles();
+        for (int i = 0; i < _stepButtons.Count && i < titles.Length; i++)
+        {
+            if (_stepButtons[i].Content is global::Avalonia.Controls.StackPanel sp && sp.Children.Count >= 2)
+                if (sp.Children[1] is TextBlock lbl) lbl.Text = titles[i];
+        }
+        StepIndicator.Text = string.Format(LocalizationService._("isoBuild.stepOf"), _currentStep + 1, TotalSteps);
+    }
+
     private void BuildStepper()
     {
         StepperPanel.Children.Clear();
         _stepButtons.Clear();
 
+        var titles = GetStepTitles();
         for (int i = 0; i < TotalSteps; i++)
         {
             var idx = i;
@@ -99,7 +256,7 @@ public partial class IsoBuilderView : UserControl
             sp.Children.Add(numBorder);
             sp.Children.Add(new TextBlock
             {
-                Text = StepTitles[i], FontSize = 13,
+                Text = titles[i], FontSize = 13,
                 VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                 Foreground = new SolidColorBrush(Color.Parse("#8888A0"))
             });
@@ -144,7 +301,7 @@ public partial class IsoBuilderView : UserControl
             }
         }
 
-        StepIndicator.Text = $"Step {step + 1} of {TotalSteps}";
+        StepIndicator.Text = string.Format(LocalizationService._("isoBuild.stepOf"), step + 1, TotalSteps);
         BackBtn.IsVisible = step > 0;
         NextBtn.IsVisible = step < TotalSteps - 1;
         BuildBtn.IsVisible = step == TotalSteps - 1;
@@ -304,7 +461,7 @@ public partial class IsoBuilderView : UserControl
             if (files.Count > 0)
             {
                 _isoPath = files[0].Path.LocalPath;
-                IsoPathText.Text = System.IO.Path.GetFileName(_isoPath);
+                IsoPathText.Text = System.IO.Path.GetFileName(_isoPath) ?? "";
                 var fi = new FileInfo(_isoPath);
                 var sizeMb = fi.Length / (1024.0 * 1024.0);
                 var sizeGb = sizeMb / 1024.0;
@@ -345,7 +502,7 @@ public partial class IsoBuilderView : UserControl
                     });
                 }
             }
-            ExeCountText.Text = $"{_exePaths.Count} file(s) added";
+            ExeCountText.Text = string.Format(LocalizationService._("isoBuild.s6.filesAdded"), _exePaths.Count);
         }
         catch (Exception ex) { Debug.WriteLine($"Add EXE error: {ex.Message}"); }
     }
@@ -354,7 +511,7 @@ public partial class IsoBuilderView : UserControl
     {
         _exePaths.Clear();
         ExeFilesList.Children.Clear();
-        ExeCountText.Text = "No files added";
+        ExeCountText.Text = LocalizationService._("isoBuild.s6.noFiles");
     }
 
     // ══════════════════════════════════════════
@@ -364,8 +521,8 @@ public partial class IsoBuilderView : UserControl
     private void ScanDrivers_Click(object? sender, RoutedEventArgs e)
     {
         DriverScanStatus.Text = OperatingSystem.IsWindows()
-            ? "Driver scanning requires administrator mode."
-            : "Driver scan only available on Windows.";
+            ? LocalizationService._("isoBuild.s7.requiresAdmin")
+            : LocalizationService._("isoBuild.s7.windowsOnly");
     }
 
     // ══════════════════════════════════════════
@@ -494,24 +651,25 @@ public partial class IsoBuilderView : UserControl
 
     private void UpdateSummary()
     {
+        var L = LocalizationService._;
         var sb = new StringBuilder();
-        sb.AppendLine($"ISO: {(_isoPath != null ? System.IO.Path.GetFileName(_isoPath) : "None")}");
-        sb.AppendLine($"Account: {(LocalAccountRadio.IsChecked == true ? "Local" : "Microsoft")}");
-        sb.AppendLine($"Bloatware to remove: {_bloatware.Count(b => b.Selected)}");
-        sb.AppendLine($"Custom EXEs: {_exePaths.Count}");
+        sb.AppendLine($"ISO: {(_isoPath != null ? System.IO.Path.GetFileName(_isoPath) : L("isoBuild.summary.none"))}");
+        sb.AppendLine($"{L("isoBuild.summary.account")}: {(LocalAccountRadio.IsChecked == true ? L("isoBuild.summary.local") : L("isoBuild.summary.microsoft"))}");
+        sb.AppendLine($"{L("isoBuild.summary.bloatware")}: {_bloatware.Count(b => b.Selected)}");
+        sb.AppendLine($"{L("isoBuild.summary.exes")}: {_exePaths.Count}");
         var selectedApps = _wingetApps.Count(w => w.Selected) + _customWingetIds.Count;
-        sb.AppendLine($"Winget apps: {selectedApps}");
+        sb.AppendLine($"{L("isoBuild.summary.winget")}: {selectedApps}");
         var presets = new List<string>();
-        if (PresetDefaultCheck.IsChecked == true) presets.Add("Default");
-        if (PresetGamingCheck.IsChecked == true) presets.Add("Gaming");
-        if (PresetPrivacyCheck.IsChecked == true) presets.Add("Privacy");
-        if (PresetDevCheck.IsChecked == true) presets.Add("Developer");
-        if (PresetOfficeCheck.IsChecked == true) presets.Add("Office");
-        sb.AppendLine($"Registry presets: {(presets.Count > 0 ? string.Join(", ", presets) : "None")}");
-        sb.AppendLine($"Output: {(OutputUnattendOnly.IsChecked == true ? "Files only" : "Standalone ISO")}");
+        if (PresetDefaultCheck.IsChecked == true) presets.Add(L("isoBuild.summary.presetDefault"));
+        if (PresetGamingCheck.IsChecked == true) presets.Add(L("isoBuild.summary.presetGaming"));
+        if (PresetPrivacyCheck.IsChecked == true) presets.Add(L("isoBuild.summary.presetPrivacy"));
+        if (PresetDevCheck.IsChecked == true) presets.Add(L("isoBuild.summary.presetDev"));
+        if (PresetOfficeCheck.IsChecked == true) presets.Add(L("isoBuild.summary.presetOffice"));
+        sb.AppendLine($"{L("isoBuild.summary.presets")}: {(presets.Count > 0 ? string.Join(", ", presets) : L("isoBuild.summary.none"))}");
+        sb.AppendLine($"{L("isoBuild.summary.output")}: {(OutputUnattendOnly.IsChecked == true ? L("isoBuild.s11.filesOnly") : L("isoBuild.s11.standaloneIso"))}");
 
         SummaryText.Text = sb.ToString();
-        EstimatedTimeText.Text = "Estimated time: ~5-15 seconds";
+        EstimatedTimeText.Text = LocalizationService._("isoBuild.s11.estimatedTime");
     }
 
     private IsoBuilderConfig BuildConfig()
@@ -572,7 +730,7 @@ public partial class IsoBuilderView : UserControl
     {
         if (string.IsNullOrEmpty(_isoPath) || !File.Exists(_isoPath))
         {
-            SummaryText.Text = "ERROR: Please select a valid ISO file first (Step 1).";
+            SummaryText.Text = LocalizationService._("isoBuild.error.noIso");
             return;
         }
 
@@ -697,15 +855,19 @@ public partial class IsoBuilderView : UserControl
                 using var identity = WindowsIdentity.GetCurrent();
                 var principal = new WindowsPrincipal(identity);
                 var isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
-                AdminStatusText.Text = isAdmin ? "Running as Administrator" : "Not Administrator (limited)";
+                AdminStatusText.Text = isAdmin
+                    ? LocalizationService._("isoBuild.admin.isAdmin")
+                    : LocalizationService._("isoBuild.admin.notAdmin");
                 AdminStatusText.Foreground = new SolidColorBrush(Color.Parse(isAdmin ? "#00D4AA" : "#F59E0B"));
             }
             else
             {
-                AdminStatusText.Text = OperatingSystem.IsLinux() ? "Linux (root check)" : "macOS";
+                AdminStatusText.Text = OperatingSystem.IsLinux()
+                    ? LocalizationService._("isoBuild.admin.linux")
+                    : LocalizationService._("isoBuild.admin.macos");
             }
         }
-        catch { AdminStatusText.Text = "Admin status unknown"; }
+        catch { AdminStatusText.Text = LocalizationService._("isoBuild.admin.unknown"); }
     }
 
     // ══════════════════════════════════════════

@@ -6,22 +6,23 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Hosts Editor"
+      <controls:ModuleHeader x:Name="ModuleHdr"
+                             Title=""
                              Subtitle="Manage /etc/hosts entries with a visual interface">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button Classes="action-btn" Click="Backup_Click"
                     VerticalAlignment="Center" Padding="12,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F4BE;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock Text="Backup" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+                <TextBlock Text="💾" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="BackupLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
             <Button Classes="action-btn" Click="Reload_Click"
                     VerticalAlignment="Center" Padding="12,8">
               <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="&#x1F504;" FontSize="{DynamicResource FontSizeBody}"/>
-                <TextBlock x:Name="ReloadLabel" Text="Reload" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+                <TextBlock Text="🔄" FontSize="{DynamicResource FontSizeBody}"/>
+                <TextBlock x:Name="ReloadLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
               </StackPanel>
             </Button>
             <!-- PageTitle preserved for localization -->
@@ -36,11 +37,11 @@
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Border Width="20" Height="20" CornerRadius="5" VerticalAlignment="Center"
                     Background="{DynamicResource BgCardBrush}">
-              <TextBlock Text="&#x25CF;" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock Text="●" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="#F59E0B"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="File:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="FileLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        VerticalAlignment="Center"/>
             <TextBlock x:Name="FilePath" Text="--"
@@ -49,7 +50,7 @@
                        TextTrimming="CharacterEllipsis"/>
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Entries:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="EntriesLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        VerticalAlignment="Center"/>
             <TextBlock x:Name="EntryCount" Text="--"
@@ -57,7 +58,7 @@
                        Foreground="#F59E0B" VerticalAlignment="Center"/>
           </StackPanel>
           <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Admin:" FontSize="{DynamicResource FontSizeBodySmall}"
+            <TextBlock x:Name="AdminLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}"
                        Foreground="{DynamicResource TextMutedBrush}"
                        VerticalAlignment="Center"/>
             <TextBlock x:Name="AdminStatus" Text="--"
@@ -66,7 +67,7 @@
           </StackPanel>
           <Border Grid.Column="3" x:Name="UnsavedBadge" IsVisible="False"
                   CornerRadius="8" Background="{DynamicResource BgCardBrush}" Padding="10,4">
-            <TextBlock Text="Unsaved Changes" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
+            <TextBlock x:Name="UnsavedLabel" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="SemiBold"
                        Foreground="{DynamicResource StatusWarningBrush}"/>
           </Border>
         </Grid>
@@ -74,7 +75,7 @@
 
       <!-- Subtitle / status text -->
       <TextBlock x:Name="SubtitleText"
-                 Text="Manage /etc/hosts entries with a visual interface"
+                 Text=""
                  FontSize="{DynamicResource FontSizeBodySmall}"
                  Foreground="{DynamicResource TextMutedBrush}"
                  IsVisible="False"/>
@@ -82,20 +83,20 @@
       <!-- Add Entry Row -->
       <controls:GlassCard>
         <Grid ColumnDefinitions="150,*,*,Auto">
-          <TextBox x:Name="NewIp" Watermark="IP Address" Margin="0,0,8,0"
+          <TextBox x:Name="NewIp" Margin="0,0,8,0"
                    Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
                    Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontSizeBody}"
                    CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
-          <TextBox Grid.Column="1" x:Name="NewHost" Watermark="Hostname" Margin="0,0,8,0"
+          <TextBox Grid.Column="1" x:Name="NewHost" Margin="0,0,8,0"
                    Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
                    Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontSizeBody}"
                    CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
-          <TextBox Grid.Column="2" x:Name="NewComment" Watermark="Comment (optional)" Margin="0,0,8,0"
+          <TextBox Grid.Column="2" x:Name="NewComment" Margin="0,0,8,0"
                    Background="Transparent" BorderBrush="{DynamicResource BorderSubtleBrush}"
                    Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontSizeBody}"
                    CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
           <Button Grid.Column="3" Classes="action-btn" Click="AddEntry_Click" Padding="14,6">
-            <TextBlock Text="+ Add" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
+            <TextBlock x:Name="AddLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentPrimaryBrush}"/>
           </Button>
         </Grid>
@@ -111,19 +112,19 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
               <Border Width="16" Height="16" CornerRadius="4"
                       Background="{DynamicResource BgCardBrush}">
-                <TextBlock Text="&#x25C9;" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
+                <TextBlock Text="◉" FontSize="{DynamicResource FontSizeLabel}" Foreground="#F59E0B"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
-              <TextBlock Text="IP ADDRESS" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+              <TextBlock x:Name="ColIpLabel" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                          Foreground="{DynamicResource TextMutedBrush}"/>
             </StackPanel>
-            <TextBlock Grid.Column="2" Text="HOSTNAME" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+            <TextBlock x:Name="ColHostLabel" Grid.Column="2" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="3" Text="COMMENT" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+            <TextBlock x:Name="ColCommentLabel" Grid.Column="3" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}"/>
-            <TextBlock Grid.Column="4" Text="SOURCE" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+            <TextBlock x:Name="ColSourceLabel" Grid.Column="4" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="ACTIONS" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
+            <TextBlock x:Name="ColActionsLabel" Grid.Column="5" Text="" FontSize="{DynamicResource FontSizeLabel}" FontWeight="Bold"
                        Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center"/>
           </Grid>
           <ItemsControl x:Name="HostsList">
@@ -155,7 +156,7 @@
                     <Button Grid.Column="5" Tag="{Binding DeleteTag}" Classes="action-btn"
                             Padding="6,3" Click="Delete_Click"
                             FontSize="{DynamicResource FontSizeLabel}"
-                            Content="Delete" IsVisible="{Binding CanEdit}" HorizontalAlignment="Center"/>
+                            Content="{Binding DeleteLabel}" IsVisible="{Binding CanEdit}" HorizontalAlignment="Center"/>
                   </Grid>
                 </Border>
               </DataTemplate>
@@ -167,20 +168,20 @@
       <!-- Bottom Bar: Import + Save -->
       <Grid ColumnDefinitions="*,Auto">
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBox x:Name="ImportUrl" Watermark="Block list URL (e.g. StevenBlack hosts)"
+          <TextBox x:Name="ImportUrl"
                    MinWidth="350" Background="Transparent"
                    BorderBrush="{DynamicResource BorderSubtleBrush}"
                    Foreground="{DynamicResource TextPrimaryBrush}" FontSize="{DynamicResource FontSizeBodySmall}"
                    CornerRadius="{StaticResource RadiusSm}" Padding="8,6"/>
           <Button Classes="action-btn" Click="Import_Click" Padding="12,6">
-            <TextBlock Text="Import Block List" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
+            <TextBlock x:Name="ImportBlockListLabel" Text="" FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"/>
           </Button>
         </StackPanel>
         <Button Grid.Column="1" x:Name="SaveBtn" Click="Save_Click"
                 Background="{DynamicResource AccentPrimaryBrush}"
                 Foreground="{DynamicResource TextPrimaryBrush}" Padding="20,10"
                 CornerRadius="{StaticResource RadiusMd}"
-                FontWeight="Bold" FontSize="{DynamicResource FontSizeBody}" Content="Save Changes"
+                FontWeight="Bold" FontSize="{DynamicResource FontSizeBody}" Content=""
                 HorizontalAlignment="Right"/>
       </Grid>
 

@@ -6,11 +6,12 @@
     <StackPanel Spacing="16">
 
       <!-- Header -->
-      <controls:ModuleHeader Title="Network Monitor"
+      <controls:ModuleHeader x:Name="ModuleHdr"
+                             Title=""
                              Subtitle="Real-time network interface statistics and per-adapter bandwidth">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Refresh" Click="Scan_Click" Classes="action-btn" Padding="14,8"
+            <Button x:Name="RefreshBtn" Content="" Click="Scan_Click" Classes="action-btn" Padding="14,8"
                     VerticalAlignment="Center"/>
             <!-- PageTitle: invisible, code-behind writes localized string -->
             <TextBlock x:Name="PageTitle" IsVisible="False"/>
@@ -20,13 +21,13 @@
 
       <!-- Stats row -->
       <controls:StatRow>
-        <controls:StatCard Label="INTERFACES"
+        <controls:StatCard x:Name="StatIfaces"
                            Value="{Binding #IfaceCount.Text}"
                            ValueBrush="{DynamicResource TextPrimaryBrush}"/>
-        <controls:StatCard Label="TOTAL SENT"
+        <controls:StatCard x:Name="StatSent"
                            Value="{Binding #TotalSent.Text}"
                            ValueBrush="{DynamicResource AccentBlueBrush}"/>
-        <controls:StatCard Label="TOTAL RECEIVED"
+        <controls:StatCard x:Name="StatRecv"
                            Value="{Binding #TotalRecv.Text}"
                            ValueBrush="{DynamicResource StatusSuccessBrush}"/>
       </controls:StatRow>
@@ -42,11 +43,11 @@
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Border Width="20" Height="20" CornerRadius="6"
                     Background="{DynamicResource BgCardBrush}">
-              <TextBlock Text="&#x25C9;" FontSize="{DynamicResource FontSizeLabel}"
+              <TextBlock Text="◉" FontSize="{DynamicResource FontSizeLabel}"
                          Foreground="{DynamicResource AccentPrimaryBrush}"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-            <TextBlock Text="Network Interfaces"
+            <TextBlock x:Name="IfacesSectionLabel" Text=""
                        FontSize="{DynamicResource FontSizeBodySmall}" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
           </StackPanel>

@@ -13,6 +13,9 @@ public partial class NetworkMonitorView : UserControl
         Loaded += (s, e) => { RunScan(); ApplyLocalization(); };
         LocalizationService.LanguageChanged += () =>
             global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     private void Scan_Click(object? sender, RoutedEventArgs e) => RunScan();
@@ -82,5 +85,16 @@ public partial class NetworkMonitorView : UserControl
         _ => $"{b / (1024.0 * 1024 * 1024):F2} GB"
     };
 
-    private void ApplyLocalization() { PageTitle.Text = LocalizationService._("nav.networkMonitor"); }
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        PageTitle.Text          = L("nav.networkMonitor");
+        ModuleHdr.Title         = L("netMon.title");
+        ModuleHdr.Subtitle      = L("netMon.subtitle");
+        RefreshBtn.Content      = L("common.refresh");
+        StatIfaces.Label        = L("netMon.stat.interfaces");
+        StatSent.Label          = L("netMon.stat.totalSent");
+        StatRecv.Label          = L("netMon.stat.totalRecv");
+        IfacesSectionLabel.Text = L("netMon.section.interfaces");
+    }
 }

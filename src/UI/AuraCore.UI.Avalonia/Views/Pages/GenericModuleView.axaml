@@ -12,10 +12,10 @@
             Padding="32" MinHeight="300">
       <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
         <TextBlock x:Name="ModIcon" FontSize="32" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="ModStatus" Text="Module loaded successfully"
+        <TextBlock x:Name="ModStatus" Text=""
                    FontSize="14" Foreground="{DynamicResource AccentPrimaryBrush}"
                    HorizontalAlignment="Center"/>
-        <TextBlock Text="This module is active. Full UI will be ported in upcoming updates."
+        <TextBlock x:Name="ModPortingNote" Text=""
                    FontSize="12" Foreground="{DynamicResource TextMutedBrush}"
                    HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="400"
                    TextAlignment="Center"/>

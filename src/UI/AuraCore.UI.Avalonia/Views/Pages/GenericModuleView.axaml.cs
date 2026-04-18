@@ -5,14 +5,38 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class GenericModuleView : UserControl
 {
-    public GenericModuleView() => InitializeComponent();
+    private IOptimizationModule? _module;
+
+    public GenericModuleView()
+    {
+        InitializeComponent();
+        Loaded += (s, e) => ApplyLocalization();
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+        Unloaded += (s, e) =>
+            LocalizationService.LanguageChanged -= () =>
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
+    }
 
     public GenericModuleView(IOptimizationModule module) : this()
     {
+        _module = module;
         ModTitle.Text = module.DisplayName;
-        ModSubtitle.Text = $"Category: {module.Category} | Risk: {module.Risk}";
-        ModPlatform.Text = $"Platform: {module.Platform}";
+        ModSubtitle.Text = $"{LocalizationService._("genMod.category")}: {module.Category} | {LocalizationService._("genMod.risk")}: {module.Risk}";
+        ModPlatform.Text = $"{LocalizationService._("genMod.platform")}: {module.Platform}";
         ModIcon.Text = GetCategoryIcon(module.Category);
+    }
+
+    private void ApplyLocalization()
+    {
+        var L = LocalizationService._;
+        ModStatus.Text       = L("genMod.loadedOk");
+        ModPortingNote.Text  = L("genMod.portingNote");
+        if (_module is not null)
+        {
+            ModSubtitle.Text = $"{L("genMod.category")}: {_module.Category} | {L("genMod.risk")}: {_module.Risk}";
+            ModPlatform.Text = $"{L("genMod.platform")}: {_module.Platform}";
+        }
     }
 
     private static string GetCategoryIcon(AuraCore.Domain.Enums.OptimizationCategory cat) => cat switch

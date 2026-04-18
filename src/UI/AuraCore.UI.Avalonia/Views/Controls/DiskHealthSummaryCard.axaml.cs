@@ -23,6 +23,24 @@ public partial class DiskHealthSummaryCard : UserControl
     public DiskHealthSummaryCard()
     {
         InitializeComponent();
+        ApplyLocalization();
+        LocalizationService.LanguageChanged += () =>
+            Dispatcher.UIThread.Post(ApplyLocalization);
+    }
+
+    private void ApplyLocalization()
+    {
+        var titleText = this.FindControl<TextBlock>("TitleText");
+        if (titleText is not null)
+            titleText.Text = LocalizationService.Get("diskHealth.card.title");
+
+        var viewDetailsBtn = this.FindControl<Button>("ViewDetailsBtn");
+        if (viewDetailsBtn is not null)
+            viewDetailsBtn.Content = LocalizationService.Get("diskHealth.card.viewDetails");
+
+        var worstTempLabel = this.FindControl<TextBlock>("WorstTempLabel");
+        if (worstTempLabel is not null)
+            worstTempLabel.Text = LocalizationService.Get("diskHealth.card.worstTemp");
     }
 
     /// <summary>

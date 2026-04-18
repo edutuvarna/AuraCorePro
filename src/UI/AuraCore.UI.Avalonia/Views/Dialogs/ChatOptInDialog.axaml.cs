@@ -15,6 +15,8 @@ public partial class ChatOptInDialog : Window
     {
         InitializeComponent();
         ApplyLocalization();
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     public ChatOptInDialog(ChatOptInDialogViewModel vm) : this()
@@ -83,6 +85,8 @@ public partial class ChatOptInDialog : Window
 
     private void ApplyLocalization()
     {
+        Title = LocalizationService.Get("chatOptIn.step1.title");
+
         var step1Label = this.FindControl<TextBlock>("Step1Label");
         if (step1Label is not null)
             step1Label.Text = LocalizationService.Get("chatOptIn.progress.step1");
@@ -98,6 +102,30 @@ public partial class ChatOptInDialog : Window
         var heroRationale = this.FindControl<TextBlock>("HeroRationale");
         if (heroRationale is not null)
             heroRationale.Text = LocalizationService.Get("chatOptIn.recommended.defaultRationale");
+
+        var stepHeaderKicker = this.FindControl<TextBlock>("StepHeaderKicker");
+        if (stepHeaderKicker is not null)
+            stepHeaderKicker.Text = LocalizationService.Get("chatOptIn.step1.kicker");
+
+        var stepHeaderTitle = this.FindControl<TextBlock>("StepHeaderTitle");
+        if (stepHeaderTitle is not null)
+            stepHeaderTitle.Text = LocalizationService.Get("chatOptIn.step1.experimentalHeader");
+
+        var step1Body = this.FindControl<TextBlock>("Step1Body");
+        if (step1Body is not null)
+            step1Body.Text = LocalizationService.Get("chatOptIn.step1.body1");
+
+        var step1BodySub = this.FindControl<TextBlock>("Step1BodySub");
+        if (step1BodySub is not null)
+            step1BodySub.Text = LocalizationService.Get("chatOptIn.step1.body2");
+
+        var cancelBtn = this.FindControl<Button>("Step1CancelBtn");
+        if (cancelBtn is not null)
+            cancelBtn.Content = LocalizationService.Get("chatOptIn.step1.cancelButton");
+
+        var continueBtn = this.FindControl<Button>("Step1ContinueBtn");
+        if (continueBtn is not null)
+            continueBtn.Content = LocalizationService.Get("chatOptIn.step1.continueButton");
     }
 
     private void InitializeComponent() => AvaloniaXamlLoader.Load(this);

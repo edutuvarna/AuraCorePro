@@ -5,12 +5,11 @@
   <controls:GlassCard>
     <StackPanel Spacing="8">
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock x:Name="TitleText" Text="Disk Health"
+        <TextBlock x:Name="TitleText" Text="—"
                    FontWeight="SemiBold" FontSize="{DynamicResource FontSizeBody}"
                    Foreground="{DynamicResource TextPrimaryBrush}"/>
-        <Button Grid.Column="1" Classes="link-btn"
+        <Button x:Name="ViewDetailsBtn" Grid.Column="1" Classes="link-btn"
                 Click="ViewDetails_Click"
-                Content="View details →"
                 FontSize="{DynamicResource FontSizeBodySmall}"/>
       </Grid>
       <TextBlock x:Name="StatusLine" Text="—"
@@ -24,7 +23,7 @@
                      Foreground="{DynamicResource TextPrimaryBrush}"/>
         </StackPanel>
         <StackPanel>
-          <TextBlock Text="Worst temp" FontSize="{DynamicResource FontSizeBodySmall}"
+          <TextBlock x:Name="WorstTempLabel" FontSize="{DynamicResource FontSizeBodySmall}"
                      Foreground="{DynamicResource TextMutedBrush}"/>
           <TextBlock x:Name="WorstTemp" Text="—" FontWeight="SemiBold"
                      Foreground="{DynamicResource TextPrimaryBrush}"/>

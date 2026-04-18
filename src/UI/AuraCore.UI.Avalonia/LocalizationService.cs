@@ -1614,6 +1614,27 @@ public static class LocalizationService
         ["privhelper.dialog.timeout"]       = "Helper was installed but pipe did not come up within 5 seconds.",
         ["privhelper.dialog.failed"]        = "Install failed. Check Event Viewer for details.",
         ["privhelper.notInstalled.toast"]   = "Privileged helper not installed.",
+
+        // ── Batch 3: Disk Health summary card ──
+        ["diskHealth.card.title"]      = "Disk Health",
+        ["diskHealth.card.viewDetails"] = "View details \u2192",
+        ["diskHealth.card.worstTemp"]  = "Worst temp",
+
+        // ── Batch 3: AI Consent dialog ──
+        ["aiConsent.title"]       = "Help AuraCore Learn",
+        ["aiConsent.description"] = "AuraCore Pro uses local AI to analyze your system. To improve AI accuracy, we can collect anonymous usage statistics (CPU/RAM averages, disk trends). No personal data is collected. All AI analysis runs locally on your device.",
+        ["aiConsent.allow"]       = "\u2713 Allow",
+        ["aiConsent.decline"]     = "\u2717 Decline",
+        ["aiConsent.note"]        = "You can change this later in Settings.",
+
+        // ── Batch 3: ChatOptIn step 1 header / body ──
+        ["chatOptIn.step1.kicker"]             = "\u2756 CORTEX CHAT \u2014 STEP 1 of 2",
+        ["chatOptIn.step1.experimentalHeader"] = "\u26A0 Experimental Feature",
+        ["chatOptIn.step1.body1"]              = "CORTEX Chat uses a local AI model that may produce inaccurate or misleading outputs. Always verify any suggestions before applying them to your system.",
+        ["chatOptIn.step1.body2"]              = "This feature is under active development.",
+
+        // ── Batch 3: Model Manager downloading label ──
+        ["modelManager.downloading"] = "Downloading...",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -3168,6 +3189,27 @@ public static class LocalizationService
         ["privhelper.dialog.timeout"]       = "Yardımcı kuruldu ancak 5 saniye içinde hazır olmadı.",
         ["privhelper.dialog.failed"]        = "Kurulum başarısız. Ayrıntılar için Olay Görüntüleyici'yi kontrol edin.",
         ["privhelper.notInstalled.toast"]   = "Yetkili yardımcı kurulu değil.",
+
+        // ── Batch 3: Disk Health summary card ──
+        ["diskHealth.card.title"]       = "Disk Sa\u011Fl\u0131\u011F\u0131",
+        ["diskHealth.card.viewDetails"] = "Ayr\u0131nt\u0131lar\u0131 g\u00F6r \u2192",
+        ["diskHealth.card.worstTemp"]   = "En y\u00FCksek s\u0131cakl\u0131k",
+
+        // ── Batch 3: AI Consent dialog ──
+        ["aiConsent.title"]       = "AuraCore'un \u00D6\u011Frenmesine Yard\u0131m Et",
+        ["aiConsent.description"] = "AuraCore Pro, sisteminizi analiz etmek i\u00E7in lokal yapay zeka kullan\u0131r. Yapay zekan\u0131n do\u011Frulu\u011Funu art\u0131rmak i\u00E7in anonim kullan\u0131m istatistikleri (CPU/RAM ortalamalar\u0131, disk trendleri) toplayabiliriz. Ki\u015Fisel veri toplanmaz. T\u00FCm AI analizi cihaz\u0131n\u0131zda lokal olarak \u00E7al\u0131\u015F\u0131r.",
+        ["aiConsent.allow"]       = "\u2713 \u0130zin Veriyorum",
+        ["aiConsent.decline"]     = "\u2717 \u0130zin Vermiyorum",
+        ["aiConsent.note"]        = "Bu ayar\u0131 daha sonra Ayarlar sayfas\u0131ndan de\u011Fi\u015Ftirebilirsiniz.",
+
+        // ── Batch 3: ChatOptIn step 1 header / body ──
+        ["chatOptIn.step1.kicker"]             = "\u2756 CORTEX SOHBET \u2014 ADIM 1 / 2",
+        ["chatOptIn.step1.experimentalHeader"] = "\u26A0 Deneysel \u00D6zellik",
+        ["chatOptIn.step1.body1"]              = "CORTEX Sohbet yerel bir AI modeli kullan\u0131r ve hatal\u0131 veya yan\u0131lt\u0131c\u0131 \u00E7\u0131kt\u0131lar \u00FCretebilir. Sisteminize uygulamadan \u00F6nce t\u00FCm \u00F6nerileri do\u011Frulay\u0131n.",
+        ["chatOptIn.step1.body2"]              = "Bu \u00F6zellik aktif geli\u015Ftirme a\u015Famas\u0131ndad\u0131r.",
+
+        // ── Batch 3: Model Manager downloading label ──
+        ["modelManager.downloading"] = "\u0130ndiriliyor...",
     };
 
     private static void Save()

@@ -14,7 +14,6 @@
 
       <!-- Title -->
       <TextBlock x:Name="TitleText"
-                 Text="Install privilege helper"
                  FontSize="{StaticResource FontSizeHeading}"
                  FontWeight="SemiBold"
                  Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -27,8 +26,8 @@
 
       <!-- Action buttons -->
       <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,8,0,0">
-        <Button x:Name="CancelButton" Content="Cancel" Padding="16,8" />
-        <Button x:Name="InstallButton" Content="Install" Classes="primary" Padding="16,8" />
+        <Button x:Name="CancelButton" Padding="16,8" />
+        <Button x:Name="InstallButton" Classes="primary" Padding="16,8" />
       </StackPanel>
 
     </StackPanel>

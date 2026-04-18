@@ -10,11 +10,29 @@ public partial class ModelManagerDialog : UserControl
     public ModelManagerDialog()
     {
         InitializeComponent();
+        ApplyLocalization();
+        LocalizationService.LanguageChanged += () =>
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(ApplyLocalization);
     }
 
     public ModelManagerDialog(ModelManagerDialogViewModel vm) : this()
     {
         DataContext = vm;
+    }
+
+    private void ApplyLocalization()
+    {
+        var downloadingLabel = this.FindControl<TextBlock>("DownloadingLabel");
+        if (downloadingLabel is not null)
+            downloadingLabel.Text = LocalizationService.Get("modelManager.downloading");
+
+        var cancelBtn = this.FindControl<Button>("CancelDialogButton");
+        if (cancelBtn is not null)
+            cancelBtn.Content = LocalizationService.Get("modelManager.cancelButton");
+
+        var downloadBtn = this.FindControl<Button>("DownloadUseButton");
+        if (downloadBtn is not null)
+            downloadBtn.Content = LocalizationService.Get("modelManager.downloadButton");
     }
 
     private void OnRowTapped(object? sender, TappedEventArgs e)

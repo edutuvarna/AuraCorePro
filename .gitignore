@@ -86,3 +86,8 @@ node_modules/
 *.tmp
 *.temp
 ~$*
+
+# Phase 6.2 — Verify.Xunit pixel-regression received artifacts (never commit;
+# promote .received.* → .verified.* via accept-workflow instead).
+tests/AuraCore.Tests.UI.Avalonia/goldens/*.received.png
+tests/AuraCore.Tests.UI.Avalonia/goldens/*.received.txt

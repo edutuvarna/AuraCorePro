@@ -32,19 +32,17 @@
             <TextBlock x:Name="AppearanceLabel" Text="Appearance" FontSize="13" FontWeight="SemiBold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
           </StackPanel>
-          <Grid ColumnDefinitions="*,Auto">
-            <StackPanel>
-              <TextBlock x:Name="ThemeKeyLabel" Text="Theme" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
-              <TextBlock x:Name="ThemeDescLabel" Text="Choose between dark and light mode" FontSize="11"
-                         Foreground="{DynamicResource TextMutedBrush}"/>
+          <StackPanel Spacing="6">
+            <TextBlock x:Name="ThemeKeyLabel"
+                       FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock x:Name="ThemeDescLabel"
+                       FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="14" Margin="0,8,0,0">
+              <RadioButton x:Name="ThemeSystemRb" GroupName="Theme"/>
+              <RadioButton x:Name="ThemeLightRb"  GroupName="Theme"/>
+              <RadioButton x:Name="ThemeDarkRb"   GroupName="Theme"/>
             </StackPanel>
-            <Button Grid.Column="1" x:Name="ThemeToggleBtn" Click="ThemeToggle_Click"
-                    CornerRadius="{StaticResource RadiusMd}"
-                    Background="#12FFFFFF" Padding="14,8" Cursor="Hand">
-              <TextBlock x:Name="ThemeLabel" Text="Dark" FontSize="12" FontWeight="SemiBold"
-                         Foreground="{DynamicResource AccentPrimaryBrush}"/>
-            </Button>
-          </Grid>
+          </StackPanel>
           <Grid ColumnDefinitions="*,Auto">
             <StackPanel>
               <TextBlock x:Name="LangKeyLabel" Text="Language" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>

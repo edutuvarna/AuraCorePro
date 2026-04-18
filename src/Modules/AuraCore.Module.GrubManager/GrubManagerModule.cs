@@ -193,11 +193,13 @@ public sealed class GrubManagerModule : IOptimizationModule
         if (!File.Exists(GrubBackupPath))
             return;
 
-        // TODO(phase-5.2.1): migrate to IShellCommandService once a "restore-etc-grub"
-        // sub-action is added to GrubArgvValidator (current restore-backup hardcodes
-        // /boot/grub/grub.cfg as destination; /etc/default/grub needs its own action).
-        var copyResult = await ProcessRunner.RunAsync("sudo",
-            $"-n cp {GrubBackupPath} {GrubConfigPath}", ct, timeoutSeconds: 30);
+        var copyResult = await _shell.RunPrivilegedAsync(
+            new PrivilegedCommand(
+                Id: "grub",
+                Executable: "grub",
+                Arguments: new[] { "restore-etc-grub" },
+                TimeoutSeconds: 30),
+            ct);
 
         if (!copyResult.Success)
         {
@@ -313,12 +315,15 @@ public sealed class GrubManagerModule : IOptimizationModule
             return false;
 
         // Backup before first modification
-        // TODO(phase-5.2.1): migrate to IShellCommandService once a "backup-etc-grub"
-        // sub-action is added to GrubArgvValidator (no cp sub-action for /etc/default/grub exists yet).
         if (!File.Exists(GrubBackupPath))
         {
-            var backup = await ProcessRunner.RunAsync("sudo",
-                $"-n cp {GrubConfigPath} {GrubBackupPath}", ct, timeoutSeconds: 30);
+            var backup = await _shell.RunPrivilegedAsync(
+                new PrivilegedCommand(
+                    Id: "grub",
+                    Executable: "grub",
+                    Arguments: new[] { "backup-etc-grub" },
+                    TimeoutSeconds: 30),
+                ct);
             if (!backup.Success)
             {
                 Debug.WriteLine($"[grub-manager] Backup failed: {backup.Stderr}");
@@ -366,12 +371,13 @@ public sealed class GrubManagerModule : IOptimizationModule
         }
         else if (await ProcessRunner.CommandExistsAsync("grub-mkconfig", ct))
         {
-            // TODO(phase-5.2.1): migrate to IShellCommandService once a "grub-mkconfig"
-            // sub-action is added to GrubArgvValidator (current validator only supports
-            // update-grub, edit-config, restore-backup; grub-mkconfig with -o flag needs
-            // its own whitelist entry to avoid the sh -c pipeline metacharacter reject).
-            var result = await ProcessRunner.RunAsync("sudo",
-                "-n grub-mkconfig -o /boot/grub/grub.cfg", ct, timeoutSeconds: 120);
+            var result = await _shell.RunPrivilegedAsync(
+                new PrivilegedCommand(
+                    Id: "grub",
+                    Executable: "grub",
+                    Arguments: new[] { "grub-mkconfig" },
+                    TimeoutSeconds: 120),
+                ct);
             if (!result.Success)
                 Debug.WriteLine($"[grub-manager] grub-mkconfig failed: {result.Stderr}");
         }

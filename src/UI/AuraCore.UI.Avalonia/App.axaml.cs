@@ -6,6 +6,7 @@ using AuraCore.Desktop.Services.PrivilegeIpc;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
 using AuraCore.Module.ServiceManager;
+using AuraCore.UI.Avalonia.Helpers;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,8 +14,8 @@ namespace AuraCore.UI.Avalonia;
 
 public partial class App : global::Avalonia.Application
 {
-    private static ServiceProvider? _services;
-    public static IServiceProvider Services => _services!;
+    private static IServiceProvider? _services;
+    public static IServiceProvider Services { get => _services!; internal set => _services = value; }
 
     /// <summary>
     /// Phase 5.3 Task 9: App-level singleton accessor for the narrow-mode service.
@@ -78,6 +79,13 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.WakeOnLan.WakeOnLanRegistration.AddWakeOnLanModule(sc);
             // ── Phase 5.5 Task 10: Service Manager ──
             sc.AddServiceManager();
+
+            // ── Task A2: Windows named-pipe privileged helper installer ──
+            sc.AddSingleton<IPipeProbe>(new NamedPipeProbe("AuraCorePro"));
+            sc.AddSingleton<PrivilegedHelperInstaller>(sp =>
+                new PrivilegedHelperInstaller(
+                    sp.GetRequiredService<IPipeProbe>(),
+                    PrivilegedHelperInstaller.DefaultElevatorInvoke));
         }
 
         // ── Linux-only modules (Faz 2+) ──
@@ -280,10 +288,10 @@ public partial class App : global::Avalonia.Application
                 currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Admin));
         // ── end Phase 3 ──
 
-        _services = sc.BuildServiceProvider();
+        Services = sc.BuildServiceProvider();
 
         // Phase 5.3 Task 9: expose the narrow-mode service for StatRow code-behind binding.
-        NarrowMode = _services.GetService<INarrowModeService>();
+        NarrowMode = Services.GetService<INarrowModeService>();
 
         // Initialize theme (loads saved preference)
         ThemeService.Initialize();

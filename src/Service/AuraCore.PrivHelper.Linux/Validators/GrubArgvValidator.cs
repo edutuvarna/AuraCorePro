@@ -5,7 +5,7 @@ namespace AuraCore.PrivHelper.Linux.Validators;
 /// <summary>
 /// Validates argv for the "grub" action ID.
 ///
-/// Three sub-actions are supported (first arg selects):
+/// Six sub-actions are supported (first arg selects):
 ///
 ///   update-grub
 ///     args:  ["update-grub"]
@@ -24,6 +24,21 @@ namespace AuraCore.PrivHelper.Linux.Validators;
 ///     exe:   /bin/cp
 ///     argv:  [backup-source-path, "/boot/grub/grub.cfg"]
 ///     constraints: source path must match ^[/\w._-]+$
+///
+///   grub-mkconfig
+///     args:  ["grub-mkconfig"]
+///     exe:   /usr/sbin/grub-mkconfig
+///     argv:  ["-o", "/boot/grub/grub.cfg"]
+///
+///   backup-etc-grub
+///     args:  ["backup-etc-grub"]
+///     exe:   /bin/cp
+///     argv:  ["/etc/default/grub", "/etc/default/grub.bak.auracore"]
+///
+///   restore-etc-grub
+///     args:  ["restore-etc-grub"]
+///     exe:   /bin/cp
+///     argv:  ["/etc/default/grub.bak.auracore", "/etc/default/grub"]
 /// </summary>
 internal sealed class GrubArgvValidator : IArgvValidator
 {
@@ -31,7 +46,10 @@ internal sealed class GrubArgvValidator : IArgvValidator
     private const string SedExe        = "/bin/sed";
     private const string CpExe         = "/bin/cp";
 
-    private const string GrubCfgPath   = "/boot/grub/grub.cfg";
+    private const string GrubCfgPath          = "/boot/grub/grub.cfg";
+    private const string GrubMkconfigExe      = "/usr/sbin/grub-mkconfig";
+    private const string EtcDefaultGrub       = "/etc/default/grub";
+    private const string EtcDefaultGrubBackup = "/etc/default/grub.bak.auracore";
 
     // Safe filesystem path: absolute, no spaces, no shell meta
     private static readonly Regex SafePath =
@@ -53,10 +71,13 @@ internal sealed class GrubArgvValidator : IArgvValidator
 
         return subAction switch
         {
-            "update-grub"    => ValidateUpdateGrub(args),
-            "edit-config"    => ValidateEditConfig(args),
-            "restore-backup" => ValidateRestoreBackup(args),
-            _                => ActionResolution.Reject($"grub: unknown sub-action '{subAction}'; expected update-grub, edit-config, or restore-backup"),
+            "update-grub"      => ValidateUpdateGrub(args),
+            "edit-config"      => ValidateEditConfig(args),
+            "restore-backup"   => ValidateRestoreBackup(args),
+            "grub-mkconfig"    => ValidateGrubMkconfig(args),
+            "backup-etc-grub"  => ValidateBackupEtcGrub(args),
+            "restore-etc-grub" => ValidateRestoreEtcGrub(args),
+            _                  => ActionResolution.Reject($"grub: unknown sub-action '{subAction}'; expected update-grub, edit-config, restore-backup, grub-mkconfig, backup-etc-grub, or restore-etc-grub"),
         };
     }
 
@@ -101,5 +122,32 @@ internal sealed class GrubArgvValidator : IArgvValidator
 
         // cp source /boot/grub/grub.cfg
         return new ActionResolution(CpExe, new[] { sourcePath, GrubCfgPath });
+    }
+
+    private static ActionResolution ValidateGrubMkconfig(string[] args)
+    {
+        // Expected: ["grub-mkconfig"] — no extra client args; dest is locked to /boot/grub/grub.cfg.
+        if (args.Length != 1)
+            return ActionResolution.Reject("grub: grub-mkconfig takes no additional arguments");
+
+        return new ActionResolution(GrubMkconfigExe, new[] { "-o", GrubCfgPath });
+    }
+
+    private static ActionResolution ValidateBackupEtcGrub(string[] args)
+    {
+        // Expected: ["backup-etc-grub"] — copy /etc/default/grub -> /etc/default/grub.bak.auracore.
+        if (args.Length != 1)
+            return ActionResolution.Reject("grub: backup-etc-grub takes no additional arguments");
+
+        return new ActionResolution(CpExe, new[] { EtcDefaultGrub, EtcDefaultGrubBackup });
+    }
+
+    private static ActionResolution ValidateRestoreEtcGrub(string[] args)
+    {
+        // Expected: ["restore-etc-grub"] — copy /etc/default/grub.bak.auracore -> /etc/default/grub.
+        if (args.Length != 1)
+            return ActionResolution.Reject("grub: restore-etc-grub takes no additional arguments");
+
+        return new ActionResolution(CpExe, new[] { EtcDefaultGrubBackup, EtcDefaultGrub });
     }
 }

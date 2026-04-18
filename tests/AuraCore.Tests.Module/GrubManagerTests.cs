@@ -289,31 +289,6 @@ public class GrubManagerTests
         Assert.NotNull(result);
     }
 
-    // ---- Deferred sudo hits: documented ----
-
-    [Fact]
-    public void GrubManager_DeferredSudoHits_AreDocumented()
-    {
-        // This test documents the 3 remaining sudo -n call-sites that were NOT migrated
-        // to IShellCommandService in phase-5.2.1 due to missing GrubArgvValidator sub-actions:
-        //
-        //   1. BackupAndSetGrubValue: cp GrubConfigPath → GrubBackupPath
-        //      Deferred because no "backup-etc-grub" sub-action exists in GrubArgvValidator.
-        //      (restore-backup hardcodes /boot/grub/grub.cfg as destination; /etc/default/grub
-        //      needs its own action.)
-        //
-        //   2. RollbackAsync: cp GrubBackupPath → GrubConfigPath
-        //      Same reason as above — restore-backup targets /boot/grub/grub.cfg not
-        //      /etc/default/grub.
-        //
-        //   3. RegenerateGrubConfigAsync: grub-mkconfig -o /boot/grub/grub.cfg
-        //      Deferred because no "grub-mkconfig" sub-action exists; the -o flag would
-        //      require a new whitelist entry separate from "update-grub".
-        //
-        // Each deferred site is marked with // TODO(phase-5.2.1) in the engine source.
-        Assert.True(true, "Deferred sudo hits are documented in engine source with TODO(phase-5.2.1) comments.");
-    }
-
     // ---- ParseGrubConfig (static, no shell needed) ----
 
     [Fact]

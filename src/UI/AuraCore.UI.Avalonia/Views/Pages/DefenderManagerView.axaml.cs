@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
@@ -7,6 +9,8 @@ using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.DefenderManager;
 using AuraCore.Module.DefenderManager.Models;
+using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
@@ -117,14 +121,52 @@ public partial class DefenderManagerView : UserControl
     private static SolidColorBrush P(string hex) => new(Color.Parse(hex));
     private async void Scan_Click(object? sender, RoutedEventArgs e) => await RunScan();
 
+    private async Task<bool> EnsurePrivilegedHelperInstalledAsync()
+    {
+        var installer = App.Services?.GetService<PrivilegedHelperInstaller>();
+        if (installer is null) return true; // DI not wired (tests/design-time) — don't block
+
+        if (await installer.IsInstalledAsync(CancellationToken.None))
+            return true;
+
+        // Prompt for consent + install
+        var topWindow = TopLevel.GetTopLevel(this) as Window;
+        if (topWindow is null) return false;
+
+        var dialog = new PrivilegedHelperInstallDialog(installer);
+        await dialog.ShowDialog(topWindow);
+        return dialog.Outcome == PrivilegedHelperInstallOutcome.Success;
+    }
+
     private async void UpdateSigs_Click(object? sender, RoutedEventArgs e)
-        => await RunDefenderAction(() => _module!.UpdateSignaturesAsync(), "Updating signatures...", "Signatures updated.");
+    {
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
+            return;
+        }
+        await RunDefenderAction(() => _module!.UpdateSignaturesAsync(), "Updating signatures...", "Signatures updated.");
+    }
 
     private async void QuickScan_Click(object? sender, RoutedEventArgs e)
-        => await RunDefenderAction(() => _module!.QuickScanAsync(), "Running quick scan...", "Quick scan started.");
+    {
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
+            return;
+        }
+        await RunDefenderAction(() => _module!.QuickScanAsync(), "Running quick scan...", "Quick scan started.");
+    }
 
     private async void FullScan_Click(object? sender, RoutedEventArgs e)
-        => await RunDefenderAction(() => _module!.FullScanAsync(), "Running full scan...", "Full scan started.");
+    {
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            DefActionStatus.Text = LocalizationService.Get("privhelper.notInstalled.toast");
+            return;
+        }
+        await RunDefenderAction(() => _module!.FullScanAsync(), "Running full scan...", "Full scan started.");
+    }
 
     private async Task RunDefenderAction(
         System.Func<System.Threading.Tasks.Task<DefenderManagerModule.DefenderOperationOutcome>> action,

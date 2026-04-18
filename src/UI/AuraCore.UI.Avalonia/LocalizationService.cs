@@ -1044,6 +1044,12 @@ public static class LocalizationService
         ["aiChat.experimentalBadge"] = "EXPERIMENTAL",
         ["aiChat.experimentalWarning"] = "This feature is experimental. Responses may be inaccurate. For reliable AI-powered analysis, use the AI Insights page.",
 
+        // ── Chat model reload (Phase 5 debt A1) ──
+        ["chat.reload.success"]   = "Model reloaded",
+        ["chat.reload.cancelled"] = "Model reload cancelled",
+        ["chat.reload.busy"]      = "Another reload is in progress",
+        ["chat.reload.failed"]    = "Model reload failed",
+
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Environment Variables",
         ["nav.firewallRules"] = "Firewall Rules",
@@ -1543,6 +1549,18 @@ public static class LocalizationService
         ["cortex.status.active"] = "Active",
         ["cortex.status.paused"] = "Paused",
         ["cortex.status.ready"] = "Ready to start",
+
+        // ── Privileged Helper Install Dialog (Task A2) ──
+        ["privhelper.dialog.title"]         = "Install Privileged Helper",
+        ["privhelper.dialog.intro"]         = "Driver, Defender, and Service write features require a background helper service that runs with elevated privileges. Installing will prompt for admin access.",
+        ["privhelper.dialog.installLabel"]  = "Install",
+        ["privhelper.dialog.cancelLabel"]   = "Cancel",
+        ["privhelper.dialog.installing"]    = "Installing\u2026 please approve the UAC prompt.",
+        ["privhelper.dialog.success"]       = "Privileged helper installed successfully.",
+        ["privhelper.dialog.userCancelled"] = "Install cancelled.",
+        ["privhelper.dialog.timeout"]       = "Helper was installed but pipe did not come up within 5 seconds.",
+        ["privhelper.dialog.failed"]        = "Install failed. Check Event Viewer for details.",
+        ["privhelper.notInstalled.toast"]   = "Privileged helper not installed.",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -2527,6 +2545,12 @@ public static class LocalizationService
         ["aiChat.experimentalBadge"] = "DENEYSEL",
         ["aiChat.experimentalWarning"] = "Bu ozellik deneyseldir. Yanitlar hatali olabilir. Guvenilir AI destekli analiz icin AI Analiz sayfasini kullanin.",
 
+        // ── Chat model reload (Phase 5 debt A1) ──
+        ["chat.reload.success"]   = "Model yeniden yüklendi",
+        ["chat.reload.cancelled"] = "Model yeniden yükleme iptal edildi",
+        ["chat.reload.busy"]      = "Başka bir yeniden yükleme sürüyor",
+        ["chat.reload.failed"]    = "Model yeniden yükleme başarısız",
+
         // ── New Modules (Session 18) ──
         ["nav.environmentVariables"] = "Ortam Degiskenleri",
         ["nav.firewallRules"] = "Guvenlik Duvari Kurallari",
@@ -3026,6 +3050,18 @@ public static class LocalizationService
         ["cortex.status.active"] = "Aktif",
         ["cortex.status.paused"] = "Duraklatıldı",
         ["cortex.status.ready"] = "Başlamaya Hazır",
+
+        // ── Yetkili Yardımcı Kurulum İletişim Kutusu (Task A2) ──
+        ["privhelper.dialog.title"]         = "Yetkili Yardımcıyı Kur",
+        ["privhelper.dialog.intro"]         = "Sürücü, Defender ve Servis yazma özellikleri, yükseltilmiş yetkilerle çalışan bir arka plan yardımcısına ihtiyaç duyar. Kurulum yönetici onayı ister.",
+        ["privhelper.dialog.installLabel"]  = "Kur",
+        ["privhelper.dialog.cancelLabel"]   = "İptal",
+        ["privhelper.dialog.installing"]    = "Kuruluyor\u2026 UAC istemini onaylayın.",
+        ["privhelper.dialog.success"]       = "Yetkili yardımcı başarıyla kuruldu.",
+        ["privhelper.dialog.userCancelled"] = "Kurulum iptal edildi.",
+        ["privhelper.dialog.timeout"]       = "Yardımcı kuruldu ancak 5 saniye içinde hazır olmadı.",
+        ["privhelper.dialog.failed"]        = "Kurulum başarısız. Ayrıntılar için Olay Görüntüleyici'yi kontrol edin.",
+        ["privhelper.notInstalled.toast"]   = "Yetkili yardımcı kurulu değil.",
     };
 
     private static void Save()

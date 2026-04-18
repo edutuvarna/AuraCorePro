@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -5,6 +7,8 @@ using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Module.DriverUpdater;
 using AuraCore.Module.DriverUpdater.Models;
+using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
@@ -95,9 +99,31 @@ public partial class DriverUpdaterView : UserControl
         if (_module is not null) await _module.OpenDeviceManagerAsync();
     }
 
+    private async Task<bool> EnsurePrivilegedHelperInstalledAsync()
+    {
+        var installer = App.Services?.GetService<PrivilegedHelperInstaller>();
+        if (installer is null) return true; // DI not wired (tests/design-time) — don't block
+
+        if (await installer.IsInstalledAsync(CancellationToken.None))
+            return true;
+
+        // Prompt for consent + install
+        var topWindow = TopLevel.GetTopLevel(this) as Window;
+        if (topWindow is null) return false;
+
+        var dialog = new PrivilegedHelperInstallDialog(installer);
+        await dialog.ShowDialog(topWindow);
+        return dialog.Outcome == PrivilegedHelperInstallOutcome.Success;
+    }
+
     private async void PrivScan_Click(object? sender, RoutedEventArgs e)
     {
         if (_module is null) return;
+        if (!await EnsurePrivilegedHelperInstalledAsync())
+        {
+            SubText.Text = LocalizationService.Get("privhelper.notInstalled.toast");
+            return;
+        }
         PrivScanLabel.Text = "Scanning...";
         HelperMissingBanner.IsVisible = false;
         try

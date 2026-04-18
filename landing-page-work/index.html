@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuraCore Pro — AI Powered System Intelligence</title>
+<meta name="description" content="The ultimate cross-platform optimization suite for Windows, Linux, and macOS. 45+ modules, AI assistant with 7 fine-tuned models, real-time monitoring, gaming mode, and more.">
+<meta property="og:title" content="AuraCore Pro - AI Powered System Intelligence">
+<meta property="og:description" content="The most advanced cross-platform optimization suite. 45+ intelligent modules for Windows, Linux, and macOS that clean, optimize, and protect your system.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://auracore.pro">
+<meta property="og:image" content="https://auracore.pro/og-image.png">
+<meta property="og:site_name" content="AuraCore Pro">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AuraCore Pro - AI Powered System Intelligence">
+<meta name="twitter:description" content="45+ intelligent modules to clean, optimize, and protect your Windows, Linux, and macOS systems.">
+<meta name="twitter:image" content="https://auracore.pro/og-image.png">
+<meta name="theme-color" content="#06d6a0">
+<link rel="canonical" href="https://auracore.pro">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar"><div class="nav-inner">
+  <a href="#" class="nav-brand"><div class="aura-logo" style="width:36px;height:36px" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none"><defs><linearGradient id="nl1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#06d6a0"/><stop offset="1" stop-color="#0891b2"/></linearGradient><linearGradient id="nl2" x1="36" y1="0" x2="0" y2="36"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient><filter id="nlg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="18" cy="18" r="16" stroke="url(#nl1)" stroke-width="1.5" opacity=".3"/><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#nl1)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="12s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#nl2)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="120 18 18" to="480 18 18" dur="16s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#nl1)" stroke-width="1" opacity=".3"><animateTransform attributeName="transform" type="rotate" from="240 18 18" to="600 18 18" dur="20s" repeatCount="indefinite"/></ellipse><circle class="aura-core" cx="18" cy="18" r="5" fill="url(#nl1)" filter="url(#nlg)"><animate attributeName="r" values="3.5;6;3.5" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".7;1;.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="18" cy="18" r="2" fill="#050811" opacity=".4"/></svg></div><span class="nav-title">AuraCore Pro</span></a>
+  <div class="nav-links">
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#isobuilder" data-i18n="nav.iso">ISO Builder</a>
+    <a href="#modules" data-i18n="nav.modules">Modules</a>
+    <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+    <a href="mailto:support@auracore.pro" data-i18n="nav.support">Support</a>
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">TR</button>
+    <a href="#" onclick="showAuth('login');return false" class="nav-cta" id="navAuthBtn" data-i18n="nav.signin">Sign In</a>
+  </div>
+  <div class="nav-mobile-actions">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtnMobile">TR</button>
+    <a href="#" onclick="showAuth('login');return false" class="nav-cta" style="padding:6px 16px;font-size:0.8rem" data-i18n="nav.signin">Sign In</a>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div></nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" onclick="closeMenu()" data-i18n="nav.features">Features</a>
+  <a href="#isobuilder" onclick="closeMenu()" data-i18n="nav.iso">ISO Builder</a>
+  <a href="#modules" onclick="closeMenu()" data-i18n="nav.modules">Modules</a>
+  <a href="#pricing" onclick="closeMenu()" data-i18n="nav.pricing">Pricing</a>
+  <div class="mobile-divider"></div>
+  <a href="mailto:support@auracore.pro" data-i18n="nav.support">Support</a>
+  <a href="#" onclick="closeMenu();showAuth('register');return false" data-i18n="nav.signup">Create Account</a>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-card">
+    <button class="auth-close" onclick="closeAuth()">&times;</button>
+    <div class="aura-logo" style="width:48px;height:48px;margin:0 auto 1.2rem" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none"><defs><linearGradient id="al1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#06d6a0"/><stop offset="1" stop-color="#0891b2"/></linearGradient><linearGradient id="al2" x1="36" y1="0" x2="0" y2="36"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient><filter id="alg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="18" cy="18" r="16" stroke="url(#al1)" stroke-width="1.5" opacity=".3"/><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#al1)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="12s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#al2)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="120 18 18" to="480 18 18" dur="16s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#al1)" stroke-width="1" opacity=".3"><animateTransform attributeName="transform" type="rotate" from="240 18 18" to="600 18 18" dur="20s" repeatCount="indefinite"/></ellipse><circle class="aura-core" cx="18" cy="18" r="5" fill="url(#al1)" filter="url(#alg)"><animate attributeName="r" values="3.5;6;3.5" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".7;1;.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="18" cy="18" r="2" fill="#050811" opacity=".4"/></svg></div>
+    <div id="authContent"></div>
+  </div>
+</div>
+
+
+<!-- CRYPTO MODAL -->
+<div class="cm-overlay" id="cmOverlay" onclick="if(event.target===this)cmClose()">
+  <div class="cm-card">
+    <div class="cm-head">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg><span id="cmTitle">Pay with Crypto</span></h3>
+      <button class="cm-close" onclick="cmClose()">&times;</button>
+    </div>
+    <div class="cm-plan">
+      <span class="cm-plan-n" id="cmPN">Pro</span>
+      <span class="cm-plan-p" id="cmPP">$4.99 <span>/mo</span></span>
+    </div>
+    <div class="cm-tabs">
+      <button class="cm-tab active" onclick="cmTab('btc')" id="cmTB">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#f7931a"/><path d="M22.5 14.2c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.8-.2-1.3-.3l.7-2.7-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.3l-2.2-.5-.4 1.7s1.2.3 1.2.3c.6.2.8.6.7 1l-.7 2.9h.1l-.1 0-1 4.1c-.1.2-.3.5-.7.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.1.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.8.5 5 .3 5.9-2.3.7-2.1 0-3.3-1.5-4 1.1-.3 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.1-4.1 1-5.3.7l.9-3.8c1.2.3 5 .9 4.4 3.1zm.5-5.4c-.5 1.9-3.5.9-4.4.7l.8-3.4c1 .2 4.1.7 3.6 2.7z" fill="#fff"/></svg>
+        Bitcoin
+      </button>
+      <button class="cm-tab" onclick="cmTab('usdt')" id="cmTU">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#26a17b"/><path d="M17.9 17.1c-.1 0-.7.1-2 .1-1 0-1.7 0-1.9-.1-3.8-.2-6.6-.9-6.6-1.7s2.8-1.5 6.6-1.7v2.7c.3 0 1 .1 2 .1 1.2 0 1.7-.1 1.9-.1v-2.7c3.8.2 6.6.9 6.6 1.7s-2.8 1.6-6.6 1.7zm0-3.6v-2.4h5.5V8h-14.8v3.1h5.5v2.4c-4.3.2-7.5 1.1-7.5 2.2s3.2 2 7.5 2.2v7.9h3.8v-7.9c4.3-.2 7.5-1.1 7.5-2.2s-3.2-2-7.5-2.2z" fill="#fff"/></svg>
+        USDT <span style="font-size:.7rem;opacity:.5">ERC-20</span>
+      </button>
+    </div>
+    <div class="cm-body">
+      <div class="cm-pane active" id="cmPaneBtc">
+        <div class="cm-qr-wrap">
+          <div class="cm-qr-label" id="cmQrLabelBtc">Scan to pay with Bitcoin</div>
+          <div class="cm-qr-box"><div id="cmQrBtc"></div></div>
+          <div class="cm-net btc"><span class="cm-net-dot"></span> Bitcoin Network</div>
+          <div class="cm-addr">
+            <span class="cm-addr-text">bc1q99jlwen6d8rh7uwculh9h0acwzc8serugsvf5s</span>
+            <button class="cm-copy" onclick="cmCopy('btc',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="cm-pane" id="cmPaneUsdt">
+        <div class="cm-qr-wrap">
+          <div class="cm-qr-label" id="cmQrLabelUsdt">Scan to pay with USDT</div>
+          <div class="cm-qr-box"><div id="cmQrUsdt"></div></div>
+          <div class="cm-net erc"><span class="cm-net-dot"></span> Ethereum (ERC-20)</div>
+          <div class="cm-addr">
+            <span class="cm-addr-text">0x29985B1e41557871A8266D03f271B6836E2fbe78</span>
+            <button class="cm-copy" onclick="cmCopy('usdt',this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="cm-warn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p id="cmWarnText">
+          <strong>BTC:</strong> Only send via the <strong>Bitcoin network</strong>. Do NOT use BEP20 or other chains.<br>
+          <strong>USDT:</strong> Only send via <strong>Ethereum (ERC-20)</strong>. Do NOT use TRC-20 or BEP20.<br>
+          Sending on the wrong network will result in <strong>permanent loss of funds</strong>.
+        </p>
+      </div>
+      <div class="cm-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p id="cmInfoText">Send the <strong style="color:var(--text)">exact amount</strong> shown above. After payment, email your <strong style="color:var(--amber)">transaction ID</strong> to <a href="mailto:support@auracore.pro" style="color:var(--cyan)">support@auracore.pro</a> — your license will be activated within 24 hours.</p>
+      </div>
+    </div>
+    <div class="cm-foot">
+      <button class="cm-foot-back" id="cmBackBtn" onclick="cmClose();cmBackToCard()">&#8592; Back to Card Payment</button>
+      <p>Need help? <a href="mailto:support@auracore.pro" style="color:var(--cyan)">support@auracore.pro</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero"><div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span></span> <span data-i18n="hero.badge">Now Available for Windows, Linux & macOS</span></div>
+    <h1 data-i18n-html="hero.title">Your System,<br><span class="gradient">Supercharged.</span></h1>
+    <p data-i18n="hero.desc">The most advanced cross-platform optimization suite. 47 intelligent modules and 7 AI models that clean, optimize, and protect your system across Windows, Linux, and macOS.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/edutuvarna/AuraCorePro/releases/download/v1.6.0/AuraCorePro-Setup.exe" class="btn-primary download-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span data-i18n="hero.download">Download Free</span></a>
+      <a href="#" onclick="showAuth('register');return false" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span data-i18n="hero.createAccount">Create Account</span></a>
+    </div>
+    <p data-i18n="hero.avnote" style="font-size:0.72rem;opacity:0.35;margin-top:10px">Windows SmartScreen may show a warning - click More info then Run anyway. This is normal for new software.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-value">47</div><div class="hero-stat-label" data-i18n="hero.modules">Modules</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">3</div><div class="hero-stat-label" data-i18n="hero.platforms">Platforms</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">&infin;</div><div class="hero-stat-label" data-i18n="hero.freeTier">Free Tier</div></div>
+      <div class="hero-stat"><div class="hero-stat-value">0</div><div class="hero-stat-label" data-i18n="hero.bloatware">Bloatware</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features"><div class="section-inner">
+  <div class="section-label reveal" data-i18n="features.label">Core Features</div>
+  <h2 class="section-title reveal" data-i18n-html="features.title">Everything your PC needs.<br>Nothing it doesn't.</h2>
+  <p class="section-desc reveal" data-i18n="features.desc">Every module is built for real impact — no placebo optimizations. Just real improvements you can measure.</p>
+  <div class="features-grid">
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></div><h3 data-i18n="f1.t">Real-Time Dashboard</h3><p data-i18n="f1.d">Live CPU, RAM, Disk monitoring with colored stat cards. AI-powered health scoring updates every 3 seconds.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(6,214,160,0.1);color:#06d6a0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></div><h3 data-i18n="f2.t">Intelligent Junk Cleaner</h3><p data-i18n="f2.d">Risk-rated categories. Finds temp files, caches, logs — shows exactly what it'll delete before touching anything.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19v-3"/><path d="M10 19v-3"/><path d="M14 19v-3"/><path d="M18 19v-3"/><path d="M8 11V9"/><path d="M16 11V9"/><path d="M12 11V9"/><path d="M2 15h20"/><path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V15H2v-3.063a2 2 0 0 0 0-3.837Z"/></svg></div><h3 data-i18n="f3.t">RAM Optimizer</h3><p data-i18n="f3.d">Per-process memory tracking with leak detection. Sparkline trends show which apps are memory hogs.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(6,214,160,0.1);color:#06d6a0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></div><h3 data-i18n="f12.t">System Health</h3><p data-i18n="f12.d">Full diagnostic scan with health scoring. Monitors CPU, RAM, disk, GPU, battery, and startup programs across all platforms.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h3 data-i18n="f13.t">AI Assistant</h3><p data-i18n="f13.d">Built-in AI chat powered by 7 fine-tuned models. Answers questions, diagnoses issues, and recommends optimizations — 100% local.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div><h3 data-i18n="f14.t">Process Monitor</h3><p data-i18n="f14.d">Detailed process visibility with CPU, memory, disk I/O tracking. Identifies resource hogs and suggests safe actions.</p></div>
+  </div>
+</div></section>
+
+<!-- CROSS-PLATFORM -->
+<section class="features" id="crossplatform" style="background:linear-gradient(180deg,rgba(6,214,160,0.03) 0%,transparent 100%)"><div class="section-inner">
+  <div class="section-label reveal" data-i18n="cp.label">Cross-Platform</div>
+  <h2 class="section-title reveal" data-i18n-html="cp.title">One app. Three platforms.<br><span class="gradient">Zero compromises.</span></h2>
+  <p class="section-desc reveal" data-i18n="cp.desc">AuraCore Pro runs natively on Windows, Linux, and macOS with platform-specific optimizations tailored to each OS.</p>
+  <div class="features-grid three-col">
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><h3 data-i18n="cp.win.t">Windows</h3><p data-i18n="cp.win.d">27 modules: Registry Optimizer, Gaming Mode, Bloatware Removal, Disk Cleanup, Storage Compression, Defender Manager, and more.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></div><h3 data-i18n="cp.linux.t">Linux</h3><p data-i18n="cp.linux.d">17 modules: Systemd Manager, Package Cleaner, Kernel Cleaner, Docker Cleaner, GRUB Manager, App Installer (141 apps), and more.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg></div><h3 data-i18n="cp.mac.t">macOS</h3><p data-i18n="cp.mac.d">16 modules: Brew Manager, Xcode Cleaner, DNS Flusher, Spotlight Manager, Time Machine Manager, App Installer (141 apps), and more.</p></div>
+  </div>
+</div></section>
+
+<!-- AI ASSISTANT -->
+<section class="features" id="ai" style="background:linear-gradient(180deg,rgba(139,92,246,0.03) 0%,transparent 100%)"><div class="section-inner">
+  <div class="section-label reveal" data-i18n="ai.label">AI Powered</div>
+  <h2 class="section-title reveal" data-i18n-html="ai.title">7 fine-tuned AI models.<br><span class="gradient">Your personal optimization expert.</span></h2>
+  <p class="section-desc reveal" data-i18n="ai.desc">Built-in AI assistant trained on 2,844 AuraCore-specific examples. Answers questions, diagnoses issues, and recommends optimizations — all running locally on your machine.</p>
+  <div class="features-grid three-col">
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(6,214,160,0.1);color:#06d6a0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h3 data-i18n="ai.chat.t">AI Chat</h3><p data-i18n="ai.chat.d">Ask anything about system optimization. The AI reads your system metrics in real-time and gives context-aware advice.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(236,72,153,0.1);color:#ec4899"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3 data-i18n="ai.rag.t">RAG Retrieval</h3><p data-i18n="ai.rag.d">AI retrieves relevant source code context from a vector database before answering — zero hallucination, maximum accuracy.</p></div>
+    <div class="feature-card reveal"><div class="feature-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m6.8 15-3.5 2"/><path d="m20.7 7-3.5 2"/><path d="M6.8 9 3.3 7"/><path d="m20.7 17-3.5-2"/><circle cx="12" cy="12" r="4"/></svg></div><h3 data-i18n="ai.models.t">7 Model Options</h3><p data-i18n="ai.models.d">From TinyLlama 1.1B (fast) to Qwen 32B (powerful). Choose the best model for your hardware — all run 100% locally, no cloud needed.</p></div>
+  </div>
+</div></section>
+
+<!-- ISO BUILDER -->
+<section class="iso-section" id="isobuilder"><div class="section-inner">
+  <div class="iso-grid">
+    <div class="iso-content">
+      <div class="section-label reveal" data-i18n="iso.label">New Feature</div>
+      <h2 class="section-title reveal" data-i18n-html="iso.title">Custom ISO Builder.<br><span class="gradient">Your Windows, your rules.</span></h2>
+      <p class="section-desc reveal" data-i18n="iso.desc">Build a fully customized Windows installation ISO with a 12-step wizard. Remove bloatware, pre-install apps, configure settings - all before Windows even boots.</p>
+      <div class="iso-steps reveal" id="isoSteps"></div>
+      <a href="#" onclick="showAuth('register');return false" class="iso-cta reveal">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        <span data-i18n="iso.cta">Try ISO Builder</span>
+      </a>
+    </div>
+    <div class="iso-visual reveal">
+      <div class="iso-mockup">
+        <div class="iso-mockup-titlebar">
+          <div class="iso-mockup-dot" style="background:#ef4444"></div>
+          <div class="iso-mockup-dot" style="background:#f59e0b"></div>
+          <div class="iso-mockup-dot" style="background:#06d6a0"></div>
+          <span style="font-size:0.65rem;color:var(--text3);margin-left:6px;font-family:Outfit;font-weight:500">ISO Builder Wizard</span>
+        </div>
+        <div class="iso-mockup-body">
+          <div class="iso-mockup-sidebar">
+            <div class="iso-mockup-step done">&#10003; Select ISO</div>
+            <div class="iso-mockup-step done">&#10003; User Account</div>
+            <div class="iso-mockup-step done">&#10003; OOBE Settings</div>
+            <div class="iso-mockup-step active">&#9679; Bloatware</div>
+            <div class="iso-mockup-step">Winget Apps</div>
+            <div class="iso-mockup-step">Registry</div>
+            <div class="iso-mockup-step">Review</div>
+          </div>
+          <div class="iso-mockup-main">
+            <div style="font-size:0.75rem;font-weight:600;color:var(--text);font-family:Outfit">Remove Bloatware</div>
+            <div style="font-size:0.6rem;color:var(--text3);margin-bottom:4px">Select apps to remove from Windows installation</div>
+            <div class="iso-mockup-chips">
+              <div class="iso-mockup-chip">Xbox App</div>
+              <div class="iso-mockup-chip">Cortana</div>
+              <div class="iso-mockup-chip">OneDrive</div>
+              <div class="iso-mockup-chip off">Edge</div>
+              <div class="iso-mockup-chip">Teams</div>
+              <div class="iso-mockup-chip">Clipchamp</div>
+              <div class="iso-mockup-chip off">Calculator</div>
+              <div class="iso-mockup-chip">News</div>
+            </div>
+            <div style="margin-top:auto;display:flex;gap:8px;justify-content:flex-end;padding-top:10px">
+              <div style="padding:6px 14px;border-radius:6px;font-size:0.6rem;background:rgba(255,255,255,0.04);color:var(--text3);border:1px solid rgba(255,255,255,0.06)">Back</div>
+              <div style="padding:6px 14px;border-radius:6px;font-size:0.6rem;background:rgba(139,92,246,0.2);color:var(--purple);font-weight:600">Next</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- MODULES -->
+<section class="modules" id="modules"><div class="section-inner">
+  <div class="section-label reveal" data-i18n="modules.label">All Modules</div>
+  <h2 class="section-title reveal" id="modulesTitle" data-i18n-html="modules.title">45+ modules. <span class="gradient">Zero bloat.</span></h2>
+  <p class="section-desc reveal" data-i18n="modules.desc">Every tool a power user needs, organized into one cohesive app.</p>
+  <div class="platform-tabs reveal">
+    <button class="platform-tab active" onclick="showPlatform('windows')" id="tabWindows">Windows (27)</button>
+    <button class="platform-tab" onclick="showPlatform('linux')" id="tabLinux">Linux (17)</button>
+    <button class="platform-tab" onclick="showPlatform('macos')" id="tabMacos">macOS (16)</button>
+  </div>
+  <div class="modules-grid reveal" id="modulesGrid"></div>
+</div></section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing"><div class="section-inner" style="text-align:center">
+  <div class="section-label reveal" data-i18n="pricing.label">Pricing</div>
+  <h2 class="section-title reveal" style="margin:0 auto 1rem" data-i18n-html="pricing.title">Simple pricing.<br>Powerful at every tier.</h2>
+  <p class="section-desc reveal" style="margin:0 auto 3rem" data-i18n="pricing.desc">Start free, upgrade when you need more.</p>
+  <div class="pricing-grid" id="pricingGrid"></div>
+</div></section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 data-i18n-html="cta.title">Ready to <span class="gradient">supercharge</span> your system?</h2>
+  <p data-i18n="cta.desc">Join thousands of users who already optimized their computing experience.</p>
+  <div style="position:relative;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <a href="https://github.com/edutuvarna/AuraCorePro/releases/download/v1.6.0/AuraCorePro-Setup.exe" class="btn-primary download-link" style="font-size:1.05rem;padding:16px 40px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span data-i18n="cta.btn">Download AuraCore Pro</span></a>
+    <a href="#" onclick="showAuth('register');return false" class="btn-secondary" style="font-size:1.05rem;padding:16px 40px"><span data-i18n="cta.signup">Create Free Account</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer><div class="footer-inner">
+  <div class="footer-brand"><div class="aura-logo" style="width:28px;height:28px" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none"><defs><linearGradient id="fl1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#06d6a0"/><stop offset="1" stop-color="#0891b2"/></linearGradient><linearGradient id="fl2" x1="36" y1="0" x2="0" y2="36"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient><filter id="flg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="18" cy="18" r="16" stroke="url(#fl1)" stroke-width="1.5" opacity=".3"/><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#fl1)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="12s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#fl2)" stroke-width="1.2" opacity=".5"><animateTransform attributeName="transform" type="rotate" from="120 18 18" to="480 18 18" dur="16s" repeatCount="indefinite"/></ellipse><ellipse class="aura-orbit" cx="18" cy="18" rx="16" ry="7" stroke="url(#fl1)" stroke-width="1" opacity=".3"><animateTransform attributeName="transform" type="rotate" from="240 18 18" to="600 18 18" dur="20s" repeatCount="indefinite"/></ellipse><circle class="aura-core" cx="18" cy="18" r="5" fill="url(#fl1)" filter="url(#flg)"><animate attributeName="r" values="3.5;6;3.5" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".7;1;.7" dur="2.5s" repeatCount="indefinite"/></circle><circle cx="18" cy="18" r="2" fill="#050811" opacity=".4"/></svg></div><span style="font-family:Outfit;font-weight:600;font-size:0.9rem">AuraCore Pro</span></div>
+  <div class="footer-links"><a href="mailto:support@auracore.pro">support@auracore.pro</a><a href="#" onclick="showAuth('login');return false" data-i18n="nav.signin">Sign In</a><a href="/privacy" data-i18n="footer.privacy">Privacy</a><a href="/terms" data-i18n="footer.terms">Terms</a><a href="https://github.com/edutuvarna/AuraCorePro" target="_blank" rel="noopener">GitHub</a></div>
+  <div class="footer-copy">&copy; 2026 AuraCore Pro. <span data-i18n="footer.rights">All rights reserved.</span></div>
+</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="/scripts/main.js"></script>
+</body>
+</html>

@@ -43,7 +43,7 @@ public partial class RegistryOptimizerView : UserControl
                 return new RegIssueItem(i.Description, i.KeyPath, i.Category, i.Risk, fg, bg);
             }).ToList();
         }
-        catch { SubText.Text = "Scan failed"; } finally { ScanLabel.Text = LocalizationService._("common.scan"); }
+        catch { SubText.Text = LocalizationService._("common.scanFailed"); } finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
     private static SolidColorBrush P(string h) => new(Color.Parse(h));
     private async void Scan_Click(object? s, RoutedEventArgs e) => await RunScan();

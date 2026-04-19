@@ -10,14 +10,15 @@ public partial class ScheduleSection : UserControl
 {
     private readonly Dictionary<string, ScheduleInfo> _schedules = new();
 
-    private static readonly (string Id, string Name, string Desc, string Icon, string Color)[] TaskDefs =
+    // Task definitions use localization keys; names/descs resolved at card-build time via L().
+    private static readonly (string Id, string NameKey, string DescKey, string Icon, string Color)[] TaskDefs =
     {
-        ("junk",     "Junk Cleaner",        "Clean temporary files and caches",     "\u2702", "#00D4AA"),
-        ("ram",      "RAM Optimizer",        "Free up unused memory",               "\u26A1", "#3B82F6"),
-        ("registry", "Registry Scan",        "Scan for registry issues",            "\u2699", "#8B5CF6"),
-        ("privacy",  "Privacy Cleaner",      "Clear browser data and trackers",     "\u26D4", "#EC4899"),
-        ("disk",     "Disk Cleanup",         "Remove unnecessary system files",     "\u267B", "#F59E0B"),
-        ("health",   "System Health Check",  "Run full system diagnostics",         "\u2665", "#22C55E"),
+        ("junk",     "schedule.task.junkCleaner",    "schedule.task.junkCleanerDesc",    "\u2702", "#00D4AA"),
+        ("ram",      "schedule.task.ramOptimizer",   "schedule.task.ramOptimizerDesc",   "\u26A1", "#3B82F6"),
+        ("registry", "schedule.task.registryScan",   "schedule.task.registryScanDesc",   "\u2699", "#8B5CF6"),
+        ("privacy",  "schedule.task.privacyCleaner", "schedule.task.privacyCleanerDesc", "\u26D4", "#EC4899"),
+        ("disk",     "schedule.task.diskCleanup",    "schedule.task.diskCleanupDesc",    "\u267B", "#F59E0B"),
+        ("health",   "schedule.task.healthCheck",    "schedule.task.healthCheckDesc",    "\u2665", "#22C55E"),
     };
 
     private static readonly string[] IntervalLabels =
@@ -52,7 +53,7 @@ public partial class ScheduleSection : UserControl
     {
         TaskList.Children.Clear();
 
-        foreach (var (id, name, desc, icon, color) in TaskDefs)
+        foreach (var (id, nameKey, descKey, icon, color) in TaskDefs)
         {
             var info = new ScheduleInfo { TaskId = id, Interval = "disabled", IsEnabled = false };
             _schedules[id] = info;
@@ -78,24 +79,24 @@ public partial class ScheduleSection : UserControl
             // ── Name + Description ──
             var nameBlock = new TextBlock
             {
-                Text = name, FontSize = 14, FontWeight = FontWeight.SemiBold,
+                Text = LocalizationService._(nameKey), FontSize = 14, FontWeight = FontWeight.SemiBold,
                 Foreground = FindBrush("TextPrimaryBrush", global::Avalonia.Media.Brushes.White)
             };
             var descBlock = new TextBlock
             {
-                Text = desc, FontSize = 11,
+                Text = LocalizationService._(descKey), FontSize = 11,
                 Foreground = FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray)
             };
 
             // ── Timing labels ──
             var lastRunLabel = new TextBlock
             {
-                Text = "Last run: Never", FontSize = 10, Tag = id + "_last",
+                Text = LocalizationService._("schedule.lastRunNever"), FontSize = 10, Tag = id + "_last",
                 Foreground = FindBrush("TextMutedBrush", global::Avalonia.Media.Brushes.Gray)
             };
             var nextRunLabel = new TextBlock
             {
-                Text = "Next run: --", FontSize = 10, Tag = id + "_next",
+                Text = LocalizationService._("schedule.nextRunPending"), FontSize = 10, Tag = id + "_next",
                 Foreground = new SolidColorBrush(accentColor, 0.8)
             };
 
@@ -204,14 +205,14 @@ public partial class ScheduleSection : UserControl
 
         if (!info.IsEnabled || info.Interval == "disabled")
         {
-            info.NextRunLabel!.Text = "Next run: --";
+            info.NextRunLabel!.Text = LocalizationService._("schedule.nextRunPending");
             return;
         }
 
         var span = IntervalToTimeSpan(info.Interval);
         if (span == TimeSpan.Zero)
         {
-            info.NextRunLabel!.Text = "Next run: --";
+            info.NextRunLabel!.Text = LocalizationService._("schedule.nextRunPending");
             return;
         }
 
@@ -224,20 +225,20 @@ public partial class ScheduleSection : UserControl
         info.TickHandler = handler;
 
         var nextRun = DateTime.Now.Add(span);
-        info.NextRunLabel!.Text = $"Next run: {nextRun:g}";
+        info.NextRunLabel!.Text = string.Format(LocalizationService._("schedule.nextRunFmt"), nextRun.ToString("g"));
     }
 
     private void OnTimerFired(ScheduleInfo info)
     {
         info.LastRun = DateTime.Now;
-        info.LastRunLabel!.Text = $"Last run: {info.LastRun:T}";
+        info.LastRunLabel!.Text = string.Format(LocalizationService._("schedule.lastRunFmt"), info.LastRun?.ToString("T") ?? "");
 
         // Recalculate next run
         var span = IntervalToTimeSpan(info.Interval);
         if (span > TimeSpan.Zero)
         {
             var nextRun = DateTime.Now.Add(span);
-            info.NextRunLabel!.Text = $"Next run: {nextRun:g}";
+            info.NextRunLabel!.Text = string.Format(LocalizationService._("schedule.nextRunFmt"), nextRun.ToString("g"));
         }
 
         // Fire the appropriate task (placeholder -- real modules would be injected)

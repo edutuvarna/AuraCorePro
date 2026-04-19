@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Simplified orbital arc -->
+  <path d="M52 18 A28 16 -25 0 1 52 46" fill="none" stroke="#06d6a0" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M12 46 A28 16 -25 0 1 12 18" fill="none" stroke="#0891b2" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Module dots -->
+  <circle cx="18" cy="20" r="3" fill="#06d6a0"/>
+  <circle cx="46" cy="44" r="3" fill="#0891b2"/>
+  
+  <!-- Core -->
+  <circle cx="32" cy="32" r="10" fill="#06d6a0" opacity="0.1" stroke="#06d6a0" stroke-width="0.8"/>
+  <circle cx="32" cy="32" r="6" fill="#06d6a0"/>
+  <circle cx="32" cy="32" r="3" fill="#0891b2"/>
+</svg>

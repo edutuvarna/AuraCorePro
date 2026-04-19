@@ -25,8 +25,8 @@ public partial class TimeMachineManagerView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS()) { SubText.Text = "macOS only"; return; }
-        SubText.Text = "Checking Time Machine...";
+        if (!OperatingSystem.IsMacOS()) { SubText.Text = LocalizationService._("common.macOsOnly"); return; }
+        SubText.Text = LocalizationService._("timeMachine.checking");
 
         var (status, details, exclusions) = await Task.Run(() =>
         {
@@ -50,7 +50,7 @@ public partial class TimeMachineManagerView : UserControl
         TmStatus.Text = string.IsNullOrEmpty(status) ? "Idle" : status;
         LastBackup.Text = details.Contains("Latest:") ? details.Split('\n')[0].Replace("Latest: ", "") : "--";
         DetailsText.Text = details;
-        SubText.Text = "Time Machine status loaded";
+        SubText.Text = LocalizationService._("timeMachine.loaded");
 
         ExclusionList.ItemsSource = exclusions.Select(ex => new Border
         {

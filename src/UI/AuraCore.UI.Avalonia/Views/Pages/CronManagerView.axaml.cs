@@ -29,8 +29,8 @@ public partial class CronManagerView : UserControl
     {
         try
         {
-        if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
-        SubText.Text = "Reading crontab...";
+        if (!OperatingSystem.IsLinux()) { SubText.Text = LocalizationService._("common.linuxOnly"); return; }
+        SubText.Text = LocalizationService._("cron.reading");
 
         var (userJobs, systemDirs) = await Task.Run(() =>
         {

@@ -80,7 +80,7 @@ public partial class NetworkOptimizerView : UserControl
             else
             {
                 DnsPrimary.Text = GetSystemDns();
-                DnsProvider.Text = "ISP Default";
+                DnsProvider.Text = LocalizationService._("netOpt.ispDefault");
                 DnsLatency.Text = MeasureDnsLatency();
             }
 
@@ -227,7 +227,7 @@ public partial class NetworkOptimizerView : UserControl
             }
             else
             {
-                DnsImprovementText.Text = "No change in latency";
+                DnsImprovementText.Text = LocalizationService._("netOpt.noChange");
                 DnsImprovementText.Foreground = new SolidColorBrush(Color.Parse("#F59E0B"));
             }
         }

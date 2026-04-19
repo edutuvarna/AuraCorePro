@@ -25,8 +25,8 @@ public partial class BrewManagerView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS()) { SubText.Text = "macOS only"; return; }
-        SubText.Text = "Scanning Homebrew...";
+        if (!OperatingSystem.IsMacOS()) { SubText.Text = LocalizationService._("common.macOsOnly"); return; }
+        SubText.Text = LocalizationService._("brew.scanning");
 
         var (formulae, casks, outdated) = await Task.Run(() =>
         {
@@ -58,7 +58,7 @@ public partial class BrewManagerView : UserControl
     private async void Cleanup_Click(object? sender, RoutedEventArgs e)
     {
         if (!OperatingSystem.IsMacOS()) return;
-        SubText.Text = "Checking cached downloads...";
+        SubText.Text = LocalizationService._("brew.checkingCache");
         // First show the user what will be cleaned
         var dryRun = await Task.Run(() => RunBrew("cleanup --dry-run"));
         var lineCount = dryRun.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;

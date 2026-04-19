@@ -149,27 +149,27 @@ public partial class ScanOptimizeView : UserControl
             {
                 ScanResultText.Text = _module.Id switch
                 {
-                    "driver-updater"  => "All drivers are up to date!",
-                    "junk-cleaner"    => "System is clean - no junk files found!",
-                    "disk-cleanup"    => "Disk is clean - nothing to remove!",
-                    "registry-optimizer" => "Registry is healthy - no issues found!",
-                    "privacy-cleaner" => "No privacy traces found!",
-                    _ => "Everything looks good!"
+                    "driver-updater"     => LocalizationService._("scanOpt.allDriversCurrent"),
+                    "junk-cleaner"       => LocalizationService._("scanOpt.systemClean"),
+                    "disk-cleanup"       => LocalizationService._("scanOpt.diskClean"),
+                    "registry-optimizer" => LocalizationService._("scanOpt.registryHealthy"),
+                    "privacy-cleaner"    => LocalizationService._("scanOpt.noPrivacyTraces"),
+                    _                    => LocalizationService._("scanOpt.looksGood")
                 };
-                ScanDetailText.Text = "No action needed. Your system is already optimized for this module.";
+                ScanDetailText.Text = LocalizationService._("scanOpt.noActionNeeded");
                 OptimizeBtn.IsEnabled = false;
                 ShowPanel("scan");
             }
             else
             {
-                ScanResultText.Text = "Scan blocked";
-                ScanDetailText.Text = _lastScan.BlockedReason ?? "This module requires administrator privileges.";
+                ScanResultText.Text = LocalizationService._("scanOpt.scanBlocked");
+                ScanDetailText.Text = _lastScan.BlockedReason ?? LocalizationService._("common.adminRequired");
                 ShowPanel("scan");
             }
         }
         catch (Exception ex)
         {
-            ScanResultText.Text = "Scan failed";
+            ScanResultText.Text = LocalizationService._("common.scanFailed");
             ScanDetailText.Text = ex.Message;
             ShowPanel("scan");
         }
@@ -207,13 +207,13 @@ public partial class ScanOptimizeView : UserControl
             if (result.BytesFreed > 0)
                 detail += $" Freed {FormatBytes(result.BytesFreed)}.";
             ResultDetail.Text = result.Success ? detail
-                : "Some items could not be processed. Try running as administrator.";
+                : LocalizationService._("scanOpt.partialSuccess");
 
             ShowPanel("result");
         }
         catch (Exception ex)
         {
-            ResultTitle.Text = "Error";
+            ResultTitle.Text = LocalizationService._("common.error");
             ResultDetail.Text = ex.Message;
             ShowPanel("result");
         }

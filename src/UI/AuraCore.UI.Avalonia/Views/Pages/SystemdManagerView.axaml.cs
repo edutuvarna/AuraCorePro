@@ -29,9 +29,9 @@ public partial class SystemdManagerView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only - systemctl not available"; return; }
+        if (!OperatingSystem.IsLinux()) { SubText.Text = LocalizationService._("systemd.linuxOnly"); return; }
         ScanBtn.IsEnabled = false;
-        SubText.Text = "Scanning systemd services...";
+        SubText.Text = LocalizationService._("systemd.scanning");
 
         _allItems = await Task.Run(() =>
         {

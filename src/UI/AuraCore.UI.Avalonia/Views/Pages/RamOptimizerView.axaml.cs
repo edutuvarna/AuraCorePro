@@ -149,7 +149,7 @@ public partial class RamOptimizerView : UserControl
             OptBtn.IsEnabled = r.TotalReclaimableBytes > 0;
             RebuildProcessList(r);
         }
-        catch { SubText.Text = "Scan failed"; }
+        catch { SubText.Text = LocalizationService._("common.scanFailed"); }
         finally { ScanLabel.Text = LocalizationService._("common.scan"); }
     }
 

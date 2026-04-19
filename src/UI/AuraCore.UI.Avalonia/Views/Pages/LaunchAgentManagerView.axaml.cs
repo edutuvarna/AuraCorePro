@@ -24,8 +24,8 @@ public partial class LaunchAgentManagerView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS()) { SubText.Text = "macOS only"; return; }
-        SubText.Text = "Scanning LaunchAgents/Daemons...";
+        if (!OperatingSystem.IsMacOS()) { SubText.Text = LocalizationService._("common.macOsOnly"); return; }
+        SubText.Text = LocalizationService._("launchAgent.scanning");
 
         var items = await Task.Run(() =>
         {

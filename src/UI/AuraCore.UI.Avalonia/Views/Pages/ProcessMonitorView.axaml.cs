@@ -64,7 +64,7 @@ public partial class ProcessMonitorView : UserControl
 
             RenderProcessList(report);
         }
-        catch { SubtitleText.Text = "Scan failed"; }
+        catch { SubtitleText.Text = LocalizationService._("common.scanFailed"); }
         finally
         {
             _isScanning = false;

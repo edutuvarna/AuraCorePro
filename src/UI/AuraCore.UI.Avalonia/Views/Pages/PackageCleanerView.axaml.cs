@@ -24,9 +24,9 @@ public partial class PackageCleanerView : UserControl
 
     private async void Scan_Click(object? sender, RoutedEventArgs e)
     {
-        if (!OperatingSystem.IsLinux()) { SubText.Text = "Linux only"; return; }
+        if (!OperatingSystem.IsLinux()) { SubText.Text = LocalizationService._("common.linuxOnly"); return; }
         ScanBtn.IsEnabled = false;
-        SubText.Text = "Scanning package caches...";
+        SubText.Text = LocalizationService._("pkgCleaner.scanning");
 
         var categories = await Task.Run(() =>
         {

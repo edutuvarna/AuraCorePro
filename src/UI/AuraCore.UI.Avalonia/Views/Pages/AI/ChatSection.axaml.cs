@@ -57,7 +57,7 @@ public partial class ChatSection : UserControl
         // Set initial chip placeholder here (in XAML-default is empty to avoid hardcoded scanner offender)
         var chip = this.FindControl<SplitButton>("ModelChip");
         if (chip is not null)
-            chip.Content = "\u2699 No model selected \u25BE";
+            chip.Content = LocalizationService._("chat.noModelSelected");
         Loaded += OnLoaded;
     }
 
@@ -111,11 +111,11 @@ public partial class ChatSection : UserControl
 
         if (catalog is null || installed is null || settings is null)
         {
-            chip.Content = "\u2699 No model selected \u25BE";
+            chip.Content = LocalizationService._("chat.noModelSelected");
             // Add a disabled placeholder item so clicking the dropdown still gives feedback
             flyout.Items.Add(new MenuItem
             {
-                Header = "No models installed",
+                Header = LocalizationService._("chat.noModelsInstalled"),
                 IsEnabled = false,
             });
             flyout.Items.Add(new Separator());
@@ -130,7 +130,7 @@ public partial class ChatSection : UserControl
         {
             flyout.Items.Add(new MenuItem
             {
-                Header = "No models installed",
+                Header = LocalizationService._("chat.noModelsInstalled"),
                 IsEnabled = false,
             });
         }

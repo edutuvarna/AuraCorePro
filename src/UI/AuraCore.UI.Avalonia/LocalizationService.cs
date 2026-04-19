@@ -2433,6 +2433,71 @@ public static class LocalizationService
         ["swap.statTotal"]              = "SWAP TOTAL",
         ["swap.statUsed"]               = "SWAP USED",
         ["swap.statSwappiness"]         = "SWAPPINESS",
+
+        // ── C# code-behind gate sweep (Phase 6 companion scanner) ──
+        // Common platform/status strings used programmatically across modules
+        ["common.scanFailed"]           = "Scan failed",
+        ["common.macOsOnly"]            = "macOS only",
+        ["common.linuxOnly"]            = "Linux only",
+
+        // Brew Manager
+        ["brew.scanning"]               = "Scanning Homebrew...",
+        ["brew.checkingCache"]          = "Checking cached downloads...",
+
+        // Cron Manager
+        ["cron.reading"]                = "Reading crontab...",
+
+        // Launch Agent Manager
+        ["launchAgent.scanning"]        = "Scanning LaunchAgents/Daemons...",
+
+        // Package Cleaner
+        ["pkgCleaner.scanning"]         = "Scanning package caches...",
+
+        // Systemd Manager
+        ["systemd.linuxOnly"]           = "Linux only - systemctl not available",
+        ["systemd.scanning"]            = "Scanning systemd services...",
+
+        // Time Machine Manager
+        ["timeMachine.checking"]        = "Checking Time Machine...",
+        ["timeMachine.loaded"]          = "Time Machine status loaded",
+
+        // Scan/Optimize shared view
+        ["common.adminRequired"]        = "This module requires administrator privileges.",
+        ["scanOpt.noActionNeeded"]      = "No action needed. Your system is already optimized for this module.",
+        ["scanOpt.scanBlocked"]         = "Scan blocked",
+        ["scanOpt.allDriversCurrent"]   = "All drivers are up to date!",
+        ["scanOpt.systemClean"]         = "System is clean - no junk files found!",
+        ["scanOpt.diskClean"]           = "Disk is clean - nothing to remove!",
+        ["scanOpt.registryHealthy"]     = "Registry is healthy - no issues found!",
+        ["scanOpt.noPrivacyTraces"]     = "No privacy traces found!",
+        ["scanOpt.looksGood"]           = "Everything looks good!",
+        ["scanOpt.partialSuccess"]      = "Some items could not be processed. Try running as administrator.",
+
+        // Network Optimizer
+        ["netOpt.ispDefault"]           = "ISP Default",
+        ["netOpt.noChange"]             = "No change in latency",
+
+        // Chat / AI section
+        ["chat.noModelSelected"]        = "\u2699 No model selected \u25BE",
+        ["chat.noModelsInstalled"]      = "No models installed",
+
+        // AI Schedule section
+        ["schedule.lastRunNever"]       = "Last run: Never",
+        ["schedule.lastRunFmt"]         = "Last run: {0}",
+        ["schedule.nextRunPending"]     = "Next run: --",
+        ["schedule.nextRunFmt"]         = "Next run: {0}",
+        ["schedule.task.junkCleaner"]       = "Junk Cleaner",
+        ["schedule.task.junkCleanerDesc"]   = "Clean temporary files and caches",
+        ["schedule.task.ramOptimizer"]      = "RAM Optimizer",
+        ["schedule.task.ramOptimizerDesc"]  = "Free up unused memory",
+        ["schedule.task.registryScan"]      = "Registry Scan",
+        ["schedule.task.registryScanDesc"]  = "Scan for registry issues",
+        ["schedule.task.privacyCleaner"]    = "Privacy Cleaner",
+        ["schedule.task.privacyCleanerDesc"]= "Clear browser data and trackers",
+        ["schedule.task.diskCleanup"]       = "Disk Cleanup",
+        ["schedule.task.diskCleanupDesc"]   = "Remove unnecessary system files",
+        ["schedule.task.healthCheck"]       = "System Health Check",
+        ["schedule.task.healthCheckDesc"]   = "Run full system diagnostics",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4806,6 +4871,60 @@ public static class LocalizationService
         ["swap.statTotal"]              = "TAKAS TOPLAM",
         ["swap.statUsed"]               = "TAKAS KULLANILAN",
         ["swap.statSwappiness"]         = "SWAPPINESS",
+
+        // ── C# kod-arka kapı tarama (Phase 6 tamamlama) ──
+        ["common.scanFailed"]           = "Tarama başarısız",
+        ["common.macOsOnly"]            = "Yalnızca macOS",
+        ["common.linuxOnly"]            = "Yalnızca Linux",
+
+        ["brew.scanning"]               = "Homebrew taranıyor...",
+        ["brew.checkingCache"]          = "Önbelleğe alınan indirmeler kontrol ediliyor...",
+
+        ["cron.reading"]                = "Crontab okunuyor...",
+
+        ["launchAgent.scanning"]        = "LaunchAgent'lar/Daemon'lar taranıyor...",
+
+        ["pkgCleaner.scanning"]         = "Paket önbellekleri taranıyor...",
+
+        ["systemd.linuxOnly"]           = "Yalnızca Linux - systemctl kullanılamıyor",
+        ["systemd.scanning"]            = "Systemd servisleri taranıyor...",
+
+        ["timeMachine.checking"]        = "Time Machine kontrol ediliyor...",
+        ["timeMachine.loaded"]          = "Time Machine durumu yüklendi",
+
+        ["common.adminRequired"]        = "Bu modül yönetici ayrıcalıkları gerektirir.",
+        ["scanOpt.noActionNeeded"]      = "İşlem gerekmiyor. Sisteminiz bu modül için zaten optimize edilmiş.",
+        ["scanOpt.scanBlocked"]         = "Tarama engellendi",
+        ["scanOpt.allDriversCurrent"]   = "Tüm sürücüler güncel!",
+        ["scanOpt.systemClean"]         = "Sistem temiz - gereksiz dosya bulunamadı!",
+        ["scanOpt.diskClean"]           = "Disk temiz - kaldırılacak bir şey yok!",
+        ["scanOpt.registryHealthy"]     = "Kayıt defteri sağlıklı - sorun bulunamadı!",
+        ["scanOpt.noPrivacyTraces"]     = "Gizlilik izi bulunamadı!",
+        ["scanOpt.looksGood"]           = "Her şey iyi görünüyor!",
+        ["scanOpt.partialSuccess"]      = "Bazı öğeler işlenemedi. Yönetici olarak çalıştırmayı deneyin.",
+
+        ["netOpt.ispDefault"]           = "İSS Varsayılanı",
+        ["netOpt.noChange"]             = "Gecikme değişimi yok",
+
+        ["chat.noModelSelected"]        = "\u2699 Model seçilmedi \u25BE",
+        ["chat.noModelsInstalled"]      = "Yüklü model yok",
+
+        ["schedule.lastRunNever"]       = "Son çalışma: Hiç",
+        ["schedule.lastRunFmt"]         = "Son çalışma: {0}",
+        ["schedule.nextRunPending"]     = "Sonraki çalışma: --",
+        ["schedule.nextRunFmt"]         = "Sonraki çalışma: {0}",
+        ["schedule.task.junkCleaner"]       = "Gereksiz Temizleyici",
+        ["schedule.task.junkCleanerDesc"]   = "Geçici dosyaları ve önbellekleri temizler",
+        ["schedule.task.ramOptimizer"]      = "RAM İyileştirici",
+        ["schedule.task.ramOptimizerDesc"]  = "Kullanılmayan belleği serbest bırakır",
+        ["schedule.task.registryScan"]      = "Kayıt Defteri Taraması",
+        ["schedule.task.registryScanDesc"]  = "Kayıt defteri sorunlarını tarar",
+        ["schedule.task.privacyCleaner"]    = "Gizlilik Temizleyici",
+        ["schedule.task.privacyCleanerDesc"]= "Tarayıcı verilerini ve izleyicileri temizler",
+        ["schedule.task.diskCleanup"]       = "Disk Temizliği",
+        ["schedule.task.diskCleanupDesc"]   = "Gereksiz sistem dosyalarını kaldırır",
+        ["schedule.task.healthCheck"]       = "Sistem Sağlığı Kontrolü",
+        ["schedule.task.healthCheckDesc"]   = "Tam sistem tanılaması çalıştırır",
     };
 
     private static void Save()

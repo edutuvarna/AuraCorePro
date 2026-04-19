@@ -194,6 +194,12 @@ public partial class App : global::Avalonia.Application
         // ── AI Analyzer Engine ──
         AuraCore.Engine.AIAnalyzer.AIAnalyzerRegistration.AddAIAnalyzer(sc);
 
+        // Drives the AI Analyzer engine: samples CPU/RAM/Disk every 2s and
+        // triggers AnalyzeAsync every 60s. Without this service the engine
+        // is registered but never receives samples — Cortex Insights UI
+        // would stay on the "Cortex is learning" placeholder indefinitely.
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.AIMetricsCollectorService>();
+
         // ── Phase 3: AI Features services ──
         // Model catalog + installed models (singletons — read-only / cross-session state)
         sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.AI.IModelCatalog,
@@ -309,6 +315,15 @@ public partial class App : global::Avalonia.Application
 
         // Start update checker (background, non-blocking)
         UpdateChecker.Instance.Start();
+
+        // Drive the AI Analyzer engine (see AIMetricsCollectorService for
+        // rationale). Background loop; disposed when the app exits.
+        try
+        {
+            Services.GetRequiredService<global::AuraCore.UI.Avalonia.Services.AI.AIMetricsCollectorService>()
+                    .Start();
+        }
+        catch { /* non-fatal — AI features will stay in placeholder state */ }
 
         // Background AI metric sync (consent-controlled, daily)
         _ = Task.Run(async () =>

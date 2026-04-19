@@ -6,6 +6,26 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "4180", "--directory", "landing-page-work"],
       "port": 4180
+    },
+    {
+      "name": "tunnel",
+      "runtimeExecutable": "ssh",
+      "runtimeArgs": [
+        "-o", "StrictHostKeyChecking=no",
+        "-o", "ServerAliveInterval=60",
+        "-o", "ExitOnForwardFailure=yes",
+        "-i", "C:/Users/Admin/.ssh/id_ed25519",
+        "-N",
+        "-L", "5432:localhost:5432",
+        "root@165.227.170.3"
+      ],
+      "port": 5432
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/Backend/AuraCore.API"],
+      "port": 5000
     }
   ]
 }

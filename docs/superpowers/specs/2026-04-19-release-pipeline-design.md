@@ -587,6 +587,11 @@ Audit spec'inde finalize edilecek. Önerim: **SignalR** (.NET ekosistemiyle uyum
 
 **Landing tests:** Manual — preview sunucusunda OS spoofing ile Windows/Linux/macOS user-agent simülasyonu, primary button doğru URL'i gösteriyor mu kontrol.
 
+**Linux pre-release multi-distro smoke** (6.6.I sub-phase):
+- Ubuntu 22.04 + Fedora 40 + Debian 12 VM'lerde fresh install testi (yukarıda detaylandı)
+- `IsAvailable()` defensive pattern her Linux-only module'e uygulanır: Docker Cleaner (Docker yoksa), Snap/Flatpak Cleaner (snapd/flatpak yoksa), GRUB Manager (GRUB yoksa — nadiren de olsa systemd-boot sistemler var)
+- Windows'taki Defender Manager precedent'i: `module.IsAvailableOnThisSystem()` → false → sidebar'da disabled + tooltip "{Service} not detected on this system". Crash YOK.
+
 **E2E smoke test (manuel, release sonrası):**
 - Admin panel'den v1.7.0 publish (fake installer, 100KB test .exe)
 - https://download.auracore.pro/releases/v1.7.0/AuraCorePro-Windows-v1.7.0.exe erişilebilir
@@ -637,7 +642,17 @@ Plan yazımı sırasında kullanılacak sub-wave bölümleri için:
 6. **6.6.F — Landing integration:** JS fetch + OS-detect + dropdown + deploy to origin
 7. **6.6.G — Desktop update flow:** `UpdateDownloader` + banner/modal UI + `UpdateChecker` platform param + SHA256 verify + installer launch + tests
 8. **6.6.H — Manual ops docs:** R2 custom domain + lifecycle rule + GitHub PAT setup + env var cheatsheet → `docs/ops/release-pipeline-setup.md`
-9. **6.6.I — E2E smoke + ceremonial close:** test release (v1.7.0-rc1 fake), verify tüm akış + memory + merge
+9. **6.6.I — Pre-release Linux smoke + E2E test + ceremonial close:**
+   - **Linux multi-distro smoke test** (manual, in fresh VMs or Docker containers):
+     - Ubuntu 22.04 LTS (snapd default, apt, GNOME)
+     - Fedora 40 (dnf, GNOME)
+     - Debian 12 stable (apt, no snapd default)
+     - Her biri için: `.deb` install (veya tarball extract) → app açılıyor mu → hero sayfa render → Systemd Manager + Package Cleaner + Journal Cleaner + Docker Cleaner (Docker yüklü değil senaryosu ile) açılınca crash etmiyor mu → privilege helper (`auracore-privhelper`) install prompt'u çıkıyor mu + polkit doğru çalışıyor mu
+     - Bulunan crash/bug'lar: `IsAvailable()` defensive-degrade pattern uygulanarak fix (Windows Defender Manager gibi — servis yoksa module disabled + "not detected" tooltip; crash YOK). Pattern hedefi: hiçbir Linux modül, environment eksikliği nedeniyle hard crash etmesin
+   - **E2E smoke test** (stable channel release öncesi):
+     - Admin panel'den v1.7.0-rc1 test publish (Windows + Linux), `download.auracore.pro` live verify, landing OS-detect doğru button gösteriyor mu, desktop app banner'ı + download + SHA256 verify + installer launch full round-trip
+     - GitHub Releases mirror sayfası (v1.7.0-rc1 tag, binaries + sha256sums.txt)
+   - **Ceremonial close**: memory file + MEMORY.md + merge to main via `--no-ff`
 
 Tahmini effort: sub-phase başına 2-4 saat, toplam ~20-30 saat (2-3 session'a yayılır).
 

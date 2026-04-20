@@ -19,6 +19,7 @@
 7. Desktop app: yeni `UpdateDownloader` service — banner/modal UI, arka plan indirme + SHA256 verify + installer başlatma
 8. GitHub Releases mirror (async, fire-and-forget): binary'ler + release notes + `sha256sums.txt` asset
 9. Migration: EF migration + v1.6.0 backfill row (existing GitHub URL'i `BinaryUrl` olarak)
+10. **Bundled admin UX fix**: admin.auracore.pro/users sayfasında GUID kolonu + copy-to-clipboard (tier değişikliği için GUID lookup operasyonel sürtüşmesini giderir — sub-phase 6.6.E içinde)
 
 ### Out of scope (gelecek iş — spec creep koruyucu)
 
@@ -284,6 +285,32 @@ public record PublishUpdateRequestV2(
 - `?platform=windows|linux|macos` query parameter eklenir (default=windows for back-compat)
 - DB query filter'ı `.Where(u => u.Platform == platform)` ekler
 
+### Bundled admin panel UX fix — Users page GUID display
+
+Aynı sub-phase 6.6.E admin panel iş paketine dahildir (scope drift değil, tek paket):
+
+**Problem:** `admin.auracore.pro/users` sayfasında kullanıcı listesi email/role/tier/joined kolonlarını gösteriyor, ama **GUID (Id)** görünmüyor. Admin tier değişikliği yapmak istediğinde (backend endpoint'leri GUID bekliyor) GUID'yi elde etmek için DB'ye manuel `psql` sorgusu çekmek zorunda kalıyor — operasyonel sürtüşme.
+
+**Fix:** Users table'ına GUID kolonu + copy-to-clipboard butonu:
+
+- **Yeni kolon: "ID"** — shortened GUID gösterir (ilk 8 karakter + ellipsis, örn. `d36c4b70…`)
+- **Hover tooltip:** Full GUID'yi tooltip ile göster
+- **Click-to-copy:** Shortened GUID hücresine tıklayınca full GUID clipboard'a kopyalanır, 2sn'lik "Copied!" toast gösterilir
+- Mevcut Actions kolonundaki disable + delete ikonları dokunulmaz
+
+**Layout (mevcut + yeni kolon):**
+```
+USER                         ID           ROLE    TIER    JOINED       ACTIONS
+baconungabunga@gmail.com     d36c4b70… 📋 user    FREE    4/20/2026    🚫 🗑
+sql'--@test.com              b82f1e55… 📋 user    FREE    4/13/2026    🚫 🗑
+```
+
+**Implementation:** Next.js component değişikliği tek dosyada (`admin-panel/src/pages/users/...` veya exported static'teki ilgili JS bundle — karar sub-phase 6.6.E'de netleşir, admin panel repo'sunu incelendiğinde). Backend `GET /api/admin/users` endpoint'i zaten `Id`'yi dönüyor (büyük ihtimalle; implementation sırasında doğrulanır), sadece frontend rendering eksik.
+
+**Test:** Manuel — admin panel'e gir, Users'ı aç, ID kolonunu gör, tıkla kopyala, başka bir yerde paste ile doğrula.
+
+---
+
 ### Admin panel flow (Next.js)
 
 **New page:** `admin.auracore.pro/updates/publish`
@@ -506,7 +533,7 @@ Plan yazımı sırasında kullanılacak sub-wave bölümleri için:
 2. **6.6.B — R2 client:** `IR2Client` abstraction + `AwsR2Client` impl + presigned URL + HEAD/GET/COPY/DELETE + SHA256 helper + test (mock S3)
 3. **6.6.C — Backend endpoints:** `prepare-upload` yeni + `publish` refactor + `check` platform param + integration tests
 4. **6.6.D — GitHub mirror:** Octokit service + async task + env var + retry endpoint + test
-5. **6.6.E — Admin panel UI:** Next.js form + presigned-PUT upload + progress bar + multi-platform checkbox + publish wiring
+5. **6.6.E — Admin panel UI:** Next.js form + presigned-PUT upload + progress bar + multi-platform checkbox + publish wiring **+ bundled: Users page GUID column + copy-to-clipboard**
 6. **6.6.F — Landing integration:** JS fetch + OS-detect + dropdown + deploy to origin
 7. **6.6.G — Desktop update flow:** `UpdateDownloader` + banner/modal UI + `UpdateChecker` platform param + SHA256 verify + installer launch + tests
 8. **6.6.H — Manual ops docs:** R2 custom domain + lifecycle rule + GitHub PAT setup + env var cheatsheet → `docs/ops/release-pipeline-setup.md`

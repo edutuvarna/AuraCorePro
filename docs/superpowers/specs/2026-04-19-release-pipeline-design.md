@@ -20,6 +20,7 @@
 8. GitHub Releases mirror (async, fire-and-forget): binary'ler + release notes + `sha256sums.txt` asset
 9. Migration: EF migration + v1.6.0 backfill row (existing GitHub URL'i `BinaryUrl` olarak)
 10. **Bundled admin UX fix**: admin.auracore.pro/users sayfasında GUID kolonu + copy-to-clipboard (tier değişikliği için GUID lookup operasyonel sürtüşmesini giderir — sub-phase 6.6.E içinde)
+11. **Bundled admin UX fix**: Updates list "Invalid Date" bug (Bug 1, baseline section'da detay) — sub-phase 6.6.E içinde ~15 dk quick-fix
 
 ### Out of scope (gelecek iş — spec creep koruyucu)
 
@@ -468,6 +469,105 @@ Akış:
 4. **First release (v1.7.0 publish)**: admin panel'den normal akış. Discord webhook + GitHub mirror otomatik tetiklenir; manual verification: https://github.com/edutuvarna/AuraCorePro/releases'te görünmeli
 5. **Landing cold-cache**: Cloudflare edge cache (30 dk) nedeniyle ilk fetch sonrası yeni JS + yeni API response yansıması 30 dk'ya kadar gecikebilir. Purge gerekirse `wrangler cache purge` veya Cloudflare dashboard
 
+## Current admin panel state — baseline (for reference + bug flags)
+
+Release pipeline Publish Update form'u yeniden yazılırken mevcut admin panel davranışını bozmamak için baseline screenshotlarla belgelenmiştir (kullanıcı 2026-04-19'da gönderdi).
+
+### Updates tab (mevcut)
+
+**Column'lar:** VERSION | CHANNEL | MANDATORY | PUBLISHED | ACTIONS
+**Actions:** sadece 🗑 (delete) icon
+
+**Gözlemlenen veri (production):**
+- v1.5.0 stable Mandatory=Yes Published="**Invalid Date**"
+- v1.2.0 stable Mandatory=Yes Published="**Invalid Date**"
+- v1.1.0 stable Mandatory=Yes Published="**Invalid Date**"
+- v1.6.0 **listede yok** (production'da yayınlanan güncel sürüm listede yer almıyor — DB boş mu kullanıcı henüz publish etmedi mi belirsiz; spec'in v1.6.0 backfill adımı bu boşluğu dolduracak)
+
+**🐞 Bug 1 — Invalid Date:** Tüm satırların PUBLISHED sütunu "Invalid Date" gösteriyor. Muhtemelen frontend `new Date(row.publishedAt).toLocaleDateString()` çağırıyor ama `publishedAt` null ya da unexpected format (Next.js hydration mismatch olabilir). Bu iş doğrudan release pipeline scope'unda değil ama aynı Updates tab'ını touch edeceğimiz için sub-phase 6.6.E sırasında quick-fix olarak yanında hallolur (ek ~15 dk).
+
+### Publish Update form (mevcut — tamamen değişiyor)
+
+**Mevcut alanlar:** Version (text) | Channel (Stable dropdown) | **Download URL (manuel paste)** | Release Notes (textarea) | Mandatory (checkbox) | Cancel / Publish
+
+**Mevcut akış:** Admin R2 (veya başka yer)'e dosyayı manuel yüklüyor, URL'i kopyalıyor, bu form'a yapıştırıyor, Publish. Spec'in tamamen replace ettiği akış bu.
+
+**Yeni akış (spec uyarınca):** Download URL textbox YOK; yerine per-platform file upload alanı + progress bar. Backend presigned PUT → R2 → SHA256 otomatik. Kullanıcı tarafında sıfır manuel URL yönetimi.
+
+### Sidebar tabs (referans için tam liste)
+
+- **OVERVIEW:** Dashboard
+- **MANAGEMENT:** Users, Payments, Subscriptions, Licenses, Updates, Devices
+- **ANALYTICS:** Crash Reports, Telemetry, Audit Log
+- **SYSTEM:** IP Whitelist, Configuration, Security
+
+Bu spec'in implementasyonunda sadece **Updates** tab'ına (form + list) dokunacak + **Users** tab'ına GUID kolonu eklenecek. Diğer tab'lar dokunulmaz.
+
+---
+
+## Related future work — Admin Panel Comprehensive Audit + Real-Time Sync (SEPARATE SPEC)
+
+**Kapsam:** Release pipeline spec'inde DEĞİL. Phase 6 Item 7 (veya 8, macOS notarization'dan sonra) olarak ayrı bir spec + plan + implementasyon yapılması gerekiyor. Bu bölüm o spec'e referans oluşturmak için bilinen sorunları kaydeder.
+
+### 🐞 Bug 2 — Grant Subscription dual source of truth
+
+**Semptom:** Admin panel'de Subscriptions → Grant Access "Pro" olarak tier ver, Users listesi hala FREE gösterir. Sayfa hard-reset bile çözmüyor.
+
+**Root cause** (`AdminSubscriptionController.Grant` kod okuması ile doğrulandı 2026-04-19):
+- Endpoint sadece `Licenses.Tier`'i update/insert ediyor
+- `Users.Tier` kolonu dokunulmuyor
+- Users listesi `users.Tier`'i çekiyor (License join değil)
+- Sonuç: grant başarılı gibi görünüyor ama kullanıcı tarafında hiçbir şey değişmiyor (hem admin hem de desktop app'te)
+
+**Fix stratejisi (audit spec'te):**
+- A) **Denormalize (quickest)**: Grant endpoint'i hem `Licenses.Tier` hem `Users.Tier` update etsin — çift yazma ama basit
+- B) **Single source of truth**: `Users.Tier` kolonunu kaldır, tier her zaman `active Licenses.Tier`'den computed edilir (join view ya da application-layer helper)
+- C) **Computed column** (PostgreSQL `GENERATED ALWAYS AS` + trigger): DB-level denormalization, application değişikliği yok ama PostgreSQL'e bağımlılık artar
+
+Tercih audit spec'inde finalize edilecek. Benim önerim A (çift yazma) kısa vadeli, B uzun vadeli refactor.
+
+### 🐞 Bug 3 — Stale admin panel after mutations (genel problem)
+
+**Semptom:** Admin bir değişiklik yapıyor (tier grant, update delete, config save), admin panel'in diğer tab'ları (ve hatta aynı tab'ın farklı sayfaları) stale data gösteriyor. Manuel refresh gerekiyor ve bazen manuel refresh bile işe yaramıyor (cache, hydration, CDN).
+
+**Çözüm önerisi: Real-time sync katmanı.**
+
+Seçenekler:
+- **SignalR** (.NET-native, WebSocket üstüne, client library Next.js için `@microsoft/signalr`)
+- **Raw WebSocket** (lightweight, custom protocol, DIY)
+- **SSE (Server-Sent Events)** (one-way server→client, simpler than WebSocket)
+
+Audit spec'inde finalize edilecek. Önerim: **SignalR** (.NET ekosistemiyle uyum + reconnection/auth built-in + fallback transports). Admin panel `AdminHub` subscribe eder, backend her mutation sonrası `await _hub.Clients.All.SendAsync("UserUpdated", userId)` gibi eventler broadcast eder, frontend React Query veya SWR cache invalidate eder.
+
+### Tab-by-tab audit checklist (audit spec başlangıç noktası)
+
+| Tab | Bilinen sorun / audit görevi |
+|---|---|
+| Dashboard | Widget'lar gerçek veri mi mock mu? — audit |
+| Users | GUID görünmüyor (bu spec'te fix), tier stale (Bug 2), pagination yok/var belirsiz |
+| Payments | Audit gerekli — Stripe transaction'ları görünüyor mu, reconciliation var mı |
+| Subscriptions | Bug 2. Plus: Revoke endpoint çalışıyor mu, UI'da Revoke butonu var mı |
+| Licenses | Audit gerekli — bu endpoint mevcut (`AdminLicenseController`), UI var mı bilinmiyor |
+| Updates | Bug 1 (Invalid Date). Bu spec'in kapsamı. |
+| Devices | Audit — device revoke, device list refresh behavior |
+| Crash Reports | `AdminCrashReportController` var, UI çalışıyor mu? Sıralama, filtreleme? |
+| Telemetry | `AdminTelemetryController` var, dashboard mı tablolu view mı |
+| Audit Log | Tüm admin action'ları loglanıyor mu? Bu spec'in Publish action'ı da loglanmalı |
+| IP Whitelist | `AdminIpWhitelistController` var, add/remove UI çalışıyor mu |
+| Configuration | `AdminConfigController` var, feature flag / env override UI'sı |
+| Security | Scope belirsiz — audit |
+
+### Tahmini effort
+
+- Tab-by-tab audit + bug list oluşturma: 1 session (~4-6 saat)
+- Kritik bug fixes (Bug 2 + Bug 3 foundation): 1 session (~4-6 saat)
+- SignalR integration + React invalidation wiring: 1 session (~6-8 saat)
+- Tab-specific fixes + UI polish: 1-2 session (~8-12 saat)
+
+**Toplam: ~4 session, 20-30 saat.** Phase 6 Item 7 olarak roadmap'e konmalı; macOS notarization (Item 6) tamamlandıktan sonra başlanır. User önceliklendirmesi ile sıralama değişebilir.
+
+---
+
 ## Testing strategy
 
 **Backend unit tests** (~8 yeni test):
@@ -533,7 +633,7 @@ Plan yazımı sırasında kullanılacak sub-wave bölümleri için:
 2. **6.6.B — R2 client:** `IR2Client` abstraction + `AwsR2Client` impl + presigned URL + HEAD/GET/COPY/DELETE + SHA256 helper + test (mock S3)
 3. **6.6.C — Backend endpoints:** `prepare-upload` yeni + `publish` refactor + `check` platform param + integration tests
 4. **6.6.D — GitHub mirror:** Octokit service + async task + env var + retry endpoint + test
-5. **6.6.E — Admin panel UI:** Next.js form + presigned-PUT upload + progress bar + multi-platform checkbox + publish wiring **+ bundled: Users page GUID column + copy-to-clipboard**
+5. **6.6.E — Admin panel UI:** Next.js form + presigned-PUT upload + progress bar + multi-platform checkbox + publish wiring **+ bundled: Users page GUID column + copy-to-clipboard + Updates list Invalid Date fix**
 6. **6.6.F — Landing integration:** JS fetch + OS-detect + dropdown + deploy to origin
 7. **6.6.G — Desktop update flow:** `UpdateDownloader` + banner/modal UI + `UpdateChecker` platform param + SHA256 verify + installer launch + tests
 8. **6.6.H — Manual ops docs:** R2 custom domain + lifecycle rule + GitHub PAT setup + env var cheatsheet → `docs/ops/release-pipeline-setup.md`

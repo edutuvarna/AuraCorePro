@@ -85,6 +85,10 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IR2Clie
     new AuraCore.API.Infrastructure.Services.Releases.AwsR2Client(
         sp.GetRequiredService<Amazon.S3.IAmazonS3>(), r2Bucket));
 
+// GitHub release mirror (stub until 6.6.D wires OctokitReleaseMirror)
+builder.Services.AddScoped<AuraCore.API.Application.Services.Releases.IGitHubReleaseMirror>(sp =>
+    new AuraCore.API.Infrastructure.Services.Releases.NullGitHubReleaseMirror());
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5_000_000; // 5 MB max

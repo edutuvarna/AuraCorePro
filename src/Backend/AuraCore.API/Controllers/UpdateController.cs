@@ -13,19 +13,28 @@ public sealed class UpdateController : ControllerBase
     public UpdateController(AuraCoreDbContext db) => _db = db;
 
     /// <summary>
-    /// Client calls this on startup: GET /api/updates/check?currentVersion=1.0.0&channel=stable
+    /// Client calls this on startup: GET /api/updates/check?currentVersion=1.0.0&amp;platform=windows&amp;channel=stable
     /// </summary>
     [HttpGet("check")]
     public async Task<IActionResult> Check(
         [FromQuery] string currentVersion,
+        [FromQuery] string? platform = null,
         [FromQuery] string channel = "stable",
         CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(currentVersion))
             return BadRequest(new { error = "currentVersion is required" });
 
+        // Parse platform param (case-insensitive, default Windows)
+        AppUpdatePlatform p = AppUpdatePlatform.Windows;
+        if (!string.IsNullOrWhiteSpace(platform) &&
+            !Enum.TryParse(platform, ignoreCase: true, out p))
+        {
+            return BadRequest(new { error = $"Invalid platform '{platform}'. Expected: windows|linux|macos" });
+        }
+
         var latest = await _db.AppUpdates
-            .Where(u => u.Channel == channel)
+            .Where(u => u.Channel == channel && u.Platform == p)
             .OrderByDescending(u => u.PublishedAt)
             .FirstOrDefaultAsync(ct);
 
@@ -39,6 +48,7 @@ public sealed class UpdateController : ControllerBase
             updateAvailable = isNewer,
             version = latest.Version,
             channel = latest.Channel,
+            platform = latest.Platform.ToString(),
             releaseNotes = latest.ReleaseNotes,
             downloadUrl = latest.BinaryUrl,
             isMandatory = latest.IsMandatory,

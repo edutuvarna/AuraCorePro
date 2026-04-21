@@ -98,10 +98,12 @@ public sealed class AuraCoreDbContext : DbContext
             e.ToTable("app_updates"); e.HasKey(u => u.Id);
             e.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
             e.Property(u => u.Version).HasMaxLength(32).IsRequired();
-            e.HasIndex(u => new { u.Version, u.Channel }).IsUnique();
             e.Property(u => u.Channel).HasMaxLength(20).HasDefaultValue("stable");
+            e.Property(u => u.Platform).HasDefaultValue(AppUpdatePlatform.Windows);
+            e.HasIndex(u => new { u.Version, u.Channel, u.Platform }).IsUnique();
             e.Property(u => u.BinaryUrl).HasMaxLength(1024);
             e.Property(u => u.SignatureHash).HasMaxLength(256);
+            e.Property(u => u.GitHubReleaseId).HasMaxLength(64);
             e.Property(u => u.PublishedAt).HasDefaultValueSql("now()");
         });
 

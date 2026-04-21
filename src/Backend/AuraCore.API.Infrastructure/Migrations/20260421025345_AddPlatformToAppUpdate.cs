@@ -63,7 +63,7 @@ namespace AuraCore.API.Infrastructure.Migrations
                 name: "IX_app_updates_Version_Channel_Platform",
                 table: "app_updates");
 
-            migrationBuilder.Sql(@"DELETE FROM app_updates WHERE ""Version"" = '1.6.0' AND ""BinaryUrl"" LIKE '%github.com%'.");
+            migrationBuilder.Sql(@"DELETE FROM app_updates WHERE ""Version"" = '1.6.0' AND ""BinaryUrl"" LIKE '%github.com%';");
 
             migrationBuilder.DropColumn(
                 name: "GitHubReleaseId",

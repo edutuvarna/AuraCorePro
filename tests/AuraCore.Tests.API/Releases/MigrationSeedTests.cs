@@ -23,17 +23,26 @@ public class MigrationSeedTests
     }
 
     [Fact]
-    public void Composite_unique_index_allows_same_version_on_different_platforms()
+    public void Composite_unique_index_covers_Version_Channel_Platform()
     {
-        // This is a model-level test — confirms the new composite index config
-        // allows (v1.7.0, stable, Windows) AND (v1.7.0, stable, Linux) to coexist.
+        // Model-metadata assertion (InMemory DB does NOT enforce unique indexes, so
+        // we inspect EF's compiled model directly to verify the composite index
+        // has the expected shape).
         var options = new DbContextOptionsBuilder<AuraCoreDbContext>()
-            .UseInMemoryDatabase($"test-{Guid.NewGuid()}")
+            .UseInMemoryDatabase($"meta-{Guid.NewGuid()}")
             .Options;
         using var db = new AuraCoreDbContext(options);
-        db.AppUpdates.Add(new AppUpdate { Version = "1.7.0", Channel = "stable", Platform = AppUpdatePlatform.Windows, BinaryUrl = "https://x/w", SignatureHash = "", PublishedAt = DateTimeOffset.UtcNow });
-        db.AppUpdates.Add(new AppUpdate { Version = "1.7.0", Channel = "stable", Platform = AppUpdatePlatform.Linux,   BinaryUrl = "https://x/l", SignatureHash = "", PublishedAt = DateTimeOffset.UtcNow });
-        db.SaveChanges();
-        Assert.Equal(2, db.AppUpdates.Count());
+
+        var entityType = db.Model.FindEntityType(typeof(AppUpdate));
+        Assert.NotNull(entityType);
+
+        var uniqueIndex = entityType!.GetIndexes()
+            .FirstOrDefault(i => i.IsUnique && i.Properties.Count == 3);
+        Assert.NotNull(uniqueIndex);
+
+        var names = uniqueIndex!.Properties.Select(p => p.Name).ToHashSet();
+        Assert.Contains("Version", names);
+        Assert.Contains("Channel", names);
+        Assert.Contains("Platform", names);
     }
 }

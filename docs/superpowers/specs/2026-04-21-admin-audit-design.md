@@ -241,7 +241,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 
 | Tab | Auditor | Status | Critical | High | Medium | Low | Findings file |
 |---|---|---|---|---|---|---|---|
-| Subscriptions | - | pending | - | - | - | - | - |
+| Subscriptions | subagent-1 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/subscriptions.md |
 | Users | - | pending | - | - | - | - | - |
 | Licenses | - | pending | - | - | - | - | - |
 | Payments | - | pending | - | - | - | - | - |
@@ -256,14 +256,29 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 
 ## Cross-tab patterns (live — updated as audit surfaces patterns)
 
-Section filled in by main session as findings accumulate. Expected categories:
+### CTP-1: TSX reads `u.tier` but API sends `u.license.tier` — universal display bug
+**First surfaced:** Subscriptions tab (F-1, F-2). Expected to also appear in: Users tab (confirmed same code), Licenses tab (may read license directly).
+**Pattern:** `AdminUserController.GetAll` returns `{ ..., license: { tier, expiresAt } }` — tier is nested. UsersPage TSX reads `u.tier` (undefined) instead of `u.license?.tier`. All tier badges show "free". Revoke button visibility check (`u.tier !== 'free'`) is never true.
+**File:line:** `page.tsx:582` (`TierBadge` render), `page.tsx:586` (Revoke button condition).
+**Fix:** `AdminUserController.cs` should add a denormalized top-level `tier` field to the user projection (matches `GetById` behavior at line 63), OR frontend changes `u.tier` → `u.license?.tier`.
 
-- Dual-source-of-truth fields (Bug 2 pattern, possibly >1 tab)
-- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab)
-- Missing audit logging (admin action not recorded)
-- Inconsistent confirmation dialogs (some destructive actions confirmed, some not)
-- Deploy drift (source-vs-live divergence, possibly >1 tab)
-- Mobile table overflow pattern (if most tabs break at 320px the same way, one unified fix)
+### CTP-2: Missing audit log for all admin mutations
+**First surfaced:** Subscriptions tab (F-5). Expected to also appear in: Users, Licenses, Devices, IP Whitelist, Configuration tabs.
+**Pattern:** No admin action is logged to any audit table. `AdminAuditLogController` only reads `login_attempts` — not admin mutations. There is no `admin_audit_log` table.
+**Fix:** Add an `admin_audit_log` table + service. Wire into all mutation controllers as a cross-cutting concern (filter or service injection).
+
+### CTP-3: No mobile responsive layout (all tabs affected)
+**First surfaced:** Subscriptions tab (axis 5 findings). Expected to apply to ALL 12 tabs.
+**Pattern:** Root layout (`page.tsx:1460`) is `flex h-screen overflow-hidden` with no breakpoints. Sidebar is fixed 260px or 72px (no auto-collapse on small screens, no hamburger menu). At ≤375px, content area is ≤115px — completely unusable.
+**Fix:** Add a responsive sidebar (auto-collapse below 768px, hamburger toggle at ≤768px). Single fix in root layout applies to all tabs.
+
+Section previously filled with expected categories (retained for reference):
+- Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1
+- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab) — still to verify in other tabs
+- Missing audit logging → CTP-2
+- Inconsistent confirmation dialogs — still to verify across tabs
+- Deploy drift (source-vs-live divergence) — confirmed in Subscriptions (F-9), verify in other tabs
+- Mobile table overflow pattern → CTP-3
 
 ## Non-goals
 

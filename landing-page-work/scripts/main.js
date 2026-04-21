@@ -136,7 +136,7 @@ macos:{en:[
 // ═══════════════════════════════════════════════════════════
 const L={en:{
 'nav.features':'Features','nav.iso':'ISO Builder','nav.modules':'Modules','nav.pricing':'Pricing','nav.support':'Support','nav.signin':'Sign In','nav.signup':'Create Account',
-'hero.badge':'Now Available for Windows, Linux & macOS','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
+'hero.badge':'Available for Windows &amp; Linux \u2014 macOS Coming Soon','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
 'hero.desc':'The most advanced cross-platform optimization suite. 45+ intelligent modules and 7 AI models that clean, optimize, and protect your system across Windows, Linux, and macOS.',
 'hero.platforms':'Platforms',
 'hero.download':'Download Free','hero.createAccount':'Create Account','hero.seeFeatures':'See Features','hero.modules':'Modules','hero.languages':'Languages','hero.freeTier':'Free Tier','hero.bloatware':'Bloatware','hero.avnote':'Windows SmartScreen may show a warning - click More info then Run anyway. This is normal for new software.',
@@ -176,7 +176,7 @@ const L={en:{
 'ai.models.t':'7 Model Options','ai.models.d':'From TinyLlama 1.1B (fast) to Qwen 32B (powerful). Choose the best model for your hardware \u2014 all run 100% locally, no cloud needed.',
 },tr:{
 'nav.features':'Özellikler','nav.iso':'ISO Oluşturucu','nav.modules':'Modüller','nav.pricing':'Fiyatlandırma','nav.support':'Destek','nav.signin':'Giriş Yap','nav.signup':'Hesap Oluştur',
-'hero.badge':'Windows, Linux ve macOS i\u00e7in Haz\u0131r','hero.title':'Sisteminiz,<br><span class="gradient">S\u00fcper G\u00fc\u00e7l\u00fc.</span>',
+'hero.badge':'Windows ve Linux i\u00e7in mevcut \u2014 macOS yak\u0131nda','hero.title':'Sisteminiz,<br><span class="gradient">S\u00fcper G\u00fc\u00e7l\u00fc.</span>',
 'hero.desc':'En geli\u015fmi\u015f \u00e7apraz platform optimizasyon paketi. 45\'ten fazla ak\u0131ll\u0131 mod\u00fcl ve 7 AI model ile Windows, Linux ve macOS sistemlerinizi temizleyin, optimize edin ve koruyun.',
 'hero.platforms':'Platform',
 'hero.download':'Ücretsiz İndir','hero.createAccount':'Hesap Oluştur','hero.seeFeatures':'Özellikleri Gör','hero.modules':'Modül','hero.languages':'Dil','hero.freeTier':'Ücretsiz','hero.bloatware':'Bloatware','hero.avnote':'Windows SmartScreen uyarısı gösterebilir — Daha fazla bilgi ve ardından Yine de çalıştır seçeneklerine tıklayın. Bu yeni yazılımlar için normaldir.',
@@ -753,17 +753,23 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const p
 
   async function loadLatestRelease() {
     var os = detectOS();
-    var jobs = [fetchPlatformRelease(os)];
-    if (os !== 'linux') jobs.push(fetchPlatformRelease('linux'));
-    else jobs.push(fetchPlatformRelease('windows'));
 
-    var results = await Promise.all(jobs);
-    var primary = results[0];
-    var other = results[1];
+    // Fetch all 3 platforms in parallel so we can populate dropdown correctly
+    var [win, linux, mac] = await Promise.all([
+      fetchPlatformRelease('windows'),
+      fetchPlatformRelease('linux'),
+      fetchPlatformRelease('macos'),
+    ]);
 
+    // Map detected OS to its fetched release (primary)
+    var primary = { windows: win, linux: linux, macos: mac }[os];
+
+    // Update primary button href + version
     if (primary) {
       document.querySelectorAll('.download-link').forEach(function(a) {
         a.href = primary.downloadUrl;
+        a.style.pointerEvents = '';
+        a.style.opacity = '';
       });
       document.querySelectorAll('.download-version').forEach(function(el) {
         el.textContent = 'v' + primary.version;
@@ -771,24 +777,54 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const p
       document.querySelectorAll('.download-platform').forEach(function(el) {
         el.textContent = displayOS(os);
       });
+    } else if (os === 'macos') {
+      // macOS has no release yet — soft-disable the button
+      document.querySelectorAll('.download-link').forEach(function(a) {
+        a.style.pointerEvents = 'none';
+        a.style.opacity = '0.65';
+      });
     }
 
+    // Update primary button text to OS-aware label
+    var buttonText = {
+      windows: 'Download for Windows',
+      linux:   'Download for Linux',
+      macos:   'macOS Coming Soon',
+    }[os];
+    document.querySelectorAll('[data-i18n="hero.download"], [data-i18n="cta.btn"]').forEach(function(el) {
+      el.textContent = buttonText;
+    });
+    // TODO: when i18n language toggle fires, this text resets to the dictionary entry.
+    // For now, English-only OS labels are acceptable — most users see their detected OS
+    // on first load. If bilingual OS labels are needed later, hook into the language
+    // toggle event and re-apply.
+
+    // Populate "Other platforms" dropdown — show the 2 non-primary platforms
     var dropdown = document.getElementById('otherPlatformsList');
     if (dropdown) {
       dropdown.innerHTML = '';
       var add = function(label, url, comingSoon) {
         var li = document.createElement('li');
+        li.className = 'other-platforms-item';
         if (comingSoon) {
-          li.innerHTML = '<span class="disabled">' + label + ' — Coming Soon</span>';
+          li.innerHTML = '<span class="op-disabled">' + label + ' \u2014 Coming Soon</span>';
         } else {
-          li.innerHTML = '<a href="' + url + '">' + label + '</a>';
+          li.innerHTML = '<a class="op-link" href="' + url + '">' + label + '</a>';
         }
         dropdown.appendChild(li);
       };
-      if (other && os === 'windows')  add('Linux',   other.downloadUrl, false);
-      if (other && os === 'linux')    add('Windows', other.downloadUrl, false);
-      if (os === 'macos')             { if (other) add('Windows', other.downloadUrl, false); add('macOS', '', true); }
-      else                            add('macOS',   '', true);
+
+      // Determine what to show based on detected OS
+      if (os === 'windows') {
+        if (linux) add('Linux', linux.downloadUrl, false);
+        add('macOS', '', true);  // always Coming Soon for macOS
+      } else if (os === 'linux') {
+        if (win) add('Windows', win.downloadUrl, false);
+        add('macOS', '', true);
+      } else if (os === 'macos') {
+        if (win) add('Windows', win.downloadUrl, false);
+        if (linux) add('Linux', linux.downloadUrl, false);
+      }
     }
   }
 

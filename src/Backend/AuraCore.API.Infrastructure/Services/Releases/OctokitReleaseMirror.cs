@@ -12,6 +12,10 @@ public sealed class OctokitReleaseMirror : IGitHubReleaseMirror
     private readonly IR2Client _r2;
     private readonly Func<string, IGitHubClient> _clientFactory;
 
+    private readonly object _clientCacheLock = new();
+    private string? _cachedToken;
+    private IGitHubClient? _cachedClient;
+
     public OctokitReleaseMirror(IR2Client r2)
         : this(r2, token => new GitHubClient(new ProductHeaderValue("AuraCorePro-Backend")) {
             Credentials = new Credentials(token)
@@ -24,13 +28,26 @@ public sealed class OctokitReleaseMirror : IGitHubReleaseMirror
         _clientFactory = githubClientFactory;
     }
 
+    private IGitHubClient GetClient(string token)
+    {
+        lock (_clientCacheLock)
+        {
+            if (_cachedClient is null || !string.Equals(_cachedToken, token, StringComparison.Ordinal))
+            {
+                _cachedClient = _clientFactory(token);
+                _cachedToken = token;
+            }
+            return _cachedClient;
+        }
+    }
+
     public async Task<string?> MirrorAsync(AppUpdate update, string r2ObjectKey, CancellationToken ct)
     {
         var token = Environment.GetEnvironmentVariable("ASPNETCORE_GITHUB_TOKEN");
         if (string.IsNullOrWhiteSpace(token))
             return null;
 
-        var gh = _clientFactory(token);
+        var gh = GetClient(token);
         var tag = $"v{update.Version}";
 
         // Find-or-create release for this tag
@@ -41,16 +58,26 @@ public sealed class OctokitReleaseMirror : IGitHubReleaseMirror
         }
         catch (NotFoundException)
         {
-            release = await gh.Repository.Release.Create(RepoOwner, RepoName, new NewRelease(tag)
+            try
             {
-                Name = $"AuraCore Pro v{update.Version}",
-                Body = update.ReleaseNotes ?? "See AuraCore Pro changelog.",
-                Draft = false,
-                Prerelease = update.Channel != "stable",
-            });
+                release = await gh.Repository.Release.Create(RepoOwner, RepoName, new NewRelease(tag)
+                {
+                    Name = $"AuraCore Pro v{update.Version}",
+                    Body = update.ReleaseNotes ?? "See AuraCore Pro changelog.",
+                    Draft = false,
+                    Prerelease = update.Channel != "stable",
+                });
+            }
+            catch (ApiValidationException)
+            {
+                // Race: another platform's publish created this tag between our Get and Create.
+                // Fetch the now-existing release and continue with asset uploads.
+                release = await gh.Repository.Release.Get(RepoOwner, RepoName, tag);
+            }
         }
 
         // Upload the binary asset
+        // TODO(perf): stream directly from R2 to Octokit without MemoryStream buffering — at 500MB binaries this allocates fully on managed heap per call
         await using var binaryStream = new MemoryStream();
         await _r2.DownloadToStreamAsync(r2ObjectKey, binaryStream, ct);
         binaryStream.Position = 0;

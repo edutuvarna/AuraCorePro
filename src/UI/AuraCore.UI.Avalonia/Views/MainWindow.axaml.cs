@@ -821,7 +821,7 @@ public sealed partial class MainWindow : Window
         try
         {
             var downloader = App.Services.GetRequiredService<IUpdateDownloader>();
-            var avail = new AvailableUpdate(info.Version, info.DownloadUrl, "", info.IsMandatory);
+            var avail = new AvailableUpdate(info.Version, info.DownloadUrl, info.SignatureHash, info.IsMandatory);
             var progress = new Progress<double>(_ => { /* progress bar wiring is future polish */ });
             var path = await downloader.DownloadAsync(avail, progress, CancellationToken.None);
             downloader.InstallAndExit(path);

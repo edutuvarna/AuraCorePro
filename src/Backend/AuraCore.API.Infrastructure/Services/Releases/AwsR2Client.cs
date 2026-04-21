@@ -62,8 +62,9 @@ public sealed class AwsR2Client : IR2Client
         using var resp = await _s3.GetObjectAsync(new GetObjectRequest {
             BucketName = _bucket, Key = objectKey
         }, ct);
+        await using var stream = resp.ResponseStream;
         using var sha = SHA256.Create();
-        var hashBytes = await sha.ComputeHashAsync(resp.ResponseStream, ct);
+        var hashBytes = await sha.ComputeHashAsync(stream, ct);
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 
@@ -72,6 +73,7 @@ public sealed class AwsR2Client : IR2Client
         using var resp = await _s3.GetObjectAsync(new GetObjectRequest {
             BucketName = _bucket, Key = objectKey
         }, ct);
-        await resp.ResponseStream.CopyToAsync(destination, ct);
+        await using var stream = resp.ResponseStream;
+        await stream.CopyToAsync(destination, ct);
     }
 }

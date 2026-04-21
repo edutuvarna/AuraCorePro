@@ -81,7 +81,7 @@ builder.Services.AddSingleton<Amazon.S3.IAmazonS3>(_ =>
     };
     return new Amazon.S3.AmazonS3Client(r2AccessKey, r2Secret, cfg);
 });
-builder.Services.AddScoped<AuraCore.API.Application.Services.Releases.IR2Client>(sp =>
+builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IR2Client>(sp =>
     new AuraCore.API.Infrastructure.Services.Releases.AwsR2Client(
         sp.GetRequiredService<Amazon.S3.IAmazonS3>(), r2Bucket));
 

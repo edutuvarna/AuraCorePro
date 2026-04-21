@@ -11,8 +11,8 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="40">
 
-  <!-- Outer shell grid: Row 0 = privilege banner (Auto height), Row 1 = sidebar + content -->
-  <Grid RowDefinitions="Auto,*">
+  <!-- Outer shell grid: Row 0 = privilege banner (Auto), Row 1 = update banner (Auto), Row 2 = sidebar + content -->
+  <Grid RowDefinitions="Auto,Auto,*">
 
     <!-- Privilege helper missing banner (Task 11).
          IsVisible is driven from code-behind via IHelperAvailabilityService.IsBannerVisible
@@ -24,8 +24,14 @@
         InstallNowClicked="OnPrivilegeInstallNowClicked"
         DismissClicked="OnPrivilegeDismissClicked" />
 
+    <!-- Update banner (6.6.G). IsVisible=False by default; shown when UpdateChecker fires UpdateFound. -->
+    <controls:UpdateBanner
+        x:Name="UpdateBanner"
+        Grid.Row="1"
+        IsVisible="False"/>
+
   <!-- Sidebar + content area -->
-  <Grid Grid.Row="1" ColumnDefinitions="200,*">
+  <Grid Grid.Row="2" ColumnDefinitions="200,*">
 
     <!-- SIDEBAR -->
     <Border Grid.Column="0"

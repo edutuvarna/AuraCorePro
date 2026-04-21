@@ -98,6 +98,14 @@ public sealed class UpdateChecker
         catch { }
     }
 
+    private static string DetectPlatform()
+    {
+        if (OperatingSystem.IsWindows()) return "windows";
+        if (OperatingSystem.IsLinux())   return "linux";
+        if (OperatingSystem.IsMacOS())   return "macos";
+        return "windows";
+    }
+
     public async Task CheckForUpdateAsync(bool forceNotify = false)
     {
         if (IsChecking) return;
@@ -107,7 +115,7 @@ public sealed class UpdateChecker
         try
         {
             var apiUrl = LoginWindow.ApiBaseUrl;
-            var url = $"{apiUrl}/api/updates/check?currentVersion={CurrentVersion}&channel=stable";
+            var url = $"{apiUrl}/api/updates/check?currentVersion={CurrentVersion}&channel=stable&platform={DetectPlatform()}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (!string.IsNullOrEmpty(SessionState.AccessToken))

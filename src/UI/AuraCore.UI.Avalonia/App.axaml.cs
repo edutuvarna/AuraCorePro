@@ -7,6 +7,7 @@ using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Infrastructure.PrivilegeIpc;
 using AuraCore.Module.ServiceManager;
 using AuraCore.UI.Avalonia.Helpers;
+using AuraCore.UI.Avalonia.Services.Update;
 using AuraCore.UI.Avalonia.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -298,6 +299,10 @@ public partial class App : global::Avalonia.Application
                 sp.GetRequiredService<global::AuraCore.UI.Avalonia.Services.AI.ITierService>(),
                 currentTier: global::AuraCore.UI.Avalonia.Services.AI.UserTier.Admin));
         // ── end Phase 3 ──
+
+        // ── Phase 6.6.G: Update downloader (uses the singleton HttpClient already registered above) ──
+        sc.AddSingleton<IUpdateDownloader>(sp =>
+            new UpdateDownloader(sp.GetRequiredService<global::System.Net.Http.HttpClient>()));
 
         Services = sc.BuildServiceProvider();
 

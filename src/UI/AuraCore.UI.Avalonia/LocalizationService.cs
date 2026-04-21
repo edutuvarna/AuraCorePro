@@ -2498,6 +2498,16 @@ public static class LocalizationService
         ["schedule.task.diskCleanupDesc"]   = "Remove unnecessary system files",
         ["schedule.task.healthCheck"]       = "System Health Check",
         ["schedule.task.healthCheckDesc"]   = "Run full system diagnostics",
+
+        // ── Phase 6.6.G: Update banner / mandatory dialog ──
+        ["UpdateBanner_Message"]           = "Version {0} is available.",
+        ["UpdateBanner_UpdateNow"]         = "Update now",
+        ["UpdateBanner_Later"]             = "Later",
+        ["UpdateBanner_Downloading"]       = "Downloading {0}...",
+        ["UpdateBanner_HashMismatch"]      = "Hash mismatch — download corrupted. Retry?",
+        ["UpdateBanner_Ready"]             = "Update downloaded. Run installer now?",
+        ["UpdateBanner_Mandatory_Title"]   = "Required update",
+        ["UpdateBanner_Mandatory_Message"] = "Version {0} is a mandatory update. AuraCore Pro will now install the new version.",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4925,6 +4935,16 @@ public static class LocalizationService
         ["schedule.task.diskCleanupDesc"]   = "Gereksiz sistem dosyalarını kaldırır",
         ["schedule.task.healthCheck"]       = "Sistem Sağlığı Kontrolü",
         ["schedule.task.healthCheckDesc"]   = "Tam sistem tanılaması çalıştırır",
+
+        // ── Phase 6.6.G: Güncelleme banner / zorunlu iletişim kutusu ──
+        ["UpdateBanner_Message"]           = "Sürüm {0} mevcut.",
+        ["UpdateBanner_UpdateNow"]         = "Şimdi güncelle",
+        ["UpdateBanner_Later"]             = "Daha sonra",
+        ["UpdateBanner_Downloading"]       = "{0} indiriliyor...",
+        ["UpdateBanner_HashMismatch"]      = "Hash eşleşmedi — dosya bozuk. Tekrar dene?",
+        ["UpdateBanner_Ready"]             = "Güncelleme indirildi. Kurulum şimdi başlatılsın mı?",
+        ["UpdateBanner_Mandatory_Title"]   = "Zorunlu güncelleme",
+        ["UpdateBanner_Mandatory_Message"] = "Sürüm {0} zorunlu bir güncellemedir. AuraCore Pro yeni sürümü şimdi kuracak.",
     };
 
     private static void Save()

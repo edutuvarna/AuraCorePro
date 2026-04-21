@@ -66,6 +66,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// R2 (S3-compatible) client for release binary storage
+var r2AccountId = Environment.GetEnvironmentVariable("R2_ACCOUNT_ID") ?? "";
+var r2AccessKey = Environment.GetEnvironmentVariable("R2_ACCESS_KEY_ID") ?? "";
+var r2Secret    = Environment.GetEnvironmentVariable("R2_SECRET_ACCESS_KEY") ?? "";
+var r2Bucket    = Environment.GetEnvironmentVariable("R2_BUCKET") ?? "auracore-releases";
+
+builder.Services.AddSingleton<Amazon.S3.IAmazonS3>(_ =>
+{
+    var cfg = new Amazon.S3.AmazonS3Config
+    {
+        ServiceURL = $"https://{r2AccountId}.r2.cloudflarestorage.com",
+        ForcePathStyle = true,  // required for R2
+    };
+    return new Amazon.S3.AmazonS3Client(r2AccessKey, r2Secret, cfg);
+});
+builder.Services.AddScoped<AuraCore.API.Application.Services.Releases.IR2Client>(sp =>
+    new AuraCore.API.Infrastructure.Services.Releases.AwsR2Client(
+        sp.GetRequiredService<Amazon.S3.IAmazonS3>(), r2Bucket));
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5_000_000; // 5 MB max

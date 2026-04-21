@@ -799,31 +799,36 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const p
     // on first load. If bilingual OS labels are needed later, hook into the language
     // toggle event and re-apply.
 
-    // Populate "Other platforms" dropdown — show the 2 non-primary platforms
-    var dropdown = document.getElementById('otherPlatformsList');
-    if (dropdown) {
-      dropdown.innerHTML = '';
-      var add = function(label, url, comingSoon) {
-        var li = document.createElement('li');
-        li.className = 'other-platforms-item';
-        if (comingSoon) {
-          li.innerHTML = '<span class="op-disabled">' + label + ' \u2014 Coming Soon</span>';
-        } else {
-          li.innerHTML = '<a class="op-link" href="' + url + '">' + label + '</a>';
-        }
-        dropdown.appendChild(li);
+    // Populate inline "Also:" alt-platforms row — show the 2 non-primary platforms.
+    // No dropdown / no layering: everything in normal document flow below the CTA row.
+    var list = document.getElementById('altPlatformsList');
+    if (list) {
+      var linkStyle = 'color:#fff;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,0.35);padding-bottom:1px';
+      var disabledStyle = 'color:#6b7280;font-style:italic';
+      var parts = [];
+      var link = function(label, url) {
+        return '<a href="' + url + '" style="' + linkStyle + '">' + label + '</a>';
+      };
+      var comingSoon = function(label) {
+        return '<span style="' + disabledStyle + '">' + label + ' coming soon</span>';
       };
 
-      // Determine what to show based on detected OS
       if (os === 'windows') {
-        if (linux) add('Linux', linux.downloadUrl, false);
-        add('macOS', '', true);  // always Coming Soon for macOS
+        if (linux) parts.push(link('Linux', linux.downloadUrl));
+        parts.push(comingSoon('macOS'));
       } else if (os === 'linux') {
-        if (win) add('Windows', win.downloadUrl, false);
-        add('macOS', '', true);
+        if (win) parts.push(link('Windows', win.downloadUrl));
+        parts.push(comingSoon('macOS'));
       } else if (os === 'macos') {
-        if (win) add('Windows', win.downloadUrl, false);
-        if (linux) add('Linux', linux.downloadUrl, false);
+        if (win) parts.push(link('Windows', win.downloadUrl));
+        if (linux) parts.push(link('Linux', linux.downloadUrl));
+      }
+
+      // Only overwrite if we actually have something to show. The markup ships with a
+      // static "Linux · macOS coming soon" fallback so local-preview (no API) isn't blank.
+      if (parts.length > 0) {
+        var sep = ' <span style="opacity:0.4;margin:0 8px">\u00b7</span> ';
+        list.innerHTML = parts.join(sep);
       }
     }
   }

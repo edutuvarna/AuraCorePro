@@ -37,6 +37,10 @@ public sealed partial class MainWindow : Window
     private readonly INavigationService? _nav;
     private EventHandler<NavigationRequestedEventArgs>? _navSectionRequestedHandler;
 
+    // Phase 6.6.G: stored banner click handlers to prevent additive subscriptions on repeated UpdateFound events.
+    private EventHandler<RoutedEventArgs>? _updateBtnHandler;
+    private EventHandler<RoutedEventArgs>? _laterBtnHandler;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -782,10 +786,16 @@ public sealed partial class MainWindow : Window
         var updateBtn = banner.FindControl<Button>("UpdateBtn");
         var laterBtn  = banner.FindControl<Button>("LaterBtn");
 
-        if (updateBtn is not null)
-            updateBtn.Click += async (_, _) => await StartDownloadFlow(info);
-        if (laterBtn is not null)
-            laterBtn.Click += (_, _) => { banner.IsVisible = false; };
+        // Detach stale handlers before reattaching — prevents N-multiplied downloads
+        // when UpdateFound fires more than once (timer re-check, force re-check, etc.).
+        if (_updateBtnHandler is not null && updateBtn is not null) updateBtn.Click -= _updateBtnHandler;
+        if (_laterBtnHandler  is not null && laterBtn  is not null) laterBtn.Click  -= _laterBtnHandler;
+
+        _updateBtnHandler = async (_, _) => await StartDownloadFlow(info);
+        _laterBtnHandler  = (_, _) => { banner.IsVisible = false; };
+
+        if (updateBtn is not null) updateBtn.Click += _updateBtnHandler;
+        if (laterBtn  is not null) laterBtn.Click  += _laterBtnHandler;
 
         banner.IsVisible = true;
     }
@@ -805,6 +815,7 @@ public sealed partial class MainWindow : Window
                 updateBtn.Click += async (_, _) =>
                 {
                     updateBtn.IsEnabled = false;
+                    dialog.MarkInstalling();  // allow OnClosing through once install begins
                     await StartDownloadFlow(info);
                 };
 

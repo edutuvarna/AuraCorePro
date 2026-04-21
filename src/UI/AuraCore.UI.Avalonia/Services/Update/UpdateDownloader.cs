@@ -11,6 +11,9 @@ public sealed class UpdateDownloader : IUpdateDownloader
 
     public async Task<string> DownloadAsync(AvailableUpdate update, IProgress<double> progress, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(update.Sha256))
+            throw new InvalidOperationException("Update has no signature hash; aborting for safety. This usually means the update row was imported without a hash — contact support.");
+
         var filename = Path.GetFileName(new Uri(update.DownloadUrl).AbsolutePath);
         var path = Path.Combine(Path.GetTempPath(), filename);
 

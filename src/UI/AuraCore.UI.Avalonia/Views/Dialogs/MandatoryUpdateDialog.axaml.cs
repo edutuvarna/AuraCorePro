@@ -10,10 +10,25 @@ namespace AuraCore.UI.Avalonia.Views.Dialogs;
 /// </summary>
 public partial class MandatoryUpdateDialog : Window
 {
+    private bool _installing;
+
     public MandatoryUpdateDialog()
     {
         InitializeComponent();
         ApplyLocalization();
+    }
+
+    /// <summary>
+    /// Call this when the user has accepted the mandatory update and download has started.
+    /// After this, the dialog is allowed to close naturally (e.g. after InstallAndExit).
+    /// </summary>
+    public void MarkInstalling() => _installing = true;
+
+    protected override void OnClosing(global::Avalonia.Controls.WindowClosingEventArgs e)
+    {
+        if (!_installing)
+            e.Cancel = true;
+        base.OnClosing(e);
     }
 
     private void ApplyLocalization()

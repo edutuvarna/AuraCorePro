@@ -242,7 +242,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Tab | Auditor | Status | Critical | High | Medium | Low | Findings file |
 |---|---|---|---|---|---|---|---|
 | Subscriptions | subagent-1 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/subscriptions.md |
-| Users | - | pending | - | - | - | - | - |
+| Users | subagent-2 | done | 1 | 3 | 3 | 2 | docs/admin-audit/findings/users.md |
 | Licenses | - | pending | - | - | - | - | - |
 | Payments | - | pending | - | - | - | - | - |
 | Devices | - | pending | - | - | - | - | - |
@@ -272,13 +272,25 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 **Pattern:** Root layout (`page.tsx:1460`) is `flex h-screen overflow-hidden` with no breakpoints. Sidebar is fixed 260px or 72px (no auto-collapse on small screens, no hamburger menu). At ≤375px, content area is ≤115px — completely unusable.
 **Fix:** Add a responsive sidebar (auto-collapse below 768px, hamburger toggle at ≤768px). Single fix in root layout applies to all tabs.
 
+### CTP-4: Inconsistent destructive confirmation — Delete has confirm(), Revoke does not
+**First surfaced:** Users tab (F-9). Likely applies to: Devices tab (revoke), Licenses tab (revoke/delete), IP Whitelist (delete IP).
+**Pattern:** UsersPage Delete uses `if(confirm(...))` guard; UsersPage Revoke has no confirmation dialog. The pattern of "some destructive actions confirmed, others not" will likely repeat across tabs that have mixed CRUD.
+**File:line:** `page.tsx:594` (Delete with confirm), `page.tsx:587–590` (Revoke without confirm).
+**Fix:** Standardize on a confirmation step for every destructive mutation (delete, revoke, ban, disable). Consider a shared `ConfirmModal` component rather than `window.confirm()` for better UX.
+
+### CTP-5: EF Core tracked-entity cascade bug pattern — RemoveRange before ID collection
+**First surfaced:** Users tab (F-3). May apply to: Devices tab (`AdminDeviceController.Revoke` if it also cascades), other controllers with cascade delete logic.
+**Pattern:** `AdminUserController.cs:106–108` removes devices via `RemoveRange`, then line 118 tries to collect device IDs from the same DbContext. EF Core 8 excludes tracked-deleted entities from queries, so the ID list is always empty. CrashReports and TelemetryEvents are silently orphaned.
+**Fix:** Collect IDs before calling `RemoveRange`, or configure DB-level `ON DELETE CASCADE` on FK constraints.
+
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1
-- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab) — still to verify in other tabs
+- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab) — Bug 3 NOT confirmed on Users tab Refresh (soft refetch, not hard reload); still to verify in other tabs
 - Missing audit logging → CTP-2
-- Inconsistent confirmation dialogs — still to verify across tabs
-- Deploy drift (source-vs-live divergence) — confirmed in Subscriptions (F-9), verify in other tabs
+- Inconsistent confirmation dialogs → CTP-4
+- Deploy drift (source-vs-live divergence) — confirmed in Users (F-8, same 26-day gap as Subscriptions F-9)
 - Mobile table overflow pattern → CTP-3
+- EF Core cascade delete bug → CTP-5
 
 ## Non-goals
 

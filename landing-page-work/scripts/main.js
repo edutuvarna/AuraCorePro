@@ -719,3 +719,82 @@ updateNavAuth();
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{if(a.getAttribute('href')==='#')return;e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
 // ESC to close modals
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const pm=document.getElementById('payModal');if(pm)pm.remove();cmClose();const um=document.getElementById('userMenu');if(um)um.remove();}});
+
+
+// ============================================================================
+// Release pipeline integration (added 2026-04-21, Phase 6.6)
+// Fetches latest version from backend and updates primary Download CTAs.
+// Falls back silently to hardcoded v1.6.0 GitHub link if API unavailable.
+// ============================================================================
+(function() {
+  'use strict';
+
+  function detectOS() {
+    var p = (navigator.platform || '').toLowerCase();
+    var ua = (navigator.userAgent || '').toLowerCase();
+    if (p.indexOf('win') >= 0 || ua.indexOf('windows') >= 0) return 'windows';
+    if (p.indexOf('linux') >= 0 || ua.indexOf('linux') >= 0) return 'linux';
+    if (p.indexOf('mac') >= 0 || ua.indexOf('macintosh') >= 0) return 'macos';
+    return 'windows';
+  }
+
+  function displayOS(os) {
+    return { windows: 'Windows', linux: 'Linux', macos: 'macOS' }[os] || 'Windows';
+  }
+
+  async function fetchPlatformRelease(platform) {
+    try {
+      var r = await fetch('/api/updates/check?currentVersion=0.0.0&platform=' + platform);
+      if (!r.ok) return null;
+      var j = await r.json();
+      return j.updateAvailable ? j : null;
+    } catch (e) { return null; }
+  }
+
+  async function loadLatestRelease() {
+    var os = detectOS();
+    var jobs = [fetchPlatformRelease(os)];
+    if (os !== 'linux') jobs.push(fetchPlatformRelease('linux'));
+    else jobs.push(fetchPlatformRelease('windows'));
+
+    var results = await Promise.all(jobs);
+    var primary = results[0];
+    var other = results[1];
+
+    if (primary) {
+      document.querySelectorAll('.download-link').forEach(function(a) {
+        a.href = primary.downloadUrl;
+      });
+      document.querySelectorAll('.download-version').forEach(function(el) {
+        el.textContent = 'v' + primary.version;
+      });
+      document.querySelectorAll('.download-platform').forEach(function(el) {
+        el.textContent = displayOS(os);
+      });
+    }
+
+    var dropdown = document.getElementById('otherPlatformsList');
+    if (dropdown) {
+      dropdown.innerHTML = '';
+      var add = function(label, url, comingSoon) {
+        var li = document.createElement('li');
+        if (comingSoon) {
+          li.innerHTML = '<span class="disabled">' + label + ' — Coming Soon</span>';
+        } else {
+          li.innerHTML = '<a href="' + url + '">' + label + '</a>';
+        }
+        dropdown.appendChild(li);
+      };
+      if (other && os === 'windows')  add('Linux',   other.downloadUrl, false);
+      if (other && os === 'linux')    add('Windows', other.downloadUrl, false);
+      if (os === 'macos')             { if (other) add('Windows', other.downloadUrl, false); add('macOS', '', true); }
+      else                            add('macOS',   '', true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLatestRelease);
+  } else {
+    loadLatestRelease();
+  }
+})();

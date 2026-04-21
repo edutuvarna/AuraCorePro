@@ -198,7 +198,15 @@ Each subagent gets a self-contained prompt including:
 6. Live test URL + how to reach
 7. Output file path: `docs/admin-audit/findings/{tab-slug}.md`
 
-**Write gate:** subagents MUST ask user (via main session escalation) before any DB WRITE. Read is default; write requires explicit user turn-level approval each time.
+**Write gate:** subagents have no direct channel to the user. If a finding genuinely requires a DB WRITE (INSERT/UPDATE/DELETE/etc.) to reproduce or verify, the subagent must:
+
+1. STOP — do not execute the write
+2. Report back to main session with: the exact SQL it wants to execute, why it's necessary, what the rollback looks like if something goes wrong
+3. Main session relays this to the user in their next turn
+4. User explicitly approves or denies
+5. If approved, main session re-dispatches the subagent with explicit permission to run that specific SQL (or runs it inline and shares the result)
+
+Read queries are default and need no approval.
 
 ## Logistics
 

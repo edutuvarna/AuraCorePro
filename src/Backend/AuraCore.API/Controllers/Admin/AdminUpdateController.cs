@@ -5,6 +5,9 @@ using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace AuraCore.API.Controllers.Admin;
 
@@ -18,12 +21,21 @@ public sealed class AdminUpdateController : ControllerBase
     private readonly AuraCoreDbContext _db;
     private readonly IR2Client _r2;
     private readonly IGitHubReleaseMirror _githubMirror;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<AdminUpdateController> _logger;
 
-    public AdminUpdateController(AuraCoreDbContext db, IR2Client r2, IGitHubReleaseMirror githubMirror)
+    public AdminUpdateController(
+        AuraCoreDbContext db,
+        IR2Client r2,
+        IGitHubReleaseMirror githubMirror,
+        IServiceScopeFactory scopeFactory,
+        ILogger<AdminUpdateController> logger)
     {
         _db = db;
         _r2 = r2;
         _githubMirror = githubMirror;
+        _scopeFactory = scopeFactory;
+        _logger = logger;
     }
 
     /// <summary>Admin: mint presigned R2 PUT URL for direct browser upload</summary>
@@ -44,8 +56,7 @@ public sealed class AdminUpdateController : ControllerBase
             AppUpdatePlatform.MacOS   => new[] { ".dmg", ".pkg" },
             _ => Array.Empty<string>()
         };
-        // Special case: ".appimage" extension has inconsistent casing in filenames
-        if (!allowed.Contains(ext) && !(req.Platform == AppUpdatePlatform.Linux && (req.Filename ?? "").EndsWith(".AppImage", StringComparison.OrdinalIgnoreCase)))
+        if (!allowed.Contains(ext))
             return BadRequest(new { error = $"Invalid extension '{ext}' for platform {req.Platform}. Allowed: {string.Join(", ", allowed)}" });
 
         var channel = (req.Channel ?? "stable").Trim().ToLowerInvariant();
@@ -111,11 +122,19 @@ public sealed class AdminUpdateController : ControllerBase
             PublishedAt = DateTimeOffset.UtcNow,
         };
         _db.AppUpdates.Add(update);
-        await _db.SaveChangesAsync(ct);
+        try
+        {
+            await _db.SaveChangesAsync(ct);
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+            when (ex.InnerException is PostgresException { SqlState: "23505" })
+        {
+            return Conflict(new { error = $"v{req.Version} already exists for {req.Platform} (concurrent publish detected)" });
+        }
 
         // Fire-and-forget: Discord + GitHub mirror
         _ = SendDiscordChangelogAsync(update);
-        _ = MirrorToGitHubInBackgroundAsync(update, finalKey);
+        _ = MirrorToGitHubInBackgroundAsync(update.Id, finalKey);
 
         return Ok(new {
             message = $"v{update.Version} ({update.Platform}) published",
@@ -173,35 +192,38 @@ public sealed class AdminUpdateController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = $"Mirror failed: {ex.Message}" });
+            _logger.LogError(ex, "GitHub mirror retry failed for AppUpdate {Id}", id);
+            return StatusCode(500, new { error = "Mirror failed" });
         }
     }
 
-    private async Task MirrorToGitHubInBackgroundAsync(AppUpdate update, string r2ObjectKey)
+    private async Task MirrorToGitHubInBackgroundAsync(Guid updateId, string r2ObjectKey)
     {
         try
         {
-            var releaseId = await _githubMirror.MirrorAsync(update, r2ObjectKey, CancellationToken.None);
-            if (releaseId is not null)
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+            var mirror = scope.ServiceProvider.GetRequiredService<IGitHubReleaseMirror>();
+            var row = await db.AppUpdates.FindAsync(updateId);
+            if (row is null)
             {
-                // Update row with GitHubReleaseId (best-effort; ignore errors)
-                using var scope = HttpContext?.RequestServices?.CreateScope();
-                var db = scope?.ServiceProvider.GetService<AuraCoreDbContext>() ?? _db;
-                var row = await db.AppUpdates.FindAsync(update.Id);
-                if (row is not null)
-                {
-                    row.GitHubReleaseId = releaseId;
-                    await db.SaveChangesAsync();
-                }
+                _logger.LogWarning("MirrorToGitHubInBackgroundAsync: AppUpdate {UpdateId} not found", updateId);
+                return;
+            }
+            var releaseId = await mirror.MirrorAsync(row, r2ObjectKey, CancellationToken.None);
+            if (!string.IsNullOrEmpty(releaseId))
+            {
+                row.GitHubReleaseId = releaseId;
+                await db.SaveChangesAsync();
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"GitHub mirror failed for v{update.Version}: {ex.Message}");
+            _logger.LogWarning(ex, "GitHub mirror failed for AppUpdate {UpdateId}", updateId);
         }
     }
 
-    private static async Task SendDiscordChangelogAsync(AppUpdate update)
+    private async Task SendDiscordChangelogAsync(AppUpdate update)
     {
         try
         {
@@ -217,7 +239,7 @@ public sealed class AdminUpdateController : ControllerBase
                 {
                     new
                     {
-                        title = $"AuraCore Pro v{update.Version} ({update.Platform}) Released!",
+                        title = $"🚀 AuraCore Pro v{update.Version} ({update.Platform}) Released!",
                         description = notes,
                         color = 54442,
                         fields = new[]
@@ -238,7 +260,7 @@ public sealed class AdminUpdateController : ControllerBase
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Discord webhook error: {ex.Message}");
+            _logger.LogWarning(ex, "Discord webhook failed for v{Version}", update.Version);
         }
     }
 }

@@ -4,6 +4,8 @@ using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -18,7 +20,10 @@ public class PublishEndpointTests
         var db = new AuraCoreDbContext(opts);
         var r2 = new Mock<IR2Client>();
         var gh = new Mock<IGitHubReleaseMirror>();
-        return (new AdminUpdateController(db, r2.Object, gh.Object), db, r2, gh);
+        return (new AdminUpdateController(
+            db, r2.Object, gh.Object,
+            Mock.Of<IServiceScopeFactory>(),
+            Mock.Of<ILogger<AdminUpdateController>>()), db, r2, gh);
     }
 
     [Fact]

@@ -4,6 +4,8 @@ using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -17,7 +19,10 @@ public class PrepareUploadEndpointTests
             .UseInMemoryDatabase($"t-{Guid.NewGuid()}").Options;
         var db = new AuraCoreDbContext(options);
         var r2 = new Mock<IR2Client>();
-        var c = new AdminUpdateController(db, r2.Object, Mock.Of<IGitHubReleaseMirror>());
+        var c = new AdminUpdateController(
+            db, r2.Object, Mock.Of<IGitHubReleaseMirror>(),
+            Mock.Of<IServiceScopeFactory>(),
+            Mock.Of<ILogger<AdminUpdateController>>());
         return (c, db, r2);
     }
 

@@ -86,7 +86,7 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IR2Clie
         sp.GetRequiredService<Amazon.S3.IAmazonS3>(), r2Bucket));
 
 // GitHub release mirror (stub until 6.6.D wires OctokitReleaseMirror)
-builder.Services.AddScoped<AuraCore.API.Application.Services.Releases.IGitHubReleaseMirror>(sp =>
+builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IGitHubReleaseMirror>(sp =>
     new AuraCore.API.Infrastructure.Services.Releases.NullGitHubReleaseMirror());
 
 builder.WebHost.ConfigureKestrel(options =>

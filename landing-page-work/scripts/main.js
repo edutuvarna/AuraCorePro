@@ -799,34 +799,54 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const p
     // on first load. If bilingual OS labels are needed later, hook into the language
     // toggle event and re-apply.
 
-    // Populate "Other platforms" dropdown content — show the 2 non-primary platforms.
-    // Rendered IN NORMAL DOCUMENT FLOW via <details>; opening pushes content below DOWN,
-    // no position:absolute, no z-index — layering bugs impossible by design.
-    var content = document.getElementById('otherPlatformsContent');
-    if (content) {
-      var parts = [];
-      var linkStyle = 'color:#fff;text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:6px;font-size:0.95em;transition:all 0.15s;display:inline-block';
-      var disabledStyle = 'color:#6b7280;font-style:italic;font-size:0.9em;padding:6px 14px';
+    // Populate platform pill row — always-visible pills, detected OS marked active.
+    // Non-detected desktop platform(s) become clickable links to their download URL.
+    // macOS is always "soon" (no click, italic) until a macOS release exists.
+    // No dropdown, no positioning, no layering — pills are inline in normal flow.
+    var platformData = { windows: win, linux: linux, macos: mac };
+    var labels = { windows: 'Windows', linux: 'Linux', macos: 'macOS' };
+    var accentRgb = '6,214,160';  // matches theme green #06d6a0
+    document.querySelectorAll('#platformPills .platform-pill').forEach(function(pill) {
+      var pos = pill.getAttribute('data-os');
+      var rel = platformData[pos];
+      var isDetected = (pos === os);
+      var isMacos = (pos === 'macos');
 
-      if (os === 'windows') {
-        if (linux) parts.push('<a href="' + linux.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Linux</a>');
-        parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
-      } else if (os === 'linux') {
-        if (win) parts.push('<a href="' + win.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Windows</a>');
-        parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
-      } else if (os === 'macos') {
-        if (win) parts.push('<a href="' + win.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Windows</a>');
-        if (linux) parts.push('<a href="' + linux.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Linux</a>');
+      if (isDetected) {
+        // Active state: accent green background + border, no click (you're already on it).
+        pill.style.background = 'rgba(' + accentRgb + ',0.15)';
+        pill.style.borderColor = 'rgba(' + accentRgb + ',0.4)';
+        pill.style.color = '#06d6a0';
+        pill.style.fontWeight = '600';
+        pill.style.cursor = 'default';
+        pill.removeAttribute('href');
+        pill.innerHTML = pill.innerHTML.replace(/soon$/i, '').trim();
+        // Inject a small "detected" label append
+        if (!pill.querySelector('.pill-detected-tag')) {
+          var tag = document.createElement('span');
+          tag.className = 'pill-detected-tag';
+          tag.style.cssText = 'font-size:0.7em;opacity:0.7;margin-left:4px;text-transform:uppercase;letter-spacing:0.5px';
+          tag.textContent = '• you';
+          pill.appendChild(tag);
+        }
+      } else if (isMacos) {
+        // macOS is always soft-disabled until we ship a macOS release.
+        pill.style.opacity = '0.55';
+        pill.style.cursor = 'not-allowed';
+      } else if (rel && rel.downloadUrl) {
+        // Other desktop platform has a real download — make pill clickable.
+        pill.setAttribute('href', rel.downloadUrl);
+        pill.style.cursor = 'pointer';
+        pill.addEventListener('mouseover', function(){
+          pill.style.background = 'rgba(255,255,255,0.08)';
+          pill.style.borderColor = 'rgba(255,255,255,0.25)';
+        });
+        pill.addEventListener('mouseout', function(){
+          pill.style.background = 'rgba(255,255,255,0.03)';
+          pill.style.borderColor = 'rgba(255,255,255,0.14)';
+        });
       }
-
-      // Dev-server fallback: if API failed (no platform data), show static fallback
-      if (parts.length === 0) {
-        parts.push('<a href="https://github.com/edutuvarna/AuraCorePro/releases/tag/v1.6.0" style="' + linkStyle + '">Linux (GitHub)</a>');
-        if (os !== 'macos') parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
-      }
-
-      content.innerHTML = parts.join('');
-    }
+    });
   }
 
   if (document.readyState === 'loading') {

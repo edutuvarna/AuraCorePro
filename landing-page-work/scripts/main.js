@@ -799,37 +799,33 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const p
     // on first load. If bilingual OS labels are needed later, hook into the language
     // toggle event and re-apply.
 
-    // Populate inline "Also:" alt-platforms row — show the 2 non-primary platforms.
-    // No dropdown / no layering: everything in normal document flow below the CTA row.
-    var list = document.getElementById('altPlatformsList');
-    if (list) {
-      var linkStyle = 'color:#fff;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,0.35);padding-bottom:1px';
-      var disabledStyle = 'color:#6b7280;font-style:italic';
+    // Populate "Other platforms" dropdown content — show the 2 non-primary platforms.
+    // Rendered IN NORMAL DOCUMENT FLOW via <details>; opening pushes content below DOWN,
+    // no position:absolute, no z-index — layering bugs impossible by design.
+    var content = document.getElementById('otherPlatformsContent');
+    if (content) {
       var parts = [];
-      var link = function(label, url) {
-        return '<a href="' + url + '" style="' + linkStyle + '">' + label + '</a>';
-      };
-      var comingSoon = function(label) {
-        return '<span style="' + disabledStyle + '">' + label + ' coming soon</span>';
-      };
+      var linkStyle = 'color:#fff;text-decoration:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:6px;font-size:0.95em;transition:all 0.15s;display:inline-block';
+      var disabledStyle = 'color:#6b7280;font-style:italic;font-size:0.9em;padding:6px 14px';
 
       if (os === 'windows') {
-        if (linux) parts.push(link('Linux', linux.downloadUrl));
-        parts.push(comingSoon('macOS'));
+        if (linux) parts.push('<a href="' + linux.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Linux</a>');
+        parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
       } else if (os === 'linux') {
-        if (win) parts.push(link('Windows', win.downloadUrl));
-        parts.push(comingSoon('macOS'));
+        if (win) parts.push('<a href="' + win.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Windows</a>');
+        parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
       } else if (os === 'macos') {
-        if (win) parts.push(link('Windows', win.downloadUrl));
-        if (linux) parts.push(link('Linux', linux.downloadUrl));
+        if (win) parts.push('<a href="' + win.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Windows</a>');
+        if (linux) parts.push('<a href="' + linux.downloadUrl + '" style="' + linkStyle + '" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'transparent\'">Linux</a>');
       }
 
-      // Only overwrite if we actually have something to show. The markup ships with a
-      // static "Linux · macOS coming soon" fallback so local-preview (no API) isn't blank.
-      if (parts.length > 0) {
-        var sep = ' <span style="opacity:0.4;margin:0 8px">\u00b7</span> ';
-        list.innerHTML = parts.join(sep);
+      // Dev-server fallback: if API failed (no platform data), show static fallback
+      if (parts.length === 0) {
+        parts.push('<a href="https://github.com/edutuvarna/AuraCorePro/releases/tag/v1.6.0" style="' + linkStyle + '">Linux (GitHub)</a>');
+        if (os !== 'macos') parts.push('<span style="' + disabledStyle + '">macOS coming soon</span>');
       }
+
+      content.innerHTML = parts.join('');
     }
   }
 

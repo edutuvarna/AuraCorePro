@@ -136,7 +136,7 @@ macos:{en:[
 // ═══════════════════════════════════════════════════════════
 const L={en:{
 'nav.features':'Features','nav.iso':'ISO Builder','nav.modules':'Modules','nav.pricing':'Pricing','nav.support':'Support','nav.signin':'Sign In','nav.signup':'Create Account',
-'hero.badge':'Available for Windows &amp; Linux \u2014 macOS Coming Soon','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
+'hero.badge':'Available for Windows & Linux \u2014 macOS Coming Soon','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
 'hero.desc':'The most advanced cross-platform optimization suite. 45+ intelligent modules and 7 AI models that clean, optimize, and protect your system across Windows, Linux, and macOS.',
 'hero.platforms':'Platforms',
 'hero.download':'Download Free','hero.createAccount':'Create Account','hero.seeFeatures':'See Features','hero.modules':'Modules','hero.languages':'Languages','hero.freeTier':'Free Tier','hero.bloatware':'Bloatware','hero.avnote':'Windows SmartScreen may show a warning - click More info then Run anyway. This is normal for new software.',

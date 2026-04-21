@@ -136,7 +136,7 @@ macos:{en:[
 // ═══════════════════════════════════════════════════════════
 const L={en:{
 'nav.features':'Features','nav.iso':'ISO Builder','nav.modules':'Modules','nav.pricing':'Pricing','nav.support':'Support','nav.signin':'Sign In','nav.signup':'Create Account',
-'hero.badge':'Now Available for Windows, Linux & macOS','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
+'hero.badge':'Available for Windows & Linux \u2014 macOS Coming Soon','hero.title':'Your System,<br><span class="gradient">Supercharged.</span>',
 'hero.desc':'The most advanced cross-platform optimization suite. 45+ intelligent modules and 7 AI models that clean, optimize, and protect your system across Windows, Linux, and macOS.',
 'hero.platforms':'Platforms',
 'hero.download':'Download Free','hero.createAccount':'Create Account','hero.seeFeatures':'See Features','hero.modules':'Modules','hero.languages':'Languages','hero.freeTier':'Free Tier','hero.bloatware':'Bloatware','hero.avnote':'Windows SmartScreen may show a warning - click More info then Run anyway. This is normal for new software.',
@@ -176,7 +176,7 @@ const L={en:{
 'ai.models.t':'7 Model Options','ai.models.d':'From TinyLlama 1.1B (fast) to Qwen 32B (powerful). Choose the best model for your hardware \u2014 all run 100% locally, no cloud needed.',
 },tr:{
 'nav.features':'Özellikler','nav.iso':'ISO Oluşturucu','nav.modules':'Modüller','nav.pricing':'Fiyatlandırma','nav.support':'Destek','nav.signin':'Giriş Yap','nav.signup':'Hesap Oluştur',
-'hero.badge':'Windows, Linux ve macOS i\u00e7in Haz\u0131r','hero.title':'Sisteminiz,<br><span class="gradient">S\u00fcper G\u00fc\u00e7l\u00fc.</span>',
+'hero.badge':'Windows ve Linux i\u00e7in mevcut \u2014 macOS yak\u0131nda','hero.title':'Sisteminiz,<br><span class="gradient">S\u00fcper G\u00fc\u00e7l\u00fc.</span>',
 'hero.desc':'En geli\u015fmi\u015f \u00e7apraz platform optimizasyon paketi. 45\'ten fazla ak\u0131ll\u0131 mod\u00fcl ve 7 AI model ile Windows, Linux ve macOS sistemlerinizi temizleyin, optimize edin ve koruyun.',
 'hero.platforms':'Platform',
 'hero.download':'Ücretsiz İndir','hero.createAccount':'Hesap Oluştur','hero.seeFeatures':'Özellikleri Gör','hero.modules':'Modül','hero.languages':'Dil','hero.freeTier':'Ücretsiz','hero.bloatware':'Bloatware','hero.avnote':'Windows SmartScreen uyarısı gösterebilir — Daha fazla bilgi ve ardından Yine de çalıştır seçeneklerine tıklayın. Bu yeni yazılımlar için normaldir.',
@@ -719,3 +719,139 @@ updateNavAuth();
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{if(a.getAttribute('href')==='#')return;e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'})})});
 // ESC to close modals
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();const pm=document.getElementById('payModal');if(pm)pm.remove();cmClose();const um=document.getElementById('userMenu');if(um)um.remove();}});
+
+
+// ============================================================================
+// Release pipeline integration (added 2026-04-21, Phase 6.6)
+// Fetches latest version from backend and updates primary Download CTAs.
+// Falls back silently to hardcoded v1.6.0 GitHub link if API unavailable.
+// ============================================================================
+(function() {
+  'use strict';
+
+  function detectOS() {
+    var p = (navigator.platform || '').toLowerCase();
+    var ua = (navigator.userAgent || '').toLowerCase();
+    if (p.indexOf('win') >= 0 || ua.indexOf('windows') >= 0) return 'windows';
+    if (p.indexOf('linux') >= 0 || ua.indexOf('linux') >= 0) return 'linux';
+    if (p.indexOf('mac') >= 0 || ua.indexOf('macintosh') >= 0) return 'macos';
+    return 'windows';
+  }
+
+  function displayOS(os) {
+    return { windows: 'Windows', linux: 'Linux', macos: 'macOS' }[os] || 'Windows';
+  }
+
+  async function fetchPlatformRelease(platform) {
+    try {
+      var r = await fetch('/api/updates/check?currentVersion=0.0.0&platform=' + platform);
+      if (!r.ok) return null;
+      var j = await r.json();
+      return j.updateAvailable ? j : null;
+    } catch (e) { return null; }
+  }
+
+  async function loadLatestRelease() {
+    var os = detectOS();
+
+    // Fetch all 3 platforms in parallel so we can populate dropdown correctly
+    var [win, linux, mac] = await Promise.all([
+      fetchPlatformRelease('windows'),
+      fetchPlatformRelease('linux'),
+      fetchPlatformRelease('macos'),
+    ]);
+
+    // Map detected OS to its fetched release (primary)
+    var primary = { windows: win, linux: linux, macos: mac }[os];
+
+    // Update primary button href + version
+    if (primary) {
+      document.querySelectorAll('.download-link').forEach(function(a) {
+        a.href = primary.downloadUrl;
+        a.style.pointerEvents = '';
+        a.style.opacity = '';
+      });
+      document.querySelectorAll('.download-version').forEach(function(el) {
+        el.textContent = 'v' + primary.version;
+      });
+      document.querySelectorAll('.download-platform').forEach(function(el) {
+        el.textContent = displayOS(os);
+      });
+    } else if (os === 'macos') {
+      // macOS has no release yet — soft-disable the button
+      document.querySelectorAll('.download-link').forEach(function(a) {
+        a.style.pointerEvents = 'none';
+        a.style.opacity = '0.65';
+      });
+    }
+
+    // Update primary button text to OS-aware label
+    var buttonText = {
+      windows: 'Download for Windows',
+      linux:   'Download for Linux',
+      macos:   'macOS Coming Soon',
+    }[os];
+    document.querySelectorAll('[data-i18n="hero.download"], [data-i18n="cta.btn"]').forEach(function(el) {
+      el.textContent = buttonText;
+    });
+    // TODO: when i18n language toggle fires, this text resets to the dictionary entry.
+    // For now, English-only OS labels are acceptable — most users see their detected OS
+    // on first load. If bilingual OS labels are needed later, hook into the language
+    // toggle event and re-apply.
+
+    // Populate platform pill row — always-visible pills, detected OS marked active.
+    // Non-detected desktop platform(s) become clickable links to their download URL.
+    // macOS is always "soon" (no click, italic) until a macOS release exists.
+    // No dropdown, no positioning, no layering — pills are inline in normal flow.
+    var platformData = { windows: win, linux: linux, macos: mac };
+    var labels = { windows: 'Windows', linux: 'Linux', macos: 'macOS' };
+    var accentRgb = '6,214,160';  // matches theme green #06d6a0
+    document.querySelectorAll('#platformPills .platform-pill').forEach(function(pill) {
+      var pos = pill.getAttribute('data-os');
+      var rel = platformData[pos];
+      var isDetected = (pos === os);
+      var isMacos = (pos === 'macos');
+
+      if (isDetected) {
+        // Active state: accent green background + border, no click (you're already on it).
+        pill.style.background = 'rgba(' + accentRgb + ',0.15)';
+        pill.style.borderColor = 'rgba(' + accentRgb + ',0.4)';
+        pill.style.color = '#06d6a0';
+        pill.style.fontWeight = '600';
+        pill.style.cursor = 'default';
+        pill.removeAttribute('href');
+        pill.innerHTML = pill.innerHTML.replace(/soon$/i, '').trim();
+        // Inject a small "detected" label append
+        if (!pill.querySelector('.pill-detected-tag')) {
+          var tag = document.createElement('span');
+          tag.className = 'pill-detected-tag';
+          tag.style.cssText = 'font-size:0.7em;opacity:0.7;margin-left:4px;text-transform:uppercase;letter-spacing:0.5px';
+          tag.textContent = '• you';
+          pill.appendChild(tag);
+        }
+      } else if (isMacos) {
+        // macOS is always soft-disabled until we ship a macOS release.
+        pill.style.opacity = '0.55';
+        pill.style.cursor = 'not-allowed';
+      } else if (rel && rel.downloadUrl) {
+        // Other desktop platform has a real download — make pill clickable.
+        pill.setAttribute('href', rel.downloadUrl);
+        pill.style.cursor = 'pointer';
+        pill.addEventListener('mouseover', function(){
+          pill.style.background = 'rgba(255,255,255,0.08)';
+          pill.style.borderColor = 'rgba(255,255,255,0.25)';
+        });
+        pill.addEventListener('mouseout', function(){
+          pill.style.background = 'rgba(255,255,255,0.03)';
+          pill.style.borderColor = 'rgba(255,255,255,0.14)';
+        });
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLatestRelease);
+  } else {
+    loadLatestRelease();
+  }
+})();

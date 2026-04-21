@@ -13,7 +13,9 @@ using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Desktop.Services.Navigation;
 using AuraCore.Desktop.Services.Responsive;
 using AuraCore.Domain.Enums;
+using AuraCore.UI.Avalonia.Services.Update;
 using AuraCore.UI.Avalonia.Views.Banners;
+using AuraCore.UI.Avalonia.Views.Controls;
 using AuraCore.UI.Avalonia.Views.Dialogs;
 using AuraCore.UI.Avalonia.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +36,10 @@ public sealed partial class MainWindow : Window
     // Phase 5.4 Task 11: navigation service for deep-links (e.g. Dashboard Smart Optimize)
     private readonly INavigationService? _nav;
     private EventHandler<NavigationRequestedEventArgs>? _navSectionRequestedHandler;
+
+    // Phase 6.6.G: stored banner click handlers to prevent additive subscriptions on repeated UpdateFound events.
+    private EventHandler<RoutedEventArgs>? _updateBtnHandler;
+    private EventHandler<RoutedEventArgs>? _laterBtnHandler;
 
     public MainWindow()
     {
@@ -725,25 +731,116 @@ public sealed partial class MainWindow : Window
         // Phase 6.1.D — dispatch pending launch-URL (if we were opened via auracore://).
         var pendingUrl = App.PendingLaunchUrl;
         App.PendingLaunchUrl = null; // consume once
-        if (string.IsNullOrEmpty(pendingUrl)) return;
+        if (!string.IsNullOrEmpty(pendingUrl))
+        {
+            try
+            {
+                var knownSections = new System.Collections.Generic.HashSet<string>(System.StringComparer.Ordinal)
+                {
+                    "dashboard", "settings", "disk-health",
+                    "ai-recommendations", "ai-insights", "ai-schedule"
+                };
+                var intent = AuraCore.UI.Avalonia.Helpers.UrlSchemeHandler.Parse(
+                    pendingUrl, knownSections, AuraCore.UI.Avalonia.Helpers.ModuleIdsRegistry.All);
 
+                if (intent is not null)
+                {
+                    var nav = App.Services?.GetService(typeof(AuraCore.Application.Interfaces.Platform.INavigationService))
+                        as AuraCore.Application.Interfaces.Platform.INavigationService;
+                    nav?.NavigateTo(intent.Id);
+                }
+            }
+            catch { /* deep-link failure must not crash main window */ }
+        }
+
+        // Phase 6.6.G — subscribe to UpdateChecker.UpdateFound to show banner or mandatory dialog.
         try
         {
-            var knownSections = new System.Collections.Generic.HashSet<string>(System.StringComparer.Ordinal)
-            {
-                "dashboard", "settings", "disk-health",
-                "ai-recommendations", "ai-insights", "ai-schedule"
-            };
-            var intent = AuraCore.UI.Avalonia.Helpers.UrlSchemeHandler.Parse(
-                pendingUrl, knownSections, AuraCore.UI.Avalonia.Helpers.ModuleIdsRegistry.All);
-
-            if (intent is not null)
-            {
-                var nav = App.Services?.GetService(typeof(AuraCore.Application.Interfaces.Platform.INavigationService))
-                    as AuraCore.Application.Interfaces.Platform.INavigationService;
-                nav?.NavigateTo(intent.Id);
-            }
+            UpdateChecker.Instance.UpdateFound += OnUpdateFound;
         }
-        catch { /* deep-link failure must not crash main window */ }
+        catch { /* non-fatal — update banner stays hidden */ }
+    }
+
+    // ─── UPDATE BANNER / MANDATORY DIALOG (Phase 6.6.G) ─────────────
+
+    private void OnUpdateFound(UpdateInfo info)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (info.IsMandatory)
+                ShowMandatoryDialog(info);
+            else
+                ShowBanner(info);
+        });
+    }
+
+    private void ShowBanner(UpdateInfo info)
+    {
+        var banner = this.FindControl<UpdateBanner>("UpdateBanner");
+        if (banner is null) return;
+
+        var text = banner.FindControl<TextBlock>("BannerText");
+        if (text is not null)
+            text.Text = string.Format(LocalizationService.Get("UpdateBanner_Message"), info.Version);
+
+        var updateBtn = banner.FindControl<Button>("UpdateBtn");
+        var laterBtn  = banner.FindControl<Button>("LaterBtn");
+
+        // Detach stale handlers before reattaching — prevents N-multiplied downloads
+        // when UpdateFound fires more than once (timer re-check, force re-check, etc.).
+        if (_updateBtnHandler is not null && updateBtn is not null) updateBtn.Click -= _updateBtnHandler;
+        if (_laterBtnHandler  is not null && laterBtn  is not null) laterBtn.Click  -= _laterBtnHandler;
+
+        _updateBtnHandler = async (_, _) => await StartDownloadFlow(info);
+        _laterBtnHandler  = (_, _) => { banner.IsVisible = false; };
+
+        if (updateBtn is not null) updateBtn.Click += _updateBtnHandler;
+        if (laterBtn  is not null) laterBtn.Click  += _laterBtnHandler;
+
+        banner.IsVisible = true;
+    }
+
+    private async void ShowMandatoryDialog(UpdateInfo info)
+    {
+        try
+        {
+            var dialog = new MandatoryUpdateDialog();
+
+            var msgText = dialog.FindControl<TextBlock>("MessageText");
+            if (msgText is not null)
+                msgText.Text = string.Format(LocalizationService.Get("UpdateBanner_Mandatory_Message"), info.Version);
+
+            var updateBtn = dialog.FindControl<Button>("UpdateBtn");
+            if (updateBtn is not null)
+                updateBtn.Click += async (_, _) =>
+                {
+                    updateBtn.IsEnabled = false;
+                    dialog.MarkInstalling();  // allow OnClosing through once install begins
+                    await StartDownloadFlow(info);
+                };
+
+            await dialog.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[UpdateFlow] Mandatory dialog failed: {ex.Message}");
+        }
+    }
+
+    private async Task StartDownloadFlow(UpdateInfo info)
+    {
+        try
+        {
+            var downloader = App.Services.GetRequiredService<IUpdateDownloader>();
+            var avail = new AvailableUpdate(info.Version, info.DownloadUrl, info.SignatureHash, info.IsMandatory);
+            var progress = new Progress<double>(_ => { /* progress bar wiring is future polish */ });
+            var path = await downloader.DownloadAsync(avail, progress, CancellationToken.None);
+            downloader.InstallAndExit(path);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[UpdateFlow] Download failed: {ex.Message}");
+            // Non-fatal: banner stays visible for retry
+        }
     }
 }

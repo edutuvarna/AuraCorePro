@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AuraCore.UI.Avalonia.Views.Dialogs.MandatoryUpdateDialog"
+        Width="500" Height="240" CanResize="False" WindowStartupLocation="CenterOwner"
+        SystemDecorations="BorderOnly" Topmost="True">
+  <Border Background="{DynamicResource BgCardElevatedBrush}" Padding="24" CornerRadius="12">
+    <DockPanel>
+      <TextBlock x:Name="TitleText" DockPanel.Dock="Top"
+                 FontSize="18" FontWeight="Bold" Margin="0,0,0,12"
+                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+      <TextBlock x:Name="MessageText" DockPanel.Dock="Top"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource TextSecondaryBrush}"/>
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right"
+                  Spacing="10" Margin="0,12,0,0">
+        <Button x:Name="UpdateBtn" Classes="primary"/>
+      </StackPanel>
+      <ProgressBar x:Name="ProgressBar" DockPanel.Dock="Bottom" Margin="0,12,0,0"
+                   Minimum="0" Maximum="100" Value="0" IsVisible="False"/>
+    </DockPanel>
+  </Border>
+</Window>

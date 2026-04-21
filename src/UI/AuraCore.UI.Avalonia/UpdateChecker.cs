@@ -98,6 +98,14 @@ public sealed class UpdateChecker
         catch { }
     }
 
+    private static string DetectPlatform()
+    {
+        if (OperatingSystem.IsWindows()) return "windows";
+        if (OperatingSystem.IsLinux())   return "linux";
+        if (OperatingSystem.IsMacOS())   return "macos";
+        return "windows";
+    }
+
     public async Task CheckForUpdateAsync(bool forceNotify = false)
     {
         if (IsChecking) return;
@@ -107,7 +115,7 @@ public sealed class UpdateChecker
         try
         {
             var apiUrl = LoginWindow.ApiBaseUrl;
-            var url = $"{apiUrl}/api/updates/check?currentVersion={CurrentVersion}&channel=stable";
+            var url = $"{apiUrl}/api/updates/check?currentVersion={CurrentVersion}&channel=stable&platform={DetectPlatform()}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             if (!string.IsNullOrEmpty(SessionState.AccessToken))
@@ -142,6 +150,7 @@ public sealed class UpdateChecker
             var mandatory = root.TryGetProperty("isMandatory", out var mProp) && mProp.GetBoolean();
             var deltaUrl = root.TryGetProperty("deltaUrl", out var duProp) && duProp.ValueKind == JsonValueKind.String ? duProp.GetString() ?? "" : "";
             var deltaSize = root.TryGetProperty("deltaSize", out var dsProp) && dsProp.ValueKind == JsonValueKind.Number ? dsProp.GetInt64() : (long?)null;
+            var signatureHash = root.TryGetProperty("signatureHash", out var shProp) && shProp.ValueKind == JsonValueKind.String ? shProp.GetString() ?? "" : "";
 
             if (!mandatory && version == _skippedVersion && !forceNotify)
             {
@@ -170,7 +179,8 @@ public sealed class UpdateChecker
                 DeltaUrl = deltaUrl,
                 DeltaSize = deltaSize,
                 ReleaseNotes = releaseNotes,
-                IsMandatory = mandatory
+                IsMandatory = mandatory,
+                SignatureHash = signatureHash
             });
         }
         catch (TaskCanceledException)
@@ -289,5 +299,6 @@ public sealed class UpdateInfo
     public long? DeltaSize { get; init; }
     public string ReleaseNotes { get; init; } = "";
     public bool IsMandatory { get; init; }
+    public string SignatureHash { get; init; } = "";
     public bool HasDelta => !string.IsNullOrEmpty(DeltaUrl);
 }

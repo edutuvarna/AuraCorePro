@@ -139,6 +139,22 @@ public sealed class CryptoController : ControllerBase
         await _db.SaveChangesAsync(ct);
         return Ok(new { status = "activated", userEmail = payment.User.Email, tier = payment.Tier });
     }
+
+    [HttpPost("admin/reject/{paymentId:guid}")]
+    [Authorize(Roles = "admin")]
+    [AuraCore.API.Filters.AuditAction("RejectCryptoPayment", "Payment", TargetIdFromRouteKey = "paymentId")]
+    public async Task<IActionResult> AdminRejectPayment(Guid paymentId, CancellationToken ct)
+    {
+        var payment = await _db.Payments.FirstOrDefaultAsync(p => p.Id == paymentId, ct);
+        if (payment is null) return NotFound(new { error = "Payment not found" });
+
+        if (payment.Status is not "pending" and not "confirming")
+            return BadRequest(new { error = $"Cannot reject payment in status '{payment.Status}'" });
+
+        payment.Status = "rejected";
+        await _db.SaveChangesAsync(ct);
+        return Ok(new { message = "Payment rejected", payment.Id, payment.Status });
+    }
 }
 
 public sealed record CryptoPaymentRequest(string Crypto, string Tier, string Plan);

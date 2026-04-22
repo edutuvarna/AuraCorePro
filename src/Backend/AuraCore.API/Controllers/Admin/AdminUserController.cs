@@ -100,22 +100,16 @@ public sealed class AdminUserController : ControllerBase
         var loginAttempts = await _db.LoginAttempts.Where(a => a.Email == user.Email).ToListAsync(ct);
         _db.LoginAttempts.RemoveRange(loginAttempts);
 
-        var licenses = await _db.Licenses.Where(l => l.UserId == id).ToListAsync(ct);
-        foreach (var lic in licenses)
-        {
-            var devices = await _db.Devices.Where(d => d.LicenseId == lic.Id).ToListAsync(ct);
-            _db.Devices.RemoveRange(devices);
-        }
-        _db.Licenses.RemoveRange(licenses);
+        // Load licenses with their devices eagerly, then capture deviceIds BEFORE
+        // any RemoveRange. Collecting deviceIds AFTER RemoveRange (the old pattern)
+        // returned empty because EF's change tracker excludes Deleted-state entities
+        // from subsequent queries — CTP-5 / users.md F-3.
+        var licenses = await _db.Licenses
+            .Where(l => l.UserId == id)
+            .Include(l => l.Devices)
+            .ToListAsync(ct);
+        var deviceIds = licenses.SelectMany(l => l.Devices).Select(d => d.Id).ToList();
 
-        var payments = await _db.Payments.Where(p => p.UserId == id).ToListAsync(ct);
-        _db.Payments.RemoveRange(payments);
-
-        var subscriptions = await _db.Subscriptions.Where(s => s.UserId == id).ToListAsync(ct);
-        _db.Subscriptions.RemoveRange(subscriptions);
-
-        // CrashReports and TelemetryEvents are linked via Device, not directly to User
-        var deviceIds = licenses.SelectMany(l => _db.Devices.Where(d => d.LicenseId == l.Id).Select(d => d.Id)).ToList();
         if (deviceIds.Count > 0)
         {
             var crashReports = await _db.CrashReports.Where(c => deviceIds.Contains(c.DeviceId)).ToListAsync(ct);
@@ -124,6 +118,16 @@ public sealed class AdminUserController : ControllerBase
             var telemetry = await _db.TelemetryEvents.Where(t => deviceIds.Contains(t.DeviceId)).ToListAsync(ct);
             _db.TelemetryEvents.RemoveRange(telemetry);
         }
+
+        foreach (var lic in licenses)
+            _db.Devices.RemoveRange(lic.Devices);
+        _db.Licenses.RemoveRange(licenses);
+
+        var payments = await _db.Payments.Where(p => p.UserId == id).ToListAsync(ct);
+        _db.Payments.RemoveRange(payments);
+
+        var subscriptions = await _db.Subscriptions.Where(s => s.UserId == id).ToListAsync(ct);
+        _db.Subscriptions.RemoveRange(subscriptions);
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync(ct);

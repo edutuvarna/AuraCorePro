@@ -15,23 +15,27 @@ public sealed class AdminCrashReportController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] string? search = null,
-        [FromQuery] string? appVersion = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
+        [FromQuery] string? version = null,      // T1.19: frontend sends ?version=
+        [FromQuery] string? appVersion = null,   // Legacy alias (?appVersion=)
+        [FromQuery] string? exceptionType = null,
         CancellationToken ct = default)
     {
         if (pageSize > 100) pageSize = 100;
         if (pageSize < 1) pageSize = 10;
         if (page < 1) page = 1;
 
-        var query = _db.CrashReports.AsQueryable();
+        // T1.19: coalesce — accept whichever param the caller provides
+        var versionFilter = !string.IsNullOrEmpty(version) ? version : appVersion;
 
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(c => c.ExceptionType.Contains(search));
+        var query = _db.CrashReports.AsNoTracking().AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(appVersion))
-            query = query.Where(c => c.AppVersion == appVersion);
+        if (!string.IsNullOrEmpty(versionFilter))
+            query = query.Where(c => c.AppVersion == versionFilter);
+
+        if (!string.IsNullOrEmpty(exceptionType))
+            query = query.Where(c => c.ExceptionType == exceptionType);
 
         var total = await query.CountAsync(ct);
 
@@ -41,8 +45,12 @@ public sealed class AdminCrashReportController : ControllerBase
             .Take(pageSize)
             .Select(c => new
             {
-                c.Id, c.DeviceId, c.AppVersion, c.ExceptionType, c.CreatedAt,
-                deviceName = c.Device.MachineName
+                c.Id, c.DeviceId, c.AppVersion, c.ExceptionType,
+                c.CreatedAt,
+                // T3.13 restore: first 200 chars of stack trace for list-view quick-look
+                stackTracePreview = c.StackTrace.Length > 200
+                    ? c.StackTrace.Substring(0, 200) + "..."
+                    : c.StackTrace
             })
             .ToListAsync(ct);
 

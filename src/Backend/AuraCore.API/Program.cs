@@ -55,13 +55,19 @@ builder.Services.AddCors(options =>
         else
         {
             // T3.17: production domain is auracore.pro (not auracorepro.com)
+            // Phase 6.9 hotfix: AllowCredentials needed for SignalR + any other
+            // cross-origin call that uses `credentials: 'include'` (admin panel
+            // at admin.auracore.pro → api.auracore.pro). Without this,
+            // browsers reject preflight responses with empty
+            // Access-Control-Allow-Credentials header.
             policy.WithOrigins(
                     "https://auracore.pro",
                     "https://www.auracore.pro",
                     "https://admin.auracore.pro",
                     "https://download.auracore.pro")
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
         }
     });
 });

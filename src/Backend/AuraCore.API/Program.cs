@@ -17,6 +17,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddApiInfrastructure(connectionString);
 
+builder.Services.AddScoped<AuraCore.API.Application.Services.Audit.IAuditLogService,
+                          AuraCore.API.Infrastructure.Services.Audit.AuditLogService>();
+
 // CORS — restrict origins in production
 builder.Services.AddCors(options =>
 {

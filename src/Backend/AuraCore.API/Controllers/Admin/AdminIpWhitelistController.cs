@@ -72,6 +72,18 @@ public sealed class AdminIpWhitelistController : ControllerBase
         await _db.SaveChangesAsync(ct);
         return Ok(new { message = "IP removed from whitelist" });
     }
+
+    [HttpGet("my-ip")]
+    public IActionResult GetMyIp()
+    {
+        // Admin calling from admin.auracore.pro → their IP is in X-Forwarded-For
+        // (nginx proxy). HttpContext.Connection.RemoteIpAddress reads the full chain
+        // via ForwardedHeaders middleware (configured in Program.cs).
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        // IPv6-mapped-IPv4 normalization (::ffff:192.168.1.1 → 192.168.1.1)
+        if (ip.StartsWith("::ffff:")) ip = ip.Substring(7);
+        return Ok(new { ip });
+    }
 }
 
 public sealed class AddIpWhitelistRequest

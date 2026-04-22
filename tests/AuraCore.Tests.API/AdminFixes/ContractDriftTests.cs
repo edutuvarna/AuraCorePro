@@ -50,4 +50,52 @@ public class ContractDriftTests
 
         Assert.Contains("\"tier\":\"free\"", json);
     }
+
+    [Fact]
+    public async Task AdminCrashReport_GetStats_has_semantic_aliases()
+    {
+        var db = BuildDb();
+        var deviceId = Guid.NewGuid();
+        db.Devices.Add(new Device { Id = deviceId, HardwareFingerprint = "fp", LicenseId = Guid.NewGuid() });
+        db.CrashReports.Add(new CrashReport {
+            DeviceId = deviceId, AppVersion = "1.0", ExceptionType = "Null", StackTrace = "st",
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var controller = new AdminCrashReportController(db);
+        var result = await controller.GetStats(CancellationToken.None);
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var json = System.Text.Json.JsonSerializer.Serialize(ok.Value);
+
+        // CTP-11: both time-window and semantic keys present
+        Assert.Contains("\"last24h\":", json);
+        Assert.Contains("\"today\":", json);
+        Assert.Contains("\"last7d\":", json);
+        Assert.Contains("\"thisWeek\":", json);
+        Assert.Contains("\"last30d\":", json);
+        Assert.Contains("\"thisMonth\":", json);
+    }
+
+    [Fact]
+    public async Task AdminTelemetry_GetAll_has_pages_field()
+    {
+        var db = BuildDb();
+        var deviceId = Guid.NewGuid();
+        db.Devices.Add(new Device { Id = deviceId, HardwareFingerprint = "fp", LicenseId = Guid.NewGuid() });
+        for (int i = 0; i < 60; i++)
+        {
+            db.TelemetryEvents.Add(new TelemetryEvent { DeviceId = deviceId, EventType = "e", EventData = "{}" });
+        }
+        await db.SaveChangesAsync();
+
+        var controller = new AdminTelemetryController(db);
+        var result = await controller.GetAll(eventType: null, page: 1, pageSize: 50, ct: CancellationToken.None);
+        var ok = Assert.IsType<OkObjectResult>(result);
+        var json = System.Text.Json.JsonSerializer.Serialize(ok.Value);
+
+        // CTP-10: pages field
+        Assert.Contains("\"pages\":2", json);
+        Assert.Contains("\"total\":60", json);
+    }
 }

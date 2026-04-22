@@ -46,7 +46,7 @@ public sealed class AdminCrashReportController : ControllerBase
             })
             .ToListAsync(ct);
 
-        return Ok(new { total, page, pageSize, items });
+        return Ok(new { total, page, pageSize, pages = (int)Math.Ceiling((double)total / pageSize), items });
     }
 
     [HttpGet("{id:guid}")]
@@ -88,7 +88,13 @@ public sealed class AdminCrashReportController : ControllerBase
             .Take(10)
             .ToListAsync(ct);
 
-        return Ok(new { total, last24h, last7d, last30d, topExceptions, topVersions });
+        return Ok(new {
+            total,
+            last24h, today = last24h,         // CTP-11 semantic alias
+            last7d, thisWeek = last7d,         // CTP-11 semantic alias
+            last30d, thisMonth = last30d,      // CTP-11 semantic alias
+            topExceptions, topVersions
+        });
     }
 
     [HttpDelete("{id:guid}")]

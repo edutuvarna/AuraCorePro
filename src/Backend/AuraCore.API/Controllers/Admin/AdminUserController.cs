@@ -52,7 +52,7 @@ public sealed class AdminUserController : ControllerBase
             })
             .ToListAsync(ct);
 
-        return Ok(new { total, page, pageSize, users });
+        return Ok(new { total, page, pageSize, pages = (int)Math.Ceiling((double)total / pageSize), users });
     }
 
     [HttpGet("{id:guid}")]

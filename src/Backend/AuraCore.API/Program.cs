@@ -3,11 +3,13 @@ using AuraCore.API.Infrastructure;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Port=5432;Database=auracoredb;Username=postgres;Password=CHANGE_ME_IN_ENV";
@@ -133,36 +135,55 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// Maintenance mode check
+// Maintenance mode check — cached 30s, fails FAST (503) on DB error so an
+// accidentally-unreachable app_configs table doesn't silently disable the
+// maintenance banner (configuration.md F-4).
 app.Use(async (context, next) =>
 {
-    // Skip maintenance check for admin endpoints, health, and auth
     var path = context.Request.Path.Value?.ToLower() ?? "";
+    // Skip maintenance check for admin endpoints, health, and auth
     if (path.StartsWith("/api/admin/") || path.StartsWith("/health") || path.StartsWith("/api/auth/"))
     {
         await next();
         return;
     }
 
+    var cache = context.RequestServices.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+    AuraCore.API.Domain.Entities.AppConfig? config;
     try
     {
-        using var scope = app.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
-        var config = await db.AppConfigs.FirstOrDefaultAsync(c => c.Id == 1);
-        if (config?.IsMaintenanceMode == true)
-        {
-            context.Response.StatusCode = 503;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(
-                System.Text.Json.JsonSerializer.Serialize(new
-                {
-                    error = "Service is under maintenance",
-                    message = config.MaintenanceMessage ?? "AuraCore Pro is currently under maintenance. Please try again later."
-                }));
-            return;
-        }
+        config = await cache.GetOrCreateAsync<AuraCore.API.Domain.Entities.AppConfig?>(
+            "maintenance-config",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
+                var db = context.RequestServices.GetRequiredService<AuraCoreDbContext>();
+                return await db.AppConfigs.FirstOrDefaultAsync(c => c.Id == 1);
+            });
     }
-    catch { /* If config check fails, don't block requests */ }
+    catch
+    {
+        // Fail FAST: DB unreachable → 503 (not fail-open) so an actual maintenance
+        // mode toggle can't be silently nullified by a DB hiccup.
+        context.Response.StatusCode = 503;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(
+            System.Text.Json.JsonSerializer.Serialize(new { error = "Configuration unavailable" }));
+        return;
+    }
+
+    if (config?.IsMaintenanceMode == true)
+    {
+        context.Response.StatusCode = 503;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(
+            System.Text.Json.JsonSerializer.Serialize(new
+            {
+                error = "Service is under maintenance",
+                message = config.MaintenanceMessage ?? "AuraCore Pro is currently under maintenance. Please try again later."
+            }));
+        return;
+    }
 
     await next();
 });

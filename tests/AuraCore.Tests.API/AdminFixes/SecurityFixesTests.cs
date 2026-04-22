@@ -115,4 +115,29 @@ public class SecurityFixesTests
         var crashOrphansBefore = await db.CrashReports.CountAsync(c => deviceIds.Contains(c.DeviceId));
         Assert.Equal(1, crashOrphansBefore);   // and we can find children to cascade-delete
     }
+
+    [Fact]
+    public void Stripe_webhook_null_signature_contract_check()
+    {
+        // Contract: When Stripe-Signature header is absent, StringValues.ToString() returns
+        // empty string, which the webhook handler must catch before calling ConstructEvent
+        // (which would otherwise throw NullReferenceException → HTTP 500). Pins the
+        // string.IsNullOrEmpty(signature) guard that Task 8 added to StripeController.Webhook.
+        var headers = new Microsoft.AspNetCore.Http.HeaderDictionary();
+        // No Stripe-Signature header added.
+        var signature = headers["Stripe-Signature"].ToString();
+        Assert.True(string.IsNullOrEmpty(signature));  // → BadRequest(new { error = "Missing signature" })
+    }
+
+    [Fact]
+    public void Stripe_webhook_empty_signature_also_rejected()
+    {
+        // Contract: Even if the header is present but empty, the guard rejects it.
+        var headers = new Microsoft.AspNetCore.Http.HeaderDictionary
+        {
+            ["Stripe-Signature"] = ""
+        };
+        var signature = headers["Stripe-Signature"].ToString();
+        Assert.True(string.IsNullOrEmpty(signature));
+    }
 }

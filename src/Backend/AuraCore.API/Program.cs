@@ -54,10 +54,12 @@ builder.Services.AddCors(options =>
         }
         else
         {
+            // T3.17: production domain is auracore.pro (not auracorepro.com)
             policy.WithOrigins(
-                    "https://auracorepro.com",
-                    "https://www.auracorepro.com",
-                    "https://admin.auracorepro.com")
+                    "https://auracore.pro",
+                    "https://www.auracore.pro",
+                    "https://admin.auracore.pro",
+                    "https://download.auracore.pro")
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         }

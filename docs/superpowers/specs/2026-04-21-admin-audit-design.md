@@ -244,7 +244,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Subscriptions | subagent-1 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/subscriptions.md |
 | Users | subagent-2 | done | 1 | 3 | 3 | 2 | docs/admin-audit/findings/users.md |
 | Licenses | subagent-3 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/licenses.md |
-| Payments | - | pending | - | - | - | - | - |
+| Payments | subagent-4 | done | 3 | 3 | 3 | 2 | docs/admin-audit/findings/payments.md |
 | Devices | - | pending | - | - | - | - | - |
 | Updates | - | pending | - | - | - | - | - |
 | Crash Reports | - | pending | - | - | - | - | - |
@@ -292,6 +292,24 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 **Risk for other tabs:** The same rollback may have stripped other controllers. Each subsequent subagent should compare the local repo controller to any backups found at `/root/auracore-src-backup-final-202604122153/AuraCore.API/Controllers/Admin/` and verify the live DLL strings contain the expected method names.
 **Backup location:** `/root/auracore-src-backup-final-202604122153/AuraCore.API/Controllers/Admin/` — this backup (April 12) predates the rollback-based April 14 DLL. Use `strings /var/www/auracore-api/AuraCore.API.dll | grep AdminXController` to identify which methods survived the rollback.
 **Fix:** For each gutted controller: restore the full implementation from the backup, test against the frontend's expected API contract, then rebuild and redeploy.
+
+### CTP-7: Webhook idempotency — payment handlers must check ExternalId before inserting
+**First surfaced:** Payments tab (F-5). May also affect: any future webhook-driven payment flow.
+**Pattern:** `HandleCheckoutCompleted` and `HandleInvoicePaid` in `StripeController.cs` call `_db.Payments.Add(...)` unconditionally. Stripe guaranteed-delivery retries can fire the same event multiple times. Without an idempotency check, each retry creates a new payment record and re-updates the license. The server backup had this guard (`AnyAsync(p => p.ExternalId == sessionId && p.Status == "completed")`) at line 183–184 — it was lost in the rollback.
+**DB constraint gap:** `ExternalId` index is non-unique in EF config AND not even created in the DB (migration did not apply). No DB-level deduplication protection.
+**Fix:** Restore the `alreadyProcessed` check from backup. Add `e.HasIndex(p => p.ExternalId).IsUnique()` with partial index for NULLs.
+
+### CTP-8: Frontend hardcoded `$` currency symbol — multi-currency amounts displayed incorrectly
+**First surfaced:** Payments tab (F-7). Likely also affects: Dashboard recent payments panel.
+**Pattern:** `page.tsx:669` — `${ (p.amount ?? 0).toFixed(2) }` — hardcoded `$` prefix. The API returns `currency` field (USD/TRY/EUR/BTC/USDT); the frontend never reads it. Turkish/European users who paid in TRY or EUR see their payment shown as `$X.XX`.
+**Fix:** Replace hardcoded `$` with `Intl.NumberFormat` currency-aware formatting.
+
+### CTP-6 UPDATE: Financial controllers also stripped by rollback
+Payments audit confirms CTP-6 extends beyond `AdminLicenseController`. The rollback stripped:
+- `StripeController.cs`: 408 lines (backup) → 276 lines (local). Lost: idempotency check, `invoice.payment_failed` handler, `charge.refunded` handler, dispute handlers, structured logging.
+- `CryptoController.cs`: 162 lines (backup) → 144 lines (local). Lost: `AdminRejectPayment` endpoint.
+- `AdminChartController.cs`: Entire controller missing from local repo and deployed DLL (backup has full implementation).
+These are higher-severity than the Licenses rollback because they affect payment processing correctness.
 
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1

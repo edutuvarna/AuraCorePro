@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   LayoutDashboard, Users, CreditCard, Shield, Settings,
-  Search, Trash2, KeyRound, Crown, Activity, Server,
-  TrendingUp, UserCheck, DollarSign, Clock, Check,
-  RefreshCw, Eye, Ban, Zap, Globe, ChevronRight, ChevronLeft, X,
+  Search, Trash2, KeyRound, Crown, Server,
+  UserCheck, DollarSign, Clock, Check,
+  RefreshCw, Ban, Zap, Globe, ChevronRight, ChevronLeft,
   Cpu, HardDrive, Wifi, WifiOff, ShieldCheck,
   Monitor, AlertTriangle, BarChart2, Settings2, Key, Bug, Plus,
   CheckCircle2, XCircle, ChevronDown, ArrowUpRight, ArrowDownRight,
-  Layers, Lock, Unlock, FileText, Send
+  Layers, Lock, Unlock, FileText
 } from 'lucide-react';
 import { api, setToken, getToken } from '@/lib/api';
 import { startConnection, stopConnection } from '@/lib/signalr';
@@ -22,6 +22,9 @@ import { SubscriptionsPage } from '@/views/SubscriptionsPage';
 import { LicensesPage } from '@/views/LicensesPage';
 import { PaymentsPage } from '@/views/PaymentsPage';
 import { DevicesPage } from '@/views/DevicesPage';
+import { UpdatesPage } from '@/views/UpdatesPage';
+import { CrashReportsPage } from '@/views/CrashReportsPage';
+import { TelemetryPage } from '@/views/TelemetryPage';
 
 // ────────────────────────────────────────────────
 // Types
@@ -138,237 +141,6 @@ function StatusBadge({ status }: { status: string }) {
 
 function TierBadge({ tier }: { tier: string }) {
   return <StatusBadge status={tier} />;
-}
-
-// ────────────────────────────────────────────────
-// UPDATES PAGE
-// ────────────────────────────────────────────────
-function UpdatesPage() {
-  const [updates, setUpdates] = useState<any[]>([]);
-  const [form, setForm] = useState({ version: '', downloadUrl: '', releaseNotes: '', channel: 'stable', isMandatory: false });
-  const [showForm, setShowForm] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  useEffect(() => { api.getUpdates().then(setUpdates); }, []);
-
-  const publish = async () => {
-    const { ok, data } = await api.publishUpdate(form);
-    if (ok) { setMsg('Update published!'); setShowForm(false); api.getUpdates().then(setUpdates); setForm({ version: '', downloadUrl: '', releaseNotes: '', channel: 'stable', isMandatory: false }); }
-    else setMsg(data?.error || 'Failed');
-  };
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Updates" subtitle="Manage app update releases">
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2"><Plus className="w-4 h-4" />Publish Update</button>
-      </PageHeader>
-
-      {showForm && (
-        <div className="glass-card p-6 mb-5 animate-slide-up max-w-2xl">
-          <h3 className="font-display font-semibold mb-4">New Update</h3>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Version</label>
-              <input value={form.version} onChange={e => setForm({ ...form, version: e.target.value })} className="input-dark w-full" placeholder="1.6.0" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Channel</label>
-              <select value={form.channel} onChange={e => setForm({ ...form, channel: e.target.value })} className="input-dark w-full">
-                <option value="stable">Stable</option><option value="beta">Beta</option>
-              </select>
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Download URL</label>
-            <input value={form.downloadUrl} onChange={e => setForm({ ...form, downloadUrl: e.target.value })} className="input-dark w-full" placeholder="https://..." />
-          </div>
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Release Notes</label>
-            <textarea value={form.releaseNotes} onChange={e => setForm({ ...form, releaseNotes: e.target.value })} className="input-dark w-full h-24 resize-none" />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.isMandatory} onChange={e => setForm({ ...form, isMandatory: e.target.checked })} className="rounded" />
-              <span className="text-sm text-white/60">Mandatory update</span>
-            </label>
-            <div className="flex gap-3">
-              <button onClick={() => setShowForm(false)} className="btn-ghost">Cancel</button>
-              <button onClick={publish} className="btn-primary flex items-center gap-2"><Send className="w-4 h-4" />Publish</button>
-            </div>
-          </div>
-          {msg && <p className={`text-sm mt-3 ${msg.includes('!') ? 'text-aura-green' : 'text-aura-red'}`}>{msg}</p>}
-        </div>
-      )}
-
-      <div className="glass-card p-5">
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">Version</th>
-            <th className="text-left py-3 px-4 font-medium">Channel</th>
-            <th className="text-left py-3 px-4 font-medium">Mandatory</th>
-            <th className="text-left py-3 px-4 font-medium">Published</th>
-            <th className="text-right py-3 px-4 font-medium">Actions</th>
-          </tr></thead>
-          <tbody>
-            {updates.map((u: any) => (
-              <tr key={u.id} className="table-row">
-                <td className="py-3 px-4 font-mono font-semibold text-accent">{u.version}</td>
-                <td className="py-3 px-4"><StatusBadge status={u.channel || 'stable'} /></td>
-                <td className="py-3 px-4">{u.isMandatory ? <span className="text-aura-amber">Yes</span> : <span className="text-white/30">No</span>}</td>
-                <td className="py-3 px-4 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
-                <td className="py-3 px-4 text-right">
-                  <button onClick={async () => { if(confirm('Delete?')) { await api.deleteUpdate(u.id); api.getUpdates().then(setUpdates); }}}
-                    className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors"><Trash2 className="w-4 h-4" /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {updates.length === 0 && <EmptyState icon={Zap} title="No updates published" subtitle="Click 'Publish Update' to create one" />}
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────
-// CRASH REPORTS PAGE
-// ────────────────────────────────────────────────
-function CrashReportsPage() {
-  const [data, setData] = useState<any>({ items: [], total: 0, page: 1, pages: 0 });
-  const [stats, setCrashStats] = useState<any>(null);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [detail, setDetail] = useState<any>(null);
-
-  const load = useCallback(async () => {
-    const [d, s] = await Promise.all([api.getCrashReports(search || undefined, undefined, page), api.getCrashStats()]);
-    setData(d); setCrashStats(s);
-  }, [search, page]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Crash Reports" subtitle="Application crash diagnostics">
-        <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
-      </PageHeader>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <KPICard label="Total Crashes" value={stats?.total ?? data.total ?? 0} icon={Bug} color="text-aura-red" />
-        <KPICard label="Today" value={stats?.today ?? 0} icon={AlertTriangle} color="text-aura-amber" />
-        <KPICard label="This Week" value={stats?.thisWeek ?? 0} icon={TrendingUp} color="text-accent" />
-        <KPICard label="Unique Types" value={stats?.uniqueTypes ?? 0} icon={Layers} color="text-aura-purple" />
-      </div>
-
-      {detail && (
-        <div className="glass-card p-5 mb-5 animate-slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display font-semibold">Crash Detail</h3>
-            <button onClick={() => setDetail(null)} className="btn-ghost p-1.5"><X className="w-4 h-4" /></button>
-          </div>
-          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-            <div><span className="text-white/40">Type:</span> <span className="ml-2 text-aura-red">{detail.exceptionType}</span></div>
-            <div><span className="text-white/40">Version:</span> <span className="ml-2">{detail.appVersion}</span></div>
-          </div>
-          <pre className="bg-surface-950 rounded-xl p-4 text-xs font-mono text-white/60 overflow-x-auto max-h-60">{detail.stackTrace}</pre>
-        </div>
-      )}
-
-      <div className="glass-card p-5">
-        <div className="mb-5 max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search exception type..." onSubmit={load} />
-        </div>
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">Exception</th>
-            <th className="text-left py-3 px-4 font-medium">Version</th>
-            <th className="text-left py-3 px-4 font-medium">Date</th>
-            <th className="text-right py-3 px-4 font-medium">Actions</th>
-          </tr></thead>
-          <tbody>
-            {(data.items || []).map((c: any) => (
-              <tr key={c.id} className="table-row">
-                <td className="py-3 px-4 text-aura-red/80 font-mono text-xs">{c.exceptionType}</td>
-                <td className="py-3 px-4 text-white/50">{c.appVersion}</td>
-                <td className="py-3 px-4 text-white/40">{new Date(c.createdAt).toLocaleDateString()}</td>
-                <td className="py-3 px-4 text-right flex justify-end gap-2">
-                  <button onClick={async () => { const d = await api.getCrashReport(c.id); if(d) setDetail(d); }}
-                    className="p-1.5 rounded-lg hover:bg-accent/10 text-white/30 hover:text-accent transition-colors"><Eye className="w-4 h-4" /></button>
-                  <button onClick={async () => { await api.deleteCrashReport(c.id); load(); }}
-                    className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors"><Trash2 className="w-4 h-4" /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {(data.items || []).length === 0 && <EmptyState icon={Bug} title="No crash reports" subtitle="Great news - no crashes recorded!" />}
-        <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────
-// TELEMETRY PAGE
-// ────────────────────────────────────────────────
-function TelemetryPage() {
-  const [data, setData] = useState<any>({ items: [], total: 0, page: 1, pages: 0 });
-  const [stats, setStats] = useState<any>(null);
-  const [eventType, setEventType] = useState('');
-  const [types, setTypes] = useState<string[]>([]);
-  const [page, setPage] = useState(1);
-
-  useEffect(() => { api.getTelemetryEventTypes().then(setTypes); }, []);
-
-  const load = useCallback(async () => {
-    const [d, s] = await Promise.all([api.getTelemetry(eventType || undefined, page), api.getTelemetryStats()]);
-    setData(d); setStats(s);
-  }, [eventType, page]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Telemetry" subtitle="Usage analytics from desktop app">
-        <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
-      </PageHeader>
-
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
-        <KPICard label="Total Events" value={stats?.totalEvents ?? data.total ?? 0} icon={BarChart2} color="text-accent" />
-        <KPICard label="Today" value={stats?.today ?? 0} icon={Activity} color="text-aura-green" />
-        <KPICard label="Event Types" value={types.length} icon={Layers} color="text-aura-purple" />
-      </div>
-
-      <div className="glass-card p-5">
-        <div className="flex items-center gap-4 mb-5">
-          <select value={eventType} onChange={e => setEventType(e.target.value)} className="input-dark">
-            <option value="">All event types</option>
-            {types.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-        </div>
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">Event Type</th>
-            <th className="text-left py-3 px-4 font-medium">Device</th>
-            <th className="text-left py-3 px-4 font-medium">Session</th>
-            <th className="text-left py-3 px-4 font-medium">Date</th>
-          </tr></thead>
-          <tbody>
-            {(data.items || []).map((t: any, i: number) => (
-              <tr key={i} className="table-row">
-                <td className="py-3 px-4"><span className="badge badge-cyan">{t.eventType}</span></td>
-                <td className="py-3 px-4 font-mono text-xs text-white/40">{t.deviceId?.substring(0, 8)}...</td>
-                <td className="py-3 px-4 font-mono text-xs text-white/40">{t.sessionId?.substring(0, 8) || '-'}</td>
-                <td className="py-3 px-4 text-white/40">{new Date(t.createdAt).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {(data.items || []).length === 0 && <EmptyState icon={BarChart2} title="No telemetry data" subtitle="Events will appear once devices start sending data" />}
-        <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
-      </div>
-    </div>
-  );
 }
 
 // ────────────────────────────────────────────────

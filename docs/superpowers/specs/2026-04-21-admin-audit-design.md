@@ -245,7 +245,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Users | subagent-2 | done | 1 | 3 | 3 | 2 | docs/admin-audit/findings/users.md |
 | Licenses | subagent-3 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/licenses.md |
 | Payments | subagent-4 | done | 3 | 3 | 3 | 2 | docs/admin-audit/findings/payments.md |
-| Devices | - | pending | - | - | - | - | - |
+| Devices | subagent-5 | done | 2 | 3 | 2 | 2 | docs/admin-audit/findings/devices.md |
 | Updates | - | pending | - | - | - | - | - |
 | Crash Reports | - | pending | - | - | - | - | - |
 | Telemetry | - | pending | - | - | - | - | - |
@@ -310,6 +310,21 @@ Payments audit confirms CTP-6 extends beyond `AdminLicenseController`. The rollb
 - `CryptoController.cs`: 162 lines (backup) → 144 lines (local). Lost: `AdminRejectPayment` endpoint.
 - `AdminChartController.cs`: Entire controller missing from local repo and deployed DLL (backup has full implementation).
 These are higher-severity than the Licenses rollback because they affect payment processing correctness.
+
+### CTP-6 UPDATE 2: Devices controller also stripped + response shape diverged
+Devices audit (subagent-5) confirms CTP-6 for `AdminDeviceController`:
+- Backup: 90 lines, 4 endpoints (`List`, `GetById`, `Stats`, `Delete`)
+- Local repo: 67 lines (-26%), 2 endpoints (`GetAll`, `GetStats`)
+- Stripped from DLL: `GetById` (confirmed 404) + `Delete` (confirmed 404)
+- Additionally, the local repo's remaining endpoints diverged in response shape: missing `pages` field (pagination broken), renamed stats fields (all KPI cards show 0), added `HardwareFingerprint` to list (security concern), removed `crashCount`/`telemetryCount` (columns always show 0).
+- **Bug 3 (B-2) NOT confirmed on Devices tab** — Refresh button calls `load()` (soft refetch), not `window.location.reload()`.
+
+### CTP-9 (NEW): EF unique index migration gap — composite indexes declared in EF config but absent from production DB
+**First surfaced:** Payments tab (ExternalId index missing). Confirmed in Devices tab (`(LicenseId, HardwareFingerprint)` composite unique index missing from DB).
+**Pattern:** EF Core `HasIndex(...)` and `HasIndex(...).IsUnique()` declarations exist in `AuraCoreDbContext.cs` but the corresponding migration never created these indexes in the production PostgreSQL database. `pg_indexes` shows only the primary key index for both `payments` and `devices` tables.
+**Impact for Devices:** The `(LicenseId, HardwareFingerprint)` composite unique index (`AuraCoreDbContext.cs:59`) is not in the DB. A race condition during device registration allows duplicate device rows (same fingerprint, same license). The application-level guard in `DeviceController.Register` is the only deduplication protection.
+**Check for all tabs:** Subsequent auditors should run `SELECT indexname FROM pg_indexes WHERE tablename='{table}';` to verify all EF-declared indexes are present in prod.
+**Fix:** Apply missing migrations or manually create the indexes with `CREATE UNIQUE INDEX ... ON devices ("LicenseId","HardwareFingerprint");`
 
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1

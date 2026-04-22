@@ -40,9 +40,15 @@ public sealed class AdminDeviceController : ControllerBase
             .Select(d => new
             {
                 d.Id, d.LicenseId, d.MachineName, d.OsVersion,
-                d.HardwareFingerprint, d.RegisteredAt, d.LastSeenAt,
+                // T1.14: HardwareFingerprint removed from list view (privacy).
+                // GetById still returns it (detail view is authorized-admin context).
+                d.RegisteredAt, d.LastSeenAt,
                 licenseTier = d.License.Tier,
-                userEmail = d.License.User.Email
+                userEmail = d.License.User.Email,
+                // T1.15: count fields so frontend 'Crashes' and 'Telemetry Events'
+                // columns populate.
+                crashCount = d.CrashReports.Count(),
+                telemetryCount = d.TelemetryEvents.Count()
             })
             .ToListAsync(ct);
 

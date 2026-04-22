@@ -249,10 +249,10 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Updates | subagent-6 | done | 1 | 1 | 2 | 2 | docs/admin-audit/findings/updates.md |
 | Crash Reports | subagent-7 | done | 1 | 3 | 3 | 1 | docs/admin-audit/findings/crash-reports.md |
 | Telemetry | subagent-8 | done | 0 | 3 | 1 | 1 | docs/admin-audit/findings/telemetry.md |
-| Audit Log | - | pending | - | - | - | - | - |
+| Audit Log | subagent-9 | done | 2 | 1 | 2 | 1 | docs/admin-audit/findings/audit-log.md |
 | IP Whitelist | subagent-10 | done | 3 | 1 | 2 | 1 | docs/admin-audit/findings/ip-whitelist.md |
 | Configuration | subagent-11 | done | 1 | 2 | 2 | 2 | docs/admin-audit/findings/configuration.md |
-| Security (2FA) | - | pending | - | - | - | - | - |
+| Security (2FA) | subagent-12 | done | 2 | 1 | 2 | 2 | docs/admin-audit/findings/security-2fa.md |
 
 ## Cross-tab patterns (live — updated as audit surfaces patterns)
 
@@ -347,6 +347,12 @@ Updates audit (subagent-6) confirms the rollback/deployment pattern for Updates 
 **Detection method:** `strings /var/www/auracore-api/AuraCore.API.dll | grep routeHint` vs `grep route /root/admin-panel/src/lib/api.ts`.
 **Risk for remaining tabs:** Configuration tab and Security tab (both audited after this) should cross-check their routes.
 **Fix:** Frontend rebuild (next.js `npm run build` + deploy to `/var/www/admin-panel/`) after backend route/shape stabilizes. Until then, all four drift dimensions cause silent failures.
+
+### CTP-13 (NEW, Security tab): 2FA brute-force bypass via login-attempt success-log gap
+**First surfaced:** Security tab (subagent-12, F-2). Single-tab issue (login controller), but affects the entire login security posture.
+**Pattern:** `AuthController.Login` logs the LoginAttempt as `Success=result.Success` (password-check result) BEFORE the TOTP validation step. When an admin has 2FA enabled and submits a correct password with a wrong TOTP code, the attempt is logged as `Success=true`. The IP-based and email-based rate limits only count `!Success` rows — so 2FA-fail attempts never count toward lockout. An attacker who has already cracked an admin password can brute-force all 1,000,000 TOTP codes unthrottled at `/api/auth/login`.
+**File:line:** `AuthController.cs:129–135` (log before 2FA check), `AuthController.cs:111–123` (rate limit on !Success only). Additionally `AuthService.cs:83–88` (RefreshToken persisted before 2FA verified — orphaned tokens on each attempt).
+**Fix:** Move LoginAttempt logging to AFTER the TOTP check (or log a separate "2FA failure" with `Success=false`). Do not generate/persist the RefreshToken until after TOTP is also validated.
 
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1

@@ -98,4 +98,17 @@ public class ContractDriftTests
         Assert.Contains("\"pages\":2", json);
         Assert.Contains("\"total\":60", json);
     }
+
+    [Fact]
+    public void AddIpWhitelistRequest_deserializes_from_ip_key()
+    {
+        // Frontend sends {"ip": "1.2.3.4", "label": "office"} — backend must bind this
+        // to IpAddress via JsonPropertyName.
+        var json = "{\"ip\":\"1.2.3.4\",\"label\":\"office\"}";
+        var req = System.Text.Json.JsonSerializer.Deserialize<AuraCore.API.Controllers.Admin.AddIpWhitelistRequest>(json);
+
+        Assert.NotNull(req);
+        Assert.Equal("1.2.3.4", req!.IpAddress);
+        Assert.Equal("office", req.Label);
+    }
 }

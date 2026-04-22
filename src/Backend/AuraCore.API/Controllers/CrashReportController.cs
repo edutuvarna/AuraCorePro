@@ -2,6 +2,8 @@ using AuraCore.API.Application.Interfaces;
 using AuraCore.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.API.Controllers;
 
@@ -16,6 +18,14 @@ public sealed class CrashReportController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Submit([FromBody] CrashReportRequest request, CancellationToken ct)
     {
+        // T1.25 CrashReportsEnabled enforcement
+        var cache = HttpContext?.RequestServices?.GetService<IMemoryCache>();
+        if (cache is not null
+            && cache.TryGetValue<AppConfig>("maintenance-config", out var cachedCfg)
+            && cachedCfg is not null
+            && cachedCfg.CrashReportsEnabled == false)
+            return StatusCode(503, new { error = "Crash reporting is currently disabled" });
+
         if (string.IsNullOrEmpty(request.AppVersion) || request.AppVersion.Length > 32)
             return BadRequest(new { error = "Invalid AppVersion" });
         if (request.ExceptionType?.Length > 512)

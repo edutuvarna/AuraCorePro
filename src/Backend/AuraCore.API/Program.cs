@@ -54,10 +54,12 @@ builder.Services.AddCors(options =>
         }
         else
         {
+            // T3.17: production domain is auracore.pro (not auracorepro.com)
             policy.WithOrigins(
-                    "https://auracorepro.com",
-                    "https://www.auracorepro.com",
-                    "https://admin.auracorepro.com")
+                    "https://auracore.pro",
+                    "https://www.auracore.pro",
+                    "https://admin.auracore.pro",
+                    "https://download.auracore.pro")
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         }
@@ -116,6 +118,13 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IGitHub
     new AuraCore.API.Infrastructure.Services.Releases.OctokitReleaseMirror(
         sp.GetRequiredService<AuraCore.API.Application.Services.Releases.IR2Client>()));
 
+// T1.20: Telemetry rate limiter — 60 events/min per IP, ephemeral in-memory state
+builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelemetryRateLimiter,
+                              AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter>();
+
+// T2.24: login_attempts retention sweep — purges rows older than 90 days once per 24h
+builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Audit.AuditLogPurgeService>();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5_000_000; // 5 MB max
@@ -139,6 +148,24 @@ catch (Exception ex)
 {
     // Log but don't crash — migrations might not exist yet on first setup
     app.Logger.LogWarning("Auto-migrate skipped: {Message}. Run 'dotnet ef database update' manually.", ex.Message);
+}
+
+// T1.26: warn if extra app_configs rows exist (DB-level constraint added in Wave 1).
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+    try
+    {
+        var extra = await db.AppConfigs.Where(c => c.Id != 1).CountAsync();
+        if (extra > 0)
+        {
+            app.Logger.LogWarning("T1.26: found {Extra} extra AppConfig rows; only Id=1 is authoritative. Consider: DELETE FROM app_configs WHERE \"Id\" != 1;", extra);
+        }
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning("T1.26 singleton check skipped: {Msg}", ex.Message);
+    }
 }
 
 // Security headers

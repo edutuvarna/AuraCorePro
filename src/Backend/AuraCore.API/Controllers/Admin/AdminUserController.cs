@@ -73,6 +73,7 @@ public sealed class AdminUserController : ControllerBase
     }
 
     [HttpPost("reset-password")]
+    [AuraCore.API.Filters.AuditAction("ResetPassword", "User")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req, CancellationToken ct)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email, ct);
@@ -90,6 +91,7 @@ public sealed class AdminUserController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [AuraCore.API.Filters.AuditAction("DeleteUser", "User", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> DeleteUser(Guid id, CancellationToken ct)
     {
         var user = await _db.Users.FindAsync(new object[] { id }, ct);

@@ -43,6 +43,7 @@ public sealed class AdminConfigController : ControllerBase
     }
 
     [HttpPut]
+    [AuraCore.API.Filters.AuditAction("UpdateAppConfig", "AppConfig")]
     public async Task<IActionResult> Update([FromBody] UpdateConfigRequest req, CancellationToken ct)
     {
         var config = await _db.AppConfigs.FirstOrDefaultAsync(c => c.Id == 1, ct);
@@ -78,7 +79,7 @@ public sealed class AdminConfigController : ControllerBase
 
 public sealed record UpdateConfigRequest(
     bool? IsMaintenanceMode = null,
-    string? MaintenanceMessage = null,
+    [System.ComponentModel.DataAnnotations.MaxLength(1000)] string? MaintenanceMessage = null,
     bool? NewRegistrations = null,
     bool? TelemetryEnabled = null,
     bool? CrashReportsEnabled = null,

@@ -34,7 +34,12 @@ public sealed class AdminLicenseController : ControllerBase
             .Skip((page - 1) * pageSize).Take(pageSize)
             .Select(l => new {
                 l.Id, l.Key, l.Tier, l.Status, l.MaxDevices, l.CreatedAt, l.ExpiresAt,
-                userId = l.UserId, userEmail = l.User != null ? l.User.Email : null
+                userId = l.UserId, userEmail = l.User != null ? l.User.Email : null,
+                // T1.8: frontend reads activeDevices; provide both names so legacy
+                // and current callers both see device count. Phase 6.10 rebuild
+                // consolidates to one.
+                activeDevices = l.Devices.Count(),
+                deviceCount = l.Devices.Count()
             })
             .ToListAsync(ct);
 

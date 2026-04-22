@@ -236,7 +236,12 @@ public sealed class StripeController : ControllerBase
         var userId = user.Id;
         var expiresAt = plan switch { "yearly" => DateTimeOffset.UtcNow.AddYears(1), "lifetime" => DateTimeOffset.UtcNow.AddYears(100), _ => DateTimeOffset.UtcNow.AddMonths(1) };
         var amount = session.AmountTotal.HasValue ? session.AmountTotal.Value / 100m : 0;
-        _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = "USD", Plan = plan, Tier = tier, Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
+        // T1.12 fix: derive currency from session metadata (populated by CreateCheckoutSession).
+        // Fallback to session.Currency (Stripe-provided 3-letter lowercase) or "USD".
+        var paymentCurrency = session.Metadata.TryGetValue("currency", out var c) && !string.IsNullOrEmpty(c)
+            ? c.ToUpperInvariant()
+            : (!string.IsNullOrEmpty(session.Currency) ? session.Currency.ToUpperInvariant() : "USD");
+        _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = paymentCurrency, Plan = plan, Tier = tier, Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
         var license = await _db.Licenses.FirstOrDefaultAsync(l => l.UserId == userId && l.Status == "active", ct);
         if (license is not null) { license.Tier = tier; license.MaxDevices = Math.Max(deviceCount, 1); license.ExpiresAt = expiresAt; }
         else { _db.Licenses.Add(new License { UserId = userId, Key = Guid.NewGuid().ToString("N"), Tier = tier, MaxDevices = Math.Max(deviceCount, 1), ExpiresAt = expiresAt }); }
@@ -258,7 +263,9 @@ public sealed class StripeController : ControllerBase
         sub.CurrentPeriodEnd = sub.Plan == "yearly" ? DateTimeOffset.UtcNow.AddYears(1) : DateTimeOffset.UtcNow.AddMonths(1);
         var license = await _db.Licenses.FirstOrDefaultAsync(l => l.UserId == sub.UserId && l.Status == "active", ct);
         if (license is not null) license.ExpiresAt = sub.CurrentPeriodEnd;
-        _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = sub.UserId, Provider = "stripe", ExternalId = invoice.Id, Amount = (decimal)(invoice.AmountPaid / 100.0), Currency = invoice.Currency.ToUpper(), Plan = sub.Plan, Tier = license?.Tier ?? "pro", Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
+        // T2.14 fix: use decimal arithmetic (/100m) not float /100.0. Currency already
+        // comes from Stripe's invoice object so it's already the correct ISO code.
+        _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = sub.UserId, Provider = "stripe", ExternalId = invoice.Id, Amount = invoice.AmountPaid / 100m, Currency = (invoice.Currency ?? "usd").ToUpperInvariant(), Plan = sub.Plan, Tier = license?.Tier ?? "pro", Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
         await _db.SaveChangesAsync(ct);
     }
 

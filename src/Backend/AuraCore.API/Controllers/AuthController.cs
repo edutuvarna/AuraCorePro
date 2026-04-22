@@ -6,6 +6,8 @@ using AuraCore.API.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.API.Controllers;
 
@@ -30,6 +32,14 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
+        // T1.25 NewRegistrations enforcement — rejects signups when admin disabled them
+        var cache = HttpContext?.RequestServices?.GetService<IMemoryCache>();
+        if (cache is not null
+            && cache.TryGetValue<AppConfig>("maintenance-config", out var cachedCfg)
+            && cachedCfg is not null
+            && cachedCfg.NewRegistrations == false)
+            return StatusCode(503, new { error = "New registrations are temporarily disabled" });
+
         if (string.IsNullOrWhiteSpace(request.Email))
             return BadRequest(new { error = "Email is required" });
 

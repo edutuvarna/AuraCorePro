@@ -140,4 +140,21 @@ public class SecurityFixesTests
         var signature = headers["Stripe-Signature"].ToString();
         Assert.True(string.IsNullOrEmpty(signature));
     }
+
+    [Fact]
+    public void TotpEncryption_roundtrip_preserves_secret()
+    {
+        // Use EphemeralDataProtectionProvider — a real DataProtection provider that keeps
+        // keys in-memory only. This pins the Encrypt→Decrypt roundtrip contract without
+        // needing a persisted keyring.
+        var provider = new Microsoft.AspNetCore.DataProtection.EphemeralDataProtectionProvider();
+        var enc = new AuraCore.API.Infrastructure.Services.Security.TotpEncryption(provider);
+
+        var plaintext = "JBSWY3DPEHPK3PXP";  // sample base32 TOTP secret
+        var ciphertext = enc.Encrypt(plaintext);
+        var recovered = enc.Decrypt(ciphertext);
+
+        Assert.NotEqual(plaintext, ciphertext);
+        Assert.Equal(plaintext, recovered);
+    }
 }

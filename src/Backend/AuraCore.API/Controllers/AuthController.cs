@@ -16,13 +16,15 @@ public sealed class AuthController : ControllerBase
     private readonly IAuthService _auth;
     private readonly AuraCoreDbContext _db;
     private readonly IWhitelistService _whitelist;
+    private readonly ITotpEncryption _totpEnc;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist)
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc)
     {
         _auth = auth;
         _db = db;
         _whitelist = whitelist;
+        _totpEnc = totpEnc;
     }
 
     [HttpPost("register")]
@@ -167,7 +169,8 @@ public sealed class AuthController : ControllerBase
                 });
             }
 
-            if (!TotpService.ValidateCode(user.TotpSecret!, request.TotpCode))
+            var plaintextTotpSecret = _totpEnc.Decrypt(user.TotpSecret!);
+            if (!TotpService.ValidateCode(plaintextTotpSecret, request.TotpCode))
             {
                 // Password OK but TOTP wrong — count as failed attempt so brute-forcing
                 // the TOTP also hits the rate limit (security-2fa.md F-1).

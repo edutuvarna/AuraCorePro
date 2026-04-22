@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,14 @@ namespace AuraCore.API.Controllers;
 public sealed class TotpController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
+    private readonly ITotpEncryption _totpEnc;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _totpAttempts = new();
 
-    public TotpController(AuraCoreDbContext db) => _db = db;
+    public TotpController(AuraCoreDbContext db, ITotpEncryption totpEnc)
+    {
+        _db = db;
+        _totpEnc = totpEnc;
+    }
 
     private Guid? GetUserId()
     {
@@ -34,7 +40,7 @@ public sealed class TotpController : ControllerBase
         if (user is null) return NotFound();
 
         var secret = TotpService.GenerateSecret();
-        user.TotpSecret = secret;
+        user.TotpSecret = _totpEnc.Encrypt(secret);
         user.TotpEnabled = false;
         user.UpdatedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
@@ -60,7 +66,8 @@ public sealed class TotpController : ControllerBase
         if (string.IsNullOrEmpty(user.TotpSecret))
             return BadRequest(new { error = "Call /setup first" });
 
-        if (!TotpService.ValidateCode(user.TotpSecret, req.Code))
+        var plaintextSecret = _totpEnc.Decrypt(user.TotpSecret!);
+        if (!TotpService.ValidateCode(plaintextSecret, req.Code))
             return Unauthorized(new { error = "Invalid code. Check your authenticator app." });
 
         user.TotpEnabled = true;
@@ -90,7 +97,8 @@ public sealed class TotpController : ControllerBase
         if (!user.TotpEnabled || string.IsNullOrEmpty(user.TotpSecret))
             return BadRequest(new { error = "2FA not enabled for this user" });
 
-        if (!TotpService.ValidateCode(user.TotpSecret, req.Code))
+        var plaintextSecretValidate = _totpEnc.Decrypt(user.TotpSecret!);
+        if (!TotpService.ValidateCode(plaintextSecretValidate, req.Code))
         {
             // Track failed attempt
             _totpAttempts[email] = _totpAttempts.TryGetValue(email, out var a)
@@ -114,7 +122,8 @@ public sealed class TotpController : ControllerBase
         if (user is null) return NotFound();
         if (!user.TotpEnabled) return Ok(new { message = "2FA already disabled" });
 
-        if (!TotpService.ValidateCode(user.TotpSecret!, req.Code))
+        var plaintextSecretDisable = _totpEnc.Decrypt(user.TotpSecret!);
+        if (!TotpService.ValidateCode(plaintextSecretDisable, req.Code))
             return Unauthorized(new { error = "Invalid code" });
 
         user.TotpEnabled = false;

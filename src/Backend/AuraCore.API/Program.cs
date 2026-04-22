@@ -2,6 +2,7 @@ using System.Text;
 using AuraCore.API.Infrastructure;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +24,24 @@ builder.Services.AddScoped<AuraCore.API.Application.Services.Audit.IAuditLogServ
                           AuraCore.API.Infrastructure.Services.Audit.AuditLogService>();
 builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelistService,
                           AuraCore.API.Infrastructure.Services.Security.WhitelistService>();
+
+// DataProtection with persistent keyring. Keys directory must be app-user-owned, chmod 600.
+// On prod (Linux) default to /var/www/auracore-api/.dataprotection-keys; allow override via env var.
+// On local dev the path won't exist — fall back to a temp dir so the app still boots.
+var dpKeysPath = Environment.GetEnvironmentVariable("DATAPROTECTION_KEYS_PATH");
+if (string.IsNullOrEmpty(dpKeysPath))
+{
+    dpKeysPath = builder.Environment.IsProduction()
+        ? "/var/www/auracore-api/.dataprotection-keys"
+        : Path.Combine(Path.GetTempPath(), "auracore-dp-keys-dev");
+}
+try { Directory.CreateDirectory(dpKeysPath); } catch { /* keys will be ephemeral if path not writable */ }
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dpKeysPath))
+    .SetApplicationName("AuraCorePro");
+
+builder.Services.AddScoped<AuraCore.API.Application.Services.Security.ITotpEncryption,
+                          AuraCore.API.Infrastructure.Services.Security.TotpEncryption>();
 
 // CORS — restrict origins in production
 builder.Services.AddCors(options =>

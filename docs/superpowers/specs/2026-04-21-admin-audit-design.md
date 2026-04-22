@@ -247,7 +247,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Payments | subagent-4 | done | 3 | 3 | 3 | 2 | docs/admin-audit/findings/payments.md |
 | Devices | subagent-5 | done | 2 | 3 | 2 | 2 | docs/admin-audit/findings/devices.md |
 | Updates | subagent-6 | done | 1 | 1 | 2 | 2 | docs/admin-audit/findings/updates.md |
-| Crash Reports | - | pending | - | - | - | - | - |
+| Crash Reports | subagent-7 | done | 1 | 3 | 3 | 1 | docs/admin-audit/findings/crash-reports.md |
 | Telemetry | - | pending | - | - | - | - | - |
 | Audit Log | - | pending | - | - | - | - | - |
 | IP Whitelist | - | pending | - | - | - | - | - |

@@ -49,4 +49,41 @@ public class SecurityFixesTests
         var total = await db.LoginAttempts.CountAsync();
         Assert.Equal(0, total);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("short7")]    // 6 chars, fails MinLength(8)
+    [InlineData("       ")]   // whitespace — 7 chars, fails MinLength(8)
+    public void ResetPasswordRequest_rejects_short_or_empty_NewPassword(string pw)
+    {
+        // Validate via System.ComponentModel.DataAnnotations.Validator.TryValidateObject
+        // — this exercises the same attributes MVC auto-binds against.
+        var req = new AuraCore.API.Controllers.Admin.ResetPasswordRequest
+        {
+            Email = "target@example.com",
+            NewPassword = pw,
+        };
+        var ctx = new System.ComponentModel.DataAnnotations.ValidationContext(req);
+        var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        var ok = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(req, ctx, results, validateAllProperties: true);
+
+        Assert.False(ok);
+        Assert.Contains(results, r => r.MemberNames.Contains("NewPassword"));
+    }
+
+    [Fact]
+    public void ResetPasswordRequest_accepts_8plus_char_NewPassword()
+    {
+        var req = new AuraCore.API.Controllers.Admin.ResetPasswordRequest
+        {
+            Email = "target@example.com",
+            NewPassword = "MySecureP4ss!",
+        };
+        var ctx = new System.ComponentModel.DataAnnotations.ValidationContext(req);
+        var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        var ok = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(req, ctx, results, validateAllProperties: true);
+
+        Assert.True(ok);
+        Assert.Empty(results);
+    }
 }

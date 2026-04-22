@@ -131,4 +131,13 @@ public sealed class AdminUserController : ControllerBase
     }
 }
 
-public sealed record ResetPasswordRequest(string Email, string NewPassword);
+public sealed class ResetPasswordRequest
+{
+    [System.ComponentModel.DataAnnotations.Required]
+    public string Email { get; set; } = string.Empty;
+
+    [System.ComponentModel.DataAnnotations.Required]
+    [System.ComponentModel.DataAnnotations.MinLength(8, ErrorMessage = "Password must be at least 8 characters")]
+    [System.ComponentModel.DataAnnotations.MaxLength(128, ErrorMessage = "Password too long")]
+    public string NewPassword { get; set; } = string.Empty;
+}

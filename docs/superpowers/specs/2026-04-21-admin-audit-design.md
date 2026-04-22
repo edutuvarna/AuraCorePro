@@ -251,7 +251,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Telemetry | subagent-8 | done | 0 | 3 | 1 | 1 | docs/admin-audit/findings/telemetry.md |
 | Audit Log | - | pending | - | - | - | - | - |
 | IP Whitelist | subagent-10 | done | 3 | 1 | 2 | 1 | docs/admin-audit/findings/ip-whitelist.md |
-| Configuration | - | pending | - | - | - | - | - |
+| Configuration | subagent-11 | done | 1 | 2 | 2 | 2 | docs/admin-audit/findings/configuration.md |
 | Security (2FA) | - | pending | - | - | - | - | - |
 
 ## Cross-tab patterns (live — updated as audit surfaces patterns)

@@ -38,6 +38,13 @@ public sealed class AdminUserController : ControllerBase
             .Select(u => new
             {
                 u.Id, u.Email, u.Role, u.CreatedAt,
+                // CTP-1: top-level tier for frontend compatibility (u.tier).
+                // Mirrors AdminUserController.GetById's projection pattern.
+                tier = _db.Licenses
+                    .Where(l => l.UserId == u.Id && l.Status == "active")
+                    .Select(l => l.Tier)
+                    .FirstOrDefault() ?? "free",
+                // Nested license object retained for callers that read u.license.tier.
                 license = _db.Licenses
                     .Where(l => l.UserId == u.Id && l.Status == "active")
                     .Select(l => new { l.Tier, l.ExpiresAt })

@@ -3,6 +3,7 @@ using AuraCore.API.Infrastructure;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
+
+// Phase 6.9 hotfix: trust nginx's X-Forwarded-For + X-Forwarded-Proto so
+// HttpContext.Connection.RemoteIpAddress reflects the actual client IP
+// (not 127.0.0.1 from the nginx loopback). Nginx on origin already sends
+// both headers (auracore-api + auracore-admin sites). Without this middleware,
+// the admin panel's 'Whitelist My IP' shows 127.0.0.1, rate-limit counts all
+// requests as coming from localhost, and audit_log.IpAddress is useless.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Clear the default restrictive networks; trust the loopback proxy explicitly.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+    options.KnownProxies.Add(System.Net.IPAddress.Parse("127.0.0.1"));
+    options.KnownProxies.Add(System.Net.IPAddress.Parse("::1"));
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Port=5432;Database=auracoredb;Username=postgres;Password=CHANGE_ME_IN_ENV";
@@ -137,6 +154,10 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var app = builder.Build();
+
+// Trust nginx X-Forwarded-* headers BEFORE any middleware that reads the IP
+// (CORS, auth, maintenance check, rate limiter). Must be the first app.Use call.
+app.UseForwardedHeaders();
 
 // Auto-migrate on startup (applies pending migrations to DB)
 // Wrapped in try-catch: first run has no migrations yet, that's OK

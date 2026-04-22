@@ -125,38 +125,52 @@ public sealed class AuthController : ControllerBase
         // ── Authenticate ──
         var result = await _auth.LoginAsync(request.Email, request.Password, ct);
 
-        // Log attempt
-        _db.LoginAttempts.Add(new LoginAttempt
+        // Helper for one-line LoginAttempt writes. Deferred until we know the true outcome
+        // so 2FA failures count against rate limits (security-2fa.md F-1).
+        async Task LogAttemptAsync(bool success)
         {
-            Email = request.Email.ToLowerInvariant().Trim(),
-            IpAddress = ip,
-            Success = result.Success
-        });
-        await _db.SaveChangesAsync(ct);
+            _db.LoginAttempts.Add(new LoginAttempt
+            {
+                Email = request.Email.ToLowerInvariant().Trim(),
+                IpAddress = ip,
+                Success = success
+            });
+            await _db.SaveChangesAsync(ct);
+        }
 
         if (!result.Success)
+        {
+            await LogAttemptAsync(false);
             return Unauthorized(new { error = result.Error });
+        }
 
         // ── 2FA Check ──
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant().Trim(), ct);
         if (user is not null && user.TotpEnabled)
         {
-            // If 2FA code provided in request, validate it
-            if (!string.IsNullOrEmpty(request.TotpCode))
+            if (string.IsNullOrEmpty(request.TotpCode))
             {
-                if (!TotpService.ValidateCode(user.TotpSecret!, request.TotpCode))
-                    return Unauthorized(new { error = "Invalid 2FA code" });
-            }
-            else
-            {
-                // Return partial response — client must provide 2FA code
+                // Password was correct, but we haven't seen the TOTP code yet. Do not log
+                // an attempt — client must re-submit with TotpCode. The next call will log
+                // either Success=true or Success=false based on the TOTP verdict.
                 return Ok(new
                 {
                     requires2fa = true,
                     message = "Enter your 2FA code from Google Authenticator"
                 });
             }
+
+            if (!TotpService.ValidateCode(user.TotpSecret!, request.TotpCode))
+            {
+                // Password OK but TOTP wrong — count as failed attempt so brute-forcing
+                // the TOTP also hits the rate limit (security-2fa.md F-1).
+                await LogAttemptAsync(false);
+                return Unauthorized(new { error = "Invalid 2FA code" });
+            }
         }
+
+        // Password OK + (TOTP OK or not required).
+        await LogAttemptAsync(true);
 
         return Ok(new
         {

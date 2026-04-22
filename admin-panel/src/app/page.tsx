@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  LayoutDashboard, Users, CreditCard, Shield, Settings,
-  Search, Trash2, KeyRound, Crown, Server,
-  UserCheck, DollarSign, Clock, Check,
-  RefreshCw, Ban, Zap, Globe, ChevronRight, ChevronLeft,
-  Cpu, HardDrive, Wifi, WifiOff, ShieldCheck,
+  LayoutDashboard, Users, CreditCard, Shield,
+  Search, Trash2, Crown,
+  UserCheck, Check,
+  RefreshCw, Zap, Globe, ChevronRight, ChevronLeft,
+  ShieldCheck,
   Monitor, AlertTriangle, BarChart2, Settings2, Key, Bug, Plus,
-  CheckCircle2, XCircle, ChevronDown, ArrowUpRight, ArrowDownRight,
+  ArrowUpRight, ArrowDownRight,
   Layers, Lock, Unlock, FileText
 } from 'lucide-react';
 import { api, setToken, getToken } from '@/lib/api';
@@ -25,6 +25,7 @@ import { DevicesPage } from '@/views/DevicesPage';
 import { UpdatesPage } from '@/views/UpdatesPage';
 import { CrashReportsPage } from '@/views/CrashReportsPage';
 import { TelemetryPage } from '@/views/TelemetryPage';
+import { AuditLogPage } from '@/views/AuditLogPage';
 
 // ────────────────────────────────────────────────
 // Types
@@ -141,83 +142,6 @@ function StatusBadge({ status }: { status: string }) {
 
 function TierBadge({ tier }: { tier: string }) {
   return <StatusBadge status={tier} />;
-}
-
-// ────────────────────────────────────────────────
-// AUDIT LOG PAGE
-// ────────────────────────────────────────────────
-function AuditLogPage() {
-  const [data, setData] = useState<any>({ attempts: [], total: 0 });
-  const [stats, setStats] = useState<any>(null);
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<boolean | undefined>(undefined);
-  const [page, setPage] = useState(1);
-
-  const load = useCallback(async () => {
-    const [d, s] = await Promise.all([api.getLoginAttempts(search || undefined, filter, page), api.getLoginAttemptStats()]);
-    setData(d); setStats(s);
-  }, [search, filter, page]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Audit Log" subtitle="Login attempts and security events">
-        <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
-      </PageHeader>
-
-      {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-          <KPICard label="Successful (24h)" value={stats.successful24h ?? 0} icon={CheckCircle2} color="text-aura-green" />
-          <KPICard label="Failed (24h)" value={stats.failed24h ?? 0} icon={XCircle} color="text-aura-red" />
-          <KPICard label="Unique IPs" value={stats.uniqueIps ?? 0} icon={Globe} color="text-accent" />
-          <KPICard label="Suspicious IPs" value={stats.suspiciousIps ?? 0} icon={AlertTriangle} color="text-aura-amber" />
-        </div>
-      )}
-
-      <div className="glass-card p-5">
-        <div className="flex items-center gap-4 mb-5 flex-wrap">
-          <div className="max-w-xs flex-1">
-            <SearchBar value={search} onChange={setSearch} placeholder="Search email or IP..." onSubmit={load} />
-          </div>
-          <div className="flex gap-2">
-            {[
-              { label: 'All', value: undefined },
-              { label: 'Success', value: true },
-              { label: 'Failed', value: false },
-            ].map(f => (
-              <button key={f.label} onClick={() => { setFilter(f.value); setPage(1); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f.value ? 'bg-accent/15 text-accent border border-accent/30' : 'btn-ghost'}`}>
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">Email</th>
-            <th className="text-left py-3 px-4 font-medium">IP Address</th>
-            <th className="text-left py-3 px-4 font-medium">Status</th>
-            <th className="text-left py-3 px-4 font-medium">Time</th>
-          </tr></thead>
-          <tbody>
-            {(data.attempts || []).map((a: any, i: number) => (
-              <tr key={i} className="table-row">
-                <td className="py-3 px-4 text-white/80">{a.email}</td>
-                <td className="py-3 px-4 font-mono text-xs text-white/40">{a.ipAddress}</td>
-                <td className="py-3 px-4">
-                  {a.success ? <span className="badge badge-green">Success</span> : <span className="badge badge-red">Failed</span>}
-                </td>
-                <td className="py-3 px-4 text-white/40">{new Date(a.createdAt).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {(data.attempts || []).length === 0 && <EmptyState icon={FileText} title="No login attempts" />}
-        <Pagination page={page} pages={Math.ceil((data.total || 0) / 50)} onChange={setPage} />
-      </div>
-    </div>
-  );
 }
 
 // ────────────────────────────────────────────────

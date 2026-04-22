@@ -20,6 +20,7 @@ public sealed class AuraCoreDbContext : DbContext
     public DbSet<AppConfig> AppConfigs => Set<AppConfig>();
     public DbSet<IpWhitelist> IpWhitelists => Set<IpWhitelist>();
     public DbSet<PasswordResetCode> PasswordResetCodes => Set<PasswordResetCode>();
+    public DbSet<AuditLogEntry> AuditLogs => Set<AuditLogEntry>();
 
     protected override void OnModelCreating(ModelBuilder m)
     {
@@ -173,6 +174,24 @@ public sealed class AuraCoreDbContext : DbContext
             e.Property(c => c.AutoUpdateEnabled).HasDefaultValue(true);
             e.Property(c => c.LastUpdated).HasDefaultValueSql("now()");
             e.HasData(new AppConfig { Id = 1 });
+        });
+
+        m.Entity<AuditLogEntry>(e => {
+            e.ToTable("audit_log");
+            e.HasKey(a => a.Id);
+            e.Property(a => a.Id).UseIdentityAlwaysColumn();
+            e.Property(a => a.ActorEmail).HasMaxLength(256).IsRequired();
+            e.Property(a => a.Action).HasMaxLength(64).IsRequired();
+            e.Property(a => a.TargetType).HasMaxLength(32).IsRequired();
+            e.Property(a => a.TargetId).HasMaxLength(128);
+            e.Property(a => a.BeforeData).HasColumnType("jsonb");
+            e.Property(a => a.AfterData).HasColumnType("jsonb");
+            e.Property(a => a.IpAddress).HasMaxLength(45);
+            e.Property(a => a.CreatedAt).HasDefaultValueSql("now()");
+            e.HasIndex(a => new { a.ActorId, a.CreatedAt }).HasDatabaseName("idx_audit_actor_created");
+            e.HasIndex(a => new { a.Action, a.CreatedAt }).HasDatabaseName("idx_audit_action_created");
+            e.HasIndex(a => new { a.TargetType, a.TargetId }).HasDatabaseName("idx_audit_target");
+            e.HasOne(a => a.Actor).WithMany().HasForeignKey(a => a.ActorId).OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

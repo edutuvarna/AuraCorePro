@@ -3,6 +3,8 @@ using AuraCore.API.Application.Services.Telemetry;
 using AuraCore.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.API.Controllers;
 
@@ -23,6 +25,14 @@ public sealed class TelemetryController : ControllerBase
     [HttpPost("batch")]
     public async Task<IActionResult> ReceiveBatch([FromBody] TelemetryBatchRequest request, CancellationToken ct)
     {
+        // T1.25 TelemetryEnabled enforcement
+        var cache = HttpContext?.RequestServices?.GetService<IMemoryCache>();
+        if (cache is not null
+            && cache.TryGetValue<AppConfig>("maintenance-config", out var cachedCfg)
+            && cachedCfg is not null
+            && cachedCfg.TelemetryEnabled == false)
+            return StatusCode(503, new { error = "Telemetry collection is currently disabled" });
+
         if (request.Events == null || request.Events.Count == 0)
             return BadRequest(new { error = "No events provided" });
 

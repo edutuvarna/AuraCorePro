@@ -148,6 +148,24 @@ catch (Exception ex)
     app.Logger.LogWarning("Auto-migrate skipped: {Message}. Run 'dotnet ef database update' manually.", ex.Message);
 }
 
+// T1.26: warn if extra app_configs rows exist (DB-level constraint added in Wave 1).
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+    try
+    {
+        var extra = await db.AppConfigs.Where(c => c.Id != 1).CountAsync();
+        if (extra > 0)
+        {
+            app.Logger.LogWarning("T1.26: found {Extra} extra AppConfig rows; only Id=1 is authoritative. Consider: DELETE FROM app_configs WHERE \"Id\" != 1;", extra);
+        }
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning("T1.26 singleton check skipped: {Msg}", ex.Message);
+    }
+}
+
 // Security headers
 app.Use(async (context, next) =>
 {

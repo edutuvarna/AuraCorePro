@@ -3,6 +3,8 @@ using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.API.Controllers;
 
@@ -22,6 +24,14 @@ public sealed class UpdateController : ControllerBase
         [FromQuery] string channel = "stable",
         CancellationToken ct = default)
     {
+        // T1.25 AutoUpdateEnabled enforcement
+        var cache = HttpContext?.RequestServices?.GetService<IMemoryCache>();
+        if (cache is not null
+            && cache.TryGetValue<AppConfig>("maintenance-config", out var cachedCfg)
+            && cachedCfg is not null
+            && cachedCfg.AutoUpdateEnabled == false)
+            return StatusCode(503, new { error = "Auto-update is currently disabled" });
+
         if (string.IsNullOrWhiteSpace(currentVersion))
             return BadRequest(new { error = "currentVersion is required" });
 

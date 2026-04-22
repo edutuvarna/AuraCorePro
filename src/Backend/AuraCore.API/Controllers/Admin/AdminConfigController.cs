@@ -79,7 +79,7 @@ public sealed class AdminConfigController : ControllerBase
 
 public sealed record UpdateConfigRequest(
     bool? IsMaintenanceMode = null,
-    string? MaintenanceMessage = null,
+    [property: System.ComponentModel.DataAnnotations.MaxLength(1000)] string? MaintenanceMessage = null,
     bool? NewRegistrations = null,
     bool? TelemetryEnabled = null,
     bool? CrashReportsEnabled = null,

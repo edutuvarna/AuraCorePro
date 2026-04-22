@@ -246,7 +246,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Licenses | subagent-3 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/licenses.md |
 | Payments | subagent-4 | done | 3 | 3 | 3 | 2 | docs/admin-audit/findings/payments.md |
 | Devices | subagent-5 | done | 2 | 3 | 2 | 2 | docs/admin-audit/findings/devices.md |
-| Updates | - | pending | - | - | - | - | - |
+| Updates | subagent-6 | done | 1 | 1 | 2 | 2 | docs/admin-audit/findings/updates.md |
 | Crash Reports | - | pending | - | - | - | - | - |
 | Telemetry | - | pending | - | - | - | - | - |
 | Audit Log | - | pending | - | - | - | - | - |
@@ -324,7 +324,16 @@ Devices audit (subagent-5) confirms CTP-6 for `AdminDeviceController`:
 **Pattern:** EF Core `HasIndex(...)` and `HasIndex(...).IsUnique()` declarations exist in `AuraCoreDbContext.cs` but the corresponding migration never created these indexes in the production PostgreSQL database. `pg_indexes` shows only the primary key index for both `payments` and `devices` tables.
 **Impact for Devices:** The `(LicenseId, HardwareFingerprint)` composite unique index (`AuraCoreDbContext.cs:59`) is not in the DB. A race condition during device registration allows duplicate device rows (same fingerprint, same license). The application-level guard in `DeviceController.Register` is the only deduplication protection.
 **Check for all tabs:** Subsequent auditors should run `SELECT indexname FROM pg_indexes WHERE tablename='{table}';` to verify all EF-declared indexes are present in prod.
-**Fix:** Apply missing migrations or manually create the indexes with `CREATE UNIQUE INDEX ... ON devices ("LicenseId","HardwareFingerprint");`
+**Confirmed in:** app_updates (subagent-6) — `IX_app_updates_Version_Channel_Platform` absent. Root cause: `__EFMigrationsHistory` is empty (0 rows) — DB was bootstrapped via raw DDL, no `dotnet ef database update` was ever run. All EF-declared indexes across all tables are likely absent.
+**Fix:** Apply missing migrations or manually create the indexes with `CREATE UNIQUE INDEX ... ON devices ("LicenseId","HardwareFingerprint");` and `CREATE UNIQUE INDEX "IX_app_updates_Version_Channel_Platform" ON app_updates ("Version","Channel","Platform");`
+
+### CTP-6 UPDATE 3: Updates tab is GREENFIELD POST-ROLLBACK (not stripped)
+Updates audit (subagent-6) confirms the rollback/deployment pattern for Updates is different from other tabs:
+- Backup (April 12): 96-line pre-6.6.E `AdminUpdateController` — simple URL-based Publish + List only. No R2, no GitHub, no PrepareUpload.
+- Local repo (6.6.E): 282-line new controller — entirely new code written post-rollback (PrepareUpload + Publish V2 + List + Delete + RetryGitHubMirror).
+- Deployed DLL (April 14): pre-6.6.E state — only `Publish V1`, `List`, `Delete` in DLL strings. `IR2Client` and `IGitHubReleaseMirror` absent from DLL.
+- The 6.6.E backend was NEVER deployed. The frontend was rebuilt (April 21 chunk). The result is a frontend/backend contract mismatch — the entire upload flow is broken in prod.
+- This is NOT a CTP-6 rollback strip. It is a deployment gap: new feature implemented but backend redeploy step skipped.
 
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1

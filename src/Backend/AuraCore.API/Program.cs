@@ -120,6 +120,9 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IGitHub
 builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelemetryRateLimiter,
                               AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter>();
 
+// T2.24: login_attempts retention sweep — purges rows older than 90 days once per 24h
+builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Audit.AuditLogPurgeService>();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5_000_000; // 5 MB max

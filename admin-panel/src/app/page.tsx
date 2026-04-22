@@ -17,6 +17,7 @@ import { LoginScreen } from '@/components/LoginScreen';
 import { Sidebar, NavGroup } from '@/components/Sidebar';
 import { PageHeader } from '@/components/PageHeader';
 import { DashboardPage } from '@/views/DashboardPage';
+import { UsersPage } from '@/views/UsersPage';
 
 // ────────────────────────────────────────────────
 // Types
@@ -133,82 +134,6 @@ function StatusBadge({ status }: { status: string }) {
 
 function TierBadge({ tier }: { tier: string }) {
   return <StatusBadge status={tier} />;
-}
-
-// ────────────────────────────────────────────────
-// USERS PAGE
-// ────────────────────────────────────────────────
-function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
-  const load = useCallback(async () => {
-    const data = await api.getUsers(search || undefined, page, 25);
-    setUsers(data.users || []); setTotal(data.total || 0);
-  }, [search, page]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Users" subtitle={`${total} registered users`}>
-        <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
-      </PageHeader>
-      <div className="glass-card p-5">
-        <div className="mb-5 max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search by email..." onSubmit={load} />
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-              <th className="text-left py-3 px-4 font-medium">User</th>
-              <th className="text-left py-3 px-4 font-medium">Role</th>
-              <th className="text-left py-3 px-4 font-medium">Tier</th>
-              <th className="text-left py-3 px-4 font-medium">Joined</th>
-              <th className="text-right py-3 px-4 font-medium">Actions</th>
-            </tr></thead>
-            <tbody>
-              {users.map((u: any) => (
-                <tr key={u.id} className="table-row">
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-aura-purple/20 flex items-center justify-center text-xs font-bold text-white/70">
-                        {(u.email || '?')[0].toUpperCase()}
-                      </div>
-                      <span className="text-white/80">{u.email}</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-white/50">{u.role}</td>
-                  <td className="py-3 px-4"><TierBadge tier={u.tier || 'free'} /></td>
-                  <td className="py-3 px-4 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center justify-end gap-2">
-                      {u.role !== 'admin' && u.tier !== 'free' && (
-                        <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
-                          className="p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
-                          <Ban className="w-4 h-4" />
-                        </button>
-                      )}
-                      {u.role !== 'admin' && (
-                        <button onClick={async () => { if(confirm(`Delete ${u.email}?`)) { await api.deleteUser(u.id); load(); }}}
-                          className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {users.length === 0 && <EmptyState icon={Users} title="No users found" />}
-        </div>
-        <Pagination page={page} pages={Math.ceil(total / 25)} onChange={setPage} />
-      </div>
-    </div>
-  );
 }
 
 // ────────────────────────────────────────────────

@@ -21,8 +21,8 @@
 ## Summary
 
 - **0 critical**
-- **2 high** — CTP-11 cascade (2 of 3 KPI cards always show 0) + no rate limit / batch-size cap on client telemetry POST (DoS/DB-flood vector)
-- **2 medium** — CTP-9 cascade (2 declared indexes absent from prod) + CTP-10 cascade (error-path fallback wrong shape)
+- **3 high** — CTP-11 cascade (2 of 3 KPI cards always show 0) + no rate limit / batch-size cap on client telemetry POST (DoS/DB-flood vector) + CTP-10 cascade (backend omits `pages` entirely — pagination hidden at scale)
+- **1 medium** — CTP-9 cascade (2 declared indexes absent from prod)
 - **1 low** — Table missing `overflow-x-auto` (mobile horizontal overflow)
 - **1 informational** — 0 rows in `telemetry_events` (table empty, no data ingested yet — indexes not yet pressure-tested)
 
@@ -42,7 +42,7 @@ No admin mutation endpoints (delete/export/clear) exist on telemetry — CTP-2 i
 
 **Backend stats response** (`GET /api/admin/telemetry/stats`):
 ```json
-{ "total": N, "last24h": N, "last7d": N, "byType": [...], "dailyLast7": [...] }
+{ "total": N, "last24h": N, "last7d": N, "last30d": N, "topEventTypes": [...] }
 ```
 
 **Frontend reads** (`page.tsx:1050–1052`):
@@ -122,23 +122,33 @@ CREATE INDEX ix_telemetry_events_event_type ON telemetry_events ("EventType");
 
 ---
 
-### F-4 [MEDIUM] CTP-10 cascade — Error-path fallback returns `pages: 0`, Pagination hidden on network failure
+### F-4 [HIGH] CTP-10 cascade — Backend omits `pages` field entirely, pagination hidden at scale
 
 **Axis:** functional, UX
 
 **Pattern reference:** CTP-10 (confirmed in Devices F-2 and Crash Reports F-1 as root cause). See those findings for full root-cause analysis.
 
-**Note on Telemetry-specific behavior:** Unlike Crash Reports (where the backend omits the `pages` field entirely making this CRITICAL), the Telemetry backend **correctly returns** `pages` in the happy path:
-```csharp
-return Ok(new { items, total, page, pages = (int)Math.Ceiling(total / (double)pageSize) });
+**Backend list response** (`GET /api/admin/telemetry/list`):
+```json
+{ "total": N, "page": N, "pageSize": N, "items": [...] }
 ```
-So pagination works correctly when the API is reachable. However the error-path fallback in `api.ts` lines 319–320 still has the wrong shape:
+The actual `return Ok(new { total, page, pageSize, items })` at `AdminTelemetryController.cs:50` does **not include a `pages` field**. There is no `Math.Ceiling` pagination calculation anywhere in this controller.
+
+**Frontend pagination component** (`page.tsx:1081`):
+```tsx
+<Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
+```
+`data.pages` is always `undefined` (field absent from response) → falls back to `0` → `pages <= 1` → pagination component renders nothing. The operator cannot navigate beyond page 1 regardless of total row count.
+
+The error-path fallback in `api.ts` lines 319–320 is also affected:
 ```ts
 } catch { return { items: [], total: 0, page: 1, pages: 0 }; }
 ```
-On network error, `data.pages` becomes 0 and `<Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />` (line 1081) renders nothing. The operator loses visibility into whether they're on page 1 or have lost data.
+But the happy path is the primary broken surface — pagination is non-functional even on successful API responses.
 
-**Severity:** MEDIUM — affects error recovery UX; primary path works correctly.
+**CTP-10 uniformity:** This makes the pagination omission **identical to Crash Reports F-1** — both backends return `{total, page, pageSize, items}` with no `pages` field. The pattern is consistent (consistently broken) across both tabs.
+
+**Severity:** HIGH — breaks happy-path pagination at scale. Currently latent (0 rows in `telemetry_events`), but will become operationally CRITICAL once telemetry ingestion begins and admin blind-spot past page 1 is exposed. Upgrade to CRITICAL recommended at first production ingestion.
 
 ---
 
@@ -212,4 +222,4 @@ This masks all functional bugs above — an operator loading the Telemetry tab w
 
 | Tab | Critical | High | Medium | Low | Info | New CTP |
 |-----|----------|------|--------|-----|------|---------|
-| Telemetry | 0 | 2 | 2 | 1 | 1 | — |
+| Telemetry | 0 | 3 | 1 | 1 | 1 | — |

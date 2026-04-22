@@ -250,7 +250,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 | Crash Reports | subagent-7 | done | 1 | 3 | 3 | 1 | docs/admin-audit/findings/crash-reports.md |
 | Telemetry | subagent-8 | done | 0 | 3 | 1 | 1 | docs/admin-audit/findings/telemetry.md |
 | Audit Log | - | pending | - | - | - | - | - |
-| IP Whitelist | - | pending | - | - | - | - | - |
+| IP Whitelist | subagent-10 | done | 3 | 1 | 2 | 1 | docs/admin-audit/findings/ip-whitelist.md |
 | Configuration | - | pending | - | - | - | - | - |
 | Security (2FA) | - | pending | - | - | - | - | - |
 
@@ -334,6 +334,19 @@ Updates audit (subagent-6) confirms the rollback/deployment pattern for Updates 
 - Deployed DLL (April 14): pre-6.6.E state — only `Publish V1`, `List`, `Delete` in DLL strings. `IR2Client` and `IGitHubReleaseMirror` absent from DLL.
 - The 6.6.E backend was NEVER deployed. The frontend was rebuilt (April 21 chunk). The result is a frontend/backend contract mismatch — the entire upload flow is broken in prod.
 - This is NOT a CTP-6 rollback strip. It is a deployment gap: new feature implemented but backend redeploy step skipped.
+
+### CTP-12 (NEW): API contract drift — backend refactor without coordinated frontend rebuild
+**First surfaced:** IP Whitelist tab (subagent-10, F-2).
+**Pattern:** When a backend controller is refactored (route rename, field name change, response shape change, endpoint additions/removals), the deployed frontend compiled bundle may be months behind. Result: route, body field names, response shape, and endpoint set all diverge simultaneously.
+**IP Whitelist specific drift (4-dimensional):**
+- Route: frontend sends to `/api/admin/whitelist`; backend serves `/api/admin/ip-whitelist` → 404
+- POST body: frontend sends `{ip, label}`; backend expects `{IpAddress, Label}` → silent empty-string binding
+- GET response: frontend expects `[{ip, label, addedAt}]` flat array; backend returns `{total, page, pageSize, items: [...]}` paginated envelope
+- DELETE key: frontend uses IP string as path param; backend expects Guid → route mismatch
+- Extra: `my-ip` endpoint in frontend, absent from backend DLL
+**Detection method:** `strings /var/www/auracore-api/AuraCore.API.dll | grep routeHint` vs `grep route /root/admin-panel/src/lib/api.ts`.
+**Risk for remaining tabs:** Configuration tab and Security tab (both audited after this) should cross-check their routes.
+**Fix:** Frontend rebuild (next.js `npm run build` + deploy to `/var/www/admin-panel/`) after backend route/shape stabilizes. Until then, all four drift dimensions cause silent failures.
 
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  LayoutDashboard, Users, CreditCard, Shield, Settings, LogOut,
+  LayoutDashboard, Users, CreditCard, Shield, Settings,
   Search, Trash2, KeyRound, Crown, Activity, Server,
   TrendingUp, UserCheck, DollarSign, Clock, AlertCircle, Check,
   RefreshCw, Eye, Ban, Zap, Globe, ChevronRight, ChevronLeft, X,
@@ -18,6 +18,8 @@ import {
 import { api, setToken, getToken } from '@/lib/api';
 import { startConnection, stopConnection, on, off } from '@/lib/signalr';
 import { LoginScreen } from '@/components/LoginScreen';
+import { Sidebar, NavGroup } from '@/components/Sidebar';
+import { PageHeader } from '@/components/PageHeader';
 
 // ────────────────────────────────────────────────
 // Types
@@ -29,109 +31,35 @@ interface ActivityEvent {
 }
 
 // ────────────────────────────────────────────────
-// SIDEBAR
+// SIDEBAR NAV CONFIG
 // ────────────────────────────────────────────────
-const NAV_GROUPS = [
-  { label: 'Overview', items: [
-    { id: 'dashboard' as Page, icon: LayoutDashboard, label: 'Dashboard' },
+const NAV_GROUPS: NavGroup[] = [
+  { title: 'Overview', items: [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   ]},
-  { label: 'Management', items: [
-    { id: 'users' as Page, icon: Users, label: 'Users' },
-    { id: 'payments' as Page, icon: CreditCard, label: 'Payments' },
-    { id: 'subscriptions' as Page, icon: Crown, label: 'Subscriptions' },
-    { id: 'licenses' as Page, icon: Key, label: 'Licenses' },
-    { id: 'updates' as Page, icon: Zap, label: 'Updates' },
-    { id: 'devices' as Page, icon: Monitor, label: 'Devices' },
+  { title: 'Management', items: [
+    { id: 'users', icon: Users, label: 'Users' },
+    { id: 'payments', icon: CreditCard, label: 'Payments' },
+    { id: 'subscriptions', icon: Crown, label: 'Subscriptions' },
+    { id: 'licenses', icon: Key, label: 'Licenses' },
+    { id: 'updates', icon: Zap, label: 'Updates' },
+    { id: 'devices', icon: Monitor, label: 'Devices' },
   ]},
-  { label: 'Analytics', items: [
-    { id: 'crashes' as Page, icon: Bug, label: 'Crash Reports' },
-    { id: 'telemetry' as Page, icon: BarChart2, label: 'Telemetry' },
-    { id: 'audit' as Page, icon: FileText, label: 'Audit Log' },
+  { title: 'Analytics', items: [
+    { id: 'crashes', icon: Bug, label: 'Crash Reports' },
+    { id: 'telemetry', icon: BarChart2, label: 'Telemetry' },
+    { id: 'audit', icon: FileText, label: 'Audit Log' },
   ]},
-  { label: 'System', items: [
-    { id: 'whitelist' as Page, icon: Shield, label: 'IP Whitelist' },
-    { id: 'config' as Page, icon: Settings2, label: 'Configuration' },
-    { id: 'security' as Page, icon: ShieldCheck, label: 'Security' },
+  { title: 'System', items: [
+    { id: 'whitelist', icon: Shield, label: 'IP Whitelist' },
+    { id: 'config', icon: Settings2, label: 'Configuration' },
+    { id: 'security', icon: ShieldCheck, label: 'Security' },
   ]},
 ];
-
-function Sidebar({ page, setPage, onLogout }: { page: Page; setPage: (p: Page) => void; onLogout: () => void }) {
-  const [collapsed, setCollapsed] = useState(false);
-
-  return (
-    <aside className={`${collapsed ? 'w-[72px]' : 'w-[260px]'} h-screen bg-surface-950/80 backdrop-blur-xl border-r border-white/[0.04] flex flex-col transition-all duration-300 shrink-0 relative`}>
-      {/* Logo */}
-      <div className="h-16 flex items-center gap-3 px-5 border-b border-white/[0.04] shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-aura-blue flex items-center justify-center shrink-0">
-          <Layers className="w-5 h-5 text-white" />
-        </div>
-        {!collapsed && (
-          <div className="animate-fade-in">
-            <div className="font-display font-bold text-sm leading-none">AuraCore</div>
-            <div className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Admin Panel</div>
-          </div>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
-        {NAV_GROUPS.map(group => (
-          <div key={group.label}>
-            {!collapsed && (
-              <div className="text-[10px] font-semibold text-white/20 uppercase tracking-widest px-3 mb-2">{group.label}</div>
-            )}
-            <div className="space-y-0.5">
-              {group.items.map(item => {
-                const Icon = item.icon;
-                const active = page === item.id;
-                return (
-                  <button key={item.id} onClick={() => setPage(item.id)}
-                    className={`sidebar-item w-full ${active ? 'active' : ''} ${collapsed ? 'justify-center px-0' : ''}`}
-                    title={collapsed ? item.label : undefined}>
-                    <Icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-accent' : ''}`} />
-                    {!collapsed && <span>{item.label}</span>}
-                    {active && !collapsed && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      {/* Footer */}
-      <div className="border-t border-white/[0.04] p-3 shrink-0">
-        <button onClick={onLogout}
-          className={`sidebar-item w-full text-aura-red/60 hover:text-aura-red hover:bg-aura-red/[0.06] ${collapsed ? 'justify-center px-0' : ''}`}>
-          <LogOut className="w-[18px] h-[18px]" />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
-      </div>
-
-      {/* Collapse Toggle */}
-      <button onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-surface-800 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 transition-all z-10">
-        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-      </button>
-    </aside>
-  );
-}
 
 // ────────────────────────────────────────────────
 // REUSABLE COMPONENTS
 // ────────────────────────────────────────────────
-function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between mb-8">
-      <div>
-        <h1 className="text-2xl font-display font-bold tracking-tight">{title}</h1>
-        {subtitle && <p className="text-white/40 text-sm mt-1">{subtitle}</p>}
-      </div>
-      {children && <div className="flex items-center gap-3">{children}</div>}
-    </div>
-  );
-}
-
 function KPICard({ label, value, icon: Icon, color = 'text-accent', trend, sub, span = 1 }: {
   label: string; value: string | number; icon: any; color?: string; trend?: number; sub?: string; span?: number;
 }) {
@@ -1377,7 +1305,7 @@ function AdminPanel({ onLogout }: { onLogout: () => void }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar page={page} setPage={setPage} onLogout={onLogout} />
+      <Sidebar groups={NAV_GROUPS} activePage={page} onSelect={(p) => setPage(p as Page)} />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1400px] mx-auto p-6 lg:p-8">
           {renderPage()}

@@ -116,6 +116,10 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Releases.IGitHub
     new AuraCore.API.Infrastructure.Services.Releases.OctokitReleaseMirror(
         sp.GetRequiredService<AuraCore.API.Application.Services.Releases.IR2Client>()));
 
+// T1.20: Telemetry rate limiter — 60 events/min per IP, ephemeral in-memory state
+builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelemetryRateLimiter,
+                              AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter>();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5_000_000; // 5 MB max

@@ -73,4 +73,33 @@ public class BackendBugFixTests
     {
         Assert.True(3651 > 3650, "Guard `req.Days > 3650` triggers for 10-year+ requests");
     }
+
+    [Fact]
+    public void TelemetryRateLimiter_admits_first_60_events_then_rejects()
+    {
+        var limiter = new AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter();
+        for (int i = 0; i < 60; i++)
+            Assert.True(limiter.TryAdmit("1.2.3.4", 1));
+        Assert.False(limiter.TryAdmit("1.2.3.4", 1));   // 61st rejected
+        Assert.True(limiter.TryAdmit("5.6.7.8", 1));   // Different IP, unaffected
+    }
+
+    [Fact]
+    public void TelemetryRateLimiter_empty_ip_admits_trivially()
+    {
+        var limiter = new AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter();
+        // No IP → always admit (e.g., local loopback, development)
+        Assert.True(limiter.TryAdmit("", 1));
+    }
+
+    [Fact]
+    public void TelemetryRateLimiter_rejects_oversized_single_batch()
+    {
+        var limiter = new AuraCore.API.Infrastructure.Services.Telemetry.TelemetryRateLimiter();
+        // A single request claiming 61 events should exceed the minute quota
+        Assert.False(limiter.TryAdmit("9.9.9.9", 61));
+        // But a fresh IP with 60 exactly is fine
+        Assert.True(limiter.TryAdmit("8.8.8.8", 60));
+        Assert.False(limiter.TryAdmit("8.8.8.8", 1));  // Now 61 total for this IP
+    }
 }

@@ -1,4 +1,5 @@
 using AuraCore.API.Application.Interfaces;
+using AuraCore.API.Application.Services.Telemetry;
 using AuraCore.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +12,31 @@ namespace AuraCore.API.Controllers;
 public sealed class TelemetryController : ControllerBase
 {
     private readonly ITelemetryRepository _telemetry;
-    public TelemetryController(ITelemetryRepository telemetry) => _telemetry = telemetry;
+    private readonly ITelemetryRateLimiter _rateLimiter;
+
+    public TelemetryController(ITelemetryRepository telemetry, ITelemetryRateLimiter rateLimiter)
+    {
+        _telemetry = telemetry;
+        _rateLimiter = rateLimiter;
+    }
 
     [HttpPost("batch")]
     public async Task<IActionResult> ReceiveBatch([FromBody] TelemetryBatchRequest request, CancellationToken ct)
     {
         if (request.Events == null || request.Events.Count == 0)
             return BadRequest(new { error = "No events provided" });
-        if (request.Events.Count > 500)
-            return BadRequest(new { error = "Too many events in batch (max 500)" });
+
+        var eventsCount = request.Events.Count;
+
+        // T1.20: batch-size cap
+        if (eventsCount > 100)
+            return BadRequest(new { error = "Batch too large (max 100 events per request)" });
+
+        // T1.20: rate limit
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+        if (!_rateLimiter.TryAdmit(ip, eventsCount))
+            return StatusCode(429, new { error = "Rate limit exceeded. Try again in 1 minute." });
+
         foreach (var e in request.Events)
         {
             if (string.IsNullOrEmpty(e.EventType) || e.EventType.Length > 128)

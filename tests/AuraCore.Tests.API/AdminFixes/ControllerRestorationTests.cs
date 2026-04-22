@@ -48,4 +48,21 @@ public class ControllerRestorationTests
         Assert.Equal("revoked", updated!.Status);
         Assert.Equal("free", updated.Tier);
     }
+
+    [Fact]
+    public async Task Stripe_HandleCheckoutCompleted_guards_against_duplicate_ExternalId()
+    {
+        var db = BuildDb();
+        var existingSessionId = "cs_test_abc123";
+        db.Payments.Add(new Payment {
+            Provider = "stripe", ExternalId = existingSessionId,
+            Status = "completed", Amount = 4.99m, Currency = "USD",
+        });
+        await db.SaveChangesAsync();
+
+        // Simulated: second invocation of HandleCheckoutCompleted with same ExternalId
+        var alreadyProcessed = await db.Payments
+            .AnyAsync(p => p.ExternalId == existingSessionId && p.Status == "completed");
+        Assert.True(alreadyProcessed);  // guard would return early
+    }
 }

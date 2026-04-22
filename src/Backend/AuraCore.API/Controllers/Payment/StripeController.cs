@@ -141,15 +141,21 @@ public sealed class StripeController : ControllerBase
 
     [HttpPost("webhook")]
     [AllowAnonymous]
+    [AuraCore.API.Filters.AuditAction("StripeWebhookEvent", "Payment")]
     public async Task<IActionResult> Webhook(CancellationToken ct)
     {
         var webhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? _config["Stripe:WebhookSecret"];
         if (string.IsNullOrEmpty(webhookSecret) || webhookSecret == "LOADED_FROM_ENV") return BadRequest(new { error = "Webhook secret not configured" });
+
+        var signature = Request.Headers["Stripe-Signature"].ToString();
+        if (string.IsNullOrEmpty(signature)) return BadRequest(new { error = "Missing signature" });
+
         using var reader = new StreamReader(Request.Body);
         var json = await reader.ReadToEndAsync(ct);
         Event stripeEvent;
-        try { stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], webhookSecret); }
+        try { stripeEvent = EventUtility.ConstructEvent(json, signature, webhookSecret); }
         catch (StripeException) { return BadRequest(new { error = "Invalid signature" }); }
+        catch (NullReferenceException) { return BadRequest(new { error = "Malformed webhook payload" }); }
         switch (stripeEvent.Type)
         {
             case "checkout.session.completed": await HandleCheckoutCompleted(stripeEvent, ct); break;
@@ -212,6 +218,13 @@ public sealed class StripeController : ControllerBase
     {
         var session = stripeEvent.Data.Object as Session;
         if (session is null) return;
+
+        // Idempotency guard: Stripe may retry webhooks. Skip if we've already recorded
+        // a completed payment for this session. Prevents duplicate Payment/License/Subscription rows.
+        var alreadyProcessed = await _db.Payments
+            .AnyAsync(p => p.ExternalId == session.Id && p.Status == "completed", ct);
+        if (alreadyProcessed) return;
+
         var tier = session.Metadata.GetValueOrDefault("tier", "pro");
         var plan = session.Metadata.GetValueOrDefault("plan", "monthly");
         int.TryParse(session.Metadata.GetValueOrDefault("deviceCount", "1"), out var deviceCount);

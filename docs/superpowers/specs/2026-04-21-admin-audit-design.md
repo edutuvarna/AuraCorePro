@@ -243,7 +243,7 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 |---|---|---|---|---|---|---|---|
 | Subscriptions | subagent-1 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/subscriptions.md |
 | Users | subagent-2 | done | 1 | 3 | 3 | 2 | docs/admin-audit/findings/users.md |
-| Licenses | - | pending | - | - | - | - | - |
+| Licenses | subagent-3 | done | 2 | 3 | 3 | 2 | docs/admin-audit/findings/licenses.md |
 | Payments | - | pending | - | - | - | - | - |
 | Devices | - | pending | - | - | - | - | - |
 | Updates | - | pending | - | - | - | - | - |
@@ -260,10 +260,12 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 **First surfaced:** Subscriptions tab (F-1, F-2). Expected to also appear in: Users tab (confirmed same code), Licenses tab (may read license directly).
 **Pattern:** `AdminUserController.GetAll` returns `{ ..., license: { tier, expiresAt } }` — tier is nested. UsersPage TSX reads `u.tier` (undefined) instead of `u.license?.tier`. All tier badges show "free". Revoke button visibility check (`u.tier !== 'free'`) is never true.
 **File:line:** `page.tsx:582` (`TierBadge` render), `page.tsx:586` (Revoke button condition).
+**Licenses tab check (subagent-3):** Licenses tab reads `l.tier` directly — NOT a second instance of CTP-1. Licenses tab would display tier correctly if the GET endpoint existed.
 **Fix:** `AdminUserController.cs` should add a denormalized top-level `tier` field to the user projection (matches `GetById` behavior at line 63), OR frontend changes `u.tier` → `u.license?.tier`.
 
 ### CTP-2: Missing audit log for all admin mutations
 **First surfaced:** Subscriptions tab (F-5). Expected to also appear in: Users, Licenses, Devices, IP Whitelist, Configuration tabs.
+**Confirmed in:** Users tab (F-5 equivalent), Licenses tab (F-8) — 3 tabs confirmed, no exceptions found.
 **Pattern:** No admin action is logged to any audit table. `AdminAuditLogController` only reads `login_attempts` — not admin mutations. There is no `admin_audit_log` table.
 **Fix:** Add an `admin_audit_log` table + service. Wire into all mutation controllers as a cross-cutting concern (filter or service injection).
 
@@ -274,18 +276,26 @@ These are known before the audit begins. Audit will verify, characterize, and ad
 
 ### CTP-4: Inconsistent destructive confirmation — Delete has confirm(), Revoke does not
 **First surfaced:** Users tab (F-9). Likely applies to: Devices tab (revoke), Licenses tab (revoke/delete), IP Whitelist (delete IP).
-**Pattern:** UsersPage Delete uses `if(confirm(...))` guard; UsersPage Revoke has no confirmation dialog. The pattern of "some destructive actions confirmed, others not" will likely repeat across tabs that have mixed CRUD.
-**File:line:** `page.tsx:594` (Delete with confirm), `page.tsx:587–590` (Revoke without confirm).
+**Confirmed in:** Licenses tab (F-7) — Revoke AND Activate have no confirmation. Licenses tab has ZERO confirm() anywhere — worse than Users tab (which at least has confirm on Delete).
+**Pattern:** UsersPage Delete uses `if(confirm(...))` guard; UsersPage Revoke has no confirmation dialog. LicensesPage: both Revoke and Activate lack any confirmation. The pattern of "some destructive actions confirmed, others not" will likely repeat across tabs that have mixed CRUD.
+**File:line:** `page.tsx:594` (Delete with confirm), `page.tsx:587–590` (Revoke without confirm), `page.tsx:790` (Licenses Revoke, no confirm), `page.tsx:793` (Licenses Activate, no confirm).
 **Fix:** Standardize on a confirmation step for every destructive mutation (delete, revoke, ban, disable). Consider a shared `ConfirmModal` component rather than `window.confirm()` for better UX.
 
 ### CTP-5: EF Core tracked-entity cascade bug pattern — RemoveRange before ID collection
 **First surfaced:** Users tab (F-3). May apply to: Devices tab (`AdminDeviceController.Revoke` if it also cascades), other controllers with cascade delete logic.
+**Licenses tab hunt (subagent-3):** NOT found in `AdminLicenseController`. Local repo controller (Create-only) has no RemoveRange. Backup controller (Revoke/Activate) uses single-entity FindAsync + status update — no RemoveRange pattern. Licenses → Device cascade is DB-level (OnDelete.Cascade in EF config), not application-level — immune to this bug.
 **Pattern:** `AdminUserController.cs:106–108` removes devices via `RemoveRange`, then line 118 tries to collect device IDs from the same DbContext. EF Core 8 excludes tracked-deleted entities from queries, so the ID list is always empty. CrashReports and TelemetryEvents are silently orphaned.
 **Fix:** Collect IDs before calling `RemoveRange`, or configure DB-level `ON DELETE CASCADE` on FK constraints.
 
+### CTP-6: Security rollback stripped controller endpoints — other controllers may also be stubs
+**First surfaced:** Licenses tab (F-1, F-3, F-9). The security rollback event (B-4) is now confirmed to have gutted `AdminLicenseController.cs` from 121 lines to 26 lines (Create-only). This is the most visible rollback artifact.
+**Risk for other tabs:** The same rollback may have stripped other controllers. Each subsequent subagent should compare the local repo controller to any backups found at `/root/auracore-src-backup-final-202604122153/AuraCore.API/Controllers/Admin/` and verify the live DLL strings contain the expected method names.
+**Backup location:** `/root/auracore-src-backup-final-202604122153/AuraCore.API/Controllers/Admin/` — this backup (April 12) predates the rollback-based April 14 DLL. Use `strings /var/www/auracore-api/AuraCore.API.dll | grep AdminXController` to identify which methods survived the rollback.
+**Fix:** For each gutted controller: restore the full implementation from the backup, test against the frontend's expected API contract, then rebuild and redeploy.
+
 Section previously filled with expected categories (retained for reference):
 - Dual-source-of-truth fields (Bug 2 pattern) → subsumed by CTP-1
-- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab) — Bug 3 NOT confirmed on Users tab Refresh (soft refetch, not hard reload); still to verify in other tabs
+- Stale-after-mutation UI (Bug 3 pattern, possibly >1 tab) — Bug 3 NOT confirmed on Users tab Refresh (soft refetch); NOT confirmed on Licenses tab Refresh (same soft refetch pattern); still to verify in other tabs
 - Missing audit logging → CTP-2
 - Inconsistent confirmation dialogs → CTP-4
 - Deploy drift (source-vs-live divergence) — confirmed in Users (F-8, same 26-day gap as Subscriptions F-9)

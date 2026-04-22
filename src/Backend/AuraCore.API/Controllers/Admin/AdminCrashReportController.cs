@@ -98,6 +98,7 @@ public sealed class AdminCrashReportController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [AuraCore.API.Filters.AuditAction("DeleteCrashReport", "CrashReport", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var report = await _db.CrashReports.FindAsync(new object[] { id }, ct);

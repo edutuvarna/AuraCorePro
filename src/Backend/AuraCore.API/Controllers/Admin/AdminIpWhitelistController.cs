@@ -38,6 +38,7 @@ public sealed class AdminIpWhitelistController : ControllerBase
     }
 
     [HttpPost]
+    [AuraCore.API.Filters.AuditAction("AddIpWhitelist", "IpWhitelist")]
     public async Task<IActionResult> Add([FromBody] AddIpWhitelistRequest req, CancellationToken ct)
     {
         var exists = await _db.IpWhitelists.AnyAsync(i => i.IpAddress == req.IpAddress, ct);
@@ -61,6 +62,7 @@ public sealed class AdminIpWhitelistController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [AuraCore.API.Filters.AuditAction("RemoveIpWhitelist", "IpWhitelist", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var entry = await _db.IpWhitelists.FindAsync(new object[] { id }, ct);

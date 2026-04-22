@@ -43,6 +43,7 @@ public sealed class AdminConfigController : ControllerBase
     }
 
     [HttpPut]
+    [AuraCore.API.Filters.AuditAction("UpdateAppConfig", "AppConfig")]
     public async Task<IActionResult> Update([FromBody] UpdateConfigRequest req, CancellationToken ct)
     {
         var config = await _db.AppConfigs.FirstOrDefaultAsync(c => c.Id == 1, ct);

@@ -91,4 +91,7 @@ node_modules/
 # promote .received.* → .verified.* via accept-workflow instead).
 tests/AuraCore.Tests.UI.Avalonia/goldens/*.received.png
 tests/AuraCore.Tests.UI.Avalonia/goldens/*.received.txt
-admin-panel-work/
+# Phase 6.10 — admin-panel build artifacts (source IS tracked at admin-panel/)
+admin-panel/node_modules/
+admin-panel/.next/
+admin-panel/out/

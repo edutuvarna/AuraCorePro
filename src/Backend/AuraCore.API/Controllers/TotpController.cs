@@ -15,7 +15,7 @@ public sealed class TotpController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     private readonly ITotpEncryption _totpEnc;
-    private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _totpAttempts = new();
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (int Count, DateTime ResetAt)> _totpAttempts = new();
 
     public TotpController(AuraCoreDbContext db, ITotpEncryption totpEnc)
     {
@@ -77,38 +77,50 @@ public sealed class TotpController : ControllerBase
         return Ok(new { message = "2FA enabled successfully!", enabled = true });
     }
 
+    // T2.29: [AllowAnonymous] removed — the previous implementation accepted an arbitrary email in the
+    // request body and returned 2FA enrollment status for that address, enabling account enumeration
+    // and revealing which accounts lack 2FA (credential-stuffing intelligence). The endpoint now
+    // requires a valid JWT; the caller's own identity is resolved from the token, and no email is
+    // accepted from the body.
     [HttpPost("validate")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Validate([FromBody] TotpLoginRequest req, CancellationToken ct)
+    public async Task<IActionResult> Validate([FromBody] TotpValidateRequest req, CancellationToken ct)
     {
-        var email = req.Email?.ToLower() ?? "";
+        var userId = GetUserId();
+        if (userId is null) return Unauthorized(new { error = "Invalid token" });
 
-        // Rate limiting: max 5 attempts per 15 minutes
-        if (_totpAttempts.TryGetValue(email, out var attempt))
+        var userKey = userId.Value.ToString();
+        var now = DateTime.UtcNow;
+
+        // T2.30: Rate limiting via ConcurrentDictionary (thread-safe, atomic AddOrUpdate).
+        // Check BEFORE the DB hit so we don't do unnecessary work under brute-force.
+        if (_totpAttempts.TryGetValue(userKey, out var existing))
         {
-            if (attempt.ResetAt > DateTime.UtcNow && attempt.Count >= 5)
+            if (existing.ResetAt > now && existing.Count >= 5)
                 return StatusCode(429, new { error = "Too many attempts. Try again later." });
-            if (attempt.ResetAt <= DateTime.UtcNow)
-                _totpAttempts.Remove(email);
+            if (existing.ResetAt <= now)
+                _totpAttempts.TryRemove(userKey, out _); // Window expired — clean up stale entry
         }
 
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email.ToLowerInvariant().Trim(), ct);
-        if (user is null) return NotFound(new { error = "User not found" });
+        var user = await _db.Users.FindAsync(new object[] { userId.Value }, ct);
+        if (user is null) return NotFound();
         if (!user.TotpEnabled || string.IsNullOrEmpty(user.TotpSecret))
-            return BadRequest(new { error = "2FA not enabled for this user" });
+            return BadRequest(new { error = "2FA not enabled for this account" });
 
         var plaintextSecretValidate = _totpEnc.Decrypt(user.TotpSecret!);
         if (!TotpService.ValidateCode(plaintextSecretValidate, req.Code))
         {
-            // Track failed attempt
-            _totpAttempts[email] = _totpAttempts.TryGetValue(email, out var a)
-                ? (a.Count + 1, a.ResetAt)
-                : (1, DateTime.UtcNow.AddMinutes(15));
+            // Atomic increment: window carries over if still active, resets if expired.
+            _totpAttempts.AddOrUpdate(
+                userKey,
+                _ => (1, now.AddMinutes(15)),
+                (_, prev) => prev.ResetAt > now
+                    ? (prev.Count + 1, prev.ResetAt)
+                    : (1, now.AddMinutes(15)));
             return Unauthorized(new { error = "Invalid 2FA code" });
         }
 
-        // Clear attempts on success
-        _totpAttempts.Remove(email);
+        // Clear rate-limit entry on success.
+        _totpAttempts.TryRemove(userKey, out _);
         return Ok(new { valid = true, message = "2FA verified" });
     }
 
@@ -147,4 +159,7 @@ public sealed class TotpController : ControllerBase
 }
 
 public sealed record TotpVerifyRequest(string Code);
+// TotpValidateRequest: Code-only; email previously leaked account existence — see T2.29 fix above.
+public sealed record TotpValidateRequest(string Code);
+// TotpLoginRequest kept for any in-flight callers; superseded by TotpValidateRequest.
 public sealed record TotpLoginRequest(string Email, string Code);

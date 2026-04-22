@@ -1,4 +1,5 @@
 using AuraCore.API.Application.Interfaces;
+using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Infrastructure.Services;
@@ -14,12 +15,14 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;
     private readonly AuraCoreDbContext _db;
+    private readonly IWhitelistService _whitelist;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db)
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist)
     {
         _auth = auth;
         _db = db;
+        _whitelist = whitelist;
     }
 
     [HttpPost("register")]
@@ -107,20 +110,24 @@ public sealed class AuthController : ControllerBase
 
         var ip = GetClientIp();
 
-        // ── Rate Limiting: 3 failed attempts in 30 min → block ──
-        var cutoff = DateTimeOffset.UtcNow.AddMinutes(-30);
-        var recentFails = await _db.LoginAttempts
-            .CountAsync(a => a.IpAddress == ip && !a.Success && a.CreatedAt > cutoff, ct);
+        // ── Rate Limiting: bypass for whitelisted operational IPs (ip-whitelist.md F-3) ──
+        var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
+        if (!whitelisted)
+        {
+            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-30);
+            var recentFails = await _db.LoginAttempts
+                .CountAsync(a => a.IpAddress == ip && !a.Success && a.CreatedAt > cutoff, ct);
 
-        if (recentFails >= 3)
-            return StatusCode(429, new { error = "Too many failed attempts. Try again in 30 minutes." });
+            if (recentFails >= 3)
+                return StatusCode(429, new { error = "Too many failed attempts. Try again in 30 minutes." });
 
-        // Per-email rate limiting
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant() ?? "";
-        var emailFails = await _db.LoginAttempts
-            .CountAsync(a => a.Email == normalizedEmail && !a.Success && a.CreatedAt > cutoff, ct);
-        if (emailFails >= 5)
-            return StatusCode(429, new { error = "Account temporarily locked. Try again later." });
+            // Per-email rate limiting
+            var normalizedEmail = request.Email?.Trim().ToLowerInvariant() ?? "";
+            var emailFails = await _db.LoginAttempts
+                .CountAsync(a => a.Email == normalizedEmail && !a.Success && a.CreatedAt > cutoff, ct);
+            if (emailFails >= 5)
+                return StatusCode(429, new { error = "Account temporarily locked. Try again later." });
+        }
 
         // ── Authenticate ──
         var result = await _auth.LoginAsync(request.Email, request.Password, ct);

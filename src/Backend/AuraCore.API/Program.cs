@@ -19,6 +19,8 @@ builder.Services.AddApiInfrastructure(connectionString);
 
 builder.Services.AddScoped<AuraCore.API.Application.Services.Audit.IAuditLogService,
                           AuraCore.API.Infrastructure.Services.Audit.AuditLogService>();
+builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelistService,
+                          AuraCore.API.Infrastructure.Services.Security.WhitelistService>();
 
 // CORS — restrict origins in production
 builder.Services.AddCors(options =>

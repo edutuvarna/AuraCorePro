@@ -24,7 +24,8 @@
 ## Summary
 
 - **3 critical** — Webhook NullReferenceException on null Stripe-Signature (500 instead of 400); missing idempotency check allows double-payment credit; Reject button calls a non-existent endpoint (404 → silent fail leaving payment in confirming state permanently)
-- **3 high** — Revenue chart call hits non-deployed AdminChartController (404); hardcoded `$` symbol ignores stored `Currency` field; `invoice.AmountPaid / 100.0` double-cast instead of `/ 100m` introduces floating-point precision risk
+- **3 high** — Revenue chart call hits non-deployed AdminChartController (404); hardcoded `$` symbol ignores stored `Currency` field; hardcoded `"USD"` in HandleCheckoutCompleted ignores session's actual currency
+- **1 medium** (downgraded from high) — `invoice.AmountPaid / 100.0` double-cast instead of `/ 100m`; for values like 499 / 100.0 = 4.99 in double is exactly safe; risk is theoretical at common price points
 - **3 medium** — No confirmation dialog on Approve/Reject crypto (immediate irreversible mutations); no admin audit log for any payment mutation (CTP-2); `ExternalId` index is non-unique — allows duplicate payment records with same Stripe session ID
 - **2 low** — StatusBadge does not handle `awaiting_payment`, `confirming`, or `disputed` statuses (renders badge-blue generic fallback); no blockchain explorer link for crypto TX hash
 
@@ -209,7 +210,7 @@ SELECT "ExternalId", COUNT(*) FROM payments GROUP BY "ExternalId" HAVING COUNT(*
 
 ---
 
-### F-6 [HIGH] `invoice.AmountPaid / 100.0` uses IEEE 754 double division — floating-point precision loss on invoice amounts
+### F-6 [MEDIUM] `invoice.AmountPaid / 100.0` uses IEEE 754 double division — floating-point precision loss on invoice amounts (theoretical at common price points)
 
 **Axis:** functional, code-db-sync
 **Baseline bug ref:** (new — financial-specific)
@@ -467,8 +468,8 @@ CTP-3 applies (same root layout, fixed 260px sidebar — no breakpoints). Same a
 ### 6. Deployment drift
 
 - **AdminPaymentController:** Does not exist in local repo, backup, or DLL — not a rollback artifact. This endpoint was never implemented; tab always used Dashboard endpoints.
-- **AdminChartController:** Exists in backup (408 lines), missing from local repo and deployed DLL (F-4). This IS a rollback artifact (CTP-6 pattern confirmed).
-- **CryptoController:** Backup has 162 lines (with `AdminRejectPayment`), local repo has 144 lines (missing `AdminRejectPayment`) — rollback artifact (F-3, CTP-6 pattern confirmed).
+- **AdminChartController:** Exists in backup (73 lines), missing from local repo and deployed DLL (F-4). This IS a rollback artifact (CTP-6 pattern confirmed). Note: the 408-line count belongs to the StripeController backup, not AdminChartController.
+- **CryptoController:** Backup has 163 lines (with `AdminRejectPayment`), local repo has 145 lines (missing `AdminRejectPayment`) — rollback artifact (F-3, CTP-6 pattern confirmed).
 - **StripeController:** Backup has 408 lines, local repo has 276 lines — the backup has more event handlers (`invoice.payment_failed`, `charge.refunded`, `charge.dispute.funds_withdrawn`, `charge.dispute.updated`) and logging. Local repo stripped these. Additionally, the backup has the idempotency check (F-5). CTP-6 confirmed for financial controllers.
 - **Source vs deployed DLL:** Local repo matches deployed DLL (both lack `AdminChartController` and full `CryptoController`). Consistent — rollback occurred at source level.
 - **Admin panel source drift:** Same 26-day gap as prior tabs (source = March 27, live = April 21). No payment-specific TSX changes in April 21 build vs March 27 source.
@@ -477,7 +478,7 @@ CTP-3 applies (same root layout, fixed 260px sidebar — no breakpoints). Same a
 
 ## CTP-6 Update: Financial controllers also stripped
 
-Both `StripeController.cs` (276 vs 408 lines) and `CryptoController.cs` (144 vs 162 lines) are significantly stripped vs the server backup. Key capabilities removed from local repo vs backup:
+Both `StripeController.cs` (276 vs 408 lines) and `CryptoController.cs` (145 vs 163 lines) are significantly stripped vs the server backup. Key capabilities removed from local repo vs backup:
 - `StripeController`: idempotency check for `HandleCheckoutCompleted` (F-5), `HandlePaymentFailed`, `HandleChargeRefunded`, `HandleDisputeFundsWithdrawn`, `HandleDisputeUpdated` event handlers, structured logging via `_logger`
 - `CryptoController`: `AdminRejectPayment` endpoint (F-3)
 - `AdminChartController`: entire controller missing (F-4)

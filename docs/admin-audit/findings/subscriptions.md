@@ -18,7 +18,8 @@
 
 ## Summary
 
-- **2 critical** — tier sync broken (all pro users appear free), Revoke button unreachable due to same bug
+- **1 critical** — tier sync broken (all pro users appear free)
+- **1 medium** (downgraded from critical) — Revoke button practically unreachable due to F-1 cascade; button renders but tier display makes it misleading
 - **3 high** — subscriptions table completely unused; API layer bypasses Nginx basic auth; audit log records zero admin actions
 - **3 medium** — no Days field validation (min/max/tier), no confirmation on grant, UX confusion from toast showing success for a name-misleading action
 - **2 low** — deployment drift (out/ is 26 days stale vs live), admin@auracore.pro has `license.Tier = 'free'` which is likely unintentional
@@ -88,12 +89,12 @@ WHERE u."Email" = 'ozgurdeniz807@gmail.com';
 
 ---
 
-### F-2 [CRITICAL] Revoke button in Users tab permanently inaccessible — same TSX bug as F-1
+### F-2 [MEDIUM] Revoke button practically unreachable due to F-1 tier display bug — downstream cascade of F-1
 
 **Axis:** functional, code-db-sync
 **Baseline bug ref:** B-1 (downstream effect)
 
-**Symptom:** The Revoke (ban) icon button that should appear for pro-tier users in the Users tab is never rendered. Admin cannot revoke subscriptions from the Users tab — only via a direct API call or the raw DB.
+**Symptom:** The Revoke (ban) icon button that should appear for pro-tier users in the Users tab is never visible in practice. Admin cannot revoke subscriptions from the Users tab — only via a direct API call or the raw DB.
 
 **Reproduction steps:**
 1. Log in as `admin@auracore.pro`
@@ -103,16 +104,17 @@ WHERE u."Email" = 'ozgurdeniz807@gmail.com';
 
 **Expected behavior:** For users with `license.tier !== 'free'`, a Revoke icon appears in Actions column.
 
-**Actual behavior:** Condition at `page.tsx:586` — `u.role !== 'admin' && u.tier !== 'free'` — evaluates to `false` for all users because `u.tier` is always `undefined`.
+**Actual behavior:** Because all users display `tier="free"` due to F-1 (the `u.tier || 'free'` fallback from undefined), the tier-display gate means no user appears revocable.
 
 **Root cause:**
-- `/root/admin-panel/src/app/page.tsx:586` — `u.tier !== 'free'` — `undefined !== 'free'` is `true` (JS behavior), BUT the complete expression is `u.role !== 'admin' && u.tier !== 'free'` which IS true for non-admin users... 
+- `/root/admin-panel/src/app/page.tsx:586` — `u.tier !== 'free'` — `undefined !== 'free'` is actually `true` in JS, so technically the Revoke button IS rendered for non-admin users. However, since F-1 causes all tier badges to show "free" via `u.tier || 'free'`, the admin panel gives no indication that any user has a Pro tier, so the admin never perceives a need to click Revoke.
+- This is a downstream cascade of F-1 — not an independent critical issue. The button mechanism works; the tier data feeding it is wrong.
 
-**Correction after further analysis:** `undefined !== 'free'` is actually `true` in JS, so the Revoke button SHOULD appear for non-admin users. Re-testing confirmed: the button condition passes, but the Revoke action (`api.revokeSubscription(u.id)`) calls `POST /api/admin/subscriptions/revoke/{userId}` which correctly sets `license.Tier = 'free'`. The issue is the button was never visible during the test because the UI live data showed all-free tiers.
+**Revised root cause:** The Revoke button condition (`u.role !== 'admin' && u.tier !== 'free'`) evaluates to `true` for all non-admin users (because `undefined !== 'free'` is truthy). The button IS rendered. The real problem is that all tier badges show "free" due to F-1, making the Revoke buttons appear without meaningful context — and more importantly, admin cannot tell at a glance which users actually have Pro licenses, undermining the Revoke workflow entirely.
 
-**Revised root cause:** The Revoke button IS technically renderable for non-admin users, but users who already show tier="free" (via `u.tier || 'free'`) will not show it. Since all users render as "free" (F-1), the Revoke button never appears in practice. This is an indirect effect of F-1 — a cascading failure.
+**Severity note:** Downgraded from CRITICAL to MEDIUM — this finding is a practical consequence of F-1, not an independent critical. Fixing F-1 (API shape correction) also repairs the Revoke workflow's usability.
 
-**Risk if unfixed:** Admin must use manual API calls to revoke subscriptions from the Users tab. Fix F-1 to fix this cascade.
+**Risk if unfixed:** Admin cannot reliably identify which users have Pro licenses to revoke. Fix F-1 to restore full Revoke workflow usability.
 
 ---
 

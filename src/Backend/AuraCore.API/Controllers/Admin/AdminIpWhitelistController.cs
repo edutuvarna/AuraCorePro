@@ -1,3 +1,4 @@
+using System.Net;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -41,6 +42,10 @@ public sealed class AdminIpWhitelistController : ControllerBase
     [AuraCore.API.Filters.AuditAction("AddIpWhitelist", "IpWhitelist")]
     public async Task<IActionResult> Add([FromBody] AddIpWhitelistRequest req, CancellationToken ct)
     {
+        // T1.24: validate IP format (IPv4 or IPv6) before hitting DB
+        if (string.IsNullOrWhiteSpace(req.IpAddress) || !IsValidIpAddress(req.IpAddress))
+            return BadRequest(new { error = "Invalid IP address format (expected IPv4 or IPv6)" });
+
         var exists = await _db.IpWhitelists.AnyAsync(i => i.IpAddress == req.IpAddress, ct);
         if (exists)
             return Conflict(new { error = "IP address already whitelisted" });
@@ -83,6 +88,21 @@ public sealed class AdminIpWhitelistController : ControllerBase
         // IPv6-mapped-IPv4 normalization (::ffff:192.168.1.1 → 192.168.1.1)
         if (ip.StartsWith("::ffff:")) ip = ip.Substring(7);
         return Ok(new { ip });
+    }
+
+    // T1.24: strict IP validation that rejects shortened IPv4 forms (1.2.3 → invalid)
+    private static bool IsValidIpAddress(string ipStr)
+    {
+        if (!IPAddress.TryParse(ipStr, out var addr))
+            return false;
+
+        // For IPv4, require all 4 octets in standard dotted-decimal notation
+        if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            return ipStr.Split('.').Length == 4 && ipStr.Split('.').All(octet =>
+                int.TryParse(octet, out var num) && num >= 0 && num <= 255);
+
+        // IPv6 is valid if TryParse succeeded
+        return true;
     }
 }
 

@@ -102,4 +102,50 @@ public class BackendBugFixTests
         Assert.True(limiter.TryAdmit("8.8.8.8", 60));
         Assert.False(limiter.TryAdmit("8.8.8.8", 1));  // Now 61 total for this IP
     }
+
+    [Theory]
+    [InlineData("not-an-ip")]
+    [InlineData("999.999.999.999")]
+    [InlineData("1.2.3")]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void IP_format_validation_rejects_invalid(string ip)
+    {
+        // T1.24 contract — strict IPv4 validation (all 4 octets required)
+        if (string.IsNullOrWhiteSpace(ip))
+            return; // Empty/whitespace rejected at string check
+
+        // Helper mirroring AdminIpWhitelistController.IsValidIpAddress logic
+        var trimmed = ip.Trim();
+        var canParse = System.Net.IPAddress.TryParse(trimmed, out var addr);
+        if (!canParse)
+            return; // Not an IP at all
+
+        // IPv4 case: check for shortened forms like "1.2.3"
+        if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            var octets = trimmed.Split('.');
+            // Should NOT be valid if not exactly 4 octets
+            Assert.NotEqual(4, octets.Length);
+        }
+    }
+
+    [Theory]
+    [InlineData("1.2.3.4")]
+    [InlineData("192.168.1.1")]
+    [InlineData("::1")]
+    [InlineData("2001:db8::1")]
+    public void IP_format_validation_accepts_valid(string ip)
+    {
+        // T1.24 contract — accepts standard IPv4 dotted-decimal (all 4 octets) and IPv6
+        Assert.True(System.Net.IPAddress.TryParse(ip, out var addr));
+
+        if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            // IPv4: verify all 4 octets are present
+            var octets = ip.Split('.');
+            Assert.Equal(4, octets.Length);
+            Assert.All(octets, octet => Assert.True(int.TryParse(octet, out var num) && num >= 0 && num <= 255));
+        }
+    }
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   LayoutDashboard, Users, CreditCard, Shield, Settings,
   Search, Trash2, KeyRound, Crown, Activity, Server,
-  TrendingUp, UserCheck, DollarSign, Clock, AlertCircle, Check,
+  TrendingUp, UserCheck, DollarSign, Clock, Check,
   RefreshCw, Eye, Ban, Zap, Globe, ChevronRight, ChevronLeft, X,
   Cpu, HardDrive, Wifi, WifiOff, ShieldCheck,
   Monitor, AlertTriangle, BarChart2, Settings2, Key, Bug, Plus,
@@ -20,6 +20,8 @@ import { DashboardPage } from '@/views/DashboardPage';
 import { UsersPage } from '@/views/UsersPage';
 import { SubscriptionsPage } from '@/views/SubscriptionsPage';
 import { LicensesPage } from '@/views/LicensesPage';
+import { PaymentsPage } from '@/views/PaymentsPage';
+import { DevicesPage } from '@/views/DevicesPage';
 
 // ────────────────────────────────────────────────
 // Types
@@ -139,76 +141,6 @@ function TierBadge({ tier }: { tier: string }) {
 }
 
 // ────────────────────────────────────────────────
-// PAYMENTS PAGE
-// ────────────────────────────────────────────────
-function PaymentsPage() {
-  const [payments, setPayments] = useState<any[]>([]);
-  const [pending, setPending] = useState<any[]>([]);
-
-  useEffect(() => {
-    const load = async () => {
-      const [p, c] = await Promise.all([api.getRecentPayments(50), api.getPendingCrypto()]);
-      setPayments(p || []); setPending(c || []);
-    };
-    load();
-  }, []);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Payments" subtitle="All payment transactions" />
-
-      {pending.length > 0 && (
-        <div className="glass-card p-5 mb-5 border-aura-amber/20">
-          <h3 className="font-display font-semibold text-sm mb-4 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-aura-amber" />Pending Crypto ({pending.length})
-          </h3>
-          <div className="space-y-2">
-            {pending.map((p: any) => (
-              <div key={p.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/[0.02]">
-                <div>
-                  <p className="text-sm text-white/80">{p.userEmail}</p>
-                  <p className="text-xs text-white/30">${p.amount} - {p.crypto}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={async () => { await api.verifyCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                    className="btn-ghost text-aura-green border-aura-green/20 flex items-center gap-1"><Check className="w-3 h-3" />Approve</button>
-                  <button onClick={async () => { await api.rejectCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                    className="btn-danger flex items-center gap-1"><X className="w-3 h-3" />Reject</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="glass-card p-5">
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">User</th>
-            <th className="text-left py-3 px-4 font-medium">Provider</th>
-            <th className="text-left py-3 px-4 font-medium">Amount</th>
-            <th className="text-left py-3 px-4 font-medium">Status</th>
-            <th className="text-left py-3 px-4 font-medium">Date</th>
-          </tr></thead>
-          <tbody>
-            {payments.map((p: any, i: number) => (
-              <tr key={i} className="table-row">
-                <td className="py-3 px-4 text-white/80">{p.userEmail || p.email || '-'}</td>
-                <td className="py-3 px-4 text-white/50">{p.provider}</td>
-                <td className="py-3 px-4 font-semibold text-accent">${(p.amount ?? 0).toFixed(2)}</td>
-                <td className="py-3 px-4"><StatusBadge status={p.status || 'pending'} /></td>
-                <td className="py-3 px-4 text-white/40">{new Date(p.createdAt || p.date).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {payments.length === 0 && <EmptyState icon={CreditCard} title="No payments recorded" />}
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────
 // UPDATES PAGE
 // ────────────────────────────────────────────────
 function UpdatesPage() {
@@ -293,66 +225,6 @@ function UpdatesPage() {
           </tbody>
         </table>
         {updates.length === 0 && <EmptyState icon={Zap} title="No updates published" subtitle="Click 'Publish Update' to create one" />}
-      </div>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────
-// DEVICES PAGE
-// ────────────────────────────────────────────────
-function DevicesPage() {
-  const [data, setData] = useState<any>({ items: [], total: 0, page: 1, pages: 0 });
-  const [stats, setStats] = useState<any>(null);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
-  const load = useCallback(async () => {
-    const [d, s] = await Promise.all([api.getDevices(search || undefined, page), api.getDeviceStats()]);
-    setData(d); setStats(s);
-  }, [search, page]);
-
-  useEffect(() => { load(); }, [load]);
-
-  return (
-    <div className="animate-fade-in">
-      <PageHeader title="Devices" subtitle="Registered hardware across all licenses">
-        <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
-      </PageHeader>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <KPICard label="Total Devices" value={stats?.totalDevices ?? data.total ?? 0} icon={Monitor} color="text-accent" />
-        <KPICard label="Active Today" value={stats?.activeToday ?? 0} icon={Activity} color="text-aura-green" />
-        <KPICard label="Active This Week" value={stats?.activeThisWeek ?? 0} icon={TrendingUp} color="text-aura-amber" />
-        <KPICard label="New This Week" value={stats?.newThisWeek ?? 0} icon={Plus} color="text-aura-purple" />
-      </div>
-
-      <div className="glass-card p-5">
-        <div className="mb-5 max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search machine name or OS..." onSubmit={load} />
-        </div>
-        <table className="w-full text-sm">
-          <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-            <th className="text-left py-3 px-4 font-medium">Machine</th>
-            <th className="text-left py-3 px-4 font-medium">OS</th>
-            <th className="text-left py-3 px-4 font-medium">Crashes</th>
-            <th className="text-left py-3 px-4 font-medium">Telemetry</th>
-            <th className="text-left py-3 px-4 font-medium">Last Seen</th>
-          </tr></thead>
-          <tbody>
-            {(data.items || []).map((d: any) => (
-              <tr key={d.id} className="table-row">
-                <td className="py-3 px-4"><div className="flex items-center gap-2"><Monitor className="w-4 h-4 text-white/30" /><span className="text-white/80">{d.machineName}</span></div></td>
-                <td className="py-3 px-4 text-white/50 text-xs">{d.osVersion}</td>
-                <td className="py-3 px-4 text-white/50">{d.crashCount ?? 0}</td>
-                <td className="py-3 px-4 text-white/50">{d.telemetryCount ?? 0}</td>
-                <td className="py-3 px-4 text-white/40">{d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleDateString() : '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {(data.items || []).length === 0 && <EmptyState icon={Monitor} title="No devices registered yet" subtitle="Devices will appear after users login from the desktop app" />}
-        <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
       </div>
     </div>
   );

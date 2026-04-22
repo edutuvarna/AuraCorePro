@@ -12,7 +12,12 @@ namespace AuraCore.API.Controllers.Admin;
 public sealed class AdminConfigController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
-    public AdminConfigController(AuraCoreDbContext db) => _db = db;
+    private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _cache;
+    public AdminConfigController(AuraCoreDbContext db, Microsoft.Extensions.Caching.Memory.IMemoryCache cache)
+    {
+        _db = db;
+        _cache = cache;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken ct)
@@ -56,6 +61,7 @@ public sealed class AdminConfigController : ControllerBase
 
         config.LastUpdated = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
+        _cache.Remove("maintenance-config");
 
         return Ok(new
         {

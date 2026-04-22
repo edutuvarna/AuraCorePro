@@ -6,77 +6,82 @@ using Microsoft.EntityFrameworkCore;
 namespace AuraCore.API.Controllers.Admin;
 
 [ApiController]
-[Route("api/admin/audit-log")]
 [Authorize(Roles = "admin")]
 public sealed class AdminAuditLogController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     public AdminAuditLogController(AuraCoreDbContext db) => _db = db;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] string? email = null,
-        [FromQuery] string? ipAddress = null,
-        [FromQuery] bool? success = null,
+    // New primary route — reads from audit_log
+    [HttpGet("api/admin/audit-log")]
+    public async Task<IActionResult> List(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
+        [FromQuery] string? action = null,
+        [FromQuery] string? actorEmail = null,
         CancellationToken ct = default)
     {
-        if (pageSize > 100) pageSize = 100;
-        if (pageSize < 1) pageSize = 10;
-        if (page < 1) page = 1;
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 200);
 
-        var query = _db.LoginAttempts.AsQueryable();
+        var q = _db.AuditLogs.AsQueryable();
+        if (!string.IsNullOrEmpty(action))       q = q.Where(a => a.Action == action);
+        if (!string.IsNullOrEmpty(actorEmail))   q = q.Where(a => a.ActorEmail.Contains(actorEmail));
 
-        if (!string.IsNullOrWhiteSpace(email))
-            query = query.Where(a => a.Email.Contains(email));
-
-        if (!string.IsNullOrWhiteSpace(ipAddress))
-            query = query.Where(a => a.IpAddress == ipAddress);
-
-        if (success.HasValue)
-            query = query.Where(a => a.Success == success.Value);
-
-        var total = await query.CountAsync(ct);
-
-        var items = await query
+        var total = await q.CountAsync(ct);
+        var items = await q
             .OrderByDescending(a => a.CreatedAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(a => new
-            {
-                a.Id, a.Email, a.IpAddress, a.Success, a.CreatedAt
+            .Skip((page - 1) * pageSize).Take(pageSize)
+            .Select(a => new {
+                a.Id, a.ActorEmail, a.Action, a.TargetType, a.TargetId,
+                a.CreatedAt, a.IpAddress,
+                actorId = a.ActorId
             })
             .ToListAsync(ct);
 
-        return Ok(new { total, page, pageSize, items });
+        return Ok(new {
+            total, page, pageSize,
+            pages = (int)Math.Ceiling((double)total / pageSize),
+            items
+        });
     }
 
-    [HttpGet("stats")]
-    public async Task<IActionResult> GetStats(CancellationToken ct)
+    // Legacy alias — frontend sends here per audit F-2; redirect to new route
+    [HttpGet("api/admin/audit/login-attempts")]
+    public IActionResult LegacyAlias(
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 50,
+        [FromQuery] string? action = null, [FromQuery] string? actorEmail = null)
     {
-        var total = await _db.LoginAttempts.CountAsync(ct);
-        var successful = await _db.LoginAttempts.CountAsync(a => a.Success, ct);
-        var failed = await _db.LoginAttempts.CountAsync(a => !a.Success, ct);
-        var last24h = await _db.LoginAttempts.CountAsync(a => a.CreatedAt > DateTimeOffset.UtcNow.AddHours(-24), ct);
-        var failedLast24h = await _db.LoginAttempts.CountAsync(a => !a.Success && a.CreatedAt > DateTimeOffset.UtcNow.AddHours(-24), ct);
+        var qs = $"?page={page}&pageSize={pageSize}";
+        if (!string.IsNullOrEmpty(action)) qs += $"&action={Uri.EscapeDataString(action)}";
+        if (!string.IsNullOrEmpty(actorEmail)) qs += $"&actorEmail={Uri.EscapeDataString(actorEmail)}";
+        return RedirectPreserveMethod($"/api/admin/audit-log{qs}");
+    }
 
-        var topFailedIps = await _db.LoginAttempts
-            .Where(a => !a.Success && a.CreatedAt > DateTimeOffset.UtcNow.AddDays(-7))
-            .GroupBy(a => a.IpAddress)
-            .Select(g => new { ipAddress = g.Key, count = g.Count() })
-            .OrderByDescending(x => x.count)
-            .Take(10)
+    [HttpGet("api/admin/audit-log/stats")]
+    public async Task<IActionResult> Stats(CancellationToken ct)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var last24 = now.AddHours(-24);
+        var last7d = now.AddDays(-7);
+
+        var total = await _db.AuditLogs.CountAsync(ct);
+        var last24hCount = await _db.AuditLogs.CountAsync(a => a.CreatedAt >= last24, ct);
+        var last7dCount = await _db.AuditLogs.CountAsync(a => a.CreatedAt >= last7d, ct);
+        var topActions = await _db.AuditLogs
+            .GroupBy(a => a.Action)
+            .Select(g => new { action = g.Key, count = g.Count() })
+            .OrderByDescending(x => x.count).Take(5)
             .ToListAsync(ct);
 
-        var topFailedEmails = await _db.LoginAttempts
-            .Where(a => !a.Success && a.CreatedAt > DateTimeOffset.UtcNow.AddDays(-7))
-            .GroupBy(a => a.Email)
-            .Select(g => new { email = g.Key, count = g.Count() })
-            .OrderByDescending(x => x.count)
-            .Take(10)
-            .ToListAsync(ct);
-
-        return Ok(new { total, successful, failed, last24h, failedLast24h, topFailedIps, topFailedEmails });
+        // CTP-11 dual aliasing: both time-window names AND semantic names
+        return Ok(new {
+            total,
+            last24h = last24hCount,
+            today = last24hCount,       // semantic alias
+            last7d = last7dCount,
+            thisWeek = last7dCount,      // semantic alias
+            topActions
+        });
     }
 }

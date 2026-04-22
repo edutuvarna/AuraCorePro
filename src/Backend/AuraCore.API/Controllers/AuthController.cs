@@ -1,4 +1,5 @@
 using AuraCore.API.Application.Interfaces;
+using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Infrastructure.Services;
@@ -14,12 +15,16 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;
     private readonly AuraCoreDbContext _db;
+    private readonly IWhitelistService _whitelist;
+    private readonly ITotpEncryption _totpEnc;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db)
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc)
     {
         _auth = auth;
         _db = db;
+        _whitelist = whitelist;
+        _totpEnc = totpEnc;
     }
 
     [HttpPost("register")]
@@ -107,56 +112,75 @@ public sealed class AuthController : ControllerBase
 
         var ip = GetClientIp();
 
-        // ── Rate Limiting: 3 failed attempts in 30 min → block ──
-        var cutoff = DateTimeOffset.UtcNow.AddMinutes(-30);
-        var recentFails = await _db.LoginAttempts
-            .CountAsync(a => a.IpAddress == ip && !a.Success && a.CreatedAt > cutoff, ct);
+        // ── Rate Limiting: bypass for whitelisted operational IPs (ip-whitelist.md F-3) ──
+        var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
+        if (!whitelisted)
+        {
+            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-30);
+            var recentFails = await _db.LoginAttempts
+                .CountAsync(a => a.IpAddress == ip && !a.Success && a.CreatedAt > cutoff, ct);
 
-        if (recentFails >= 3)
-            return StatusCode(429, new { error = "Too many failed attempts. Try again in 30 minutes." });
+            if (recentFails >= 3)
+                return StatusCode(429, new { error = "Too many failed attempts. Try again in 30 minutes." });
 
-        // Per-email rate limiting
-        var normalizedEmail = request.Email?.Trim().ToLowerInvariant() ?? "";
-        var emailFails = await _db.LoginAttempts
-            .CountAsync(a => a.Email == normalizedEmail && !a.Success && a.CreatedAt > cutoff, ct);
-        if (emailFails >= 5)
-            return StatusCode(429, new { error = "Account temporarily locked. Try again later." });
+            // Per-email rate limiting
+            var normalizedEmail = request.Email?.Trim().ToLowerInvariant() ?? "";
+            var emailFails = await _db.LoginAttempts
+                .CountAsync(a => a.Email == normalizedEmail && !a.Success && a.CreatedAt > cutoff, ct);
+            if (emailFails >= 5)
+                return StatusCode(429, new { error = "Account temporarily locked. Try again later." });
+        }
 
         // ── Authenticate ──
         var result = await _auth.LoginAsync(request.Email, request.Password, ct);
 
-        // Log attempt
-        _db.LoginAttempts.Add(new LoginAttempt
+        // Helper for one-line LoginAttempt writes. Deferred until we know the true outcome
+        // so 2FA failures count against rate limits (security-2fa.md F-1).
+        async Task LogAttemptAsync(bool success)
         {
-            Email = request.Email.ToLowerInvariant().Trim(),
-            IpAddress = ip,
-            Success = result.Success
-        });
-        await _db.SaveChangesAsync(ct);
+            _db.LoginAttempts.Add(new LoginAttempt
+            {
+                Email = request.Email.ToLowerInvariant().Trim(),
+                IpAddress = ip,
+                Success = success
+            });
+            await _db.SaveChangesAsync(ct);
+        }
 
         if (!result.Success)
+        {
+            await LogAttemptAsync(false);
             return Unauthorized(new { error = result.Error });
+        }
 
         // ── 2FA Check ──
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant().Trim(), ct);
         if (user is not null && user.TotpEnabled)
         {
-            // If 2FA code provided in request, validate it
-            if (!string.IsNullOrEmpty(request.TotpCode))
+            if (string.IsNullOrEmpty(request.TotpCode))
             {
-                if (!TotpService.ValidateCode(user.TotpSecret!, request.TotpCode))
-                    return Unauthorized(new { error = "Invalid 2FA code" });
-            }
-            else
-            {
-                // Return partial response — client must provide 2FA code
+                // Password was correct, but we haven't seen the TOTP code yet. Do not log
+                // an attempt — client must re-submit with TotpCode. The next call will log
+                // either Success=true or Success=false based on the TOTP verdict.
                 return Ok(new
                 {
                     requires2fa = true,
                     message = "Enter your 2FA code from Google Authenticator"
                 });
             }
+
+            var plaintextTotpSecret = _totpEnc.Decrypt(user.TotpSecret!);
+            if (!TotpService.ValidateCode(plaintextTotpSecret, request.TotpCode))
+            {
+                // Password OK but TOTP wrong — count as failed attempt so brute-forcing
+                // the TOTP also hits the rate limit (security-2fa.md F-1).
+                await LogAttemptAsync(false);
+                return Unauthorized(new { error = "Invalid 2FA code" });
+            }
         }
+
+        // Password OK + (TOTP OK or not required).
+        await LogAttemptAsync(true);
 
         return Ok(new
         {

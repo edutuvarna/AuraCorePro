@@ -47,7 +47,7 @@ public sealed class AdminTelemetryController : ControllerBase
             })
             .ToListAsync(ct);
 
-        return Ok(new { total, page, pageSize, items });
+        return Ok(new { total, page, pageSize, pages = (int)Math.Ceiling((double)total / pageSize), items });
     }
 
     [HttpGet("stats")]
@@ -65,7 +65,13 @@ public sealed class AdminTelemetryController : ControllerBase
             .Take(10)
             .ToListAsync(ct);
 
-        return Ok(new { total, last24h, last7d, last30d, topEventTypes });
+        return Ok(new {
+            total,
+            last24h, today = last24h,
+            last7d, thisWeek = last7d,
+            last30d, thisMonth = last30d,
+            topEventTypes
+        });
     }
 
     [HttpGet("event-types")]

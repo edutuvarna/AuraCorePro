@@ -1,3 +1,4 @@
+using AuraCore.API.Filters;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,10 +25,11 @@ public sealed class AdminDeviceController : ControllerBase
         if (pageSize < 1) pageSize = 10;
         if (page < 1) page = 1;
 
-        var query = _db.Devices.AsQueryable();
+        var query = _db.Devices.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(d => d.MachineName.Contains(search) || d.OsVersion.Contains(search));
+            query = query.Where(d => (d.MachineName != null && d.MachineName.Contains(search))
+                                  || (d.OsVersion != null && d.OsVersion.Contains(search)));
 
         var total = await query.CountAsync(ct);
 
@@ -44,24 +46,60 @@ public sealed class AdminDeviceController : ControllerBase
             })
             .ToListAsync(ct);
 
-        return Ok(new { total, page, pageSize, items });
+        return Ok(new { total, page, pageSize, pages = (int)Math.Ceiling((double)total / pageSize), items });
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var d = await _db.Devices.AsNoTracking()
+            .Include(x => x.License).ThenInclude(l => l!.User)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (d is null) return NotFound(new { error = "Device not found" });
+
+        return Ok(new {
+            d.Id, d.HardwareFingerprint, d.MachineName, d.OsVersion,
+            d.RegisteredAt, d.LastSeenAt,
+            licenseId = d.LicenseId,
+            licenseTier = d.License != null ? d.License.Tier : null,
+            userEmail = d.License != null && d.License.User != null ? d.License.User.Email : null
+        });
+    }
+
+    [HttpDelete("{id:guid}")]
+    [AuditAction("DeleteDevice", "Device", TargetIdFromRouteKey = "id")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        // Use ExecuteDeleteAsync to bypass EF tracking (CTP-5 safe)
+        var affected = await _db.Devices.Where(d => d.Id == id).ExecuteDeleteAsync(ct);
+        if (affected == 0) return NotFound(new { error = "Device not found" });
+        return Ok(new { message = "Device revoked", id });
     }
 
     [HttpGet("stats")]
     public async Task<IActionResult> GetStats(CancellationToken ct)
     {
+        var now = DateTimeOffset.UtcNow;
         var total = await _db.Devices.CountAsync(ct);
-        var activeLastDay = await _db.Devices.CountAsync(d => d.LastSeenAt > DateTimeOffset.UtcNow.AddHours(-24), ct);
-        var activeLastWeek = await _db.Devices.CountAsync(d => d.LastSeenAt > DateTimeOffset.UtcNow.AddDays(-7), ct);
-        var activeLastMonth = await _db.Devices.CountAsync(d => d.LastSeenAt > DateTimeOffset.UtcNow.AddDays(-30), ct);
-
+        var activeLastDay = await _db.Devices.CountAsync(d => d.LastSeenAt >= now.AddDays(-1), ct);
+        var activeLastWeek = await _db.Devices.CountAsync(d => d.LastSeenAt >= now.AddDays(-7), ct);
+        var activeLastMonth = await _db.Devices.CountAsync(d => d.LastSeenAt >= now.AddDays(-30), ct);
         var topOs = await _db.Devices
-            .GroupBy(d => d.OsVersion)
-            .Select(g => new { osVersion = g.Key, count = g.Count() })
-            .OrderByDescending(x => x.count)
-            .Take(10)
-            .ToListAsync(ct);
+            .Where(d => !string.IsNullOrEmpty(d.OsVersion))
+            .GroupBy(d => d.OsVersion).Select(g => new { os = g.Key, count = g.Count() })
+            .OrderByDescending(x => x.count).Take(5).ToListAsync(ct);
 
-        return Ok(new { total, activeLastDay, activeLastWeek, activeLastMonth, topOs });
+        // CTP-11 dual aliasing: both time-window names AND semantic names
+        return Ok(new {
+            total,
+            totalDevices = total,            // semantic alias
+            activeLastDay,
+            activeToday = activeLastDay,     // semantic alias
+            activeLastWeek,
+            activeThisWeek = activeLastWeek, // semantic alias
+            activeLastMonth,
+            newThisWeek = activeLastMonth,   // approximate semantic alias
+            topOs
+        });
     }
 }

@@ -8,6 +8,7 @@ namespace AuraCore.API.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/ip-whitelist")]
+[Route("api/admin/whitelist")]
 [Authorize(Roles = "admin")]
 public sealed class AdminIpWhitelistController : ControllerBase
 {
@@ -71,4 +72,11 @@ public sealed class AdminIpWhitelistController : ControllerBase
     }
 }
 
-public sealed record AddIpWhitelistRequest(string IpAddress, string? Label = null);
+public sealed class AddIpWhitelistRequest
+{
+    [System.Text.Json.Serialization.JsonPropertyName("ip")]
+    public string IpAddress { get; set; } = string.Empty;
+
+    [System.Text.Json.Serialization.JsonPropertyName("label")]
+    public string? Label { get; set; }
+}

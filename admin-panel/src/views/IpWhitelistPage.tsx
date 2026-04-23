@@ -15,6 +15,9 @@
  * decide whether to wire `@/components/ConfirmDialog` here.
  *
  * EmptyState lifted in W2.T11 to shared `@/components/`.
+ * Wave 3 / Task 17: inline `<table>` swapped for `<DataTable>` (responsive
+ * card list below 768px). Per-row Trash button gets `btn-action`
+ * (T1.6 — 44px tap target on mobile).
  *
  * Phase 6.10 W2.T10 — extracted from page.tsx (originally `WhitelistPage`,
  * renamed `IpWhitelistPage` per task plan for clarity); W2.T11 — EmptyState lifted.
@@ -27,6 +30,7 @@ import { Shield, Globe, Plus, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 export function IpWhitelistPage() {
     const [ips, setIps] = useState<any[]>([]);
@@ -88,28 +92,40 @@ export function IpWhitelistPage() {
 
             {/* IP List */}
             <div className="glass-card p-5">
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">IP Address</th>
-                        <th className="text-left py-3 px-4 font-medium">Label</th>
-                        <th className="text-left py-3 px-4 font-medium">Added</th>
-                        <th className="text-right py-3 px-4 font-medium">Actions</th>
-                    </tr></thead>
-                    <tbody>
-                        {ips.map((ip: any, i: number) => (
-                            <tr key={i} className="table-row">
-                                <td className="py-3 px-4 font-mono text-accent">{ip.ip}</td>
-                                <td className="py-3 px-4 text-white/50">{ip.label || '-'}</td>
-                                <td className="py-3 px-4 text-white/40">{ip.addedAt ? new Date(ip.addedAt).toLocaleDateString() : '-'}</td>
-                                <td className="py-3 px-4 text-right">
+                <DataTable<any>
+                    columns={[
+                        {
+                            key: 'ip',
+                            header: 'IP Address',
+                            isCardTitle: true,
+                            render: (ip) => <span className="font-mono text-accent">{ip.ip}</span>,
+                        },
+                        {
+                            key: 'label',
+                            header: 'Label',
+                            render: (ip) => <span className="text-white/50">{ip.label || '-'}</span>,
+                        },
+                        {
+                            key: 'added',
+                            header: 'Added',
+                            render: (ip) => <span className="text-white/40">{ip.addedAt ? new Date(ip.addedAt).toLocaleDateString() : '-'}</span>,
+                        },
+                        {
+                            key: 'actions',
+                            header: 'Actions',
+                            cellClassName: 'text-right',
+                            render: (ip) => (
+                                <div className="flex justify-end">
                                     <button onClick={async () => { await api.removeWhitelistIp(ip.ip); load(); }}
-                                        className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {ips.length === 0 && <EmptyState icon={Shield} title="No trusted IPs yet" subtitle="Add trusted IPs (e.g. office, home, office VPN) to exempt them from login rate-limit lockouts" />}
+                                        className="btn-action p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors inline-flex items-center justify-center"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                            ),
+                        },
+                    ] as DataTableColumn<any>[]}
+                    rows={ips}
+                    rowKey={(ip) => ip.ip}
+                    emptyState={<EmptyState icon={Shield} title="No trusted IPs yet" subtitle="Add trusted IPs (e.g. office, home, office VPN) to exempt them from login rate-limit lockouts" />}
+                />
             </div>
         </div>
     );

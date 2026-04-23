@@ -9,8 +9,11 @@
  * convention).
  *
  * StatusBadge + EmptyState lifted in W2.T11 to shared `@/components/`.
- * DataTable conversion is Wave 3 Task 16 — keep the inline `<table>` 1:1 with
- * the monolith for now.
+ * Wave 3 / Task 17: inline `<table>` swapped for `<DataTable>` (responsive
+ * card list below 768px). Per-row Trash button gets `btn-action`
+ * (T1.6 — 44px tap target on mobile). Browser `confirm()` for delete kept
+ * 1:1 — out of scope for the cosmetic sweep (Wave 5 polish can wire
+ * `ConfirmDialog`).
  *
  * Phase 6.10 W2.T8 — extracted from page.tsx; W2.T11 — primitives lifted.
  */
@@ -23,6 +26,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 export function UpdatesPage() {
     const [updates, setUpdates] = useState<any[]>([]);
@@ -82,30 +86,47 @@ export function UpdatesPage() {
             )}
 
             <div className="glass-card p-5">
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">Version</th>
-                        <th className="text-left py-3 px-4 font-medium">Channel</th>
-                        <th className="text-left py-3 px-4 font-medium">Mandatory</th>
-                        <th className="text-left py-3 px-4 font-medium">Published</th>
-                        <th className="text-right py-3 px-4 font-medium">Actions</th>
-                    </tr></thead>
-                    <tbody>
-                        {updates.map((u: any) => (
-                            <tr key={u.id} className="table-row">
-                                <td className="py-3 px-4 font-mono font-semibold text-accent">{u.version}</td>
-                                <td className="py-3 px-4"><StatusBadge status={u.channel || 'stable'} /></td>
-                                <td className="py-3 px-4">{u.isMandatory ? <span className="text-aura-amber">Yes</span> : <span className="text-white/30">No</span>}</td>
-                                <td className="py-3 px-4 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
-                                <td className="py-3 px-4 text-right">
+                <DataTable<any>
+                    columns={[
+                        {
+                            key: 'version',
+                            header: 'Version',
+                            isCardTitle: true,
+                            render: (u) => <span className="font-mono font-semibold text-accent">{u.version}</span>,
+                        },
+                        {
+                            key: 'channel',
+                            header: 'Channel',
+                            render: (u) => <StatusBadge status={u.channel || 'stable'} />,
+                        },
+                        {
+                            key: 'mandatory',
+                            header: 'Mandatory',
+                            render: (u) => u.isMandatory
+                                ? <span className="text-aura-amber">Yes</span>
+                                : <span className="text-white/30">No</span>,
+                        },
+                        {
+                            key: 'published',
+                            header: 'Published',
+                            render: (u) => <span className="text-white/40">{new Date(u.createdAt).toLocaleDateString()}</span>,
+                        },
+                        {
+                            key: 'actions',
+                            header: 'Actions',
+                            cellClassName: 'text-right',
+                            render: (u) => (
+                                <div className="flex justify-end">
                                     <button onClick={async () => { if(confirm('Delete?')) { await api.deleteUpdate(u.id); api.getUpdates().then(setUpdates); }}}
-                                        className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {updates.length === 0 && <EmptyState icon={Zap} title="No updates published" subtitle="Click 'Publish Update' to create one" />}
+                                        className="btn-action p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors inline-flex items-center justify-center"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                            ),
+                        },
+                    ] as DataTableColumn<any>[]}
+                    rows={updates}
+                    rowKey={(u) => u.id}
+                    emptyState={<EmptyState icon={Zap} title="No updates published" subtitle="Click 'Publish Update' to create one" />}
+                />
             </div>
         </div>
     );

@@ -8,8 +8,9 @@
  * convention).
  *
  * KPICard + EmptyState lifted in W2.T11 to shared `@/components/`.
- * Pagination remains inline — outside the plan's primitive lift list and
- * Wave 3 Task 16 (DataTable conversion) will absorb it.
+ * Pagination remains inline — outside the plan's primitive lift list.
+ * Wave 3 / Task 17: inline `<table>` swapped for `<DataTable>`
+ * (responsive card list below 768px).
  *
  * Phase 6.10 W2.T8 — extracted from page.tsx; W2.T11 — KPICard/EmptyState lifted.
  */
@@ -25,6 +26,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 // Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
@@ -58,6 +60,32 @@ export function TelemetryPage() {
 
     useEffect(() => { load(); }, [load]);
 
+    const items: any[] = data.items || [];
+
+    const columns: DataTableColumn<any>[] = [
+        {
+            key: 'eventType',
+            header: 'Event Type',
+            isCardTitle: true,
+            render: (t) => <span className="badge badge-cyan">{t.eventType}</span>,
+        },
+        {
+            key: 'device',
+            header: 'Device',
+            render: (t) => <span className="font-mono text-xs text-white/40">{t.deviceId?.substring(0, 8)}...</span>,
+        },
+        {
+            key: 'session',
+            header: 'Session',
+            render: (t) => <span className="font-mono text-xs text-white/40">{t.sessionId?.substring(0, 8) || '-'}</span>,
+        },
+        {
+            key: 'date',
+            header: 'Date',
+            render: (t) => <span className="text-white/40">{new Date(t.createdAt).toLocaleString()}</span>,
+        },
+    ];
+
     return (
         <div className="animate-fade-in">
             <PageHeader title="Telemetry" subtitle="Usage analytics from desktop app">
@@ -77,25 +105,12 @@ export function TelemetryPage() {
                         {types.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                 </div>
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">Event Type</th>
-                        <th className="text-left py-3 px-4 font-medium">Device</th>
-                        <th className="text-left py-3 px-4 font-medium">Session</th>
-                        <th className="text-left py-3 px-4 font-medium">Date</th>
-                    </tr></thead>
-                    <tbody>
-                        {(data.items || []).map((t: any, i: number) => (
-                            <tr key={i} className="table-row">
-                                <td className="py-3 px-4"><span className="badge badge-cyan">{t.eventType}</span></td>
-                                <td className="py-3 px-4 font-mono text-xs text-white/40">{t.deviceId?.substring(0, 8)}...</td>
-                                <td className="py-3 px-4 font-mono text-xs text-white/40">{t.sessionId?.substring(0, 8) || '-'}</td>
-                                <td className="py-3 px-4 text-white/40">{new Date(t.createdAt).toLocaleString()}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {(data.items || []).length === 0 && <EmptyState icon={BarChart2} title="No telemetry data" subtitle="Events will appear once devices start sending data" />}
+                <DataTable<any>
+                    columns={columns}
+                    rows={items}
+                    rowKey={(t) => t.id ?? `${t.eventType}-${t.createdAt}-${t.deviceId ?? ''}`}
+                    emptyState={<EmptyState icon={BarChart2} title="No telemetry data" subtitle="Events will appear once devices start sending data" />}
+                />
                 <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
             </div>
         </div>

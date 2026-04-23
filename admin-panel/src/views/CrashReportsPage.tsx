@@ -9,7 +9,9 @@
  *
  * KPICard + EmptyState lifted in W2.T11 to shared `@/components/`. SearchBar
  * and Pagination remain inline — they're outside the plan's primitive lift
- * list and Wave 3 Task 16 (DataTable conversion) will absorb them.
+ * list. Wave 3 / Task 17: inline `<table>` swapped for `<DataTable>`
+ * (responsive card list below 768px). Per-row Eye/Trash buttons get
+ * `btn-action` (T1.6 — 44px tap target on mobile).
  *
  * Phase 6.10 W2.T8 — extracted from page.tsx; W2.T11 — KPICard/EmptyState lifted.
  */
@@ -25,6 +27,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 // Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
@@ -70,6 +73,40 @@ export function CrashReportsPage() {
 
     useEffect(() => { load(); }, [load]);
 
+    const items: any[] = data.items || [];
+
+    const columns: DataTableColumn<any>[] = [
+        {
+            key: 'exception',
+            header: 'Exception',
+            isCardTitle: true,
+            render: (c) => <span className="text-aura-red/80 font-mono text-xs">{c.exceptionType}</span>,
+        },
+        {
+            key: 'version',
+            header: 'Version',
+            render: (c) => <span className="text-white/50">{c.appVersion}</span>,
+        },
+        {
+            key: 'date',
+            header: 'Date',
+            render: (c) => <span className="text-white/40">{new Date(c.createdAt).toLocaleDateString()}</span>,
+        },
+        {
+            key: 'actions',
+            header: 'Actions',
+            cellClassName: 'text-right',
+            render: (c) => (
+                <div className="flex items-center justify-end gap-2">
+                    <button onClick={async () => { const d = await api.getCrashReport(c.id); if(d) setDetail(d); }}
+                        className="btn-action p-1.5 rounded-lg hover:bg-accent/10 text-white/30 hover:text-accent transition-colors inline-flex items-center justify-center"><Eye className="w-4 h-4" /></button>
+                    <button onClick={async () => { await api.deleteCrashReport(c.id); load(); }}
+                        className="btn-action p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors inline-flex items-center justify-center"><Trash2 className="w-4 h-4" /></button>
+                </div>
+            ),
+        },
+    ];
+
     return (
         <div className="animate-fade-in">
             <PageHeader title="Crash Reports" subtitle="Application crash diagnostics">
@@ -101,30 +138,12 @@ export function CrashReportsPage() {
                 <div className="mb-5 max-w-sm">
                     <SearchBar value={search} onChange={setSearch} placeholder="Search exception type..." onSubmit={load} />
                 </div>
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">Exception</th>
-                        <th className="text-left py-3 px-4 font-medium">Version</th>
-                        <th className="text-left py-3 px-4 font-medium">Date</th>
-                        <th className="text-right py-3 px-4 font-medium">Actions</th>
-                    </tr></thead>
-                    <tbody>
-                        {(data.items || []).map((c: any) => (
-                            <tr key={c.id} className="table-row">
-                                <td className="py-3 px-4 text-aura-red/80 font-mono text-xs">{c.exceptionType}</td>
-                                <td className="py-3 px-4 text-white/50">{c.appVersion}</td>
-                                <td className="py-3 px-4 text-white/40">{new Date(c.createdAt).toLocaleDateString()}</td>
-                                <td className="py-3 px-4 text-right flex justify-end gap-2">
-                                    <button onClick={async () => { const d = await api.getCrashReport(c.id); if(d) setDetail(d); }}
-                                        className="p-1.5 rounded-lg hover:bg-accent/10 text-white/30 hover:text-accent transition-colors"><Eye className="w-4 h-4" /></button>
-                                    <button onClick={async () => { await api.deleteCrashReport(c.id); load(); }}
-                                        className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {(data.items || []).length === 0 && <EmptyState icon={Bug} title="No crash reports" subtitle="Great news - no crashes recorded!" />}
+                <DataTable<any>
+                    columns={columns}
+                    rows={items}
+                    rowKey={(c) => c.id}
+                    emptyState={<EmptyState icon={Bug} title="No crash reports" subtitle="Great news - no crashes recorded!" />}
+                />
                 <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
             </div>
         </div>

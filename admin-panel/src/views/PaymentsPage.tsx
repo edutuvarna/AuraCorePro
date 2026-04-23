@@ -7,8 +7,9 @@
  * convention).
  *
  * StatusBadge + EmptyState lifted in W2.T11 to shared `@/components/`.
- * DataTable conversion is Wave 3 Task 16 — keep the inline `<table>` 1:1 with
- * the monolith for now.
+ * Wave 3 / Task 17: inline `<table>` swapped for `<DataTable>` (responsive
+ * card list below 768px). Pending-crypto approve/reject buttons get
+ * `btn-action` (T1.6 — 44px tap target on mobile).
  */
 
 'use client';
@@ -19,6 +20,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 export function PaymentsPage() {
     const [payments, setPayments] = useState<any[]>([]);
@@ -31,6 +33,35 @@ export function PaymentsPage() {
         };
         load();
     }, []);
+
+    const columns: DataTableColumn<any>[] = [
+        {
+            key: 'user',
+            header: 'User',
+            isCardTitle: true,
+            render: (p) => <span className="text-white/80">{p.userEmail || p.email || '-'}</span>,
+        },
+        {
+            key: 'provider',
+            header: 'Provider',
+            render: (p) => <span className="text-white/50">{p.provider}</span>,
+        },
+        {
+            key: 'amount',
+            header: 'Amount',
+            render: (p) => <span className="font-semibold text-accent">${(p.amount ?? 0).toFixed(2)}</span>,
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (p) => <StatusBadge status={p.status || 'pending'} />,
+        },
+        {
+            key: 'date',
+            header: 'Date',
+            render: (p) => <span className="text-white/40">{new Date(p.createdAt || p.date).toLocaleDateString()}</span>,
+        },
+    ];
 
     return (
         <div className="animate-fade-in">
@@ -50,9 +81,9 @@ export function PaymentsPage() {
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={async () => { await api.verifyCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                                        className="btn-ghost text-aura-green border-aura-green/20 flex items-center gap-1"><Check className="w-3 h-3" />Approve</button>
+                                        className="btn-ghost btn-action text-aura-green border-aura-green/20 flex items-center gap-1"><Check className="w-3 h-3" />Approve</button>
                                     <button onClick={async () => { await api.rejectCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                                        className="btn-danger flex items-center gap-1"><X className="w-3 h-3" />Reject</button>
+                                        className="btn-danger btn-action flex items-center gap-1"><X className="w-3 h-3" />Reject</button>
                                 </div>
                             </div>
                         ))}
@@ -61,27 +92,12 @@ export function PaymentsPage() {
             )}
 
             <div className="glass-card p-5">
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">User</th>
-                        <th className="text-left py-3 px-4 font-medium">Provider</th>
-                        <th className="text-left py-3 px-4 font-medium">Amount</th>
-                        <th className="text-left py-3 px-4 font-medium">Status</th>
-                        <th className="text-left py-3 px-4 font-medium">Date</th>
-                    </tr></thead>
-                    <tbody>
-                        {payments.map((p: any, i: number) => (
-                            <tr key={i} className="table-row">
-                                <td className="py-3 px-4 text-white/80">{p.userEmail || p.email || '-'}</td>
-                                <td className="py-3 px-4 text-white/50">{p.provider}</td>
-                                <td className="py-3 px-4 font-semibold text-accent">${(p.amount ?? 0).toFixed(2)}</td>
-                                <td className="py-3 px-4"><StatusBadge status={p.status || 'pending'} /></td>
-                                <td className="py-3 px-4 text-white/40">{new Date(p.createdAt || p.date).toLocaleDateString()}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {payments.length === 0 && <EmptyState icon={CreditCard} title="No payments recorded" />}
+                <DataTable<any>
+                    columns={columns}
+                    rows={payments}
+                    rowKey={(p) => p.id ?? `${p.userEmail || p.email}-${p.createdAt || p.date}`}
+                    emptyState={<EmptyState icon={CreditCard} title="No payments recorded" />}
+                />
             </div>
         </div>
     );

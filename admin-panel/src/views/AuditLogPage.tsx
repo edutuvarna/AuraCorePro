@@ -10,14 +10,13 @@
  * Wave 5 Task 23 will redesign the body: drop the api.ts login_attempts adapter
  * (the Phase 6.9 hotfix that transforms audit_log rows into a login_attempts-
  * shaped object) and render audit_log columns natively (actor / action / target
- * / ip / time). For Wave 2 Task 9 this is just a 1:1 lift of the current
- * implementation — body rewrite is explicitly out of scope.
+ * / ip / time). Wave 3 / Task 17 sweep is intentionally minimum here — only
+ * the inline `<table>` swap to `<DataTable>` and class polish; the api adapter
+ * + column shape stay 1:1 with the Phase 6.9 hotfix until Task 23.
  *
  * KPICard + EmptyState lifted in W2.T11 to shared `@/components/`. SearchBar
  * and Pagination remain inline — they're outside the plan's primitive lift
- * list and Wave 3 Task 16 (DataTable conversion) will absorb them. DataTable
- * conversion still pending — keep the inline `<table>` 1:1 with the monolith
- * for now.
+ * list.
  *
  * Phase 6.10 W2.T9 — extracted from page.tsx; W2.T11 — KPICard/EmptyState lifted.
  */
@@ -33,6 +32,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
 
 // Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
@@ -78,6 +78,34 @@ export function AuditLogPage() {
 
     useEffect(() => { load(); }, [load]);
 
+    const attempts: any[] = data.attempts || [];
+
+    const columns: DataTableColumn<any>[] = [
+        {
+            key: 'email',
+            header: 'Email',
+            isCardTitle: true,
+            render: (a) => <span className="text-white/80">{a.email}</span>,
+        },
+        {
+            key: 'ip',
+            header: 'IP Address',
+            render: (a) => <span className="font-mono text-xs text-white/40">{a.ipAddress}</span>,
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (a) => a.success
+                ? <span className="badge badge-green">Success</span>
+                : <span className="badge badge-red">Failed</span>,
+        },
+        {
+            key: 'time',
+            header: 'Time',
+            render: (a) => <span className="text-white/40">{new Date(a.createdAt).toLocaleString()}</span>,
+        },
+    ];
+
     return (
         <div className="animate-fade-in">
             <PageHeader title="Audit Log" subtitle="Login attempts and security events">
@@ -111,27 +139,12 @@ export function AuditLogPage() {
                         ))}
                     </div>
                 </div>
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">Email</th>
-                        <th className="text-left py-3 px-4 font-medium">IP Address</th>
-                        <th className="text-left py-3 px-4 font-medium">Status</th>
-                        <th className="text-left py-3 px-4 font-medium">Time</th>
-                    </tr></thead>
-                    <tbody>
-                        {(data.attempts || []).map((a: any, i: number) => (
-                            <tr key={i} className="table-row">
-                                <td className="py-3 px-4 text-white/80">{a.email}</td>
-                                <td className="py-3 px-4 font-mono text-xs text-white/40">{a.ipAddress}</td>
-                                <td className="py-3 px-4">
-                                    {a.success ? <span className="badge badge-green">Success</span> : <span className="badge badge-red">Failed</span>}
-                                </td>
-                                <td className="py-3 px-4 text-white/40">{new Date(a.createdAt).toLocaleString()}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {(data.attempts || []).length === 0 && <EmptyState icon={FileText} title="No login attempts" />}
+                <DataTable<any>
+                    columns={columns}
+                    rows={attempts}
+                    rowKey={(a) => a.id ?? `${a.email}-${a.createdAt}-${a.ipAddress}`}
+                    emptyState={<EmptyState icon={FileText} title="No login attempts" />}
+                />
                 <Pagination page={page} pages={Math.ceil((data.total || 0) / 50)} onChange={setPage} />
             </div>
         </div>

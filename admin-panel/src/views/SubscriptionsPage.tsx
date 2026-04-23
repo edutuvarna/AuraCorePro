@@ -27,8 +27,15 @@ export function SubscriptionsPage() {
 
     const handleGrant = async () => {
         if (!userId) { setMsg('Enter a user ID'); return; }
-        const { ok } = await api.grantSubscription(userId, tier, parseInt(days));
-        setMsg(ok ? 'Subscription granted!' : 'Failed to grant subscription');
+        const { ok, data } = await api.grantSubscription(userId, tier, parseInt(days));
+        if (ok) {
+            setMsg('Subscription granted!');
+        } else {
+            // Surface backend error (e.g. "userId could not be converted to GUID")
+            // instead of swallowing it behind a generic message (Phase 6.10 hotfix Bug 1c).
+            const backendError = data?.error || data?.message;
+            setMsg(backendError ? `Failed: ${backendError}` : 'Failed to grant subscription');
+        }
     };
 
     return (

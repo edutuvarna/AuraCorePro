@@ -94,6 +94,23 @@ export function UsersPage() {
             ),
         },
         {
+            // GUID column — Phase 6.10 hotfix Bug 1d. SubscriptionsPage requires
+            // user GUID input; Task 16 DataTable conversion dropped this column
+            // and left no copy source. Truncated 8-char display + click-to-copy.
+            key: 'id',
+            header: 'ID',
+            render: (u) => (
+                <button
+                    type="button"
+                    onClick={() => navigator.clipboard?.writeText(u.id)}
+                    title={`Click to copy: ${u.id}`}
+                    className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
+                >
+                    {u.id.substring(0, 8)}…
+                </button>
+            ),
+        },
+        {
             key: 'role',
             header: 'Role',
             render: (u) => <span className="text-white/50">{u.role}</span>,

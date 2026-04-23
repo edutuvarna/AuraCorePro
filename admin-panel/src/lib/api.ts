@@ -101,8 +101,12 @@ export const api = {
       const res = await request('/api/admin/subscriptions/grant', {
         method: 'POST', body: JSON.stringify({ userId, tier, days })
       });
-      return { ok: res.ok, data: res.ok ? await res.json() : null };
-    } catch { return { ok: false, data: null }; }
+      // Always parse body — error responses carry { error: "..." } that the
+      // UI surfaces (Phase 6.10 hotfix Bug 1c).
+      let data: any = null;
+      try { data = await res.json(); } catch { data = null; }
+      return { ok: res.ok, data };
+    } catch (err: any) { return { ok: false, data: { error: err?.message || 'Network error' } }; }
   },
 
   async revokeSubscription(userId: string) {
@@ -182,18 +186,18 @@ export const api = {
     try {
       const params = new URLSearchParams({ page: String(page) });
       if (search) params.set('search', search);
-      const res = await request(`/api/admin/licenses?\${params}`);
+      const res = await request(`/api/admin/licenses?${params}`);
       return res.ok ? await res.json() : { items: [], total: 0, page: 1, pages: 0 };
     } catch { return { items: [], total: 0, page: 1, pages: 0 }; }
   },
 
   async revokeLicense(id: string) {
-    try { const res = await request(`/api/admin/licenses/\${id}/revoke`, { method: 'PUT' }); return res.ok; }
+    try { const res = await request(`/api/admin/licenses/${id}/revoke`, { method: 'PUT' }); return res.ok; }
     catch { return false; }
   },
 
   async activateLicense(id: string) {
-    try { const res = await request(`/api/admin/licenses/\${id}/activate`, { method: 'PUT' }); return res.ok; }
+    try { const res = await request(`/api/admin/licenses/${id}/activate`, { method: 'PUT' }); return res.ok; }
     catch { return false; }
   },
 

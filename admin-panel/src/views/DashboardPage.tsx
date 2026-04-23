@@ -23,7 +23,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { api } from '@/lib/api';
-import { startConnection, on, off } from '@/lib/signalr';
+import { useSignalR } from '@/hooks/useSignalR';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -62,32 +62,21 @@ export function DashboardPage() {
         };
         load();
         const interval = setInterval(load, 60000);
-
-        // SignalR
-        startConnection();
         setSignalrStatus('connected');
+        return () => clearInterval(interval);
+    }, []);
 
-        const onReg = (d: any) => addActivity('register', `New user: ${d.email}`, 'text-aura-green');
-        const onLogin = (d: any) => addActivity('login', `${d.success ? 'Login' : 'Failed login'}: ${d.email}`, d.success ? 'text-aura-blue' : 'text-aura-amber');
-        const onPayment = (d: any) => addActivity('payment', `Payment $${d.amount} from ${d.email}`, 'text-accent');
-        const onCrash = (d: any) => addActivity('crash', `Crash: ${d.type} (v${d.version})`, 'text-aura-red');
-        const onTelemetry = (d: any) => addActivity('telemetry', `Telemetry batch: ${d.count} events`, 'text-aura-purple');
-
-        const onAdminCount = () => {};
-        on('UserRegistered', onReg);
-        on('UserLogin', onLogin);
-        on('Payment', onPayment);
-        on('CrashReport', onCrash);
-        on('Telemetry', onTelemetry);
-        on('AdminCount', onAdminCount);  // suppress warning
-
-        return () => {
-            clearInterval(interval);
-            off('UserRegistered', onReg); off('UserLogin', onLogin);
-            off('Payment', onPayment); off('CrashReport', onCrash); off('Telemetry', onTelemetry);
-            off('AdminCount', onAdminCount);
-        };
-    }, [addActivity]);
+    // SignalR live activity feed (Phase 6.10 W4.T21 — useSignalR hook
+    // replaces imperative on/off/startConnection wiring; signalr.ts singleton
+    // owns the connection, hook handles per-component subscribe/unsubscribe).
+    useSignalR({
+        UserRegistered: (d) => addActivity('register', `New user: ${d.email}`, 'text-aura-green'),
+        UserLogin: (d) => addActivity('login', `${d.success ? 'Login' : 'Failed login'}: ${d.email}`, d.success ? 'text-aura-blue' : 'text-aura-amber'),
+        Payment: (d) => addActivity('payment', `Payment $${d.amount} from ${d.email}`, 'text-accent'),
+        CrashReport: (d) => addActivity('crash', `Crash: ${d.type} (v${d.version})`, 'text-aura-red'),
+        Telemetry: (d) => addActivity('telemetry', `Telemetry batch: ${d.count} events`, 'text-aura-purple'),
+        AdminCount: () => {},
+    });
 
     const chartData = useMemo(() => {
         return revenue.map((d: any) => ({

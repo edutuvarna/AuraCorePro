@@ -3,12 +3,11 @@ import { getToken } from "./api";
 const API=process.env.NEXT_PUBLIC_API_URL||"https://api.auracore.pro";
 let conn:signalR.HubConnection|null=null;
 const L:Record<string,Function[]>={};
-// Phase 6.9 hotfix: backend SignalR hub at /hubs/admin is NOT YET implemented.
-// Leaving startConnection active spams the console with CORS + 404 negotiation
-// errors and retries forever (withAutomaticReconnect). Gate behind a runtime
-// flag until the hub ships (Phase 6.10+). Flip SIGNALR_ENABLED = true to
-// re-activate real-time updates when the backend hub lands.
-const SIGNALR_ENABLED = false;
+// Phase 6.10 Wave 4 (Task 21): backend AdminHub at /hubs/admin is live —
+// re-enabled. Nginx /hubs/ location block has WebSocket upgrade headers
+// (proxy_http_version 1.1 + Upgrade/Connection + 86400s read timeout) and
+// CORS is handled by the backend with .AllowCredentials() (Phase 6.9 hotfix).
+const SIGNALR_ENABLED = true;
 
 export function startConnection(){
 if(!SIGNALR_ENABLED)return;

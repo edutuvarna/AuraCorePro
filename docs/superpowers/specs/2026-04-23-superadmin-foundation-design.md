@@ -25,7 +25,8 @@ Phase 6.11 introduces a `superadmin` role above `admin`, isolates it on a dedica
 **Auth model + subdomain isolation:**
 - New `superadmin` role on `users.role` field (alongside existing `user` and `admin`).
 - Dedicated `/api/auth/superadmin/login` endpoint (separate from `/api/auth/login`) — stricter rate limit, mandatory audit logging, never reveals whether the email exists.
-- **Dedicated `superadmin.auracore.pro` subdomain** — separate nginx server block, separate Let's Encrypt cert, optional IP allowlist hook for future hardening, separate frontend bundle.
+- **Dedicated `superadmin.auracore.pro` subdomain** — separate nginx server block, separate Let's Encrypt cert, no basic auth (2FA mandatory + brute-force lockout + URL not linked anywhere are the defense layers), commented IP allowlist hook in nginx config for future emergency activation, separate frontend bundle.
+- **Remove nginx basic auth** from `admin.auracore.pro` (admin panel goes public-internet-reachable; backend login + 2FA + rate-limit are the security layers). Both subdomains ship `robots.txt` (`Disallow: /`) and `<meta name="robots" content="noindex,nofollow">` to prevent search engine indexing.
 - Superadmin bootstrap via `SUPERADMIN_EMAILS` env var (idempotent on backend startup); initial value `ozgurdeniz807@gmail.com`.
 - Superadmin accounts MUST have 2FA enabled (mandatory override on first login — bootstrap-promoted superadmin forced to `/enable-2fa` before reaching dashboard).
 - Frontend "Sign In as Superadmin" button on `admin.auracore.pro` LoginScreen → redirects to `https://superadmin.auracore.pro/` (so the superadmin login form lives only on the superadmin subdomain — cross-link only, no superadmin code in the admin bundle).
@@ -201,12 +202,13 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/superadmin.auracore.pro/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
 
-    # Basic auth (same htpasswd as admin subdomain)
-    auth_basic "Superadmin area";
-    auth_basic_user_file /etc/nginx/.htpasswd;
+    # No basic auth — 2FA-mandatory + brute-force lockout + URL-not-linked
+    # are the active defenses. Cert Transparency exposes the subdomain in
+    # public CT logs (crt.sh) so URL secrecy is not a real defense.
 
-    # Optional IP allowlist hook (currently commented out; can be activated for extra hardening)
-    # allow <SUPERADMIN_HOME_IP>;
+    # IP allowlist hook (commented — activate during incident or hardening)
+    # allow 213.130.92.253;  # superadmin home IP
+    # allow <office-ip>;
     # deny all;
 
     root /var/www/superadmin-panel;
@@ -729,13 +731,15 @@ Targeted events use `Clients.User(userId)` pattern (SignalR built-in user mappin
 - Backend: refactor PasswordResetController.cs inline HTTPS into IEmailService abstraction + ResendEmailService implementation + 6 HTML templates.
 - Backend tests: grant lifecycle + request flow + permission filter end-to-end + email service unit tests (mock IHttpClientFactory).
 
-**Wave 3 — Dual frontend builds + nginx superadmin subdomain + shared UX primitives:**
+**Wave 3 — Dual frontend builds + nginx superadmin subdomain + shared UX primitives + admin nginx public-cut:**
 - Frontend: `NEXT_PUBLIC_BUILD_TARGET` env var + conditional NAV_GROUPS + LoginScreen variants.
 - Frontend: LockedTabPlaceholder component + locked-button rendering in views that have Tier 2 actions.
 - Frontend: PermissionRequestDialog component.
 - Frontend: useSignalR additions for permission events + per-user targeting.
 - Frontend: `build:admin` + `build:superadmin` scripts.
-- Ops: DNS A record for superadmin.auracore.pro; Let's Encrypt cert; nginx server block; initial deploy of both bundles.
+- Frontend: `public/robots.txt` (Disallow: /) on both bundles + `<meta name="robots" content="noindex,nofollow">` in app/layout.tsx.
+- Ops: DNS A record for superadmin.auracore.pro; Let's Encrypt cert; nginx server block (no basic auth, IP allowlist hook commented); initial deploy of both bundles.
+- Ops: **Remove basic auth from `admin.auracore.pro` nginx config** (admin panel goes public — backend login + 2FA are the security layers).
 - Ops: SPF TXT record fix (add `include:_spf.resend.com`).
 - Frontend tests: LockedTabPlaceholder render + PermissionRequestDialog interaction + build target conditional logic.
 
@@ -801,6 +805,8 @@ DB migrations run via standard EF Core migration in mid-deploy.
 | Scope decomposition | Phase 6.11 = Superadmin foundation; 6.12 = features; 6.13 = debt; 6.14 = RN app | Single mega-phase | Foundational change — every later feature builds on it |
 | Permission model granularity | 3-tier (tab + action + free) | Pure tab-level OR pure action-level | Mixed model fits real risk profile |
 | Auth isolation | Separate endpoint + separate subdomain | Single endpoint / single subdomain | Defense-in-depth; bundle isolation; future IP allowlist; security-through-layers |
+| nginx basic auth on admin/superadmin | Remove from both | Keep on admin / Keep on superadmin only | Modern auth = MFA + brute-force lockout + password policy; basic auth ≠ app identity, double-auth UX is poor; URL secrecy defeated by CT logs anyway; IP allowlist commented in nginx for emergency activation |
+| Search engine indexing | robots.txt Disallow:/ + noindex meta on both subdomains | No protection / IP-block crawlers | Cheap, standard, sufficient for non-public admin tooling |
 | Frontend architecture | Single codebase, dual build target via env var | Two separate Next.js projects / monorepo | Minimal code duplication; shared components; one CI pipeline; two deploy outputs |
 | Bootstrap | Env var `SUPERADMIN_EMAILS` idempotent on startup | Manual DB seed / first-user pattern | Reproducible, source-controlled |
 | ReadOnly template enforcement | `users.is_readonly` boolean checked by backend | Denial-grants in permission_grants | Simpler; single column; clear semantics |
@@ -830,7 +836,9 @@ Phase 6.11 is DONE when:
 
 - `superadmin` role exists in `users.role`; bootstrap from `SUPERADMIN_EMAILS` env var works idempotently.
 - `/api/auth/superadmin/login` endpoint live with stricter rate limit + mandatory 2FA + audit logging.
-- `superadmin.auracore.pro` subdomain resolves, has valid SSL cert, serves the superadmin bundle.
+- `superadmin.auracore.pro` subdomain resolves, has valid SSL cert, serves the superadmin bundle (no basic auth; commented IP allowlist hook present).
+- `admin.auracore.pro` nginx config has basic auth removed (admin panel public-internet-reachable).
+- Both bundles ship `robots.txt` Disallow:/ and `<meta name="robots" content="noindex,nofollow">`.
 - `admin.auracore.pro` LoginScreen has "Sign In as Superadmin" link that redirects to the subdomain.
 - 4 Tier 1 tabs render LockedTabPlaceholder for unprivileged admins with "Request Permission" button; all 4 tabs' mutation endpoints reject admin requests with `permission_required` 403.
 - 6 Tier 2 action buttons render with lock icon for unprivileged admins; click opens PermissionRequestDialog; submit creates a permission_request row.

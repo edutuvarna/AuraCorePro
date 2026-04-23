@@ -9,7 +9,11 @@
  * StatusBadge + EmptyState lifted in W2.T11 to shared `@/components/`.
  * SearchBar + Pagination + TierBadge remain inline — outside the plan's
  * primitive lift list (TierBadge is just a 1-line StatusBadge wrapper;
- * SearchBar/Pagination wait for Wave 3 Task 16 DataTable conversion).
+ * SearchBar/Pagination wait for Wave 5 visual sweep).
+ *
+ * Wave 3 / Task 16: inline `<table>` swapped for `<DataTable>` primitive
+ * (responsive: table on desktop ≥768px, card list below). Browser `confirm()`
+ * for delete swapped for `ConfirmDialog` (UX upgrade per Phase 6.9 CTP-4).
  */
 
 'use client';
@@ -23,8 +27,10 @@ import { User } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
+// Inline (not in plan's lift list — Wave 5 visual sweep will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     value: string; onChange: (v: string) => void; placeholder?: string; onSubmit?: () => void;
 }) {
@@ -38,7 +44,7 @@ function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     );
 }
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
+// Inline (not in plan's lift list — Wave 5 visual sweep will absorb).
 function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
     if (pages <= 1) return null;
     return (
@@ -64,6 +70,7 @@ export function UsersPage() {
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [confirmDelete, setConfirmDelete] = useState<{ id: string; email: string } | null>(null);
 
     const load = useCallback(async () => {
         const data = await api.getUsers(search || undefined, page, 25);
@@ -71,6 +78,58 @@ export function UsersPage() {
     }, [search, page]);
 
     useEffect(() => { load(); }, [load]);
+
+    const columns: DataTableColumn<User>[] = [
+        {
+            key: 'user',
+            header: 'User',
+            isCardTitle: true,
+            render: (u) => (
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-aura-purple/20 flex items-center justify-center text-xs font-bold text-white/70">
+                        {(u.email || '?')[0].toUpperCase()}
+                    </div>
+                    <span className="text-white/80">{u.email}</span>
+                </div>
+            ),
+        },
+        {
+            key: 'role',
+            header: 'Role',
+            render: (u) => <span className="text-white/50">{u.role}</span>,
+        },
+        {
+            key: 'tier',
+            header: 'Tier',
+            render: (u) => <TierBadge tier={u.tier || 'free'} />,
+        },
+        {
+            key: 'joined',
+            header: 'Joined',
+            render: (u) => <span className="text-white/40">{new Date(u.createdAt).toLocaleDateString()}</span>,
+        },
+        {
+            key: 'actions',
+            header: 'Actions',
+            cellClassName: 'text-right',
+            render: (u) => (
+                <div className="flex items-center justify-end gap-2">
+                    {u.role !== 'admin' && u.tier !== 'free' && (
+                        <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
+                            className="p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
+                            <Ban className="w-4 h-4" />
+                        </button>
+                    )}
+                    {u.role !== 'admin' && (
+                        <button onClick={() => setConfirmDelete({ id: u.id, email: u.email })}
+                            className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div className="animate-fade-in">
@@ -81,53 +140,29 @@ export function UsersPage() {
                 <div className="mb-5 max-w-sm">
                     <SearchBar value={search} onChange={setSearch} placeholder="Search by email..." onSubmit={load} />
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                            <th className="text-left py-3 px-4 font-medium">User</th>
-                            <th className="text-left py-3 px-4 font-medium">Role</th>
-                            <th className="text-left py-3 px-4 font-medium">Tier</th>
-                            <th className="text-left py-3 px-4 font-medium">Joined</th>
-                            <th className="text-right py-3 px-4 font-medium">Actions</th>
-                        </tr></thead>
-                        <tbody>
-                            {users.map((u) => (
-                                <tr key={u.id} className="table-row">
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-aura-purple/20 flex items-center justify-center text-xs font-bold text-white/70">
-                                                {(u.email || '?')[0].toUpperCase()}
-                                            </div>
-                                            <span className="text-white/80">{u.email}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3 px-4 text-white/50">{u.role}</td>
-                                    <td className="py-3 px-4"><TierBadge tier={u.tier || 'free'} /></td>
-                                    <td className="py-3 px-4 text-white/40">{new Date(u.createdAt).toLocaleDateString()}</td>
-                                    <td className="py-3 px-4">
-                                        <div className="flex items-center justify-end gap-2">
-                                            {u.role !== 'admin' && u.tier !== 'free' && (
-                                                <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
-                                                    className="p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
-                                                    <Ban className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                            {u.role !== 'admin' && (
-                                                <button onClick={async () => { if(confirm(`Delete ${u.email}?`)) { await api.deleteUser(u.id); load(); }}}
-                                                    className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {users.length === 0 && <EmptyState icon={Users} title="No users found" />}
-                </div>
+                <DataTable<User>
+                    columns={columns}
+                    rows={users}
+                    rowKey={(u) => u.id}
+                    emptyState={<EmptyState icon={Users} title="No users found" />}
+                />
                 <Pagination page={page} pages={Math.ceil(total / 25)} onChange={setPage} />
             </div>
+            <ConfirmDialog
+                open={confirmDelete !== null}
+                title="Delete user"
+                message={confirmDelete ? `Permanently delete ${confirmDelete.email}? This cannot be undone.` : ''}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                destructive
+                onConfirm={async () => {
+                    if (!confirmDelete) return;
+                    await api.deleteUser(confirmDelete.id);
+                    setConfirmDelete(null);
+                    load();
+                }}
+                onCancel={() => setConfirmDelete(null)}
+            />
         </div>
     );
 }

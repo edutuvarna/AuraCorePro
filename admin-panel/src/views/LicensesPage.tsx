@@ -9,8 +9,16 @@
  * KPICard + StatusBadge + EmptyState lifted in W2.T11 to shared
  * `@/components/`. SearchBar + Pagination + TierBadge remain inline — they're
  * outside the plan's primitive lift list (TierBadge is just a 1-line
- * StatusBadge wrapper; SearchBar/Pagination wait for Wave 3 Task 16 DataTable
- * conversion).
+ * StatusBadge wrapper; SearchBar/Pagination wait for Wave 5 visual sweep).
+ *
+ * Wave 3 / Task 16: inline `<table>` swapped for `<DataTable>` primitive
+ * (responsive: table on desktop ≥768px, card list below). ConfirmDialog wired
+ * for revoke (UX upgrade per Phase 6.9 CTP-4 — was a one-click destructive
+ * action prior).
+ *
+ * Note on `License.deviceCount` vs `activeDevices`: backend Phase 6.8 transition
+ * emits both names; rendering cell falls back to either (Wave 5 retires the
+ * alias).
  */
 
 'use client';
@@ -21,12 +29,15 @@ import {
     ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { License } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
+// Inline (not in plan's lift list — Wave 5 visual sweep will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     value: string; onChange: (v: string) => void; placeholder?: string; onSubmit?: () => void;
 }) {
@@ -40,7 +51,7 @@ function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     );
 }
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
+// Inline (not in plan's lift list — Wave 5 visual sweep will absorb).
 function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
     if (pages <= 1) return null;
     return (
@@ -65,6 +76,7 @@ export function LicensesPage() {
     const [data, setData] = useState<any>({ items: [], total: 0, page: 1, pages: 0 });
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [confirmRevoke, setConfirmRevoke] = useState<{ id: string; key: string } | null>(null);
 
     const load = useCallback(async () => {
         const d = await api.getLicenses(page, search || undefined);
@@ -72,6 +84,62 @@ export function LicensesPage() {
     }, [page, search]);
 
     useEffect(() => { load(); }, [load]);
+
+    const items: License[] = data.items || [];
+
+    const columns: DataTableColumn<License>[] = [
+        {
+            key: 'key',
+            header: 'Key',
+            isCardTitle: true,
+            render: (l) => <span className="font-mono text-xs text-white/50">{l.key?.substring(0, 12)}...</span>,
+        },
+        {
+            key: 'user',
+            header: 'User',
+            render: (l) => <span className="text-white/70">{l.userEmail || '-'}</span>,
+        },
+        {
+            key: 'tier',
+            header: 'Tier',
+            render: (l) => <TierBadge tier={l.tier} />,
+        },
+        {
+            key: 'devices',
+            header: 'Devices',
+            render: (l) => {
+                // Phase 6.8 transition emits both `activeDevices` (legacy) and `deviceCount`.
+                const active = (l as any).activeDevices ?? l.deviceCount ?? 0;
+                return <span className="text-white/50">{active}/{l.maxDevices ?? 1}</span>;
+            },
+        },
+        {
+            key: 'status',
+            header: 'Status',
+            render: (l) => <StatusBadge status={l.status} />,
+        },
+        {
+            key: 'created',
+            header: 'Created',
+            render: (l) => <span className="text-white/40">{new Date(l.createdAt).toLocaleDateString()}</span>,
+        },
+        {
+            key: 'actions',
+            header: 'Actions',
+            cellClassName: 'text-right',
+            render: (l) => (
+                <div className="flex justify-end">
+                    {l.status === 'active' ? (
+                        <button onClick={() => setConfirmRevoke({ id: l.id, key: l.key })}
+                            className="btn-danger text-xs px-3 py-1">Revoke</button>
+                    ) : (
+                        <button onClick={async () => { await api.activateLicense(l.id); load(); }}
+                            className="btn-ghost text-xs px-3 py-1 text-aura-green border-aura-green/20">Activate</button>
+                    )}
+                </div>
+            ),
+        },
+    ];
 
     return (
         <div className="animate-fade-in">
@@ -81,47 +149,38 @@ export function LicensesPage() {
 
             <div className="grid grid-cols-3 gap-4 mb-5">
                 <KPICard label="Total Licenses" value={data.total || 0} icon={Key} color="text-accent" />
-                <KPICard label="Active" value={data.items?.filter?.((l: any) => l.status === 'active')?.length ?? 0} icon={CheckCircle2} color="text-aura-green" />
-                <KPICard label="Revoked" value={data.items?.filter?.((l: any) => l.status === 'revoked')?.length ?? 0} icon={XCircle} color="text-aura-red" />
+                <KPICard label="Active" value={items.filter((l) => l.status === 'active').length} icon={CheckCircle2} color="text-aura-green" />
+                <KPICard label="Revoked" value={items.filter((l) => l.status === 'revoked').length} icon={XCircle} color="text-aura-red" />
             </div>
 
             <div className="glass-card p-5">
                 <div className="mb-5 max-w-sm">
                     <SearchBar value={search} onChange={setSearch} placeholder="Search by key, email, tier..." onSubmit={load} />
                 </div>
-                <table className="w-full text-sm">
-                    <thead><tr className="text-[11px] text-white/30 uppercase tracking-wider border-b border-white/[0.06]">
-                        <th className="text-left py-3 px-4 font-medium">Key</th>
-                        <th className="text-left py-3 px-4 font-medium">User</th>
-                        <th className="text-left py-3 px-4 font-medium">Tier</th>
-                        <th className="text-left py-3 px-4 font-medium">Devices</th>
-                        <th className="text-left py-3 px-4 font-medium">Status</th>
-                        <th className="text-left py-3 px-4 font-medium">Created</th>
-                        <th className="text-right py-3 px-4 font-medium">Actions</th>
-                    </tr></thead>
-                    <tbody>
-                        {(data.items || []).map((l: any) => (
-                            <tr key={l.id} className="table-row">
-                                <td className="py-3 px-4 font-mono text-xs text-white/50">{l.key?.substring(0, 12)}...</td>
-                                <td className="py-3 px-4 text-white/70">{l.userEmail || '-'}</td>
-                                <td className="py-3 px-4"><TierBadge tier={l.tier} /></td>
-                                <td className="py-3 px-4 text-white/50">{l.activeDevices ?? 0}/{l.maxDevices ?? 1}</td>
-                                <td className="py-3 px-4"><StatusBadge status={l.status} /></td>
-                                <td className="py-3 px-4 text-white/40">{new Date(l.createdAt).toLocaleDateString()}</td>
-                                <td className="py-3 px-4 text-right">
-                                    {l.status === 'active' ? (
-                                        <button onClick={async () => { await api.revokeLicense(l.id); load(); }} className="btn-danger text-xs px-3 py-1">Revoke</button>
-                                    ) : (
-                                        <button onClick={async () => { await api.activateLicense(l.id); load(); }} className="btn-ghost text-xs px-3 py-1 text-aura-green border-aura-green/20">Activate</button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                {(data.items || []).length === 0 && <EmptyState icon={Key} title="No licenses found" />}
+                <DataTable<License>
+                    columns={columns}
+                    rows={items}
+                    rowKey={(l) => l.id}
+                    emptyState={<EmptyState icon={Key} title="No licenses found" />}
+                />
                 <Pagination page={data.page || 1} pages={data.pages || 0} onChange={setPage} />
             </div>
+
+            <ConfirmDialog
+                open={confirmRevoke !== null}
+                title="Revoke license"
+                message={confirmRevoke ? `Revoke license ${confirmRevoke.key?.substring(0, 12)}...? Active devices will be disabled.` : ''}
+                confirmLabel="Revoke"
+                cancelLabel="Cancel"
+                destructive
+                onConfirm={async () => {
+                    if (!confirmRevoke) return;
+                    await api.revokeLicense(confirmRevoke.id);
+                    setConfirmRevoke(null);
+                    load();
+                }}
+                onCancel={() => setConfirmRevoke(null)}
+            />
         </div>
     );
 }

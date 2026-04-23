@@ -8,9 +8,8 @@ import { ReactNode, useEffect } from 'react';
  * Slides up from the bottom of the viewport with a tap-to-dismiss backdrop.
  * Escape key closes. `aria-modal` + `role="dialog"` for screen readers.
  *
- * No consumers in Task 11 — Wave 3 Task 15 wires the first migration target
- * (likely the row-detail drawer in mobile DataTable mode). Created here so
- * the lift commit owns every primitive in one place.
+ * First consumer wired in Wave 3 Task 15: Sidebar's mobile "more" sheet
+ * (renders the 8 non-primary nav tabs as a 2-col grid with optional mini-stats).
  */
 export interface MobileSheetProps {
     open: boolean;

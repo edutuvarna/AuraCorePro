@@ -59,7 +59,7 @@ public sealed class AdminLicenseController : ControllerBase
         });
     }
 
-    [HttpPost("{id:guid}/revoke")]
+    [HttpPut("{id:guid}/revoke")]
     [AuditAction("RevokeLicense", "License", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Revoke(Guid id, CancellationToken ct)
     {
@@ -72,7 +72,7 @@ public sealed class AdminLicenseController : ControllerBase
         return Ok(new { message = "License revoked", l.Id, l.Status, l.Tier });
     }
 
-    [HttpPost("{id:guid}/activate")]
+    [HttpPut("{id:guid}/activate")]
     [AuditAction("ActivateLicense", "License", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Activate(Guid id, [FromBody] ActivateLicenseRequest req, CancellationToken ct)
     {

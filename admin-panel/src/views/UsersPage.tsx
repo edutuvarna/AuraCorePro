@@ -19,6 +19,7 @@ import {
     Users, Search, RefreshCw, Trash2, Ban, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { User } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
@@ -59,7 +60,7 @@ function TierBadge({ tier }: { tier: string }) {
 }
 
 export function UsersPage() {
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -90,7 +91,7 @@ export function UsersPage() {
                             <th className="text-right py-3 px-4 font-medium">Actions</th>
                         </tr></thead>
                         <tbody>
-                            {users.map((u: any) => (
+                            {users.map((u) => (
                                 <tr key={u.id} className="table-row">
                                     <td className="py-3 px-4">
                                         <div className="flex items-center gap-3">

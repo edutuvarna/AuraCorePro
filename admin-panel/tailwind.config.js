@@ -7,30 +7,40 @@ module.exports = {
         surface: {
           50: '#f0f4ff',
           100: '#e0e7ff',
-          800: '#141927',
-          900: '#0B0F1A',
+          // Phase 6.10 W3 hybrid Glass + Terminal additions
+          700: '#15151a',
+          800: '#0d0d12',
+          900: '#08080c',
           950: '#060911',
         },
         accent: {
-          DEFAULT: '#06B6D4',
+          // Existing accent palette (preserved — sidebar-item, btn-primary,
+          // accent-glow, input-dark, LoginScreen all consume these)
+          DEFAULT: '#22d3ee', // bumped to plan's hybrid cyan (was #06B6D4)
           light: '#22D3EE',
           dark: '#0891B2',
           glow: 'rgba(6, 182, 212, 0.15)',
+          // Phase 6.10 W3 addition
+          secondary: '#a78bfa',
         },
         aura: {
-          cyan: '#06B6D4',
+          // Phase 6.10 W3 hybrid Glass + Terminal palette
+          cyan: '#22d3ee',
+          purple: '#a78bfa',
+          green: '#34d399',
+          red: '#f87171',
+          amber: '#fbbf24',
+          // Preserved from earlier phases (still in use by badge-blue +
+          // semantic helpers across pages)
           blue: '#3B82F6',
-          purple: '#8B5CF6',
           pink: '#EC4899',
-          amber: '#F59E0B',
-          green: '#10B981',
-          red: '#EF4444',
         }
       },
       fontFamily: {
-        display: ['Outfit', 'sans-serif'],
-        body: ['DM Sans', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        // Phase 6.10 W3 hybrid: Outfit body+display, JetBrains Mono mono
+        display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        body: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

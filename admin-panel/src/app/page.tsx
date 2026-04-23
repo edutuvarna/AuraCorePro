@@ -53,7 +53,7 @@ function AdminPanel({ onLogout: _onLogout }: { onLogout: () => void }) {
     <div className="flex h-screen overflow-hidden">
       <Sidebar groups={NAV_GROUPS} activePage={page} onSelect={(p) => setPage(p as Page)} />
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1400px] mx-auto p-6 lg:p-8"><ActivePage /></div>
+        <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
       </main>
     </div>
   );

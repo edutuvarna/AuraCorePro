@@ -74,13 +74,13 @@ public sealed class AdminLicenseController : ControllerBase
 
     [HttpPut("{id:guid}/activate")]
     [AuditAction("ActivateLicense", "License", TargetIdFromRouteKey = "id")]
-    public async Task<IActionResult> Activate(Guid id, [FromBody] ActivateLicenseRequest req, CancellationToken ct)
+    public async Task<IActionResult> Activate(Guid id, [FromBody] ActivateLicenseRequest? req, CancellationToken ct)
     {
         var l = await _db.Licenses.FirstOrDefaultAsync(x => x.Id == id, ct);
         if (l is null) return NotFound(new { error = "License not found" });
 
         l.Status = "active";
-        if (!string.IsNullOrEmpty(req.Tier)) l.Tier = req.Tier;
+        if (req is not null && !string.IsNullOrEmpty(req.Tier)) l.Tier = req.Tier;
         await _db.SaveChangesAsync(ct);
         return Ok(new { message = "License activated", l.Id, l.Status, l.Tier });
     }

@@ -1,4 +1,5 @@
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
 using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -131,7 +132,7 @@ public sealed class CryptoController : ControllerBase
             _db.Licenses.Add(new License
             {
                 UserId = payment.UserId,
-                Key = Guid.NewGuid().ToString("N"),
+                Key = LicenseKeyGenerator.Generate(),
                 Tier = payment.Tier,
                 MaxDevices = payment.Tier == "enterprise" ? 5 : 1,
                 ExpiresAt = payment.Plan == "yearly"

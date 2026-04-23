@@ -3,6 +3,7 @@ using DbSubscription = AuraCore.API.Domain.Entities.Subscription;
 using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -248,7 +249,7 @@ public sealed class StripeController : ControllerBase
         _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = paymentCurrency, Plan = plan, Tier = tier, Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
         var license = await _db.Licenses.FirstOrDefaultAsync(l => l.UserId == userId && l.Status == "active", ct);
         if (license is not null) { license.Tier = tier; license.MaxDevices = Math.Max(deviceCount, 1); license.ExpiresAt = expiresAt; }
-        else { _db.Licenses.Add(new License { UserId = userId, Key = Guid.NewGuid().ToString("N"), Tier = tier, MaxDevices = Math.Max(deviceCount, 1), ExpiresAt = expiresAt }); }
+        else { _db.Licenses.Add(new License { UserId = userId, Key = LicenseKeyGenerator.Generate(), Tier = tier, MaxDevices = Math.Max(deviceCount, 1), ExpiresAt = expiresAt }); }
         if (session.Mode == "subscription" && !string.IsNullOrEmpty(session.SubscriptionId))
         {
             var sub = await _db.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId, ct);

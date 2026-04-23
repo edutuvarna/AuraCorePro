@@ -1,9 +1,12 @@
 using StripeSubscription = Stripe.Subscription;
 using DbSubscription = AuraCore.API.Domain.Entities.Subscription;
+using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Stripe.Checkout;
@@ -16,11 +19,13 @@ public sealed class StripeController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     private readonly IConfiguration _config;
+    private readonly IHubContext<AdminHub> _hub;
 
-    public StripeController(AuraCoreDbContext db, IConfiguration config)
+    public StripeController(AuraCoreDbContext db, IConfiguration config, IHubContext<AdminHub> hub)
     {
         _db = db;
         _config = config;
+        _hub = hub;
     }
 
     [HttpPost("create-session")]
@@ -244,7 +249,7 @@ public sealed class StripeController : ControllerBase
         _db.Payments.Add(new AuraCore.API.Domain.Entities.Payment { UserId = userId, Provider = "stripe", ExternalId = session.Id, Amount = amount, Currency = paymentCurrency, Plan = plan, Tier = tier, Status = "completed", CompletedAt = DateTimeOffset.UtcNow });
         var license = await _db.Licenses.FirstOrDefaultAsync(l => l.UserId == userId && l.Status == "active", ct);
         if (license is not null) { license.Tier = tier; license.MaxDevices = Math.Max(deviceCount, 1); license.ExpiresAt = expiresAt; }
-        else { _db.Licenses.Add(new License { UserId = userId, Key = Guid.NewGuid().ToString("N"), Tier = tier, MaxDevices = Math.Max(deviceCount, 1), ExpiresAt = expiresAt }); }
+        else { _db.Licenses.Add(new License { UserId = userId, Key = LicenseKeyGenerator.Generate(), Tier = tier, MaxDevices = Math.Max(deviceCount, 1), ExpiresAt = expiresAt }); }
         if (session.Mode == "subscription" && !string.IsNullOrEmpty(session.SubscriptionId))
         {
             var sub = await _db.Subscriptions.FirstOrDefaultAsync(s => s.UserId == userId, ct);
@@ -252,6 +257,16 @@ public sealed class StripeController : ControllerBase
             else { _db.Subscriptions.Add(new DbSubscription { UserId = userId, StripeSubscriptionId = session.SubscriptionId, StripeCustomerId = session.CustomerId, Plan = plan, Status = "active", CurrentPeriodEnd = expiresAt }); }
         }
         await _db.SaveChangesAsync(ct);
+
+        // Phase 6.10 Task 19: broadcast completed payment to admin dashboard
+        await _hub.Clients.Group("admins").SendAsync("Payment", new
+        {
+            email = user.Email,
+            amount,
+            currency = paymentCurrency,
+            plan,
+            createdAt = DateTimeOffset.UtcNow
+        }, ct);
     }
 
     private async Task HandleInvoicePaid(Event stripeEvent, CancellationToken ct)

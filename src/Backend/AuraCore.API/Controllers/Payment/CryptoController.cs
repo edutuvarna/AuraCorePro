@@ -1,7 +1,10 @@
-using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
+using AuraCore.API.Hubs;
+using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuraCore.API.Controllers.Payment;
@@ -12,11 +15,13 @@ public sealed class CryptoController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     private readonly IConfiguration _config;
+    private readonly IHubContext<AdminHub> _hub;
 
-    public CryptoController(AuraCoreDbContext db, IConfiguration config)
+    public CryptoController(AuraCoreDbContext db, IConfiguration config, IHubContext<AdminHub> hub)
     {
         _db = db;
         _config = config;
+        _hub = hub;
     }
 
     /// <summary>Generate a crypto payment address for BTC or USDT</summary>
@@ -127,7 +132,7 @@ public sealed class CryptoController : ControllerBase
             _db.Licenses.Add(new License
             {
                 UserId = payment.UserId,
-                Key = Guid.NewGuid().ToString("N"),
+                Key = LicenseKeyGenerator.Generate(),
                 Tier = payment.Tier,
                 MaxDevices = payment.Tier == "enterprise" ? 5 : 1,
                 ExpiresAt = payment.Plan == "yearly"
@@ -137,6 +142,17 @@ public sealed class CryptoController : ControllerBase
         }
 
         await _db.SaveChangesAsync(ct);
+
+        // Phase 6.10 Task 19: broadcast verified crypto payment to admin dashboard
+        await _hub.Clients.Group("admins").SendAsync("Payment", new
+        {
+            email = payment.User?.Email ?? "(unknown)",
+            amount = payment.Amount,
+            currency = payment.Currency,
+            plan = payment.Plan,
+            createdAt = DateTimeOffset.UtcNow
+        }, ct);
+
         return Ok(new { status = "activated", userEmail = payment.User.Email, tier = payment.Tier });
     }
 

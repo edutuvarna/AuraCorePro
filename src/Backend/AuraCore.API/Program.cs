@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
+builder.Services.AddSignalR();
 
 // Phase 6.9 hotfix: trust nginx's X-Forwarded-For + X-Forwarded-Proto so
 // HttpContext.Connection.RemoteIpAddress reflects the actual client IP
@@ -112,6 +113,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.FromMinutes(1),
             NameClaimType = "sub",
             RoleClaimType = System.Security.Claims.ClaimTypes.Role
+        };
+
+        // Phase 6.10 W4: SignalR WebSocket transport cannot set the Authorization
+        // header from the browser. The frontend SignalR client passes the JWT via
+        // ?access_token= query string (HubConnectionBuilder.accessTokenFactory).
+        // Read it here ONLY for /hubs/ paths so non-hub endpoints keep
+        // header-only auth (defense-in-depth: query-string tokens leak in
+        // server logs / Referer headers, so we narrowly scope the exception).
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -272,6 +294,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AuraCore.API.Hubs.AdminHub>("/hubs/admin");
 app.MapGet("/health", async (AuraCoreDbContext db) =>
 {
     string dbStatus;

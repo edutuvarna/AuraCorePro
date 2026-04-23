@@ -9,7 +9,6 @@ namespace AuraCore.API.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/ip-whitelist")]
-[Route("api/admin/whitelist")]
 [Authorize(Roles = "admin")]
 public sealed class AdminIpWhitelistController : ControllerBase
 {

@@ -1,8 +1,10 @@
 using AuraCore.API.Application.Interfaces;
 using AuraCore.API.Application.Services.Telemetry;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,11 +17,13 @@ public sealed class TelemetryController : ControllerBase
 {
     private readonly ITelemetryRepository _telemetry;
     private readonly ITelemetryRateLimiter _rateLimiter;
+    private readonly IHubContext<AdminHub> _hub;
 
-    public TelemetryController(ITelemetryRepository telemetry, ITelemetryRateLimiter rateLimiter)
+    public TelemetryController(ITelemetryRepository telemetry, ITelemetryRateLimiter rateLimiter, IHubContext<AdminHub> hub)
     {
         _telemetry = telemetry;
         _rateLimiter = rateLimiter;
+        _hub = hub;
     }
 
     [HttpPost("batch")]
@@ -66,6 +70,19 @@ public sealed class TelemetryController : ControllerBase
             CreatedAt = e.Timestamp
         });
         await _telemetry.InsertBatchAsync(events, ct);
+
+        // Phase 6.10 Task 19: broadcast meaningful telemetry batches to admin
+        // dashboard. Gated at >=10 events to avoid spamming on small batches.
+        if (eventsCount >= 10)
+        {
+            await _hub.Clients.Group("admins").SendAsync("Telemetry", new
+            {
+                count = eventsCount,
+                deviceId = request.DeviceId,
+                createdAt = DateTimeOffset.UtcNow
+            }, ct);
+        }
+
         return Accepted(new { received = request.Events.Count });
     }
 }

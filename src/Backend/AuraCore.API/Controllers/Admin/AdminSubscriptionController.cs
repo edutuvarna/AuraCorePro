@@ -1,5 +1,6 @@
-using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
+using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,7 @@ public sealed class AdminSubscriptionController : ControllerBase
             _db.Licenses.Add(new License
             {
                 UserId = req.UserId,
-                Key = Guid.NewGuid().ToString("N"),
+                Key = LicenseKeyGenerator.Generate(),
                 Tier = req.Tier,
                 MaxDevices = req.Tier == "enterprise" ? 5 : 1,
                 ExpiresAt = expiresAt

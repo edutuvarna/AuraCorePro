@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  body {
+    @apply bg-surface-900 text-white font-body antialiased;
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(6, 182, 212, 0.10) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 45%);
+    min-height: 100vh;
+  }
+  code, kbd, samp, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+}
+
+@layer components {
+  /* ========================================================================
+     Hybrid Glass + Terminal — Phase 6.10 W3 (Task 14)
+     Foundation only. Task 17 sweeps consumers to apply these utilities.
+     ======================================================================== */
+
+  /* Glass surfaces */
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-xl;
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-200 hover:bg-white/[0.05] hover:border-white/[0.1];
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-3.5 py-2 rounded-md text-xs font-medium font-mono inline-flex items-center gap-2 transition-all
+           bg-gradient-to-br from-cyan-500 to-purple-500 text-white border border-white/15
+           shadow-[0_4px_20px_rgba(6,182,212,0.25)] hover:shadow-[0_4px_30px_rgba(6,182,212,0.35)];
+  }
+  .btn-ghost {
+    @apply px-3.5 py-2 rounded-md text-xs font-medium font-mono inline-flex items-center gap-2 transition-all
+           bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] text-white/80 hover:bg-white/[0.07];
+  }
+  .btn-danger {
+    @apply px-3.5 py-2 rounded-md text-xs font-medium font-mono inline-flex items-center gap-2 transition-all
+           bg-red-600/10 border border-red-500/30 text-red-400 hover:bg-red-600/20;
+  }
+  /* T1.6 tap-target carry-forward — apply to interactive controls on mobile */
+  .btn-action { min-height: 44px; min-width: 44px; }
+
+  /* Inputs */
+  .input-dark {
+    @apply px-3 py-2 rounded-md text-xs font-mono bg-white/[0.03] backdrop-blur-xl border border-white/[0.07] text-white placeholder:text-white/35
+           focus:outline-none focus:border-cyan-500/40 focus:shadow-[0_0_0_3px_rgba(6,182,212,0.08)];
+  }
+
+  /* Badges (StatusBadge.tsx consumes badge + badge-{green|amber|red|cyan|purple|blue}) */
+  .badge {
+    @apply px-2 py-0.5 rounded text-[10px] font-mono tracking-[0.05em] font-medium inline-block;
+  }
+  .badge-cyan   { @apply bg-cyan-500/10    text-cyan-300    border border-cyan-500/30; }
+  .badge-purple { @apply bg-purple-500/10  text-purple-300  border border-purple-500/30; }
+  .badge-green  { @apply bg-emerald-500/10 text-emerald-300 border border-emerald-500/30; }
+  .badge-amber  { @apply bg-amber-500/10   text-amber-300   border border-amber-500/30; }
+  .badge-red    { @apply bg-red-500/10     text-red-300     border border-red-500/30; }
+  .badge-blue   { @apply bg-blue-500/10    text-blue-300    border border-blue-500/30; }
+
+  /* ========================================================================
+     Preserved utilities from earlier phases — still consumed by KpiCard,
+     LoginScreen, Sidebar, and the 8 view tables. Task 17 may rationalize
+     these but they MUST keep working through the W3 transition.
+     ======================================================================== */
+
+  .stat-value {
+    @apply text-3xl font-display font-bold tracking-tight;
+  }
+
+  .accent-glow {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2), 0 0 60px rgba(6, 182, 212, 0.1);
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-white/50 transition-all duration-200 cursor-pointer;
+  }
+  .sidebar-item:hover {
+    @apply text-white/80 bg-white/[0.04];
+  }
+  .sidebar-item.active {
+    @apply text-accent bg-accent/[0.08] border border-accent/20;
+  }
+
+  .table-row {
+    @apply border-b border-white/[0.04] transition-colors duration-150;
+  }
+  .table-row:hover {
+    @apply bg-white/[0.02];
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

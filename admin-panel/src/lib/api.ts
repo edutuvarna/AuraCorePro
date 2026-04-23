@@ -196,9 +196,16 @@ export const api = {
     catch { return false; }
   },
 
-  async activateLicense(id: string) {
-    try { const res = await request(`/api/admin/licenses/${id}/activate`, { method: 'PUT' }); return res.ok; }
-    catch { return false; }
+  async activateLicense(id: string, tier?: string) {
+    try {
+      const opts: RequestInit = { method: 'PUT' };
+      if (tier) {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = JSON.stringify({ tier });
+      }
+      const res = await request(`/api/admin/licenses/${id}/activate`, opts);
+      return res.ok;
+    } catch { return false; }
   },
 
   // Whitelist (Phase 6.10 W5.T25 — canonical path /api/admin/ip-whitelist;

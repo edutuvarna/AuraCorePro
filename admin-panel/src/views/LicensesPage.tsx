@@ -77,6 +77,8 @@ export function LicensesPage() {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [confirmRevoke, setConfirmRevoke] = useState<{ id: string; key: string } | null>(null);
+    const [confirmActivate, setConfirmActivate] = useState<{ id: string; key: string } | null>(null);
+    const [activateTier, setActivateTier] = useState<string>('pro');
 
     const load = useCallback(async () => {
         const d = await api.getLicenses(page, search || undefined);
@@ -131,7 +133,7 @@ export function LicensesPage() {
                         <button onClick={() => setConfirmRevoke({ id: l.id, key: l.key })}
                             className="btn-action btn-danger text-xs px-3 py-1">Revoke</button>
                     ) : (
-                        <button onClick={async () => { await api.activateLicense(l.id); load(); }}
+                        <button onClick={() => { setActivateTier('pro'); setConfirmActivate({ id: l.id, key: l.key }); }}
                             className="btn-action btn-ghost text-xs px-3 py-1 text-aura-green border-aura-green/20">Activate</button>
                     )}
                 </div>
@@ -179,6 +181,59 @@ export function LicensesPage() {
                 }}
                 onCancel={() => setConfirmRevoke(null)}
             />
+
+            {confirmActivate && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                    onClick={() => setConfirmActivate(null)}
+                >
+                    <div className="glass-card p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="text-lg font-bold mb-2">Activate license</h2>
+                        <p className="text-sm text-white/65 mb-4">
+                            Choose target tier for license{' '}
+                            <span className="font-mono text-xs">{confirmActivate.key?.substring(0, 12)}…</span>
+                        </p>
+                        <div className="flex flex-col gap-2 mb-4">
+                            {(['free', 'pro', 'enterprise'] as const).map((t) => (
+                                <label
+                                    key={t}
+                                    className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-white/[0.03]"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="tier"
+                                        value={t}
+                                        checked={activateTier === t}
+                                        onChange={() => setActivateTier(t)}
+                                    />
+                                    <span className="capitalize font-mono text-sm">{t}</span>
+                                </label>
+                            ))}
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setConfirmActivate(null)}
+                                className="btn-ghost text-xs px-4 py-2"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    if (!confirmActivate) return;
+                                    const ok = await api.activateLicense(confirmActivate.id, activateTier);
+                                    if (ok) {
+                                        setConfirmActivate(null);
+                                        load();
+                                    }
+                                }}
+                                className="btn-primary text-xs px-4 py-2"
+                            >
+                                Activate as {activateTier}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

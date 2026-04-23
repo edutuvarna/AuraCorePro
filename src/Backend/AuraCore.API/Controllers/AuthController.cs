@@ -175,7 +175,7 @@ public sealed class AuthController : ControllerBase
         if (!result.Success)
         {
             await LogAttemptAsync(false);
-            await EmitLoginAsync(request.Email, success: false, ip);
+            await EmitLoginAsync(email, success: false, ip);
             return Unauthorized(new { error = result.Error });
         }
 
@@ -201,14 +201,14 @@ public sealed class AuthController : ControllerBase
                 // Password OK but TOTP wrong — count as failed attempt so brute-forcing
                 // the TOTP also hits the rate limit (security-2fa.md F-1).
                 await LogAttemptAsync(false);
-                await EmitLoginAsync(request.Email, success: false, ip);
+                await EmitLoginAsync(email, success: false, ip);
                 return Unauthorized(new { error = "Invalid 2FA code" });
             }
         }
 
         // Password OK + (TOTP OK or not required).
         await LogAttemptAsync(true);
-        await EmitLoginAsync(request.Email, success: true, ip);
+        await EmitLoginAsync(email, success: true, ip);
 
         return Ok(new
         {

@@ -8,8 +8,8 @@
  * same convention.
  *
  * KPICard / StatusBadge / EmptyState now live in @/components/ (W2.T11).
- * SignalR live-activity wiring stays as-is — Wave 4 Task 21 flips the
- * SIGNALR_ENABLED gate when the backend hub ships.
+ * SignalR live-activity wiring uses the useSignalR hook (Phase 6.10 W4.T21);
+ * signalr.ts singleton owns the connection at login/logout (app/page.tsx).
  */
 
 'use client';

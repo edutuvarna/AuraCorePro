@@ -8,8 +8,8 @@ import { startConnection, on, off } from '@/lib/signalr';
  * Subscribes to named events for the lifetime of the component, unsubscribes on unmount.
  * The connection itself is shared across all consumers (managed by signalr.ts singleton).
  *
- * Wave 4 Task 21 flips SIGNALR_ENABLED=true once the backend AdminHub ships;
- * this hook works regardless (signalr.ts no-ops when SIGNALR_ENABLED=false).
+ * SIGNALR_ENABLED is true as of Phase 6.10 W4.T21 (backend AdminHub ships in W4.T22).
+ * Hook works regardless of the flag — signalr.ts no-ops when disabled.
  */
 export interface SignalREvents {
     UserRegistered?: (payload: any) => void;

@@ -131,10 +131,10 @@ export function LicensesPage() {
                 <div className="flex justify-end">
                     {l.status === 'active' ? (
                         <button onClick={() => setConfirmRevoke({ id: l.id, key: l.key })}
-                            className="btn-danger text-xs px-3 py-1">Revoke</button>
+                            className="btn-action btn-danger text-xs px-3 py-1">Revoke</button>
                     ) : (
                         <button onClick={async () => { await api.activateLicense(l.id); load(); }}
-                            className="btn-ghost text-xs px-3 py-1 text-aura-green border-aura-green/20">Activate</button>
+                            className="btn-action btn-ghost text-xs px-3 py-1 text-aura-green border-aura-green/20">Activate</button>
                     )}
                 </div>
             ),

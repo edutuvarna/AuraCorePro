@@ -116,13 +116,13 @@ export function UsersPage() {
                 <div className="flex items-center justify-end gap-2">
                     {u.role !== 'admin' && u.tier !== 'free' && (
                         <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
-                            className="p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
+                            className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
                             <Ban className="w-4 h-4" />
                         </button>
                     )}
                     {u.role !== 'admin' && (
                         <button onClick={() => setConfirmDelete({ id: u.id, email: u.email })}
-                            className="p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
+                            className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
                             <Trash2 className="w-4 h-4" />
                         </button>
                     )}

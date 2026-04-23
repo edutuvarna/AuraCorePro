@@ -1,151 +1,163 @@
 /**
- * Audit Log page — login attempts and security events with 4 KPI cards
- * (successful 24h / failed 24h / unique IPs / suspicious IPs), search +
- * success/failed filter, paginated table.
+ * Audit Log page — native audit_log columns (actor / action / target / ip / time)
+ * with KPI cards (total / last 24h / last 7d / top action) and debounced
+ * actor-email search. Phase 6.10 W5.T23 final redesign.
+ *
+ * Replaces the Phase 6.9 transform-layer hack: the previous body rendered a
+ * synthetic login_attempts shape (success boolean column, etc.) produced by
+ * `api.getLoginAttempts()` reshaping audit_log rows. That adapter is gone —
+ * we now call `api.getAuditLog()` / `api.getAuditLogStats()` and render the
+ * backend rows verbatim per the AuditLogEntry interface.
  *
  * Lives under src/views/ rather than src/pages/ to avoid Next.js auto-detecting
  * the legacy Pages Router (sibling extractions Tasks 4-8 + 10 follow the same
  * convention).
  *
- * Wave 5 Task 23 will redesign the body: drop the api.ts login_attempts adapter
- * (the Phase 6.9 hotfix that transforms audit_log rows into a login_attempts-
- * shaped object) and render audit_log columns natively (actor / action / target
- * / ip / time). Wave 3 / Task 17 sweep is intentionally minimum here — only
- * the inline `<table>` swap to `<DataTable>` and class polish; the api adapter
- * + column shape stay 1:1 with the Phase 6.9 hotfix until Task 23.
- *
- * KPICard + EmptyState lifted in W2.T11 to shared `@/components/`. SearchBar
- * and Pagination remain inline — they're outside the plan's primitive lift
- * list.
- *
- * Phase 6.10 W2.T9 — extracted from page.tsx; W2.T11 — KPICard/EmptyState lifted.
+ * History: W2.T9 extracted from page.tsx; W2.T11 KPICard + EmptyState lifted;
+ * W3.T17 minimum-swept to DataTable while preserving login_attempts shape;
+ * W5.T23 redesigns the body per the plan's D6 spec (this commit).
  */
 
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-    Search, RefreshCw, FileText, Globe, AlertTriangle,
-    CheckCircle2, XCircle, ChevronLeft, ChevronRight,
-} from 'lucide-react';
+import { Activity, Clock, FileText, RefreshCw, Tag, TrendingUp } from 'lucide-react';
 import { api } from '@/lib/api';
+import { AuditLogEntry, ListResponse } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { PaginationLabel } from '@/components/PaginationLabel';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
-function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
-    value: string; onChange: (v: string) => void; placeholder?: string; onSubmit?: () => void;
-}) {
-    return (
-        <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
-            <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-                onKeyDown={e => e.key === 'Enter' && onSubmit?.()}
-                className="input-dark w-full pl-10" />
-        </div>
-    );
-}
+const columns: DataTableColumn<AuditLogEntry>[] = [
+    {
+        key: 'actor',
+        header: 'Actor',
+        isCardTitle: true,
+        render: (e) => <span className="text-white/85 font-mono text-xs">{e.actorEmail || '—'}</span>,
+    },
+    {
+        key: 'action',
+        header: 'Action',
+        render: (e) => <span className="badge badge-cyan">{e.action}</span>,
+    },
+    {
+        key: 'target',
+        header: 'Target',
+        render: (e) => (
+            <span className="text-white/55 font-mono text-xs">
+                {e.targetType}
+                {e.targetId ? `/${e.targetId.length > 8 ? `${e.targetId.substring(0, 8)}…` : e.targetId}` : ''}
+            </span>
+        ),
+    },
+    {
+        key: 'ip',
+        header: 'IP',
+        render: (e) => <span className="text-white/40 font-mono text-xs">{e.ipAddress ?? '—'}</span>,
+    },
+    {
+        key: 'time',
+        header: 'Time',
+        render: (e) => <span className="text-white/40 font-mono text-xs">{new Date(e.createdAt).toLocaleString()}</span>,
+    },
+];
 
-// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
-function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
-    if (pages <= 1) return null;
-    return (
-        <div className="flex items-center justify-center gap-2 mt-6">
-            <button onClick={() => onChange(page - 1)} disabled={page <= 1} className="btn-ghost px-3 py-1.5 disabled:opacity-30">
-                <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-sm text-white/40 px-3">{page} / {pages}</span>
-            <button onClick={() => onChange(page + 1)} disabled={page >= pages} className="btn-ghost px-3 py-1.5 disabled:opacity-30">
-                <ChevronRight className="w-4 h-4" />
-            </button>
-        </div>
-    );
+interface AuditLogStats {
+    total?: number;
+    last24h?: number;
+    today?: number;
+    last7d?: number;
+    thisWeek?: number;
+    topActions?: Array<{ action: string; count: number }>;
 }
 
 export function AuditLogPage() {
-    const [data, setData] = useState<any>({ attempts: [], total: 0 });
-    const [stats, setStats] = useState<any>(null);
+    const [data, setData] = useState<ListResponse<AuditLogEntry>>({
+        total: 0, page: 1, pageSize: 50, pages: 0, items: [],
+    });
+    const [stats, setStats] = useState<AuditLogStats | null>(null);
     const [search, setSearch] = useState('');
-    const [filter, setFilter] = useState<boolean | undefined>(undefined);
+    const debouncedSearch = useDebouncedValue(search, 400);
     const [page, setPage] = useState(1);
 
+    // Reset to page 1 whenever the actor-email filter changes.
+    useEffect(() => { setPage(1); }, [debouncedSearch]);
+
     const load = useCallback(async () => {
-        const [d, s] = await Promise.all([api.getLoginAttempts(search || undefined, filter, page), api.getLoginAttemptStats()]);
-        setData(d); setStats(s);
-    }, [search, filter, page]);
+        const [d, s] = await Promise.all([
+            api.getAuditLog(debouncedSearch || undefined, undefined, page),
+            api.getAuditLogStats(),
+        ]);
+        setData(d);
+        setStats(s);
+    }, [debouncedSearch, page]);
 
     useEffect(() => { load(); }, [load]);
 
-    const attempts: any[] = data.attempts || [];
-
-    const columns: DataTableColumn<any>[] = [
-        {
-            key: 'email',
-            header: 'Email',
-            isCardTitle: true,
-            render: (a) => <span className="text-white/80">{a.email}</span>,
-        },
-        {
-            key: 'ip',
-            header: 'IP Address',
-            render: (a) => <span className="font-mono text-xs text-white/40">{a.ipAddress}</span>,
-        },
-        {
-            key: 'status',
-            header: 'Status',
-            render: (a) => a.success
-                ? <span className="badge badge-green">Success</span>
-                : <span className="badge badge-red">Failed</span>,
-        },
-        {
-            key: 'time',
-            header: 'Time',
-            render: (a) => <span className="text-white/40">{new Date(a.createdAt).toLocaleString()}</span>,
-        },
-    ];
+    const topAction = stats?.topActions?.[0]?.action ?? '—';
 
     return (
         <div className="animate-fade-in">
-            <PageHeader title="Audit Log" subtitle="Login attempts and security events">
-                <button onClick={load} className="btn-ghost flex items-center gap-2"><RefreshCw className="w-4 h-4" />Refresh</button>
+            <PageHeader
+                title="Audit Log"
+                subtitle={`${data.total} mutation${data.total === 1 ? '' : 's'} recorded`}
+                breadcrumb="~/admin/audit_log"
+            >
+                <button onClick={load} className="btn-ghost flex items-center gap-2">
+                    <RefreshCw className="w-4 h-4" />Refresh
+                </button>
             </PageHeader>
 
             {stats && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-                    <KPICard label="Successful (24h)" value={stats.successful24h ?? 0} icon={CheckCircle2} color="text-aura-green" />
-                    <KPICard label="Failed (24h)" value={stats.failed24h ?? 0} icon={XCircle} color="text-aura-red" />
-                    <KPICard label="Unique IPs" value={stats.uniqueIps ?? 0} icon={Globe} color="text-accent" />
-                    <KPICard label="Suspicious IPs" value={stats.suspiciousIps ?? 0} icon={AlertTriangle} color="text-aura-amber" />
+                    <KPICard label="Total" value={stats.total ?? 0} icon={Activity} color="text-accent" />
+                    <KPICard label="Last 24h" value={stats.last24h ?? stats.today ?? 0} icon={Clock} color="text-aura-blue" />
+                    <KPICard label="Last 7d" value={stats.last7d ?? stats.thisWeek ?? 0} icon={TrendingUp} color="text-aura-green" />
+                    <KPICard label="Top Action" value={topAction} icon={Tag} color="text-aura-purple" />
                 </div>
             )}
 
             <div className="glass-card p-5">
                 <div className="flex items-center gap-4 mb-5 flex-wrap">
-                    <div className="max-w-xs flex-1">
-                        <SearchBar value={search} onChange={setSearch} placeholder="Search email or IP..." onSubmit={load} />
-                    </div>
-                    <div className="flex gap-2">
-                        {[
-                            { label: 'All', value: undefined },
-                            { label: 'Success', value: true },
-                            { label: 'Failed', value: false },
-                        ].map(f => (
-                            <button key={f.label} onClick={() => { setFilter(f.value); setPage(1); }}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filter === f.value ? 'bg-accent/15 text-accent border border-accent/30' : 'btn-ghost'}`}>
-                                {f.label}
-                            </button>
-                        ))}
-                    </div>
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Filter by actor email..."
+                        className="input-dark w-full max-w-xs"
+                    />
                 </div>
-                <DataTable<any>
+                <DataTable<AuditLogEntry>
                     columns={columns}
-                    rows={attempts}
-                    rowKey={(a) => a.id ?? `${a.email}-${a.createdAt}-${a.ipAddress}`}
-                    emptyState={<EmptyState icon={FileText} title="No login attempts" />}
+                    rows={data.items}
+                    rowKey={(e) => String(e.id)}
+                    emptyState={<EmptyState icon={FileText} title="No audit log entries" />}
                 />
-                <Pagination page={page} pages={Math.ceil((data.total || 0) / 50)} onChange={setPage} />
+                <div className="mt-4 flex justify-between items-center">
+                    <PaginationLabel page={data.page} pageSize={data.pageSize} total={data.total} />
+                    {data.pages > 1 && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={data.page <= 1}
+                                className="btn-ghost px-3 py-1.5 text-xs disabled:opacity-30"
+                            >
+                                Prev
+                            </button>
+                            <span className="text-xs text-white/40 px-2">{data.page} / {data.pages}</span>
+                            <button
+                                onClick={() => setPage(p => Math.min(data.pages, p + 1))}
+                                disabled={data.page >= data.pages}
+                                className="btn-ghost px-3 py-1.5 text-xs disabled:opacity-30"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

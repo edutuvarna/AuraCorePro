@@ -256,49 +256,26 @@ export const api = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // NEW: Audit Log
+  // Audit Log (Phase 6.10 W5.T23 — native pass-through; previous Phase 6.9
+  // login_attempts adapter retired now that AuditLogPage renders audit_log
+  // columns natively.)
   // ═══════════════════════════════════════════════════════════
-  async getLoginAttempts(search?: string, success?: boolean, page = 1, pageSize = 50) {
-    // Phase 6.8 replaced /api/admin/audit/login-attempts with /api/admin/audit-log
-    // (semantically different — admin-mutation log, not login attempts).
-    // Backend returns { total, page, pageSize, pages, items: [{actorEmail, action,
-    // targetType, targetId, createdAt, ipAddress, ...}] }. Frontend AuditLogPage
-    // was written for login_attempts shape; transform rows to that shape so the
-    // existing table still renders until Phase 6.10 rebuild restructures the tab.
+  async getAuditLog(actorEmail?: string, action?: string, page = 1, pageSize = 50) {
     try {
       let url = `/api/admin/audit-log?page=${page}&pageSize=${pageSize}`;
-      if (search) url += `&actorEmail=${encodeURIComponent(search)}`;
+      if (actorEmail) url += `&actorEmail=${encodeURIComponent(actorEmail)}`;
+      if (action) url += `&action=${encodeURIComponent(action)}`;
       const res = await request(url);
-      if (!res.ok) return { attempts: [], total: 0 };
-      const data = await res.json();
-      const rawItems = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
-      const attempts = rawItems.map((it: any) => ({
-        email: it.actorEmail ?? '—',
-        ipAddress: it.ipAddress ?? '—',
-        success: true,  // audit_log records only successful 2xx mutations
-        createdAt: it.createdAt,
-        action: it.action,
-        targetType: it.targetType,
-        targetId: it.targetId,
-      }));
-      return { attempts, total: data?.total ?? 0 };
-    } catch { return { attempts: [], total: 0 }; }
+      if (!res.ok) return { total: 0, page: 1, pageSize, pages: 0, items: [] };
+      return await res.json();
+    } catch { return { total: 0, page: 1, pageSize, pages: 0, items: [] }; }
   },
 
-  async getLoginAttemptStats() {
-    // Phase 6.8: stats at /api/admin/audit-log/stats. Backend returns
-    // { total, last24h, today, last7d, thisWeek, topActions }. Frontend
-    // expects { successful24h, failed24h, uniqueIps, suspiciousIps }.
+  async getAuditLogStats() {
     try {
       const res = await request('/api/admin/audit-log/stats');
       if (!res.ok) return null;
-      const data = await res.json();
-      return {
-        successful24h: data?.last24h ?? data?.today ?? 0,
-        failed24h: 0,
-        uniqueIps: Array.isArray(data?.topActions) ? data.topActions.length : 0,
-        suspiciousIps: 0,
-      };
+      return await res.json();
     } catch { return null; }
   },
 

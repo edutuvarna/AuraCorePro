@@ -14,6 +14,7 @@ import { startConnection, stopConnection } from '@/lib/signalr';
 import { LoginScreen } from '@/components/LoginScreen';
 import { Sidebar, NavGroup } from '@/components/Sidebar';
 import { PageHeader } from '@/components/PageHeader';
+import { StatusBadge } from '@/components/StatusBadge';
 import { DashboardPage } from '@/views/DashboardPage';
 import { UsersPage } from '@/views/UsersPage';
 import { SubscriptionsPage } from '@/views/SubscriptionsPage';
@@ -60,23 +61,10 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 // ────────────────────────────────────────────────
-// REUSABLE COMPONENTS (still inline — only StatusBadge is consumed by the
-// remaining SecurityPage. KPICard / SearchBar / EmptyState / Pagination /
-// TierBadge moved out with the extracted views in Tasks 4-10. Task 11 will
-// lift StatusBadge into shared `@/components/` and Task 13 finishes the trim.)
+// REUSABLE COMPONENTS — fully lifted in W2.T11 to `@/components/`.
+// SecurityPage below imports StatusBadge from there. Task 13 will extract
+// SecurityPage itself out of this file (final monolith trim).
 // ────────────────────────────────────────────────
-function StatusBadge({ status }: { status: string }) {
-  const s = status.toLowerCase();
-  const cls = s === 'active' || s === 'completed' || s === 'online' ? 'badge-green'
-    : s === 'pending' ? 'badge-amber'
-    : s === 'cancelled' || s === 'revoked' || s === 'failed' || s === 'refunded' ? 'badge-red'
-    : s === 'pro' ? 'badge-cyan'
-    : s === 'enterprise' ? 'badge-purple'
-    : s === 'admin' ? 'badge-red'
-    : s === 'free' ? 'badge-blue'
-    : 'badge-blue';
-  return <span className={`badge ${cls}`}>{status}</span>;
-}
 
 // ????????????????????????????????????????????????
 // SECURITY PAGE (2FA) — still inline pending Task 13 cleanup. Skipped from

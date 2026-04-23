@@ -6,11 +6,10 @@
  * the legacy Pages Router (sibling extractions Tasks 4 + 6-10 follow the same
  * convention).
  *
- * SearchBar / Pagination / TierBadge / StatusBadge / EmptyState are
- * temporarily duplicated from page.tsx (Strategy B). Task 11 lifts them into
- * shared `@/components/` and call sites flip to the import. DataTable
- * conversion is Wave 3 Task 16 — keep the inline `<table>` 1:1 with the
- * monolith for now.
+ * StatusBadge + EmptyState lifted in W2.T11 to shared `@/components/`.
+ * SearchBar + Pagination + TierBadge remain inline — outside the plan's
+ * primitive lift list (TierBadge is just a 1-line StatusBadge wrapper;
+ * SearchBar/Pagination wait for Wave 3 Task 16 DataTable conversion).
  */
 
 'use client';
@@ -21,8 +20,10 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
+import { StatusBadge } from '@/components/StatusBadge';
+import { EmptyState } from '@/components/EmptyState';
 
-// Temporarily inlined — Task 11 will lift to @/components/SearchBar
+// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     value: string; onChange: (v: string) => void; placeholder?: string; onSubmit?: () => void;
 }) {
@@ -36,20 +37,7 @@ function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
     );
 }
 
-// Temporarily inlined — Task 11 will lift to @/components/EmptyState
-function EmptyState({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle?: string }) {
-    return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6 text-white/20" />
-            </div>
-            <p className="text-white/40 font-medium">{title}</p>
-            {subtitle && <p className="text-white/25 text-sm mt-1">{subtitle}</p>}
-        </div>
-    );
-}
-
-// Temporarily inlined — Task 11 will lift to @/components/Pagination
+// Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
     if (pages <= 1) return null;
     return (
@@ -65,21 +53,7 @@ function Pagination({ page, pages, onChange }: { page: number; pages: number; on
     );
 }
 
-// Temporarily inlined — Task 11 will lift to @/components/StatusBadge
-function StatusBadge({ status }: { status: string }) {
-    const s = status.toLowerCase();
-    const cls = s === 'active' || s === 'completed' || s === 'online' ? 'badge-green'
-        : s === 'pending' ? 'badge-amber'
-        : s === 'cancelled' || s === 'revoked' || s === 'failed' || s === 'refunded' ? 'badge-red'
-        : s === 'pro' ? 'badge-cyan'
-        : s === 'enterprise' ? 'badge-purple'
-        : s === 'admin' ? 'badge-red'
-        : s === 'free' ? 'badge-blue'
-        : 'badge-blue';
-    return <span className={`badge ${cls}`}>{status}</span>;
-}
-
-// Temporarily inlined — Task 11 will lift to @/components/TierBadge (or fold into StatusBadge)
+// Inline (1-line wrapper around StatusBadge — kept for now per Task 11 spec).
 function TierBadge({ tier }: { tier: string }) {
     return <StatusBadge status={tier} />;
 }

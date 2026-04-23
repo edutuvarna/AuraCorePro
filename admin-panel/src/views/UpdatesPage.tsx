@@ -8,12 +8,11 @@
  * the legacy Pages Router (sibling extractions Tasks 4-7 + 9-10 follow the same
  * convention).
  *
- * StatusBadge / EmptyState are temporarily duplicated from page.tsx
- * (Strategy B). Task 11 lifts them into shared `@/components/` and call sites
- * flip to the import. DataTable conversion is Wave 3 Task 16 — keep the inline
- * `<table>` 1:1 with the monolith for now.
+ * StatusBadge + EmptyState lifted in W2.T11 to shared `@/components/`.
+ * DataTable conversion is Wave 3 Task 16 — keep the inline `<table>` 1:1 with
+ * the monolith for now.
  *
- * Phase 6.10 W2.T8 — extracted from page.tsx.
+ * Phase 6.10 W2.T8 — extracted from page.tsx; W2.T11 — primitives lifted.
  */
 
 'use client';
@@ -22,33 +21,8 @@ import { useState, useEffect } from 'react';
 import { Plus, Send, Trash2, Zap } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
-
-// Temporarily inlined — Task 11 will lift to @/components/StatusBadge
-function StatusBadge({ status }: { status: string }) {
-    const s = status.toLowerCase();
-    const cls = s === 'active' || s === 'completed' || s === 'online' ? 'badge-green'
-        : s === 'pending' ? 'badge-amber'
-        : s === 'cancelled' || s === 'revoked' || s === 'failed' || s === 'refunded' ? 'badge-red'
-        : s === 'pro' ? 'badge-cyan'
-        : s === 'enterprise' ? 'badge-purple'
-        : s === 'admin' ? 'badge-red'
-        : s === 'free' ? 'badge-blue'
-        : 'badge-blue';
-    return <span className={`badge ${cls}`}>{status}</span>;
-}
-
-// Temporarily inlined — Task 11 will lift to @/components/EmptyState
-function EmptyState({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle?: string }) {
-    return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6 text-white/20" />
-            </div>
-            <p className="text-white/40 font-medium">{title}</p>
-            {subtitle && <p className="text-white/25 text-sm mt-1">{subtitle}</p>}
-        </div>
-    );
-}
+import { StatusBadge } from '@/components/StatusBadge';
+import { EmptyState } from '@/components/EmptyState';
 
 export function UpdatesPage() {
     const [updates, setUpdates] = useState<any[]>([]);

@@ -14,11 +14,10 @@
  * 1:1 lift — no ConfirmDialog import is added. Wave 5 polish (Task 22+) can
  * decide whether to wire `@/components/ConfirmDialog` here.
  *
- * EmptyState is temporarily duplicated from page.tsx (Strategy B). Task 11
- * lifts it into shared `@/components/` and the call site flips to the import.
+ * EmptyState lifted in W2.T11 to shared `@/components/`.
  *
  * Phase 6.10 W2.T10 — extracted from page.tsx (originally `WhitelistPage`,
- * renamed `IpWhitelistPage` per task plan for clarity).
+ * renamed `IpWhitelistPage` per task plan for clarity); W2.T11 — EmptyState lifted.
  */
 
 'use client';
@@ -27,19 +26,7 @@ import { useState, useEffect } from 'react';
 import { Shield, Globe, Plus, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
-
-// Temporarily inlined — Task 11 will lift to @/components/EmptyState
-function EmptyState({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle?: string }) {
-    return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-4">
-                <Icon className="w-6 h-6 text-white/20" />
-            </div>
-            <p className="text-white/40 font-medium">{title}</p>
-            {subtitle && <p className="text-white/25 text-sm mt-1">{subtitle}</p>}
-        </div>
-    );
-}
+import { EmptyState } from '@/components/EmptyState';
 
 export function IpWhitelistPage() {
     const [ips, setIps] = useState<any[]>([]);

@@ -1,10 +1,12 @@
 using AuraCore.API.Application.Interfaces;
 using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,14 +21,16 @@ public sealed class AuthController : ControllerBase
     private readonly AuraCoreDbContext _db;
     private readonly IWhitelistService _whitelist;
     private readonly ITotpEncryption _totpEnc;
+    private readonly IHubContext<AdminHub> _hub;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc)
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub)
     {
         _auth = auth;
         _db = db;
         _whitelist = whitelist;
         _totpEnc = totpEnc;
+        _hub = hub;
     }
 
     [HttpPost("register")]
@@ -101,6 +105,17 @@ public sealed class AuthController : ControllerBase
             return BadRequest(new { error = "Registration failed. Please try a different email or contact support." });
         }
 
+        // Phase 6.10 Task 19: broadcast new registration to admin dashboard
+        if (result.User is not null)
+        {
+            await _hub.Clients.Group("admins").SendAsync("UserRegistered", new
+            {
+                email = result.User.Email,
+                id = result.User.Id,
+                createdAt = DateTimeOffset.UtcNow
+            }, ct);
+        }
+
         return Created("/api/auth/me", new
         {
             accessToken = result.AccessToken,
@@ -160,6 +175,7 @@ public sealed class AuthController : ControllerBase
         if (!result.Success)
         {
             await LogAttemptAsync(false);
+            await EmitLoginAsync(request.Email, success: false, ip);
             return Unauthorized(new { error = result.Error });
         }
 
@@ -185,18 +201,36 @@ public sealed class AuthController : ControllerBase
                 // Password OK but TOTP wrong — count as failed attempt so brute-forcing
                 // the TOTP also hits the rate limit (security-2fa.md F-1).
                 await LogAttemptAsync(false);
+                await EmitLoginAsync(request.Email, success: false, ip);
                 return Unauthorized(new { error = "Invalid 2FA code" });
             }
         }
 
         // Password OK + (TOTP OK or not required).
         await LogAttemptAsync(true);
+        await EmitLoginAsync(request.Email, success: true, ip);
 
         return Ok(new
         {
             accessToken = result.AccessToken,
             refreshToken = result.RefreshToken,
             user = result.User
+        });
+    }
+
+    // Phase 6.10 Task 19: helper to broadcast login outcome to admin dashboard.
+    // Called AFTER LogAttemptAsync so the audit_log row is written first.
+    // Strategy A: emit only at the 3 LogAttemptAsync sites (success + auth-fail +
+    // 2FA-fail). Pre-validation rejects (empty/format/rate-limit) do not emit —
+    // the dashboard activity feed isn't trying to capture every micro-failure.
+    private async Task EmitLoginAsync(string email, bool success, string ip)
+    {
+        await _hub.Clients.Group("admins").SendAsync("UserLogin", new
+        {
+            email,
+            success,
+            ipAddress = ip,
+            createdAt = DateTimeOffset.UtcNow
         });
     }
 

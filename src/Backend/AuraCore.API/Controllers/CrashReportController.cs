@@ -1,7 +1,9 @@
 using AuraCore.API.Application.Interfaces;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +15,13 @@ namespace AuraCore.API.Controllers;
 public sealed class CrashReportController : ControllerBase
 {
     private readonly ICrashReportRepository _crashes;
-    public CrashReportController(ICrashReportRepository crashes) => _crashes = crashes;
+    private readonly IHubContext<AdminHub> _hub;
+
+    public CrashReportController(ICrashReportRepository crashes, IHubContext<AdminHub> hub)
+    {
+        _crashes = crashes;
+        _hub = hub;
+    }
 
     [HttpPost]
     public async Task<IActionResult> Submit([FromBody] CrashReportRequest request, CancellationToken ct)
@@ -44,6 +52,16 @@ public sealed class CrashReportController : ControllerBase
             SystemInfo = request.SystemInfo ?? "{}"
         };
         var created = await _crashes.CreateAsync(report, ct);
+
+        // Phase 6.10 Task 19: broadcast new crash report to admin dashboard
+        await _hub.Clients.Group("admins").SendAsync("CrashReport", new
+        {
+            type = created.ExceptionType,
+            version = created.AppVersion,
+            deviceId = created.DeviceId,
+            createdAt = DateTimeOffset.UtcNow
+        }, ct);
+
         return Created($"/api/crashreport/{created.Id}", new { reportId = created.Id });
     }
 }

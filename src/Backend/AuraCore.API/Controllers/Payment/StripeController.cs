@@ -1,9 +1,11 @@
 using StripeSubscription = Stripe.Subscription;
 using DbSubscription = AuraCore.API.Domain.Entities.Subscription;
+using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Stripe.Checkout;
@@ -16,11 +18,13 @@ public sealed class StripeController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     private readonly IConfiguration _config;
+    private readonly IHubContext<AdminHub> _hub;
 
-    public StripeController(AuraCoreDbContext db, IConfiguration config)
+    public StripeController(AuraCoreDbContext db, IConfiguration config, IHubContext<AdminHub> hub)
     {
         _db = db;
         _config = config;
+        _hub = hub;
     }
 
     [HttpPost("create-session")]
@@ -252,6 +256,16 @@ public sealed class StripeController : ControllerBase
             else { _db.Subscriptions.Add(new DbSubscription { UserId = userId, StripeSubscriptionId = session.SubscriptionId, StripeCustomerId = session.CustomerId, Plan = plan, Status = "active", CurrentPeriodEnd = expiresAt }); }
         }
         await _db.SaveChangesAsync(ct);
+
+        // Phase 6.10 Task 19: broadcast completed payment to admin dashboard
+        await _hub.Clients.Group("admins").SendAsync("Payment", new
+        {
+            email = user.Email,
+            amount,
+            currency = paymentCurrency,
+            plan,
+            createdAt = DateTimeOffset.UtcNow
+        }, ct);
     }
 
     private async Task HandleInvoicePaid(Event stripeEvent, CancellationToken ct)

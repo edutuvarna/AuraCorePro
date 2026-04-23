@@ -16,9 +16,9 @@
  * for revoke (UX upgrade per Phase 6.9 CTP-4 — was a one-click destructive
  * action prior).
  *
- * Note on `License.deviceCount` vs `activeDevices`: backend Phase 6.8 transition
- * emits both names; rendering cell falls back to either (Wave 5 retires the
- * alias).
+ * Note on `License.deviceCount`: Phase 6.10 W5.T25 retired the Phase 6.8
+ * `activeDevices` alias backend-side; rendering cell now reads `deviceCount`
+ * directly.
  */
 
 'use client';
@@ -107,11 +107,9 @@ export function LicensesPage() {
         {
             key: 'devices',
             header: 'Devices',
-            render: (l) => {
-                // Phase 6.8 transition emits both `activeDevices` (legacy) and `deviceCount`.
-                const active = (l as any).activeDevices ?? l.deviceCount ?? 0;
-                return <span className="text-white/50">{active}/{l.maxDevices ?? 1}</span>;
-            },
+            render: (l) => (
+                <span className="text-white/50">{l.deviceCount ?? 0}/{l.maxDevices ?? 1}</span>
+            ),
         },
         {
             key: 'status',

@@ -7,10 +7,8 @@
  * version when it's a 1-line change with no cascading effects). Full typing
  * pass deferred to Wave 5 polish.
  *
- * NOTE on `License.deviceCount` vs current `activeDevices`: backend Phase 6.8
- * exposes both names during the transition; Wave 5 retires the alias and
- * `deviceCount` becomes canonical. Existing LicensesPage view still reads
- * `l.activeDevices` — left untouched in W2.T13 to avoid a cascading rewrite.
+ * NOTE on `License.deviceCount`: Phase 6.10 W5.T25 retired the Phase 6.8
+ * `activeDevices` backend alias; `deviceCount` is now the single canonical name.
  */
 
 export interface User {
@@ -36,7 +34,7 @@ export interface License {
     tier: string;
     status: string;
     maxDevices: number;
-    deviceCount: number;  // Phase 6.10 — single canonical name (Wave 5 retires activeDevices alias)
+    deviceCount: number;  // Phase 6.10 W5.T25 — single canonical name (activeDevices alias retired)
     createdAt: string;
     expiresAt?: string;
     userId: string;

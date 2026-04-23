@@ -197,13 +197,14 @@ export const api = {
     catch { return false; }
   },
 
-  // Whitelist
+  // Whitelist (Phase 6.10 W5.T25 — canonical path /api/admin/ip-whitelist;
+  // Phase 6.8 alias /api/admin/whitelist retired backend-side).
   async getWhitelist() {
     // Backend returns { total, page, pageSize, items: [...] } (paginated);
     // frontend IpWhitelistPage treats the return as a flat array. Unwrap
     // .items. Defensive: also accept a bare array.
     try {
-      const res = await request('/api/admin/whitelist');
+      const res = await request('/api/admin/ip-whitelist');
       if (!res.ok) return [];
       const data = await res.json();
       return Array.isArray(data) ? data : (data?.items ?? []);
@@ -213,7 +214,7 @@ export const api = {
 
   async addWhitelistIp(ip: string, label?: string) {
     try {
-      const res = await request('/api/admin/whitelist', {
+      const res = await request('/api/admin/ip-whitelist', {
         method: 'POST', body: JSON.stringify({ ip, label })
       });
       return { ok: res.ok, data: await res.json() };
@@ -221,12 +222,12 @@ export const api = {
   },
 
   async removeWhitelistIp(ip: string) {
-    try { const res = await request(`/api/admin/whitelist/${encodeURIComponent(ip)}`, { method: 'DELETE' }); return res.ok; }
+    try { const res = await request(`/api/admin/ip-whitelist/${encodeURIComponent(ip)}`, { method: 'DELETE' }); return res.ok; }
     catch { return false; }
   },
 
   async getMyIp() {
-    try { const res = await request('/api/admin/whitelist/my-ip'); return res.ok ? await res.json() : null; }
+    try { const res = await request('/api/admin/ip-whitelist/my-ip'); return res.ok ? await res.json() : null; }
     catch { return null; }
   },
 

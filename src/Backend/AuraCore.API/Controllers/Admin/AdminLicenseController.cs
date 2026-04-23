@@ -35,10 +35,8 @@ public sealed class AdminLicenseController : ControllerBase
             .Select(l => new {
                 l.Id, l.Key, l.Tier, l.Status, l.MaxDevices, l.CreatedAt, l.ExpiresAt,
                 userId = l.UserId, userEmail = l.User != null ? l.User.Email : null,
-                // T1.8: frontend reads activeDevices; provide both names so legacy
-                // and current callers both see device count. Phase 6.10 rebuild
-                // consolidates to one.
-                activeDevices = l.Devices.Count(),
+                // Phase 6.10 W5.T25: dropped Phase 6.8 `activeDevices` alias —
+                // frontend rebuild converged on `deviceCount` as the canonical name.
                 deviceCount = l.Devices.Count()
             })
             .ToListAsync(ct);

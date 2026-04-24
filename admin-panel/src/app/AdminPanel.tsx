@@ -45,6 +45,9 @@ import { RedeemInvitationPage } from '@/views/RedeemInvitationPage';
 
 import type { UserRole } from '@/lib/types';
 import { RoleContext } from '@/lib/roleContext';
+import { Toaster } from 'react-hot-toast';
+import { ActivityFeedProvider } from '@/lib/activityFeed';
+import { PermissionNotificationsProvider } from '@/lib/permissionNotifications';
 
 export type Page =
   'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security'|
@@ -113,19 +116,37 @@ export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail 
   const email = currentUserEmail ?? decodeEmailFromJwt();
   return (
     <RoleContext.Provider value={role}>
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar
-          groups={groups}
-          activePage={page}
-          onSelect={(p) => setPage(p as Page)}
-          onLogout={onLogout}
-          currentUserEmail={email}
-          onOpenMyPermissions={() => setPage('myPerms')}
-        />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
-        </main>
-      </div>
+      <ActivityFeedProvider>
+        <PermissionNotificationsProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              className: 'glass-card',
+              style: {
+                background: 'rgba(20,20,24,0.9)',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.08)',
+              },
+            }}
+          />
+          <div className="flex h-screen overflow-hidden">
+            <Sidebar
+              groups={groups}
+              activePage={page}
+              onSelect={(p) => setPage(p as Page)}
+              onLogout={onLogout}
+              currentUserEmail={email}
+              // Superadmins inherently have every permission, so a "My Permissions"
+              // self-service page is meaningless for that role. Only expose the
+              // Sidebar entry for regular admins who actually have a scoped grant list.
+              onOpenMyPermissions={role === 'admin' ? () => setPage('myPerms') : undefined}
+            />
+            <main className="flex-1 overflow-y-auto">
+              <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
+            </main>
+          </div>
+        </PermissionNotificationsProvider>
+      </ActivityFeedProvider>
     </RoleContext.Provider>
   );
 }

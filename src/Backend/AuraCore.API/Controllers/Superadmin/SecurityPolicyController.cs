@@ -33,6 +33,7 @@ public sealed class SecurityPolicyController : ControllerBase
     }
 
     [HttpPut]
+    [AuraCore.API.Filters.AuditAction("UpdateSecurityPolicy", "SystemSetting")]
     public async Task<IActionResult> Update([FromBody] UpdateDto dto, CancellationToken ct)
     {
         var row = await _db.SystemSettings.FirstOrDefaultAsync(s => s.Key == "require_2fa_for_all_admins", ct);

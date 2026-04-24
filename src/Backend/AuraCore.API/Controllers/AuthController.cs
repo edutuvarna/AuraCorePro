@@ -180,8 +180,22 @@ public sealed class AuthController : ControllerBase
             return Unauthorized(new { error = result.Error });
         }
 
-        // ── 2FA Check ──
+        // ── Suspended-account gate ──
+        // Authorised password does NOT grant login when the account is suspended
+        // (IsActive=false). SuperadminLogin already does this at line ~315; the
+        // regular Login was missing the check — a superadmin could suspend an
+        // admin via Admin Management but the admin could still authenticate.
+        // The login_attempts row + SignalR emission still fire so the audit trail
+        // records the suspended user's attempt.
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant().Trim(), ct);
+        if (user is not null && !user.IsActive)
+        {
+            await LogAttemptAsync(false);
+            await EmitLoginAsync(email, success: false, ip);
+            return Unauthorized(new { error = "account_suspended" });
+        }
+
+        // ── 2FA Check ──
         if (user is not null && user.TotpEnabled)
         {
             if (string.IsNullOrEmpty(request.TotpCode))

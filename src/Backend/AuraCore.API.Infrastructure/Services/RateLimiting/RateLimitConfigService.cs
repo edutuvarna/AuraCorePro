@@ -22,14 +22,29 @@ public sealed class RateLimitConfigService : IRateLimitConfigService
         _db = db; _cache = cache;
     }
 
+    // Defensive deserialize: a corrupted system_settings row (hand-edited SQL,
+    // failed prior migration, etc.) must not brick GET/PUT. Return empty map
+    // on malformed JSON so the next UpdateAsync can overwrite cleanly.
+    private static Dictionary<string, RateLimitPolicy> SafeDeserialize(string raw)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<Dictionary<string, RateLimitPolicy>>(raw, JsonOpts)
+                   ?? new Dictionary<string, RateLimitPolicy>();
+        }
+        catch (JsonException)
+        {
+            return new Dictionary<string, RateLimitPolicy>();
+        }
+    }
+
     public async Task<IReadOnlyDictionary<string, RateLimitPolicy>> GetAllAsync(CancellationToken ct = default)
     {
         if (_cache.TryGetValue<Dictionary<string, RateLimitPolicy>>(CacheKey, out var cached) && cached is not null)
             return cached;
         var row = await _db.SystemSettings.FirstOrDefaultAsync(s => s.Key == SettingKey, ct);
         var raw = row?.Value ?? "{}";
-        var map = JsonSerializer.Deserialize<Dictionary<string, RateLimitPolicy>>(raw, JsonOpts)
-               ?? new Dictionary<string, RateLimitPolicy>();
+        var map = SafeDeserialize(raw);
         _cache.Set(CacheKey, map, CacheTtl);
         return map;
     }
@@ -42,8 +57,7 @@ public sealed class RateLimitConfigService : IRateLimitConfigService
             row = new SystemSetting { Key = SettingKey, Value = "{}" };
             _db.SystemSettings.Add(row);
         }
-        var map = JsonSerializer.Deserialize<Dictionary<string, RateLimitPolicy>>(row.Value, JsonOpts)
-                  ?? new Dictionary<string, RateLimitPolicy>();
+        var map = SafeDeserialize(row.Value);
         map[endpoint] = policy;
         row.Value = JsonSerializer.Serialize(map);
         row.UpdatedAt = DateTimeOffset.UtcNow;

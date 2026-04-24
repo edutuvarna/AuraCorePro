@@ -21,10 +21,17 @@ import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useRole } from '@/lib/roleContext';
 
 export function PaymentsPage() {
+    const role = useRole();
+    const { has } = usePermissions(role);
     const [payments, setPayments] = useState<any[]>([]);
     const [pending, setPending] = useState<any[]>([]);
+    const [reqOpen, setReqOpen] = useState<string | null>(null);
 
     useEffect(() => {
         const load = async () => {
@@ -80,10 +87,14 @@ export function PaymentsPage() {
                                     <p className="text-xs text-white/30">${p.amount} - {p.crypto}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={async () => { await api.verifyCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                                        className="btn-ghost btn-action text-aura-green border-aura-green/20 flex items-center gap-1"><Check className="w-3 h-3" />Approve</button>
-                                    <button onClick={async () => { await api.rejectCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
-                                        className="btn-danger btn-action flex items-center gap-1"><X className="w-3 h-3" />Reject</button>
+                                    <PermissionGate permissionKey="action:payments.approveCrypto" hasPermission={has('action:payments.approveCrypto')} onRequestStart={setReqOpen}>
+                                        <button onClick={async () => { await api.verifyCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
+                                            className="btn-ghost btn-action text-aura-green border-aura-green/20 flex items-center gap-1"><Check className="w-3 h-3" />Approve</button>
+                                    </PermissionGate>
+                                    <PermissionGate permissionKey="action:payments.rejectCrypto" hasPermission={has('action:payments.rejectCrypto')} onRequestStart={setReqOpen}>
+                                        <button onClick={async () => { await api.rejectCryptoPayment(p.id); setPending(pr => pr.filter(x => x.id !== p.id)); }}
+                                            className="btn-danger btn-action flex items-center gap-1"><X className="w-3 h-3" />Reject</button>
+                                    </PermissionGate>
                                 </div>
                             </div>
                         ))}
@@ -99,6 +110,17 @@ export function PaymentsPage() {
                     emptyState={<EmptyState icon={CreditCard} title="No payments recorded" />}
                 />
             </div>
+            {reqOpen && (
+                <PermissionRequestDialog
+                    isOpen
+                    permissionKey={reqOpen}
+                    onClose={() => setReqOpen(null)}
+                    onSubmit={async (key, reason) => {
+                        const r = await api.createPermissionRequest(key, reason);
+                        return r.ok;
+                    }}
+                />
+            )}
         </div>
     );
 }

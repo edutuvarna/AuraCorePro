@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     Users, Crown, Shield, DollarSign, TrendingUp, Clock,
     Circle, Radio, Activity, CreditCard, CheckCircle2, XCircle, ChevronRight
@@ -23,32 +23,21 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { api } from '@/lib/api';
-import { useSignalR } from '@/hooks/useSignalR';
+import { useActivityFeed } from '@/lib/activityFeed';
 import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
-
-interface ActivityEvent {
-    id: number; type: string; message: string; time: Date; color: string;
-}
 
 export function DashboardPage() {
     const [stats, setStats] = useState<any>(null);
     const [payments, setPayments] = useState<any[]>([]);
     const [health, setHealth] = useState<any>(null);
     const [revenue, setRevenue] = useState<any[]>([]);
-    const [activities, setActivities] = useState<ActivityEvent[]>([]);
-    const [activityId, setActivityId] = useState(0);
-    const [signalrStatus, setSignalrStatus] = useState<'connected'|'connecting'|'disconnected'>('connecting');
-
-    const addActivity = useCallback((type: string, msg: string, color: string) => {
-        setActivityId(prev => {
-            const id = prev + 1;
-            setActivities(a => [{ id, type, message: msg, time: new Date(), color }, ...a].slice(0, 50));
-            return id;
-        });
-    }, []);
+    // Phase 6.11 Bug #6: ActivityFeedProvider lives in AdminPanelInner so the
+    // feed + SignalR subscriptions survive sidebar-tab navigations. Previously
+    // this page owned the state and events got discarded on unmount.
+    const { activities, signalrStatus } = useActivityFeed();
 
     useEffect(() => {
         const load = async () => {
@@ -62,21 +51,8 @@ export function DashboardPage() {
         };
         load();
         const interval = setInterval(load, 60000);
-        setSignalrStatus('connected');
         return () => clearInterval(interval);
     }, []);
-
-    // SignalR live activity feed (Phase 6.10 W4.T21 — useSignalR hook
-    // replaces imperative on/off/startConnection wiring; signalr.ts singleton
-    // owns the connection, hook handles per-component subscribe/unsubscribe).
-    useSignalR({
-        UserRegistered: (d) => addActivity('register', `New user: ${d.email}`, 'text-aura-green'),
-        UserLogin: (d) => addActivity('login', `${d.success ? 'Login' : 'Failed login'}: ${d.email}`, d.success ? 'text-aura-blue' : 'text-aura-amber'),
-        Payment: (d) => addActivity('payment', `Payment $${d.amount} from ${d.email}`, 'text-accent'),
-        CrashReport: (d) => addActivity('crash', `Crash: ${d.type} (v${d.version})`, 'text-aura-red'),
-        Telemetry: (d) => addActivity('telemetry', `Telemetry batch: ${d.count} events`, 'text-aura-purple'),
-        AdminCount: () => {},
-    });
 
     const chartData = useMemo(() => {
         return revenue.map((d: any) => ({

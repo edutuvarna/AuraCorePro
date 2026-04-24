@@ -1,4 +1,5 @@
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Filters;
 using AuraCore.API.Helpers;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +17,7 @@ public sealed class AdminSubscriptionController : ControllerBase
     public AdminSubscriptionController(AuraCoreDbContext db) => _db = db;
 
     [HttpPost("grant")]
+    [RequiresPermission(PermissionKeys.ActionSubscriptionsGrant)]
     [AuraCore.API.Filters.AuditAction("GrantSubscription", "Subscription")]
     public async Task<IActionResult> Grant([FromBody] GrantRequest req, CancellationToken ct)
     {
@@ -75,6 +77,7 @@ public sealed class AdminSubscriptionController : ControllerBase
     }
 
     [HttpPost("revoke/{userId:guid}")]
+    [RequiresPermission(PermissionKeys.ActionSubscriptionsRevoke)]
     [AuraCore.API.Filters.AuditAction("RevokeSubscription", "Subscription", TargetIdFromRouteKey = "userId")]
     public async Task<IActionResult> Revoke(Guid userId, CancellationToken ct)
     {

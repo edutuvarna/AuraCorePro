@@ -43,6 +43,26 @@ builder.Services.AddScoped<AuraCore.API.Application.Services.Audit.IAuditLogServ
 builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelistService,
                           AuraCore.API.Infrastructure.Services.Security.WhitelistService>();
 
+// Phase 6.11 startup services
+builder.Services.AddScoped<AuraCore.API.Services.SuperadminBootstrapService>();
+builder.Services.AddScoped<AuraCore.API.Services.GrandfatherMigrationService>();
+
+// Phase 6.11 T37: runtime-editable rate-limit policies
+builder.Services.AddScoped<AuraCore.API.Application.Services.RateLimiting.IRateLimitConfigService,
+                          AuraCore.API.Infrastructure.Services.RateLimiting.RateLimitConfigService>();
+
+// Phase 6.11: transactional email via Resend HTTPS API
+builder.Services.AddHttpClient("resend", client =>
+{
+    client.BaseAddress = new Uri("https://api.resend.com");
+    var apiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY")
+        ?? builder.Configuration["Resend:ApiKey"];
+    if (!string.IsNullOrEmpty(apiKey))
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+});
+builder.Services.AddScoped<AuraCore.API.Application.Services.Email.IEmailService,
+                           AuraCore.API.Infrastructure.Services.Email.ResendEmailService>();
+
 // DataProtection with persistent keyring. Keys directory must be app-user-owned, chmod 600.
 // On prod (Linux) default to /var/www/auracore-api/.dataprotection-keys; allow override via env var.
 // On local dev the path won't exist — fall back to a temp dir so the app still boots.
@@ -169,6 +189,7 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelem
 
 // T2.24: login_attempts retention sweep — purges rows older than 90 days once per 24h
 builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Audit.AuditLogPurgeService>();
+builder.Services.AddHostedService<AuraCore.API.HostedServices.RetentionJob>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -197,6 +218,22 @@ catch (Exception ex)
 {
     // Log but don't crash — migrations might not exist yet on first setup
     app.Logger.LogWarning("Auto-migrate skipped: {Message}. Run 'dotnet ef database update' manually.", ex.Message);
+}
+
+// Phase 6.11: superadmin bootstrap + grandfather migration (idempotent on every startup).
+// Must run AFTER EF MigrateAsync so permission_grants table exists.
+// Call order: bootstrap FIRST so a superadmin may exist when grandfather attributes grants.
+try
+{
+    using var sa = app.Services.CreateScope();
+    var bootstrap = sa.ServiceProvider.GetRequiredService<AuraCore.API.Services.SuperadminBootstrapService>();
+    var grandfather = sa.ServiceProvider.GetRequiredService<AuraCore.API.Services.GrandfatherMigrationService>();
+    await bootstrap.RunAsync();
+    await grandfather.RunAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogWarning("Phase 6.11 startup services skipped: {Msg}", ex.Message);
 }
 
 // T1.26: warn if extra app_configs rows exist (DB-level constraint added in Wave 1).
@@ -293,6 +330,14 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Phase 6.11: reject requests whose JWT jti is blacklisted.
+// MUST be after UseAuthentication so HttpContext.User has claims.
+// Other Phase 6.11 middlewares (ScopeLimitedTokenMiddleware, ForcePasswordChangeMiddleware)
+// are added in Wave 5 immediately after this line.
+app.UseMiddleware<AuraCore.API.Middleware.TokenRevocationMiddleware>();
+app.UseMiddleware<AuraCore.API.Middleware.ScopeLimitedTokenMiddleware>();
+app.UseMiddleware<AuraCore.API.Middleware.ForcePasswordChangeMiddleware>();
+
 app.MapControllers();
 app.MapHub<AuraCore.API.Hubs.AdminHub>("/hubs/admin");
 app.MapGet("/health", async (AuraCoreDbContext db) =>
@@ -308,3 +353,9 @@ app.MapGet("/health", async (AuraCoreDbContext db) =>
 });
 
 app.Run();
+
+// Expose Program as a public partial type so WebApplicationFactory<Program>
+// in integration tests can resolve it. Without this, top-level Program is
+// internal-only and the test project would need InternalsVisibleTo gymnastics
+// that don't actually work with generic type parameters.
+public partial class Program { }

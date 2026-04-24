@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'AuraCore',
   },
+  robots: { index: false, follow: false },
 }
 
 export const viewport: Viewport = {

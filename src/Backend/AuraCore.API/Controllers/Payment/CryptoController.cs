@@ -1,4 +1,5 @@
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Filters;
 using AuraCore.API.Helpers;
 using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
@@ -110,6 +111,7 @@ public sealed class CryptoController : ControllerBase
     /// <summary>Admin verifies and activates a crypto payment</summary>
     [HttpPost("admin/verify/{paymentId:guid}")]
     [Authorize(Roles = "admin")]
+    [RequiresPermission(PermissionKeys.ActionPaymentsApproveCrypto)]
     public async Task<IActionResult> AdminVerifyPayment(Guid paymentId, CancellationToken ct)
     {
         var payment = await _db.Payments.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == paymentId, ct);
@@ -158,6 +160,7 @@ public sealed class CryptoController : ControllerBase
 
     [HttpPost("admin/reject/{paymentId:guid}")]
     [Authorize(Roles = "admin")]
+    [RequiresPermission(PermissionKeys.ActionPaymentsRejectCrypto)]
     [AuraCore.API.Filters.AuditAction("RejectCryptoPayment", "Payment", TargetIdFromRouteKey = "paymentId")]
     public async Task<IActionResult> AdminRejectPayment(Guid paymentId, CancellationToken ct)
     {

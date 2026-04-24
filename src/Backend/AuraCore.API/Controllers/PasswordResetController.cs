@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
@@ -13,13 +12,15 @@ namespace AuraCore.API.Controllers;
 public sealed class PasswordResetController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
+    private readonly AuraCore.API.Application.Services.Email.IEmailService _email;
 
     private static readonly ConcurrentDictionary<string, (int Count, DateTime ResetAt)> _forgotAttempts = new();
     private static readonly ConcurrentDictionary<string, (int Count, DateTime ResetAt)> _resetAttempts = new();
 
-    public PasswordResetController(AuraCoreDbContext db)
+    public PasswordResetController(AuraCoreDbContext db, AuraCore.API.Application.Services.Email.IEmailService email)
     {
         _db = db;
+        _email = email;
     }
 
     [HttpPost("forgot")]
@@ -67,7 +68,10 @@ public sealed class PasswordResetController : ControllerBase
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
         if (user is not null)
         {
-            await SendResetEmailAsync(email, code);
+            await _email.SendFromTemplateAsync(
+                AuraCore.API.Application.Services.Email.EmailTemplate.PasswordReset,
+                new { to = email, code, expiresMinutes = 10 },
+                ct);
         }
 
         return okResponse;
@@ -143,29 +147,6 @@ public sealed class PasswordResetController : ControllerBase
         return entry.Count <= maxAttempts;
     }
 
-    private static async Task SendResetEmailAsync(string email, string code)
-    {
-        var apiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY");
-        if (string.IsNullOrEmpty(apiKey)) return;
-
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-
-        var body = new
-        {
-            from = "AuraCore Pro <noreply@auracore.pro>",
-            to = new[] { email },
-            subject = "Password Reset Code",
-            html = $"<div style='font-family:sans-serif;max-width:400px;margin:0 auto;padding:20px'>" +
-                   $"<h2 style='color:#00D4AA'>AuraCore Pro</h2>" +
-                   $"<p>Your password reset code is:</p>" +
-                   $"<div style='font-size:32px;font-weight:bold;letter-spacing:8px;text-align:center;padding:20px;background:#f5f5f5;border-radius:8px;margin:16px 0'>{code}</div>" +
-                   $"<p style='color:#666;font-size:14px'>This code expires in 10 minutes. If you didn't request this, ignore this email.</p></div>"
-        };
-
-        await client.PostAsync("https://api.resend.com/emails",
-            new StringContent(JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json"));
-    }
 }
 
 public sealed record ForgotPasswordRequest(string Email);

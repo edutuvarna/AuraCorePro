@@ -27,14 +27,41 @@ import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { useRole } from '@/lib/roleContext';
+import { usePermissions } from '@/hooks/usePermissions';
+import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
 
 export function UpdatesPage() {
+    const role = useRole();
+    const { has, hasPending } = usePermissions(role);
+    const [reqOpen, setReqOpen] = useState(false);
     const [updates, setUpdates] = useState<any[]>([]);
     const [form, setForm] = useState({ version: '', downloadUrl: '', releaseNotes: '', channel: 'stable', isMandatory: false });
     const [showForm, setShowForm] = useState(false);
     const [msg, setMsg] = useState('');
 
     useEffect(() => { api.getUpdates().then(setUpdates); }, []);
+
+    if (role === 'admin' && !has('tab:updates')) {
+        return (
+            <>
+                <LockedTabPlaceholder
+                    tabName="Updates"
+                    permissionKey="tab:updates"
+                    hasPending={hasPending('tab:updates')}
+                    onRequestStart={() => setReqOpen(true)}
+                />
+                {reqOpen && (
+                    <PermissionRequestDialog
+                        isOpen permissionKey="tab:updates"
+                        onClose={() => setReqOpen(false)}
+                        onSubmit={async (k, r) => (await api.createPermissionRequest(k, r)).ok}
+                    />
+                )}
+            </>
+        );
+    }
 
     const publish = async () => {
         const { ok, data } = await api.publishUpdate(form);

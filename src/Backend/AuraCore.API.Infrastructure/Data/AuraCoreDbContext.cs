@@ -22,6 +22,13 @@ public sealed class AuraCoreDbContext : DbContext
     public DbSet<PasswordResetCode> PasswordResetCodes => Set<PasswordResetCode>();
     public DbSet<AuditLogEntry> AuditLogs => Set<AuditLogEntry>();
 
+    // Phase 6.11 additions
+    public DbSet<PermissionGrant> PermissionGrants => Set<PermissionGrant>();
+    public DbSet<PermissionRequest> PermissionRequests => Set<PermissionRequest>();
+    public DbSet<RevokedToken> RevokedTokens => Set<RevokedToken>();
+    public DbSet<AdminInvitation> AdminInvitations => Set<AdminInvitation>();
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+
     protected override void OnModelCreating(ModelBuilder m)
     {
         m.Entity<User>(e => {
@@ -35,6 +42,12 @@ public sealed class AuraCoreDbContext : DbContext
             e.Property(u => u.TotpEnabled).HasDefaultValue(false);
             e.Property(u => u.CreatedAt).HasDefaultValueSql("now()");
             e.Property(u => u.UpdatedAt).HasDefaultValueSql("now()");
+            e.Property(u => u.IsActive).HasDefaultValue(true);
+            e.Property(u => u.IsReadonly).HasDefaultValue(false);
+            e.Property(u => u.ForcePasswordChange).HasDefaultValue(false);
+            e.Property(u => u.CreatedVia).HasMaxLength(30).HasDefaultValue("signup");
+            e.Property(u => u.Require2fa).HasDefaultValue(false);
+            e.HasOne<User>().WithMany().HasForeignKey(u => u.CreatedByUserId).OnDelete(DeleteBehavior.SetNull);
         });
 
         m.Entity<License>(e => {
@@ -192,6 +205,76 @@ public sealed class AuraCoreDbContext : DbContext
             e.HasIndex(a => new { a.Action, a.CreatedAt }).HasDatabaseName("idx_audit_action_created");
             e.HasIndex(a => new { a.TargetType, a.TargetId }).HasDatabaseName("idx_audit_target");
             e.HasOne(a => a.Actor).WithMany().HasForeignKey(a => a.ActorId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        m.Entity<PermissionGrant>(e => {
+            e.ToTable("permission_grants"); e.HasKey(p => p.Id);
+            e.Property(p => p.Id).HasDefaultValueSql("gen_random_uuid()");
+            e.Property(p => p.PermissionKey).HasMaxLength(100).IsRequired();
+            e.Property(p => p.GrantedAt).HasDefaultValueSql("now()");
+            e.Property(p => p.RevokeReason).HasMaxLength(500);
+            e.HasOne(p => p.AdminUser).WithMany().HasForeignKey(p => p.AdminUserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.GrantedByUser).WithMany().HasForeignKey(p => p.GrantedBy).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(p => p.RevokedByUser).WithMany().HasForeignKey(p => p.RevokedBy).OnDelete(DeleteBehavior.SetNull);
+            e.HasOne(p => p.SourceRequest).WithMany().HasForeignKey(p => p.SourceRequestId).OnDelete(DeleteBehavior.SetNull);
+            // Partial unique: only one ACTIVE (not revoked) grant per (admin, key).
+            e.HasIndex(p => new { p.AdminUserId, p.PermissionKey })
+             .HasFilter("\"RevokedAt\" IS NULL")
+             .IsUnique()
+             .HasDatabaseName("uq_permission_grants_active");
+            e.HasIndex(p => p.AdminUserId).HasDatabaseName("ix_permission_grants_admin");
+        });
+
+        m.Entity<PermissionRequest>(e => {
+            e.ToTable("permission_requests"); e.HasKey(p => p.Id);
+            e.Property(p => p.Id).HasDefaultValueSql("gen_random_uuid()");
+            e.Property(p => p.PermissionKey).HasMaxLength(100).IsRequired();
+            e.Property(p => p.Reason).IsRequired();
+            e.Property(p => p.Status).HasMaxLength(20).HasDefaultValue("pending");
+            e.Property(p => p.RequestedAt).HasDefaultValueSql("now()");
+            e.Property(p => p.ReviewNote).HasMaxLength(1000);
+            e.HasOne(p => p.AdminUser).WithMany().HasForeignKey(p => p.AdminUserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.ReviewedByUser).WithMany().HasForeignKey(p => p.ReviewedBy).OnDelete(DeleteBehavior.SetNull);
+            e.HasIndex(p => new { p.Status, p.AdminUserId }).HasDatabaseName("ix_permission_requests_status_admin");
+            // Partial unique: only one PENDING request per (admin, key).
+            e.HasIndex(p => new { p.AdminUserId, p.PermissionKey })
+             .HasFilter("\"Status\" = 'pending'")
+             .IsUnique()
+             .HasDatabaseName("uq_permission_requests_pending");
+        });
+
+        m.Entity<RevokedToken>(e => {
+            e.ToTable("revoked_tokens"); e.HasKey(r => r.Jti);
+            e.Property(r => r.Jti).HasMaxLength(100).IsRequired();
+            e.Property(r => r.RevokedAt).HasDefaultValueSql("now()");
+            e.Property(r => r.RevokeReason).HasMaxLength(100).IsRequired();
+            e.HasOne(r => r.User).WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(r => r.RevokedByUser).WithMany().HasForeignKey(r => r.RevokedBy).OnDelete(DeleteBehavior.SetNull);
+            e.HasIndex(r => r.UserId).HasDatabaseName("ix_revoked_tokens_user");
+        });
+
+        m.Entity<AdminInvitation>(e => {
+            e.ToTable("admin_invitations"); e.HasKey(i => i.TokenHash);
+            e.Property(i => i.TokenHash).HasMaxLength(100).IsRequired();
+            e.Property(i => i.CreatedAt).HasDefaultValueSql("now()");
+            e.HasOne(i => i.AdminUser).WithMany().HasForeignKey(i => i.AdminUserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(i => i.CreatedByUser).WithMany().HasForeignKey(i => i.CreatedBy).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(i => i.AdminUserId).HasDatabaseName("ix_admin_invitations_user");
+        });
+
+        m.Entity<SystemSetting>(e => {
+            e.ToTable("system_settings"); e.HasKey(s => s.Key);
+            e.Property(s => s.Key).HasMaxLength(100).IsRequired();
+            e.Property(s => s.Value).IsRequired();
+            e.Property(s => s.UpdatedAt).HasDefaultValueSql("now()");
+            e.HasOne(s => s.UpdatedByUser).WithMany().HasForeignKey(s => s.UpdatedBy).OnDelete(DeleteBehavior.SetNull);
+
+            e.HasData(
+                new SystemSetting { Key = "require_2fa_for_all_admins", Value = "false", UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) },
+                new SystemSetting { Key = "rate_limit_policies",
+                    Value = "{\"auth.login\":{\"requests\":5,\"windowSeconds\":1800},\"auth.register\":{\"requests\":3,\"windowSeconds\":3600},\"admin.all\":{\"requests\":1000,\"windowSeconds\":3600},\"signalr.connect\":{\"requests\":10,\"windowSeconds\":60}}",
+                    UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) }
+            );
         });
     }
 }

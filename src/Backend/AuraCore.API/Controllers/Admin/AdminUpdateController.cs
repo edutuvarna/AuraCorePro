@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 using AuraCore.API.Application.Services.Releases;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Filters;
+using AuraCore.API.Helpers;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,7 @@ public sealed class AdminUpdateController : ControllerBase
 
     /// <summary>Admin: mint presigned R2 PUT URL for direct browser upload</summary>
     [HttpPost("prepare-upload")]
+    [RequiresPermission(PermissionKeys.TabUpdates)]
     public async Task<IActionResult> PrepareUpload([FromBody] PrepareUploadRequest req, CancellationToken ct)
     {
         if (req is null || string.IsNullOrWhiteSpace(req.Version) || !SemverRegex.IsMatch(req.Version))
@@ -79,6 +82,7 @@ public sealed class AdminUpdateController : ControllerBase
 
     /// <summary>Admin: finalize upload — HEAD verify, copy to releases/, compute SHA256, insert row, fire Discord + GitHub mirror.</summary>
     [HttpPost("publish")]
+    [RequiresPermission(PermissionKeys.TabUpdates)]
     public async Task<IActionResult> Publish([FromBody] PublishUpdateRequestV2 req, CancellationToken ct)
     {
         if (req is null || string.IsNullOrWhiteSpace(req.Version) || string.IsNullOrWhiteSpace(req.ObjectKey))
@@ -163,6 +167,7 @@ public sealed class AdminUpdateController : ControllerBase
 
     /// <summary>Delete an update</summary>
     [HttpDelete("{id:guid}")]
+    [RequiresPermission(PermissionKeys.TabUpdates)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         var u = await _db.AppUpdates.FindAsync(new object[] { id }, ct);
@@ -174,6 +179,7 @@ public sealed class AdminUpdateController : ControllerBase
 
     /// <summary>Admin: retry GitHub mirror for an existing AppUpdate (e.g., after transient failure)</summary>
     [HttpPost("{id:guid}/mirror-to-github")]
+    [RequiresPermission(PermissionKeys.TabUpdates)]
     public async Task<IActionResult> RetryGitHubMirror(Guid id, CancellationToken ct)
     {
         var u = await _db.AppUpdates.FindAsync(new object[] { id }, ct);

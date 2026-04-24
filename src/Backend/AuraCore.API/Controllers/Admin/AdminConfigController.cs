@@ -1,4 +1,6 @@
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Filters;
+using AuraCore.API.Helpers;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +45,7 @@ public sealed class AdminConfigController : ControllerBase
     }
 
     [HttpPut]
+    [RequiresPermission(PermissionKeys.TabConfiguration)]
     [AuraCore.API.Filters.AuditAction("UpdateAppConfig", "AppConfig")]
     public async Task<IActionResult> Update([FromBody] UpdateConfigRequest req, CancellationToken ct)
     {

@@ -21,7 +21,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Activity, Clock, FileText, RefreshCw, Tag, TrendingUp } from 'lucide-react';
+import { Activity, Clock, Download, FileText, RefreshCw, Tag, TrendingUp } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AuditLogEntry, ListResponse } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
@@ -108,6 +108,15 @@ export function AuditLogPage() {
             >
                 <button onClick={load} className="btn-ghost flex items-center gap-2">
                     <RefreshCw className="w-4 h-4" />Refresh
+                </button>
+                <button
+                    onClick={async () => {
+                        const r = await api.downloadAuditLogCsv();
+                        if (!r.ok) alert(`Export failed (${r.status ?? 'network'}). Please reload the page and try again.`);
+                    }}
+                    className="btn-primary inline-flex items-center gap-2"
+                >
+                    <Download className="w-4 h-4" />Export CSV
                 </button>
             </PageHeader>
 

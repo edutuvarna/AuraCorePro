@@ -1,3 +1,5 @@
+using AuraCore.API.Filters;
+using AuraCore.API.Helpers;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,6 +93,7 @@ public sealed class AdminUserController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequiresPermission(PermissionKeys.ActionUsersDelete)]
     [AuraCore.API.Filters.AuditAction("DeleteUser", "User", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> DeleteUser(Guid id, CancellationToken ct)
     {
@@ -142,6 +145,23 @@ public sealed class AdminUserController : ControllerBase
         await _db.SaveChangesAsync(ct);
         return Ok(new { message = $"User {user.Email} deleted" });
     }
+
+    [HttpPost("{id:guid}/ban")]
+    [RequiresPermission(PermissionKeys.ActionUsersBan)]
+    [AuraCore.API.Filters.AuditAction("BanUser", "User", TargetIdFromRouteKey = "id")]
+    public async Task<IActionResult> BanUser(Guid id, [FromBody] BanUserRequest req, CancellationToken ct)
+    {
+        var user = await _db.Users.FindAsync(new object[] { id }, ct);
+        if (user is null) return NotFound();
+
+        // Prevent banning yourself / other admins through this endpoint.
+        if (user.Role == "admin" || user.Role == "superadmin")
+            return BadRequest(new { error = "Admin accounts cannot be banned via this endpoint; use Suspend instead." });
+
+        user.IsActive = !req.Banned ? true : false;
+        await _db.SaveChangesAsync(ct);
+        return Ok(new { id = user.Id, email = user.Email, isActive = user.IsActive });
+    }
 }
 
 public sealed class ResetPasswordRequest
@@ -154,3 +174,5 @@ public sealed class ResetPasswordRequest
     [System.ComponentModel.DataAnnotations.MaxLength(128, ErrorMessage = "Password too long")]
     public string NewPassword { get; set; } = string.Empty;
 }
+
+public sealed record BanUserRequest(bool Banned);

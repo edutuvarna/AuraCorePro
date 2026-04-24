@@ -31,8 +31,15 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { useRole } from '@/lib/roleContext';
+import { usePermissions } from '@/hooks/usePermissions';
+import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
 
 export function IpWhitelistPage() {
+    const role = useRole();
+    const { has, hasPending } = usePermissions(role);
+    const [reqOpen, setReqOpen] = useState(false);
     const [ips, setIps] = useState<any[]>([]);
     const [newIp, setNewIp] = useState('');
     const [newLabel, setNewLabel] = useState('');
@@ -45,6 +52,26 @@ export function IpWhitelistPage() {
     };
 
     useEffect(() => { load(); }, []);
+
+    if (role === 'admin' && !has('tab:ipwhitelist')) {
+        return (
+            <>
+                <LockedTabPlaceholder
+                    tabName="IP Whitelist"
+                    permissionKey="tab:ipwhitelist"
+                    hasPending={hasPending('tab:ipwhitelist')}
+                    onRequestStart={() => setReqOpen(true)}
+                />
+                {reqOpen && (
+                    <PermissionRequestDialog
+                        isOpen permissionKey="tab:ipwhitelist"
+                        onClose={() => setReqOpen(false)}
+                        onSubmit={async (k, r) => (await api.createPermissionRequest(k, r)).ok}
+                    />
+                )}
+            </>
+        );
+    }
 
     const addIp = async () => {
         if (!newIp) return;

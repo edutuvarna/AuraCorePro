@@ -1,3 +1,4 @@
+using AuraCore.API.Filters;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -106,6 +107,7 @@ public sealed class AdminCrashReportController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [DestructiveAction]
     [AuraCore.API.Filters.AuditAction("DeleteCrashReport", "CrashReport", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {

@@ -22,6 +22,39 @@ namespace AuraCore.API.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.AdminInvitation", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("AdminUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ConsumedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("AdminUserId")
+                        .HasDatabaseName("ix_admin_invitations_user");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.ToTable("admin_invitations", (string)null);
+                });
+
             modelBuilder.Entity("AuraCore.API.Domain.Entities.AppConfig", b =>
                 {
                     b.Property<int>("Id")
@@ -77,7 +110,7 @@ namespace AuraCore.API.Infrastructure.Migrations
                             AutoUpdateEnabled = true,
                             CrashReportsEnabled = true,
                             IsMaintenanceMode = false,
-                            LastUpdated = new DateTimeOffset(new DateTime(2026, 4, 22, 3, 56, 27, 420, DateTimeKind.Unspecified).AddTicks(7339), new TimeSpan(0, 0, 0, 0, 0)),
+                            LastUpdated = new DateTimeOffset(new DateTime(2026, 4, 23, 23, 53, 22, 635, DateTimeKind.Unspecified).AddTicks(1819), new TimeSpan(0, 0, 0, 0, 0)),
                             MaintenanceMessage = "",
                             NewRegistrations = true,
                             TelemetryEnabled = true
@@ -513,6 +546,120 @@ namespace AuraCore.API.Infrastructure.Migrations
                     b.ToTable("payments", (string)null);
                 });
 
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.PermissionGrant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("AdminUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("GrantedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("GrantedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PermissionKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RevokeReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("RevokedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SourceRequestId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId")
+                        .HasDatabaseName("ix_permission_grants_admin");
+
+                    b.HasIndex("GrantedBy");
+
+                    b.HasIndex("RevokedBy");
+
+                    b.HasIndex("SourceRequestId");
+
+                    b.HasIndex("AdminUserId", "PermissionKey")
+                        .IsUnique()
+                        .HasDatabaseName("uq_permission_grants_active")
+                        .HasFilter("\"RevokedAt\" IS NULL");
+
+                    b.ToTable("permission_grants", (string)null);
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.PermissionRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("AdminUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PermissionKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("ReviewNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ReviewedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("pending");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewedBy");
+
+                    b.HasIndex("AdminUserId", "PermissionKey")
+                        .IsUnique()
+                        .HasDatabaseName("uq_permission_requests_pending")
+                        .HasFilter("\"Status\" = 'pending'");
+
+                    b.HasIndex("Status", "AdminUserId")
+                        .HasDatabaseName("ix_permission_requests_status_admin");
+
+                    b.ToTable("permission_requests", (string)null);
+                });
+
             modelBuilder.Entity("AuraCore.API.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -547,6 +694,38 @@ namespace AuraCore.API.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("refresh_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.RevokedToken", b =>
+                {
+                    b.Property<string>("Jti")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RevokeReason")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("RevokedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("RevokedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Jti");
+
+                    b.HasIndex("RevokedBy");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_revoked_tokens_user");
+
+                    b.ToTable("revoked_tokens", (string)null);
                 });
 
             modelBuilder.Entity("AuraCore.API.Domain.Entities.Subscription", b =>
@@ -596,6 +775,45 @@ namespace AuraCore.API.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("subscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.SystemSetting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Key");
+
+                    b.HasIndex("UpdatedBy");
+
+                    b.ToTable("system_settings", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Key = "require_2fa_for_all_admins",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "false"
+                        },
+                        new
+                        {
+                            Key = "rate_limit_policies",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Value = "{\"auth.login\":{\"requests\":5,\"windowSeconds\":1800},\"auth.register\":{\"requests\":3,\"windowSeconds\":3600},\"admin.all\":{\"requests\":1000,\"windowSeconds\":3600},\"signalr.connect\":{\"requests\":10,\"windowSeconds\":60}}"
+                        });
                 });
 
             modelBuilder.Entity("AuraCore.API.Domain.Entities.TelemetryEvent", b =>
@@ -652,14 +870,50 @@ namespace AuraCore.API.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CreatedVia")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasDefaultValue("signup");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<bool>("ForcePasswordChange")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("ForcePasswordChangeBy")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsReadonly")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset?>("PasswordChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("Require2fa")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -684,10 +938,31 @@ namespace AuraCore.API.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedByUserId");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.AdminInvitation", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("AuraCore.API.Domain.Entities.AuditLogEntry", b =>
@@ -744,6 +1019,57 @@ namespace AuraCore.API.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.PermissionGrant", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "GrantedByUser")
+                        .WithMany()
+                        .HasForeignKey("GrantedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "RevokedByUser")
+                        .WithMany()
+                        .HasForeignKey("RevokedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AuraCore.API.Domain.Entities.PermissionRequest", "SourceRequest")
+                        .WithMany()
+                        .HasForeignKey("SourceRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AdminUser");
+
+                    b.Navigation("GrantedByUser");
+
+                    b.Navigation("RevokedByUser");
+
+                    b.Navigation("SourceRequest");
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.PermissionRequest", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "ReviewedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AdminUser");
+
+                    b.Navigation("ReviewedByUser");
+                });
+
             modelBuilder.Entity("AuraCore.API.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("AuraCore.API.Domain.Entities.User", "User")
@@ -751,6 +1077,24 @@ namespace AuraCore.API.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.RevokedToken", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "RevokedByUser")
+                        .WithMany()
+                        .HasForeignKey("RevokedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RevokedByUser");
 
                     b.Navigation("User");
                 });
@@ -766,6 +1110,16 @@ namespace AuraCore.API.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.SystemSetting", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", "UpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("UpdatedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("UpdatedByUser");
+                });
+
             modelBuilder.Entity("AuraCore.API.Domain.Entities.TelemetryEvent", b =>
                 {
                     b.HasOne("AuraCore.API.Domain.Entities.Device", "Device")
@@ -775,6 +1129,14 @@ namespace AuraCore.API.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Device");
+                });
+
+            modelBuilder.Entity("AuraCore.API.Domain.Entities.User", b =>
+                {
+                    b.HasOne("AuraCore.API.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("AuraCore.API.Domain.Entities.Device", b =>

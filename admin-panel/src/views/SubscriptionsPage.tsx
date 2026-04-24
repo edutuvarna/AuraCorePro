@@ -18,12 +18,19 @@ import { useState } from 'react';
 import { Crown } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
+import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useRole } from '@/lib/roleContext';
 
 export function SubscriptionsPage() {
+    const role = useRole();
+    const { has } = usePermissions(role);
     const [userId, setUserId] = useState('');
     const [tier, setTier] = useState('pro');
     const [days, setDays] = useState('30');
     const [msg, setMsg] = useState('');
+    const [reqOpen, setReqOpen] = useState<string | null>(null);
 
     const handleGrant = async () => {
         if (!userId) { setMsg('Enter a user ID'); return; }
@@ -61,10 +68,23 @@ export function SubscriptionsPage() {
                             <input type="number" value={days} onChange={e => setDays(e.target.value)} className="input-dark w-full" />
                         </div>
                     </div>
-                    <button onClick={handleGrant} className="btn-primary flex items-center gap-2"><Crown className="w-4 h-4" />Grant Access</button>
+                    <PermissionGate permissionKey="action:subscriptions.grant" hasPermission={has('action:subscriptions.grant')} onRequestStart={setReqOpen}>
+                        <button onClick={handleGrant} className="btn-primary flex items-center gap-2"><Crown className="w-4 h-4" />Grant Access</button>
+                    </PermissionGate>
                     {msg && <p className={`text-sm ${msg.includes('!') ? 'text-aura-green' : 'text-aura-red'}`}>{msg}</p>}
                 </div>
             </div>
+            {reqOpen && (
+                <PermissionRequestDialog
+                    isOpen
+                    permissionKey={reqOpen}
+                    onClose={() => setReqOpen(null)}
+                    onSubmit={async (key, reason) => {
+                        const r = await api.createPermissionRequest(key, reason);
+                        return r.ok;
+                    }}
+                />
+            )}
         </div>
     );
 }

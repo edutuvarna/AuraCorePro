@@ -43,6 +43,7 @@ import { Enable2FAPage } from '@/views/Enable2FAPage';
 import { RedeemInvitationPage } from '@/views/RedeemInvitationPage';
 
 import type { UserRole } from '@/lib/types';
+import { RoleContext } from '@/lib/roleContext';
 
 export type Page =
   'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security'|
@@ -96,12 +97,14 @@ export function AdminPanelInner({ onLogout: _onLogout, role, initialPage }: Admi
   const groups = role === 'superadmin' ? [...ADMIN_NAV_GROUPS, ...SUPERADMIN_EXTRA_GROUPS] : ADMIN_NAV_GROUPS;
   const ActivePage = PAGES[page] ?? DashboardPage;
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar groups={groups} activePage={page} onSelect={(p) => setPage(p as Page)} />
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
-      </main>
-    </div>
+    <RoleContext.Provider value={role}>
+      <div className="flex h-screen overflow-hidden">
+        <Sidebar groups={groups} activePage={page} onSelect={(p) => setPage(p as Page)} />
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
+        </main>
+      </div>
+    </RoleContext.Provider>
   );
 }
 

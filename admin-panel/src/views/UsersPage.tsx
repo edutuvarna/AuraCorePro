@@ -29,6 +29,10 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { PermissionGate } from '@/components/PermissionGate';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useRole } from '@/lib/roleContext';
 
 // Inline (not in plan's lift list — Wave 5 visual sweep will absorb).
 function SearchBar({ value, onChange, placeholder = 'Search...', onSubmit }: {
@@ -66,11 +70,14 @@ function TierBadge({ tier }: { tier: string }) {
 }
 
 export function UsersPage() {
+    const role = useRole();
+    const { has } = usePermissions(role);
     const [users, setUsers] = useState<User[]>([]);
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [confirmDelete, setConfirmDelete] = useState<{ id: string; email: string } | null>(null);
+    const [reqOpen, setReqOpen] = useState<string | null>(null);
 
     const load = useCallback(async () => {
         const data = await api.getUsers(search || undefined, page, 25);
@@ -132,16 +139,20 @@ export function UsersPage() {
             render: (u) => (
                 <div className="flex items-center justify-end gap-2">
                     {u.role !== 'admin' && u.tier !== 'free' && (
-                        <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
-                            className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
-                            <Ban className="w-4 h-4" />
-                        </button>
+                        <PermissionGate permissionKey="action:subscriptions.revoke" hasPermission={has('action:subscriptions.revoke')} onRequestStart={setReqOpen}>
+                            <button onClick={async () => { await api.revokeSubscription(u.id); load(); }}
+                                className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-amber/10 text-white/30 hover:text-aura-amber transition-colors" title="Revoke">
+                                <Ban className="w-4 h-4" />
+                            </button>
+                        </PermissionGate>
                     )}
                     {u.role !== 'admin' && (
-                        <button onClick={() => setConfirmDelete({ id: u.id, email: u.email })}
-                            className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
-                            <Trash2 className="w-4 h-4" />
-                        </button>
+                        <PermissionGate permissionKey="action:users.delete" hasPermission={has('action:users.delete')} onRequestStart={setReqOpen}>
+                            <button onClick={() => setConfirmDelete({ id: u.id, email: u.email })}
+                                className="btn-action inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-aura-red/10 text-white/30 hover:text-aura-red transition-colors" title="Delete">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </PermissionGate>
                     )}
                 </div>
             ),
@@ -180,6 +191,17 @@ export function UsersPage() {
                 }}
                 onCancel={() => setConfirmDelete(null)}
             />
+            {reqOpen && (
+                <PermissionRequestDialog
+                    isOpen
+                    permissionKey={reqOpen}
+                    onClose={() => setReqOpen(null)}
+                    onSubmit={async (key, reason) => {
+                        const r = await api.createPermissionRequest(key, reason);
+                        return r.ok;
+                    }}
+                />
+            )}
         </div>
     );
 }

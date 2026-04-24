@@ -47,6 +47,10 @@ builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelist
 builder.Services.AddScoped<AuraCore.API.Services.SuperadminBootstrapService>();
 builder.Services.AddScoped<AuraCore.API.Services.GrandfatherMigrationService>();
 
+// Phase 6.11 T37: runtime-editable rate-limit policies
+builder.Services.AddScoped<AuraCore.API.Application.Services.RateLimiting.IRateLimitConfigService,
+                          AuraCore.API.Infrastructure.Services.RateLimiting.RateLimitConfigService>();
+
 // Phase 6.11: transactional email via Resend HTTPS API
 builder.Services.AddHttpClient("resend", client =>
 {

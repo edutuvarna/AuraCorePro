@@ -331,6 +331,7 @@ app.UseAuthorization();
 // are added in Wave 5 immediately after this line.
 app.UseMiddleware<AuraCore.API.Middleware.TokenRevocationMiddleware>();
 app.UseMiddleware<AuraCore.API.Middleware.ScopeLimitedTokenMiddleware>();
+app.UseMiddleware<AuraCore.API.Middleware.ForcePasswordChangeMiddleware>();
 
 app.MapControllers();
 app.MapHub<AuraCore.API.Hubs.AdminHub>("/hubs/admin");

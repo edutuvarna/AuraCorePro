@@ -482,6 +482,22 @@ public sealed class AuthController : ControllerBase
         await _db.SaveChangesAsync(ct);
         return Ok(new { accessToken = access, refreshToken = refresh });
     }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(CancellationToken ct)
+    {
+        var userId = User.GetUserId();
+        var jti = User.GetJti();
+        if (userId is not null && !string.IsNullOrEmpty(jti))
+        {
+            _db.RevokedTokens.Add(new RevokedToken { Jti = jti, UserId = userId.Value, RevokeReason = "logout" });
+            var refreshes = await _db.RefreshTokens.Where(r => r.UserId == userId.Value && !r.IsRevoked).ToListAsync(ct);
+            foreach (var r in refreshes) r.IsRevoked = true;
+            await _db.SaveChangesAsync(ct);
+        }
+        return Ok(new { ok = true });
+    }
 }
 
 public sealed record RegisterRequest(string Email, string Password);

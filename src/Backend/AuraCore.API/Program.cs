@@ -189,6 +189,7 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelem
 
 // T2.24: login_attempts retention sweep — purges rows older than 90 days once per 24h
 builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Audit.AuditLogPurgeService>();
+builder.Services.AddHostedService<AuraCore.API.HostedServices.RetentionJob>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {

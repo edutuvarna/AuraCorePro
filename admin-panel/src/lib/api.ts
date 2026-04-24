@@ -519,6 +519,16 @@ export const api = {
     return { ok: res.ok };
   },
 
+  async applyAdminTemplate(adminId: string, body: {
+    template: 'Default' | 'Trusted' | 'ReadOnly' | 'Custom';
+    customKeys?: { permissionKey: string; expiresAt?: string | null }[];
+  }) {
+    const res = await request(`/api/superadmin/admins/${adminId}/apply-template`, {
+      method: 'POST', body: JSON.stringify(body),
+    });
+    return { ok: res.ok, data: res.ok ? await res.json() : await safeJson(res) };
+  },
+
   async changePassword(currentPassword: string, newPassword: string) {
     const res = await request('/api/auth/change-password', {
       method: 'POST', body: JSON.stringify({ currentPassword, newPassword }),

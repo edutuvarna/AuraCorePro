@@ -322,6 +322,68 @@ public sealed class AdminManagementController : ControllerBase
         return Ok(new { id, require2fa = u.Require2fa });
     }
 
+    [HttpPost("admins/{id:guid}/apply-template")]
+    [AuditAction("ApplyPermissionTemplate", "User", TargetIdFromRouteKey = "id")]
+    public async Task<IActionResult> ApplyTemplate(Guid id, [FromBody] ApplyTemplateDto dto, CancellationToken ct)
+    {
+        var superId = User.GetUserId()!.Value;
+        var target = await _db.Users.FindAsync(new object[] { id }, ct);
+        if (target is null) return NotFound();
+        if (target.Role != "admin") return BadRequest(new { error = "template_applies_to_admin_only" });
+        if (!PermissionTemplates.IsValidTemplate(dto.Template))
+            return BadRequest(new { error = "unknown_template" });
+
+        // Atomic: revoke all active grants, then insert new ones, then flip is_readonly.
+        // Production is always Postgres/Relational where BeginTransactionAsync gives
+        // real atomicity. InMemory (tests) throws TransactionIgnoredWarning-as-error,
+        // so we gate the transaction on a relational provider.
+        await using var tx = _db.Database.IsRelational()
+            ? await _db.Database.BeginTransactionAsync(ct)
+            : null;
+
+        var active = await _db.PermissionGrants
+            .Where(g => g.AdminUserId == id && g.RevokedAt == null)
+            .ToListAsync(ct);
+        foreach (var g in active)
+        {
+            g.RevokedAt = DateTimeOffset.UtcNow;
+            g.RevokedBy = superId;
+            g.RevokeReason = "template_swap";
+        }
+
+        if (dto.Template == PermissionTemplates.Custom)
+        {
+            foreach (var ck in dto.CustomKeys ?? new List<CustomKey>())
+            {
+                if (!PermissionKeys.IsValidKey(ck.PermissionKey)) continue;
+                _db.PermissionGrants.Add(new PermissionGrant
+                {
+                    AdminUserId = id,
+                    PermissionKey = ck.PermissionKey,
+                    GrantedBy = superId,
+                    ExpiresAt = ck.ExpiresAt,
+                });
+            }
+        }
+        else
+        {
+            foreach (var key in PermissionTemplates.GetPermissionsForTemplate(dto.Template))
+                _db.PermissionGrants.Add(new PermissionGrant
+                {
+                    AdminUserId = id,
+                    PermissionKey = key,
+                    GrantedBy = superId,
+                });
+        }
+
+        target.IsReadonly = PermissionTemplates.RequiresIsReadonlyFlag(dto.Template);
+        await _db.SaveChangesAsync(ct);
+        if (tx is not null) await tx.CommitAsync(ct);
+        return Ok(new { id, template = dto.Template, isReadonly = target.IsReadonly });
+    }
+
+    public sealed record ApplyTemplateDto(string Template, List<CustomKey>? CustomKeys);
+
     private static DateTimeOffset? ForceChangeDeadline(string? policy) => policy switch
     {
         "on_first_login" => DateTimeOffset.UtcNow,                 // already due

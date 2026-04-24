@@ -17,17 +17,21 @@ public class AdminManagementControllerTests : IClassFixture<WebApplicationFactor
 {
     private readonly WebApplicationFactory<Program> _f;
 
+    // Static so the DbContextOptions signature is identical across every test
+    // in this class — EF then shares ONE internal IServiceProvider for all of
+    // them rather than building one per ctor call. Each test still isolates
+    // its own data by keying on fresh Guid User.Ids.
+    private static readonly string _dbName = $"amc-{Guid.NewGuid()}";
+    private static readonly InMemoryDatabaseRoot _dbRoot = new();
+
     public AdminManagementControllerTests(WebApplicationFactory<Program> f)
     {
         Environment.SetEnvironmentVariable("JWT_SECRET", "test-secret-at-least-32-characters-long!!");
-        // Shared InMemoryDatabaseRoot so seeded data is visible across scopes.
-        var dbName = $"amc-{Guid.NewGuid()}";
-        var dbRoot = new InMemoryDatabaseRoot();
         _f = f.WithWebHostBuilder(b => b.ConfigureServices(s =>
         {
             var d = s.Single(x => x.ServiceType == typeof(DbContextOptions<AuraCoreDbContext>));
             s.Remove(d);
-            s.AddDbContext<AuraCoreDbContext>(o => o.UseInMemoryDatabase(dbName, dbRoot));
+            s.AddDbContext<AuraCoreDbContext>(o => o.UseInMemoryDatabase(_dbName, _dbRoot));
 
             // Override IEmailService with a no-op so controller code doesn't hit
             // the real Resend HTTPS API.
@@ -168,6 +172,78 @@ public class AdminManagementControllerTests : IClassFixture<WebApplicationFactor
         Assert.Equal(0, await db2.Users.CountAsync(u => u.Id == targetId));
         Assert.Equal(0, await db2.PermissionGrants.CountAsync(g => g.AdminUserId == targetId));
         Assert.Equal(0, await db2.PermissionRequests.CountAsync(r => r.AdminUserId == targetId));
+    }
+
+    [Fact]
+    public async Task ApplyTemplate_Trusted_to_ReadOnly_wipes_tier2_grants_and_sets_is_readonly()
+    {
+        var (c, _) = await SuperClient();
+        using var scope = _f.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+        var target = new User { Id = Guid.NewGuid(), Email = "t@x.com", PasswordHash = "x", Role = "admin", IsReadonly = false };
+        db.Users.Add(target);
+        // Seed with Trusted template (6 Tier 2 grants)
+        foreach (var k in PermissionKeys.AllTier2)
+            db.PermissionGrants.Add(new PermissionGrant { AdminUserId = target.Id, PermissionKey = k, GrantedBy = target.Id });
+        await db.SaveChangesAsync();
+
+        var res = await c.PostAsJsonAsync($"/api/superadmin/admins/{target.Id}/apply-template", new {
+            template = "ReadOnly",
+        });
+        res.EnsureSuccessStatusCode();
+
+        using var scope2 = _f.Services.CreateScope();
+        var db2 = scope2.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+        var reloaded = await db2.Users.FirstAsync(u => u.Id == target.Id);
+        Assert.True(reloaded.IsReadonly);
+
+        var active = await db2.PermissionGrants.Where(g => g.AdminUserId == target.Id && g.RevokedAt == null).CountAsync();
+        Assert.Equal(0, active);
+
+        // Old grants preserved for audit — they should all have RevokedAt set
+        var revoked = await db2.PermissionGrants.Where(g => g.AdminUserId == target.Id && g.RevokedAt != null).CountAsync();
+        Assert.Equal(PermissionKeys.AllTier2.Count, revoked);
+    }
+
+    [Fact]
+    public async Task ApplyTemplate_Custom_creates_only_picked_keys()
+    {
+        var (c, _) = await SuperClient();
+        using var scope = _f.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+        var target = new User { Id = Guid.NewGuid(), Email = "t2@x.com", PasswordHash = "x", Role = "admin" };
+        db.Users.Add(target); await db.SaveChangesAsync();
+
+        var res = await c.PostAsJsonAsync($"/api/superadmin/admins/{target.Id}/apply-template", new {
+            template = "Custom",
+            customKeys = new[] {
+                new { permissionKey = PermissionKeys.TabUpdates, expiresAt = (string?)null },
+                new { permissionKey = PermissionKeys.ActionUsersDelete, expiresAt = (string?)null },
+            },
+        });
+        res.EnsureSuccessStatusCode();
+
+        using var scope2 = _f.Services.CreateScope();
+        var db2 = scope2.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+        var active = await db2.PermissionGrants
+            .Where(g => g.AdminUserId == target.Id && g.RevokedAt == null)
+            .Select(g => g.PermissionKey).ToListAsync();
+        Assert.Equal(2, active.Count);
+        Assert.Contains(PermissionKeys.TabUpdates, active);
+        Assert.Contains(PermissionKeys.ActionUsersDelete, active);
+    }
+
+    [Fact]
+    public async Task ApplyTemplate_rejects_unknown_template()
+    {
+        var (c, _) = await SuperClient();
+        using var scope = _f.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
+        var target = new User { Id = Guid.NewGuid(), Email = "t3@x.com", PasswordHash = "x", Role = "admin" };
+        db.Users.Add(target); await db.SaveChangesAsync();
+
+        var res = await c.PostAsJsonAsync($"/api/superadmin/admins/{target.Id}/apply-template", new { template = "Bogus" });
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, res.StatusCode);
     }
 
     private sealed class NullEmailService : IEmailService

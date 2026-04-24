@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { UserCog, UserPlus, Ban, RotateCw, Key, Trash2 } from 'lucide-react';
+import { UserCog, UserPlus, Ban, RotateCw, Key, Trash2, Shield } from 'lucide-react';
 import { api } from '@/lib/api';
 import type { AdminAccount } from '@/lib/types';
 import { CreateAdminModal } from '@/components/CreateAdminModal';
+import { EditPermissionsModal } from '@/components/EditPermissionsModal';
 
 export function AdminManagementPage() {
   const [items, setItems] = useState<AdminAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<'create'|null>(null);
+  const [editingPerms, setEditingPerms] = useState<AdminAccount | null>(null);
 
   const refresh = async () => {
     setLoading(true);
@@ -55,6 +57,7 @@ export function AdminManagementPage() {
                   <td className="p-3">{a.totpEnabled ? 'on' : 'off'}</td>
                   <td className="p-3 text-white/50">{new Date(a.createdAt).toLocaleDateString()}</td>
                   <td className="p-3 text-right space-x-2">
+                    <button title="Edit permissions" onClick={() => setEditingPerms(a)} className="btn-ghost-sm"><Shield className="w-3 h-3" /></button>
                     <button title="Reset password" onClick={() => onReset(a.id)} className="btn-ghost-sm"><Key className="w-3 h-3" /></button>
                     {a.isActive
                       ? <button title="Suspend" onClick={() => onSuspend(a.id)} className="btn-ghost-sm"><Ban className="w-3 h-3" /></button>
@@ -71,6 +74,9 @@ export function AdminManagementPage() {
       </div>
 
       {modal === 'create' && <CreateAdminModal onClose={() => setModal(null)} onCreated={refresh} />}
+      {editingPerms && (
+        <EditPermissionsModal admin={editingPerms} onClose={() => setEditingPerms(null)} onSaved={refresh} />
+      )}
     </div>
   );
 }

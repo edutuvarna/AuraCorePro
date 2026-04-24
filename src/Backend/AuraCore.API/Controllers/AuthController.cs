@@ -541,13 +541,26 @@ public sealed class AuthController : ControllerBase
         user.TotpSecret = _totpEnc.Encrypt(secret);
         await _db.SaveChangesAsync(ct);
 
-        var uri = TotpService.GetQrUri(secret, user.Email, "AuraCore Pro");
+        // Use TotpService's default issuer "AuraCorePro" (no space) so the QR code
+        // matches the account label used by the existing TotpController setup flow —
+        // otherwise Authenticator apps show two separate entries for the same user.
+        var uri = TotpService.GetQrUri(secret, user.Email);
         return Ok(new { secret, uri });
     }
 
     // Phase 6.11.W5.T35: /enable-2fa/confirm validates the TOTP code, flips
     // TotpEnabled=true, and returns a fresh non-scope-limited JWT + refresh token
     // so the frontend can leave the scope-limited setup state.
+    // Brute-force guard: 5 consecutive invalid codes within 15 minutes locks the
+    // account out of this endpoint for 15 more minutes. TOTP ±30s window means
+    // 3-of-10^6 codes are valid at any instant — without a limiter a password-
+    // holder could brute force the setup in ~55 min. The counter lives in
+    // IMemoryCache (keyed by userId) so it resets on process restart, which is
+    // acceptable for a setup-only flow — a genuine user who hits the lockout
+    // contacts superadmin to reset TotpSecret via /api/admin/users/{id}/reset-2fa.
+    private const int EnableTotpMaxFails = 5;
+    private static readonly TimeSpan EnableTotpLockoutWindow = TimeSpan.FromMinutes(15);
+
     [Authorize]
     [HttpPost("enable-2fa/confirm")]
     public async Task<IActionResult> Enable2faConfirm([FromBody] EnableDto dto, CancellationToken ct)
@@ -557,11 +570,38 @@ public sealed class AuthController : ControllerBase
         var user = await _db.Users.FindAsync(new object[] { userId.Value }, ct);
         if (user is null || user.TotpSecret is null) return BadRequest(new { error = "not_generated" });
 
+        var cache = HttpContext?.RequestServices?.GetService<IMemoryCache>();
+        var cacheKey = $"2fa-confirm-fails:{userId.Value}";
+        if (cache is not null && cache.TryGetValue<int>(cacheKey, out var failCount) && failCount >= EnableTotpMaxFails)
+            return StatusCode(429, new { error = "too_many_attempts" });
+
         var plaintext = _totpEnc.Decrypt(user.TotpSecret);
         if (!TotpService.ValidateCode(plaintext, dto.Code))
+        {
+            if (cache is not null)
+            {
+                var next = (cache.TryGetValue<int>(cacheKey, out var current) ? current : 0) + 1;
+                cache.Set(cacheKey, next, EnableTotpLockoutWindow);
+            }
             return BadRequest(new { error = "invalid_code" });
+        }
 
         user.TotpEnabled = true;
+        cache?.Remove(cacheKey);
+
+        // Blacklist the scope-limited JWT that invoked this endpoint so the
+        // remaining ~15-minute lifetime cannot be replayed against
+        // /api/auth/enable-2fa/* or /logout after the flow completes.
+        var currentJti = User.GetJti();
+        if (!string.IsNullOrEmpty(currentJti))
+        {
+            _db.RevokedTokens.Add(new RevokedToken
+            {
+                Jti = currentJti,
+                UserId = user.Id,
+                RevokeReason = "2fa_setup_complete",
+            });
+        }
         await _db.SaveChangesAsync(ct);
 
         // Issue a fresh non-scope-limited token.

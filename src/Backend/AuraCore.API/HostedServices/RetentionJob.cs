@@ -63,24 +63,42 @@ public sealed class RetentionJob : BackgroundService
     public static async Task SweepAsync(AuraCoreDbContext db, ILogger logger, CancellationToken ct = default)
     {
         var now = DateTimeOffset.UtcNow;
-
         var tokenCutoff = now - RevokedTokenRetention;
-        var oldTokens = await db.RevokedTokens
-            .Where(r => r.RevokedAt < tokenCutoff)
-            .ToListAsync(ct);
-        db.RevokedTokens.RemoveRange(oldTokens);
-        var tokensDeleted = oldTokens.Count;
-
         var inviteCutoff = now - ExpiredInvitationRetention;
-        var oldInvites = await db.AdminInvitations
-            .Where(i => i.ExpiresAt < inviteCutoff && i.ConsumedAt == null)
-            .ToListAsync(ct);
-        db.AdminInvitations.RemoveRange(oldInvites);
-        var invitesDeleted = oldInvites.Count;
+        int tokensDeleted, invitesDeleted;
 
-        if (tokensDeleted > 0 || invitesDeleted > 0)
+        if (db.Database.IsRelational())
         {
-            await db.SaveChangesAsync(ct);
+            // Bulk set-based delete on Postgres — avoids loading rows into
+            // memory when revoked_tokens grows to millions after a year of
+            // uptime (every logout / forced signout adds a row).
+            tokensDeleted = await db.RevokedTokens
+                .Where(r => r.RevokedAt < tokenCutoff)
+                .ExecuteDeleteAsync(ct);
+            invitesDeleted = await db.AdminInvitations
+                .Where(i => i.ExpiresAt < inviteCutoff && i.ConsumedAt == null)
+                .ExecuteDeleteAsync(ct);
+        }
+        else
+        {
+            // InMemory provider (used by xUnit tests) does not support
+            // ExecuteDelete — fall back to load-then-RemoveRange.
+            var oldTokens = await db.RevokedTokens
+                .Where(r => r.RevokedAt < tokenCutoff)
+                .ToListAsync(ct);
+            db.RevokedTokens.RemoveRange(oldTokens);
+            tokensDeleted = oldTokens.Count;
+
+            var oldInvites = await db.AdminInvitations
+                .Where(i => i.ExpiresAt < inviteCutoff && i.ConsumedAt == null)
+                .ToListAsync(ct);
+            db.AdminInvitations.RemoveRange(oldInvites);
+            invitesDeleted = oldInvites.Count;
+
+            if (tokensDeleted > 0 || invitesDeleted > 0)
+            {
+                await db.SaveChangesAsync(ct);
+            }
         }
 
         logger.Log(

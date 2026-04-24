@@ -1,3 +1,11 @@
+/*
+Phase 6.11 SignalR event additions (wire listeners via `on('EventName', fn)`):
+
+- PermissionRequested  (superadmin-only group) — { requestId, adminEmail, permissionKey, reason, requestedAt }
+- PermissionApproved   (targeted via Clients.User) — { permissionKey, expiresAt? }
+- PermissionDenied     (targeted) — { permissionKey, reviewNote? }
+- PermissionRevoked    (targeted) — { permissionKey, reason? }
+*/
 import * as signalR from "@microsoft/signalr";
 import { getToken } from "./api";
 const API=process.env.NEXT_PUBLIC_API_URL||"https://api.auracore.pro";

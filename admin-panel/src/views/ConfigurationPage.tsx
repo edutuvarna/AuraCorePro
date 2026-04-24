@@ -25,13 +25,40 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
+import { useRole } from '@/lib/roleContext';
+import { usePermissions } from '@/hooks/usePermissions';
+import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
+import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
 
 export function ConfigurationPage() {
+    const role = useRole();
+    const { has, hasPending } = usePermissions(role);
+    const [reqOpen, setReqOpen] = useState(false);
     const [config, setConfig] = useState<any>(null);
     const [saving, setSaving] = useState(false);
     const [msg, setMsg] = useState('');
 
     useEffect(() => { api.getConfig().then(setConfig); }, []);
+
+    if (role === 'admin' && !has('tab:configuration')) {
+        return (
+            <>
+                <LockedTabPlaceholder
+                    tabName="Configuration"
+                    permissionKey="tab:configuration"
+                    hasPending={hasPending('tab:configuration')}
+                    onRequestStart={() => setReqOpen(true)}
+                />
+                {reqOpen && (
+                    <PermissionRequestDialog
+                        isOpen permissionKey="tab:configuration"
+                        onClose={() => setReqOpen(false)}
+                        onSubmit={async (k, r) => (await api.createPermissionRequest(k, r)).ok}
+                    />
+                )}
+            </>
+        );
+    }
 
     const toggleFlag = async (key: string) => {
         if (!config) return;

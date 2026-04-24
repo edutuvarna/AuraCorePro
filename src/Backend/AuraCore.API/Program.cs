@@ -334,3 +334,9 @@ app.MapGet("/health", async (AuraCoreDbContext db) =>
 });
 
 app.Run();
+
+// Expose Program as a public partial type so WebApplicationFactory<Program>
+// in integration tests can resolve it. Without this, top-level Program is
+// internal-only and the test project would need InternalsVisibleTo gymnastics
+// that don't actually work with generic type parameters.
+public partial class Program { }

@@ -218,6 +218,133 @@ public sealed class AuthController : ControllerBase
         });
     }
 
+    // Phase 6.11.W2.T13: Superadmin-only login.
+    // Stricter than /login: 3 fails / 60 min (vs. /login's 3 / 30 min), always
+    // audit-logs to audit_log (Action='SuperadminLoginAttempt') in addition to
+    // login_attempts, never reveals whether the email exists, and 2FA is
+    // mandatory — a superadmin with totp_enabled=false gets a scope-limited
+    // JWT ('2fa-setup-only', 15 min) so the frontend can redirect to
+    // /enable-2fa. role='superadmin' is enforced; admins trying this endpoint
+    // are rejected with the same 'Invalid credentials' the enumeration attacker
+    // would get for a nonexistent email.
+    [HttpPost("superadmin/login")]
+    public async Task<IActionResult> SuperadminLogin([FromBody] LoginRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            return BadRequest(new { error = "Email and password are required" });
+
+        var email = request.Email.Trim().ToLowerInvariant();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(email,
+            @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+            return BadRequest(new { error = "Invalid email format" });
+
+        var ip = GetClientIp();
+
+        // Stricter rate limit: 3 failed attempts / 60 min (vs. /login's 3 / 30).
+        // Uses the same login_attempts table; scoped to this email with a longer window.
+        var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
+        if (!whitelisted)
+        {
+            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-60);
+            var recent = await _db.LoginAttempts.CountAsync(a =>
+                a.Email == email && !a.Success && a.CreatedAt > cutoff, ct);
+            if (recent >= 3)
+                return StatusCode(429, new { error = "Too many failed attempts. Try again in 60 minutes." });
+        }
+
+        // Resolve the user without revealing whether the email exists — every
+        // failure path below returns the same 'Invalid credentials'. Always
+        // write both a login_attempts row and an audit_log entry.
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+
+        async Task LogAttempt(bool success, Guid? userId = null)
+        {
+            _db.LoginAttempts.Add(new LoginAttempt
+            {
+                Email = email,
+                IpAddress = ip,
+                Success = success,
+            });
+            _db.AuditLogs.Add(new AuditLogEntry
+            {
+                ActorId = userId,
+                ActorEmail = email,
+                Action = "SuperadminLoginAttempt",
+                TargetType = "User",
+                TargetId = userId?.ToString(),
+                AfterData = $"{{\"success\":{(success ? "true" : "false")}}}",
+                IpAddress = ip,
+            });
+            await _db.SaveChangesAsync(ct);
+        }
+
+        if (user is null
+            || user.Role != "superadmin"
+            || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
+            await LogAttempt(false, user?.Id);
+            return Unauthorized(new { error = "Invalid credentials" });
+        }
+
+        if (!user.IsActive)
+        {
+            await LogAttempt(false, user.Id);
+            return Unauthorized(new { error = "account_suspended" });
+        }
+
+        // 2FA is mandatory for superadmin. totp_enabled=false → scope-limited JWT
+        // that only lets the frontend hit /enable-2fa; no refresh token is issued.
+        if (!user.TotpEnabled)
+        {
+            await LogAttempt(true, user.Id);
+            var scopedToken = _auth.GenerateAccessToken(user, scope: "2fa-setup-only", lifetime: TimeSpan.FromMinutes(15));
+            return Ok(new
+            {
+                requiresTwoFactorSetup = true,
+                accessToken = scopedToken,
+                user = new { user.Id, user.Email, user.Role },
+                message = "Superadmin accounts require 2FA. Complete setup to continue."
+            });
+        }
+
+        if (string.IsNullOrEmpty(request.TotpCode))
+        {
+            // Two-step: client re-submits with TotpCode. Don't log yet — the
+            // next call decides success/failure based on the TOTP verdict.
+            return Ok(new
+            {
+                requires2fa = true,
+                message = "Enter your 2FA code from your authenticator app"
+            });
+        }
+
+        var totpPlaintext = _totpEnc.Decrypt(user.TotpSecret!);
+        if (!TotpService.ValidateCode(totpPlaintext, request.TotpCode))
+        {
+            await LogAttempt(false, user.Id);
+            return Unauthorized(new { error = "Invalid 2FA code" });
+        }
+
+        await LogAttempt(true, user.Id);
+
+        var refresh = _auth.GenerateRefreshToken();
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            UserId = user.Id,
+            Token = refresh,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(30),
+        });
+        await _db.SaveChangesAsync(ct);
+
+        var access = _auth.GenerateAccessToken(user);
+        return Ok(new
+        {
+            accessToken = access,
+            refreshToken = refresh,
+            user = new { user.Id, user.Email, user.Role },
+        });
+    }
+
     // Phase 6.10 Task 19: helper to broadcast login outcome to admin dashboard.
     // Called AFTER LogAttemptAsync so the audit_log row is written first.
     // Strategy A: emit only at the 3 LogAttemptAsync sites (success + auth-fail +

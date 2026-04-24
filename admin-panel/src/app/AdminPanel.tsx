@@ -92,16 +92,35 @@ const PAGES: Record<Page, () => JSX.Element> = {
   myPerms: MyPermissionsPage, changePw: ChangePasswordPage, enable2fa: Enable2FAPage, redeemInvite: RedeemInvitationPage,
 };
 
-interface AdminPanelProps { onLogout: () => void; role: UserRole; initialPage?: Page; }
+interface AdminPanelProps { onLogout: () => void; role: UserRole; initialPage?: Page; currentUserEmail?: string; }
 
-export function AdminPanelInner({ onLogout: _onLogout, role, initialPage }: AdminPanelProps) {
+function decodeEmailFromJwt(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const token = localStorage.getItem('aura_token');
+  if (!token) return undefined;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]!));
+    return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+        ?? payload.email
+        ?? undefined;
+  } catch { return undefined; }
+}
+
+export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail }: AdminPanelProps) {
   const [page, setPage] = useState<Page>(initialPage ?? 'dashboard');
   const groups = role === 'superadmin' ? [...ADMIN_NAV_GROUPS, ...SUPERADMIN_EXTRA_GROUPS] : ADMIN_NAV_GROUPS;
   const ActivePage = PAGES[page] ?? DashboardPage;
+  const email = currentUserEmail ?? decodeEmailFromJwt();
   return (
     <RoleContext.Provider value={role}>
       <div className="flex h-screen overflow-hidden">
-        <Sidebar groups={groups} activePage={page} onSelect={(p) => setPage(p as Page)} />
+        <Sidebar
+          groups={groups}
+          activePage={page}
+          onSelect={(p) => setPage(p as Page)}
+          onLogout={onLogout}
+          currentUserEmail={email}
+        />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
         </main>

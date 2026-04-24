@@ -1,6 +1,7 @@
 using AuraCore.API.Application.Interfaces;
 using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Helpers;
 using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
 using AuraCore.API.Infrastructure.Services;
@@ -391,8 +392,100 @@ public sealed class AuthController : ControllerBase
         // Only use RemoteIpAddress - don't trust X-Forwarded-For unless behind known proxy
         return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
+
+    // Phase 6.11.W4.T27: invitation link landing endpoint. The raw token was
+    // emailed to the invitee; here we SHA256-hash it to match the row stored
+    // in admin_invitations. No authentication — anyone holding the raw token
+    // (which is single-use and 24-hour capped) proves ownership of the mailbox.
+    [HttpPost("redeem-invitation")]
+    public async Task<IActionResult> RedeemInvitation([FromBody] RedeemDto dto, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Token) || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.NewPassword))
+            return BadRequest(new { error = "missing_fields" });
+        if (dto.NewPassword.Length < 10)
+            return BadRequest(new { error = "password_too_short" });
+
+        var email = dto.Email.Trim().ToLowerInvariant();
+        var hashBytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(dto.Token));
+        var hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+        var inv = await _db.AdminInvitations.FirstOrDefaultAsync(i => i.TokenHash == hash, ct);
+        if (inv is null) return StatusCode(410, new { error = "invitation_invalid" });
+        if (inv.ConsumedAt != null || inv.ExpiresAt < DateTimeOffset.UtcNow)
+            return StatusCode(410, new { error = "invitation_expired_or_consumed" });
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == inv.AdminUserId && u.Email == email, ct);
+        if (user is null) return BadRequest(new { error = "email_mismatch" });
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        user.PasswordChangedAt = DateTimeOffset.UtcNow;
+        user.ForcePasswordChange = false;
+        user.ForcePasswordChangeBy = null;
+        inv.ConsumedAt = DateTimeOffset.UtcNow;
+        await _db.SaveChangesAsync(ct);
+
+        var access = _auth.GenerateAccessToken(user);
+        var refresh = _auth.GenerateRefreshToken();
+        _db.RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refresh, ExpiresAt = DateTimeOffset.UtcNow.AddDays(30) });
+        await _db.SaveChangesAsync(ct);
+
+        return Ok(new { accessToken = access, refreshToken = refresh, user = new { user.Id, user.Email, user.Role } });
+    }
+
+    // Phase 6.11.W4.T27: in-session password change. Current-password check is
+    // enforced EXCEPT when a force-change deadline was set and has elapsed —
+    // that's the emergency-unlock path so an admin locked out by
+    // ForcePasswordChangeBy can still recover. On success, all refresh tokens
+    // are revoked and the current access token's jti is blacklisted so other
+    // live sessions die immediately.
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePwDto dto, CancellationToken ct)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+        var user = await _db.Users.FindAsync(new object[] { userId.Value }, ct);
+        if (user is null) return Unauthorized();
+
+        if (dto.NewPassword is null || dto.NewPassword.Length < 10)
+            return BadRequest(new { error = "password_too_short" });
+
+        // Current-password verification is required UNLESS ForcePasswordChange is set and the deadline has passed (emergency unlock).
+        var deadlinePassed = user.ForcePasswordChange && user.ForcePasswordChangeBy != null && user.ForcePasswordChangeBy < DateTimeOffset.UtcNow;
+        if (!deadlinePassed)
+        {
+            if (string.IsNullOrEmpty(dto.CurrentPassword) || !BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+                return Unauthorized(new { error = "invalid_current_password" });
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        user.PasswordChangedAt = DateTimeOffset.UtcNow;
+        user.ForcePasswordChange = false;
+        user.ForcePasswordChangeBy = null;
+
+        // Revoke all existing refresh tokens so other sessions die.
+        var refreshes = await _db.RefreshTokens.Where(r => r.UserId == user.Id && !r.IsRevoked).ToListAsync(ct);
+        foreach (var r in refreshes) r.IsRevoked = true;
+        await _db.SaveChangesAsync(ct);
+
+        // Blacklist the current access token via jti so other sessions using this same token also die.
+        var currentJti = User.GetJti();
+        if (!string.IsNullOrEmpty(currentJti))
+        {
+            _db.RevokedTokens.Add(new RevokedToken { Jti = currentJti, UserId = user.Id, RevokeReason = "password_reset" });
+            await _db.SaveChangesAsync(ct);
+        }
+
+        var access = _auth.GenerateAccessToken(user);
+        var refresh = _auth.GenerateRefreshToken();
+        _db.RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refresh, ExpiresAt = DateTimeOffset.UtcNow.AddDays(30) });
+        await _db.SaveChangesAsync(ct);
+        return Ok(new { accessToken = access, refreshToken = refresh });
+    }
 }
 
 public sealed record RegisterRequest(string Email, string Password);
 public sealed record LoginRequest(string Email, string Password, string? TotpCode = null);
 public sealed record RefreshRequest(string RefreshToken);
+public sealed record RedeemDto(string Token, string Email, string NewPassword);
+public sealed record ChangePwDto(string? CurrentPassword, string NewPassword);

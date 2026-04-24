@@ -3,6 +3,7 @@ using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -24,7 +25,9 @@ public class TwoFactorEnforcementTests : IClassFixture<WebApplicationFactory<Pro
         _f = f.WithWebHostBuilder(b => b.ConfigureServices(s => {
             var d = s.Single(x => x.ServiceType == typeof(DbContextOptions<AuraCoreDbContext>));
             s.Remove(d);
-            s.AddDbContext<AuraCoreDbContext>(o => o.UseInMemoryDatabase(dbName, dbRoot));
+            s.AddDbContext<AuraCoreDbContext>(o => o
+                .UseInMemoryDatabase(dbName, dbRoot)
+                .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
         }));
     }
 

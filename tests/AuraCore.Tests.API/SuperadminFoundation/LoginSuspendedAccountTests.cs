@@ -4,6 +4,7 @@ using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -30,7 +31,14 @@ public class LoginSuspendedAccountTests : IClassFixture<WebApplicationFactory<Pr
         {
             var dbDesc = s.Single(d => d.ServiceType == typeof(DbContextOptions<AuraCoreDbContext>));
             s.Remove(dbDesc);
-            s.AddDbContext<AuraCoreDbContext>(o => o.UseInMemoryDatabase(dbName, dbRoot));
+            s.AddDbContext<AuraCoreDbContext>(o => o
+                .UseInMemoryDatabase(dbName, dbRoot)
+                // Suppress ManyServiceProvidersCreatedWarning — each xUnit test class
+                // that uses IClassFixture<WebApplicationFactory<Program>> + a per-ctor
+                // WithWebHostBuilder contributes one more IServiceProvider to EF's
+                // cache, and the suite now has enough such classes to trip the >20
+                // threshold. Irrelevant to prod behavior.
+                .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
         }));
     }
 

@@ -47,6 +47,18 @@ builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelist
 builder.Services.AddScoped<AuraCore.API.Services.SuperadminBootstrapService>();
 builder.Services.AddScoped<AuraCore.API.Services.GrandfatherMigrationService>();
 
+// Phase 6.11: transactional email via Resend HTTPS API
+builder.Services.AddHttpClient("resend", client =>
+{
+    client.BaseAddress = new Uri("https://api.resend.com");
+    var apiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY")
+        ?? builder.Configuration["Resend:ApiKey"];
+    if (!string.IsNullOrEmpty(apiKey))
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+});
+builder.Services.AddScoped<AuraCore.API.Application.Services.Email.IEmailService,
+                           AuraCore.API.Infrastructure.Services.Email.ResendEmailService>();
+
 // DataProtection with persistent keyring. Keys directory must be app-user-owned, chmod 600.
 // On prod (Linux) default to /var/www/auracore-api/.dataprotection-keys; allow override via env var.
 // On local dev the path won't exist — fall back to a temp dir so the app still boots.

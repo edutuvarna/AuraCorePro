@@ -5,7 +5,7 @@ import { Layers } from 'lucide-react';
 import { api, setToken } from '@/lib/api';
 import { startConnection, stopConnection } from '@/lib/signalr';
 import { LoginScreen } from '@/components/LoginScreen';
-import { AdminPanelInner } from './AdminPanel';
+import { AdminPanelInner, type Page } from './AdminPanel';
 import type { UserRole } from '@/lib/types';
 
 function decodeRoleFromJwt(token: string | null): UserRole {
@@ -26,6 +26,7 @@ export default function Home() {
   const [authenticated, setAuthenticated] = useState(false);
   const [role, setRole] = useState<UserRole>('admin');
   const [checking, setChecking] = useState(true);
+  const [postLoginView, setPostLoginView] = useState<Page | null>(null);
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('aura_token') : null;
@@ -56,6 +57,10 @@ export default function Home() {
       </div>
     </div>
   );
-  if (!authenticated) return <LoginScreen onLogin={(r) => { setRole(r); setAuthenticated(true); startConnection(); }} />;
-  return <AdminPanelInner role={role} onLogout={handleLogout} />;
+  if (!authenticated) return <LoginScreen onLogin={(r, scope) => {
+    setRole(r); setAuthenticated(true); startConnection();
+    if (scope === '2fa-setup-only') setPostLoginView('enable2fa');
+    else if (scope === 'change-password') setPostLoginView('changePw');
+  }} />;
+  return <AdminPanelInner role={role} onLogout={handleLogout} initialPage={postLoginView ?? 'dashboard'} />;
 }

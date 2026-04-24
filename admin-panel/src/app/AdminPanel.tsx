@@ -89,10 +89,10 @@ const PAGES: Record<Page, () => JSX.Element> = {
   myPerms: MyPermissionsPage, changePw: ChangePasswordPage, enable2fa: Enable2FAPage, redeemInvite: RedeemInvitationPage,
 };
 
-interface AdminPanelProps { onLogout: () => void; role: UserRole; }
+interface AdminPanelProps { onLogout: () => void; role: UserRole; initialPage?: Page; }
 
-export function AdminPanelInner({ onLogout: _onLogout, role }: AdminPanelProps) {
-  const [page, setPage] = useState<Page>('dashboard');
+export function AdminPanelInner({ onLogout: _onLogout, role, initialPage }: AdminPanelProps) {
+  const [page, setPage] = useState<Page>(initialPage ?? 'dashboard');
   const groups = role === 'superadmin' ? [...ADMIN_NAV_GROUPS, ...SUPERADMIN_EXTRA_GROUPS] : ADMIN_NAV_GROUPS;
   const ActivePage = PAGES[page] ?? DashboardPage;
   return (

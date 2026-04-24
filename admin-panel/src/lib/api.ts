@@ -25,10 +25,10 @@ async function request(path: string, options: RequestInit = {}) {
 
 export const api = {
   // Auth
-  async login(email: string, password: string) {
+  async login(email: string, password: string, totpCode?: string) {
     try {
       const res = await request('/api/auth/login', {
-        method: 'POST', body: JSON.stringify({ email, password })
+        method: 'POST', body: JSON.stringify({ email, password, totpCode })
       });
       const data = await res.json();
       if (res.ok && data.accessToken) {

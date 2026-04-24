@@ -207,6 +207,31 @@ public sealed class AuthController : ControllerBase
             }
         }
 
+        // Phase 6.11.W5.T35: 2FA enforcement ladder.
+        // requires_2fa = (role==superadmin) OR system_settings['require_2fa_for_all_admins']=true
+        //                OR user.Require2fa. If true AND TotpEnabled=false, issue a scope-limited
+        // ('2fa-setup-only', 15 min) JWT so the frontend can redirect to /enable-2fa.
+        if (user is not null && (user.Role == "admin" || user.Role == "superadmin"))
+        {
+            var globalOn = await _db.SystemSettings
+                .Where(s => s.Key == "require_2fa_for_all_admins")
+                .Select(s => s.Value).FirstOrDefaultAsync(ct);
+            var globalBool = string.Equals(globalOn, "true", StringComparison.OrdinalIgnoreCase);
+            var requires2fa = user.Role == "superadmin" || globalBool || user.Require2fa;
+            if (requires2fa && !user.TotpEnabled)
+            {
+                await LogAttemptAsync(true);
+                await EmitLoginAsync(email, success: true, ip);
+                var scoped = _auth.GenerateAccessToken(user, scope: "2fa-setup-only", lifetime: TimeSpan.FromMinutes(15));
+                return Ok(new
+                {
+                    requiresTwoFactorSetup = true,
+                    accessToken = scoped,
+                    user = new { user.Id, user.Email, user.Role },
+                });
+            }
+        }
+
         // Password OK + (TOTP OK or not required).
         await LogAttemptAsync(true);
         await EmitLoginAsync(email, success: true, ip);
@@ -498,6 +523,56 @@ public sealed class AuthController : ControllerBase
         }
         return Ok(new { ok = true });
     }
+
+    // Phase 6.11.W5.T35: /enable-2fa/generate issues a fresh TOTP secret, encrypts
+    // and stores it, and returns the otpauth:// URI for QR-code display. Accepts
+    // scope-limited ('2fa-setup-only') tokens via T33's allow-list.
+    [Authorize]
+    [HttpPost("enable-2fa/generate")]
+    public async Task<IActionResult> Enable2faGenerate(CancellationToken ct)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+        var user = await _db.Users.FindAsync(new object[] { userId.Value }, ct);
+        if (user is null) return Unauthorized();
+        if (user.TotpEnabled) return BadRequest(new { error = "already_enabled" });
+
+        var secret = TotpService.GenerateSecret();
+        user.TotpSecret = _totpEnc.Encrypt(secret);
+        await _db.SaveChangesAsync(ct);
+
+        var uri = TotpService.GetQrUri(secret, user.Email, "AuraCore Pro");
+        return Ok(new { secret, uri });
+    }
+
+    // Phase 6.11.W5.T35: /enable-2fa/confirm validates the TOTP code, flips
+    // TotpEnabled=true, and returns a fresh non-scope-limited JWT + refresh token
+    // so the frontend can leave the scope-limited setup state.
+    [Authorize]
+    [HttpPost("enable-2fa/confirm")]
+    public async Task<IActionResult> Enable2faConfirm([FromBody] EnableDto dto, CancellationToken ct)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+        var user = await _db.Users.FindAsync(new object[] { userId.Value }, ct);
+        if (user is null || user.TotpSecret is null) return BadRequest(new { error = "not_generated" });
+
+        var plaintext = _totpEnc.Decrypt(user.TotpSecret);
+        if (!TotpService.ValidateCode(plaintext, dto.Code))
+            return BadRequest(new { error = "invalid_code" });
+
+        user.TotpEnabled = true;
+        await _db.SaveChangesAsync(ct);
+
+        // Issue a fresh non-scope-limited token.
+        var access = _auth.GenerateAccessToken(user);
+        var refresh = _auth.GenerateRefreshToken();
+        _db.RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refresh, ExpiresAt = DateTimeOffset.UtcNow.AddDays(30) });
+        await _db.SaveChangesAsync(ct);
+        return Ok(new { accessToken = access, refreshToken = refresh, user = new { user.Id, user.Email, user.Role } });
+    }
+
+    public sealed record EnableDto(string Code);
 }
 
 public sealed record RegisterRequest(string Email, string Password);

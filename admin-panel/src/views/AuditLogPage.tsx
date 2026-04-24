@@ -109,9 +109,15 @@ export function AuditLogPage() {
                 <button onClick={load} className="btn-ghost flex items-center gap-2">
                     <RefreshCw className="w-4 h-4" />Refresh
                 </button>
-                <a href={api.exportAuditLogCsvUrl()} className="btn-primary inline-flex items-center gap-2" download>
+                <button
+                    onClick={async () => {
+                        const r = await api.downloadAuditLogCsv();
+                        if (!r.ok) alert(`Export failed (${r.status ?? 'network'}). Please reload the page and try again.`);
+                    }}
+                    className="btn-primary inline-flex items-center gap-2"
+                >
                     <Download className="w-4 h-4" />Export CSV
-                </a>
+                </button>
             </PageHeader>
 
             {stats && (

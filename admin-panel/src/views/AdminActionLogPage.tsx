@@ -21,9 +21,15 @@ export function AdminActionLogPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold flex items-center gap-2"><FileText className="w-6 h-6" />Admin Action Log</h1>
-        <a href={api.exportAdminActionLogCsvUrl(filters)} className="btn-primary inline-flex items-center gap-2" download>
+        <button
+          onClick={async () => {
+            const r = await api.downloadAdminActionLogCsv(filters);
+            if (!r.ok) alert(`Export failed (${r.status ?? 'network'}). Please reload the page and try again.`);
+          }}
+          className="btn-primary inline-flex items-center gap-2"
+        >
           <Download className="w-4 h-4" />Export CSV
-        </a>
+        </button>
       </div>
       {stats && (
         <div className="grid grid-cols-3 gap-3">

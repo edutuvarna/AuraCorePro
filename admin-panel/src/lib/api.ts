@@ -5,6 +5,18 @@ let token: string | null = null;
 export function setToken(t: string | null) { token = t; }
 export function getToken() { return token; }
 
+function triggerBlobDownload(blob: Blob, filename: string) {
+  if (typeof window === 'undefined') return;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -586,16 +598,29 @@ export const api = {
     return res.ok ? await res.json() : null;
   },
 
-  exportAuditLogCsvUrl(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
+  // Phase 6.11 post-deploy fix: JWT auth lives in the Authorization header, not
+  // a cookie, so plain <a href={url} download> navigates without the Bearer token
+  // and gets a 401 "This page isn't working" error page. Fetch the CSV through
+  // request() (which injects the header) and trigger a programmatic blob
+  // download instead.
+  async downloadAuditLogCsv(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
     const qs = new URLSearchParams();
     Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
-    return `${API}/api/admin/audit-log/export.csv?${qs}`;
+    const res = await request(`/api/admin/audit-log/export.csv?${qs}`);
+    if (!res.ok) return { ok: false, status: res.status };
+    const blob = await res.blob();
+    triggerBlobDownload(blob, `audit-log-${new Date().toISOString().slice(0, 10)}.csv`);
+    return { ok: true };
   },
 
-  exportAdminActionLogCsvUrl(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
+  async downloadAdminActionLogCsv(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
     const qs = new URLSearchParams();
     Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
-    return `${API}/api/superadmin/admin-actions/export.csv?${qs}`;
+    const res = await request(`/api/superadmin/admin-actions/export.csv?${qs}`);
+    if (!res.ok) return { ok: false, status: res.status };
+    const blob = await res.blob();
+    triggerBlobDownload(blob, `admin-actions-${new Date().toISOString().slice(0, 10)}.csv`);
+    return { ok: true };
   },
 
   async listInvitations() {

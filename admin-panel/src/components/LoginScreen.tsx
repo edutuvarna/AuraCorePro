@@ -72,22 +72,58 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           <p className="text-white/40 text-sm mt-1">Administration Console</p>
         </div>
 
-        <form onSubmit={e => { e.preventDefault(); submit('admin'); }} className="glass-card p-8 space-y-5">
+        <form
+          name="signin"
+          method="post"
+          onSubmit={e => { e.preventDefault(); submit('admin'); }}
+          className="glass-card p-8 space-y-5"
+        >
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Email</label>
-            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-              className="input-dark w-full" placeholder="admin@auracore.pro" required />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="username"
+              inputMode="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="input-dark w-full"
+              placeholder="admin@auracore.pro"
+              required
+            />
           </div>
           <div>
             <label htmlFor="password" className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Password</label>
-            <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)}
-              className="input-dark w-full" placeholder="Enter password" required />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="input-dark w-full"
+              placeholder="Enter password"
+              required
+            />
           </div>
           {needs2fa && (
             <div className="animate-fade-in">
               <label htmlFor="totp" className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">2FA Code</label>
-              <input id="totp" type="text" value={totpCode} onChange={e => setTotpCode(e.target.value)}
-                className="input-dark w-full text-center tracking-[0.5em] text-lg" placeholder="000000" maxLength={6} autoFocus />
+              <input
+                id="totp"
+                name="totp"
+                type="text"
+                autoComplete="one-time-code"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={totpCode}
+                onChange={e => setTotpCode(e.target.value)}
+                className="input-dark w-full text-center tracking-[0.5em] text-lg"
+                placeholder="000000"
+                maxLength={6}
+                autoFocus
+              />
             </div>
           )}
           {error && (

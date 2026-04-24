@@ -330,6 +330,7 @@ app.UseAuthorization();
 // Other Phase 6.11 middlewares (ScopeLimitedTokenMiddleware, ForcePasswordChangeMiddleware)
 // are added in Wave 5 immediately after this line.
 app.UseMiddleware<AuraCore.API.Middleware.TokenRevocationMiddleware>();
+app.UseMiddleware<AuraCore.API.Middleware.ScopeLimitedTokenMiddleware>();
 
 app.MapControllers();
 app.MapHub<AuraCore.API.Hubs.AdminHub>("/hubs/admin");

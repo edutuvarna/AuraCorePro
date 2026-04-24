@@ -597,6 +597,21 @@ export const api = {
     Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
     return `${API}/api/superadmin/admin-actions/export.csv?${qs}`;
   },
+
+  async listInvitations() {
+    const res = await request('/api/superadmin/invitations');
+    return res.ok ? await res.json() : { items: [] };
+  },
+
+  async revokeInvitation(tokenHash: string) {
+    const res = await request(`/api/superadmin/invitations/${tokenHash}`, { method: 'DELETE' });
+    return { ok: res.ok };
+  },
+
+  async resendInvitation(tokenHash: string) {
+    const res = await request(`/api/superadmin/invitations/${tokenHash}/resend`, { method: 'POST' });
+    return { ok: res.ok };
+  },
 };
 
 async function safeJson(res: Response) {

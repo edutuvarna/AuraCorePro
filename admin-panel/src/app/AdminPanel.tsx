@@ -14,7 +14,7 @@ import { useState } from 'react';
 import {
   LayoutDashboard, Users, CreditCard, Shield, Crown, Zap, ShieldCheck, Monitor,
   BarChart2, Settings2, Key, Bug, FileText,
-  Inbox, UserCog, ArrowRightLeft, Lock, Gauge,
+  Inbox, UserCog, ArrowRightLeft, Lock, Gauge, Mail,
 } from 'lucide-react';
 import { Sidebar, NavGroup } from '@/components/Sidebar';
 
@@ -34,6 +34,7 @@ import { SecurityPage } from '@/views/SecurityPage';
 import { PermissionRequestsPage } from '@/views/PermissionRequestsPage';
 import { AdminActionLogPage } from '@/views/AdminActionLogPage';
 import { AdminManagementPage } from '@/views/AdminManagementPage';
+import { InvitationsPage } from '@/views/InvitationsPage';
 import { RoleChangePage } from '@/views/RoleChangePage';
 import { SecurityPolicyPage } from '@/views/SecurityPolicyPage';
 import { APIRateLimitsPage } from '@/views/APIRateLimitsPage';
@@ -48,7 +49,7 @@ import { RoleContext } from '@/lib/roleContext';
 export type Page =
   'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security'|
   // superadmin-only
-  'permReq'|'adminActionLog'|'adminMgmt'|'roleChange'|'securityPolicy'|'rateLimits'|
+  'permReq'|'adminActionLog'|'adminMgmt'|'invitations'|'roleChange'|'securityPolicy'|'rateLimits'|
   // cross-role
   'myPerms'|'changePw'|'enable2fa'|'redeemInvite';
 
@@ -74,6 +75,7 @@ export const SUPERADMIN_EXTRA_GROUPS: NavGroup[] = [
     { id: 'permReq', icon: Inbox, label: 'Permission Requests' },
     { id: 'adminActionLog', icon: FileText, label: 'Admin Action Log' },
     { id: 'adminMgmt', icon: UserCog, label: 'Admin Management' },
+    { id: 'invitations', icon: Mail, label: 'Invitations' },
     { id: 'roleChange', icon: ArrowRightLeft, label: 'Role Change' },
     { id: 'securityPolicy', icon: Lock, label: 'Security Policy' },
     { id: 'rateLimits', icon: Gauge, label: 'API Rate Limits' },
@@ -86,7 +88,7 @@ const PAGES: Record<Page, () => JSX.Element> = {
   telemetry: TelemetryPage, audit: AuditLogPage, whitelist: IpWhitelistPage, config: ConfigurationPage,
   security: SecurityPage,
   permReq: PermissionRequestsPage, adminActionLog: AdminActionLogPage, adminMgmt: AdminManagementPage,
-  roleChange: RoleChangePage, securityPolicy: SecurityPolicyPage, rateLimits: APIRateLimitsPage,
+  invitations: InvitationsPage, roleChange: RoleChangePage, securityPolicy: SecurityPolicyPage, rateLimits: APIRateLimitsPage,
   myPerms: MyPermissionsPage, changePw: ChangePasswordPage, enable2fa: Enable2FAPage, redeemInvite: RedeemInvitationPage,
 };
 

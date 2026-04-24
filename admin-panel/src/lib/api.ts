@@ -382,4 +382,213 @@ export const api = {
       return res.ok ? await res.json() : null;
     } catch { return null; }
   },
+
+  // ── Phase 6.11 ───────────────────────────────────────
+
+  async superadminLogin(email: string, password: string, totpCode?: string) {
+    const res = await request('/api/auth/superadmin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, totpCode }),
+    });
+    const data = await res.json();
+    if (res.ok && data.accessToken) {
+      token = data.accessToken;
+      if (typeof window !== 'undefined') localStorage.setItem('aura_token', data.accessToken);
+    }
+    return { ok: res.ok, data };
+  },
+
+  async getMyPermissions() {
+    const res = await request('/api/admin/my-permissions');
+    return res.ok ? await res.json() : null;
+  },
+
+  async createPermissionRequest(permissionKey: string, reason: string) {
+    const res = await request('/api/admin/permission-requests', {
+      method: 'POST',
+      body: JSON.stringify({ permissionKey, reason }),
+    });
+    return { ok: res.ok, status: res.status, data: res.ok ? await res.json() : await safeJson(res) };
+  },
+
+  async listMyPermissionRequests() {
+    const res = await request('/api/admin/permission-requests');
+    return res.ok ? await res.json() : { items: [] };
+  },
+
+  async cancelPermissionRequest(id: string) {
+    const res = await request(`/api/admin/permission-requests/${id}/cancel`, { method: 'POST' });
+    return { ok: res.ok };
+  },
+
+  // Superadmin-only
+  async listPermissionRequests(status = 'pending') {
+    const res = await request(`/api/superadmin/permission-requests?status=${status}`);
+    return res.ok ? await res.json() : { items: [] };
+  },
+
+  async approvePermissionRequest(id: string, expiresAt?: string | null, reviewNote?: string) {
+    const res = await request(`/api/superadmin/permission-requests/${id}/approve`, {
+      method: 'POST', body: JSON.stringify({ expiresAt, reviewNote }),
+    });
+    return { ok: res.ok };
+  },
+
+  async denyPermissionRequest(id: string, reviewNote?: string) {
+    const res = await request(`/api/superadmin/permission-requests/${id}/deny`, {
+      method: 'POST', body: JSON.stringify({ reviewNote }),
+    });
+    return { ok: res.ok };
+  },
+
+  async bulkApprovePermissionRequests(ids: string[]) {
+    const res = await request('/api/superadmin/permission-requests/bulk/approve', {
+      method: 'POST', body: JSON.stringify({ ids }),
+    });
+    return { ok: res.ok };
+  },
+
+  async bulkDenyPermissionRequests(ids: string[]) {
+    const res = await request('/api/superadmin/permission-requests/bulk/deny', {
+      method: 'POST', body: JSON.stringify({ ids }),
+    });
+    return { ok: res.ok };
+  },
+
+  async revokePermissionGrant(adminUserId: string, permissionKey: string, reason: string) {
+    const res = await request('/api/superadmin/permission-grants/revoke', {
+      method: 'POST', body: JSON.stringify({ adminUserId, permissionKey, reason }),
+    });
+    return { ok: res.ok };
+  },
+
+  async listAdminAccounts() {
+    const res = await request('/api/superadmin/admins');
+    return res.ok ? await res.json() : { items: [] };
+  },
+
+  async createAdminAccount(body: {
+    email: string;
+    sendInvitation: boolean;
+    initialPassword?: string;
+    forcePasswordChange: 'on_first_login' | 'within_7_days' | 'within_30_days' | 'never';
+    template: 'Default' | 'Trusted' | 'ReadOnly' | 'Custom';
+    customKeys?: { permissionKey: string; expiresAt?: string | null }[];
+    require2fa: boolean;
+  }) {
+    const res = await request('/api/superadmin/admins', {
+      method: 'POST', body: JSON.stringify(body),
+    });
+    return { ok: res.ok, data: res.ok ? await res.json() : await safeJson(res) };
+  },
+
+  async promoteUserToAdmin(userId: string, body: {
+    template: 'Default' | 'Trusted' | 'ReadOnly' | 'Custom';
+    forcePasswordChange: 'on_first_login' | 'within_7_days' | 'within_30_days' | 'never';
+    require2fa: boolean;
+    customKeys?: { permissionKey: string; expiresAt?: string | null }[];
+  }) {
+    const res = await request(`/api/superadmin/users/${userId}/promote`, {
+      method: 'POST', body: JSON.stringify(body),
+    });
+    return { ok: res.ok };
+  },
+
+  async demoteAdminToUser(adminId: string) {
+    const res = await request(`/api/superadmin/admins/${adminId}/demote`, { method: 'POST' });
+    return { ok: res.ok };
+  },
+
+  async suspendAdmin(adminId: string) {
+    const res = await request(`/api/superadmin/admins/${adminId}/suspend`, { method: 'POST' });
+    return { ok: res.ok };
+  },
+
+  async restoreAdmin(adminId: string) {
+    const res = await request(`/api/superadmin/admins/${adminId}/restore`, { method: 'POST' });
+    return { ok: res.ok };
+  },
+
+  async deleteAdmin(adminId: string) {
+    const res = await request(`/api/superadmin/admins/${adminId}`, { method: 'DELETE' });
+    return { ok: res.ok };
+  },
+
+  async resetAdminPassword(adminId: string) {
+    const res = await request(`/api/superadmin/admins/${adminId}/reset-password`, { method: 'POST' });
+    return { ok: res.ok };
+  },
+
+  async changePassword(currentPassword: string, newPassword: string) {
+    const res = await request('/api/auth/change-password', {
+      method: 'POST', body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    return { ok: res.ok, data: await safeJson(res) };
+  },
+
+  async redeemInvitation(token: string, email: string, newPassword: string) {
+    const res = await request('/api/auth/redeem-invitation', {
+      method: 'POST', body: JSON.stringify({ token, email, newPassword }),
+    });
+    return { ok: res.ok, data: await safeJson(res) };
+  },
+
+  async getSecurityPolicy() {
+    const res = await request('/api/superadmin/security-policy');
+    return res.ok ? await res.json() : null;
+  },
+
+  async updateSecurityPolicy(require2faForAllAdmins: boolean) {
+    const res = await request('/api/superadmin/security-policy', {
+      method: 'PUT', body: JSON.stringify({ require2faForAllAdmins }),
+    });
+    return { ok: res.ok };
+  },
+
+  async setAdminRequire2fa(adminId: string, require2fa: boolean) {
+    const res = await request(`/api/superadmin/admins/${adminId}/require-2fa`, {
+      method: 'PUT', body: JSON.stringify({ require2fa }),
+    });
+    return { ok: res.ok };
+  },
+
+  async getRateLimitPolicies() {
+    const res = await request('/api/superadmin/rate-limits');
+    return res.ok ? await res.json() : { items: [] };
+  },
+
+  async updateRateLimitPolicy(endpoint: string, requests: number, windowSeconds: number) {
+    const res = await request(`/api/superadmin/rate-limits/${encodeURIComponent(endpoint)}`, {
+      method: 'PUT', body: JSON.stringify({ requests, windowSeconds }),
+    });
+    return { ok: res.ok };
+  },
+
+  async listAdminActionLog(params: { actorEmail?: string; action?: string; dateFrom?: string; dateTo?: string; page?: number; pageSize?: number } = {}) {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
+    const res = await request(`/api/superadmin/admin-actions?${qs}`);
+    return res.ok ? await res.json() : { items: [], total: 0 };
+  },
+
+  async getAdminActionStats() {
+    const res = await request('/api/superadmin/admin-actions/stats');
+    return res.ok ? await res.json() : null;
+  },
+
+  exportAuditLogCsvUrl(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
+    return `${API}/api/admin/audit-log/export.csv?${qs}`;
+  },
+
+  exportAdminActionLogCsvUrl(params: { dateFrom?: string; dateTo?: string; actorEmail?: string; action?: string } = {}) {
+    const qs = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => v != null && qs.append(k, String(v)));
+    return `${API}/api/superadmin/admin-actions/export.csv?${qs}`;
+  },
 };
+
+async function safeJson(res: Response) {
+  try { return await res.json(); } catch { return {}; }
+}

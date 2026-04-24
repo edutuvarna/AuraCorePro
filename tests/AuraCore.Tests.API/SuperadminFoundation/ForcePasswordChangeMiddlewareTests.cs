@@ -80,4 +80,25 @@ public class ForcePasswordChangeMiddlewareTests
         await mw.InvokeAsync(ctx, db);
         Assert.True(called);
     }
+
+    [Fact]
+    public async Task Passes_through_when_deadline_is_in_the_future()
+    {
+        var db = BuildDb();
+        var uid = Guid.NewGuid();
+        db.Users.Add(new User {
+            Id = uid, Email = "a@x.com", PasswordHash = "x", Role = "admin",
+            ForcePasswordChange = true,
+            ForcePasswordChangeBy = DateTimeOffset.UtcNow.AddHours(1),
+        });
+        await db.SaveChangesAsync();
+
+        var ctx = BuildCtx(db, uid, "/api/admin/users");
+        var called = false;
+        var mw = new ForcePasswordChangeMiddleware(_ => { called = true; return Task.CompletedTask; });
+        await mw.InvokeAsync(ctx, db);
+
+        Assert.True(called);
+        Assert.NotEqual(403, ctx.Response.StatusCode);
+    }
 }

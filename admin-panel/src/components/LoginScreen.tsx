@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { Shield, AlertCircle, RefreshCw, Lock } from 'lucide-react';
 import { api, setToken } from '@/lib/api';
+import type { UserRole } from '@/lib/types';
 
 export interface LoginScreenProps {
-    onLogin: () => void;
+    onLogin: (role: UserRole) => void;
 }
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
@@ -30,7 +31,8 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             if (res.ok && result.accessToken) {
                 setToken(result.accessToken);
                 localStorage.setItem('aura_token', result.accessToken);
-                if (result.user?.role === 'admin') { onLogin(); return; }
+                const role2fa: UserRole | undefined = result.user?.role;
+                if (role2fa === 'admin' || role2fa === 'superadmin') { onLogin(role2fa); return; }
                 setError('Access denied. Admin role required.'); setToken(null); return;
             }
             setError(result.error || '2FA verification failed'); return;
@@ -38,7 +40,8 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         const { ok, data } = await api.login(email, password);
         setLoading(false);
         if (data.requires2fa && !totpCode) { setNeeds2fa(true); return; }
-        if (ok && data.user?.role === 'admin') { onLogin(); }
+        const role: UserRole | undefined = data.user?.role;
+        if (ok && (role === 'admin' || role === 'superadmin')) { onLogin(role); }
         else if (ok) { setError('Access denied. Admin role required.'); setToken(null); }
         else { setError(data.error || 'Authentication failed'); }
     };

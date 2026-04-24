@@ -1,66 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, CreditCard, Shield, Crown, Zap, ShieldCheck, Monitor, BarChart2, Settings2, Key, Bug, Layers, FileText } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { api, setToken } from '@/lib/api';
 import { startConnection, stopConnection } from '@/lib/signalr';
 import { LoginScreen } from '@/components/LoginScreen';
-import { Sidebar, NavGroup } from '@/components/Sidebar';
-import { DashboardPage } from '@/views/DashboardPage';
-import { UsersPage } from '@/views/UsersPage';
-import { SubscriptionsPage } from '@/views/SubscriptionsPage';
-import { LicensesPage } from '@/views/LicensesPage';
-import { PaymentsPage } from '@/views/PaymentsPage';
-import { DevicesPage } from '@/views/DevicesPage';
-import { UpdatesPage } from '@/views/UpdatesPage';
-import { CrashReportsPage } from '@/views/CrashReportsPage';
-import { TelemetryPage } from '@/views/TelemetryPage';
-import { AuditLogPage } from '@/views/AuditLogPage';
-import { IpWhitelistPage } from '@/views/IpWhitelistPage';
-import { ConfigurationPage } from '@/views/ConfigurationPage';
-import { SecurityPage } from '@/views/SecurityPage';
+import { AdminPanelInner } from './AdminPanel';
+import type { UserRole } from '@/lib/types';
 
-type Page = 'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security';
-
-const NAV_GROUPS: NavGroup[] = [
-  { title: 'Overview', items: [{ id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' }] },
-  { title: 'Management', items: [
-    { id: 'users', icon: Users, label: 'Users' }, { id: 'payments', icon: CreditCard, label: 'Payments' },
-    { id: 'subscriptions', icon: Crown, label: 'Subscriptions' }, { id: 'licenses', icon: Key, label: 'Licenses' },
-    { id: 'updates', icon: Zap, label: 'Updates' }, { id: 'devices', icon: Monitor, label: 'Devices' },
-  ] },
-  { title: 'Analytics', items: [
-    { id: 'crashes', icon: Bug, label: 'Crash Reports' }, { id: 'telemetry', icon: BarChart2, label: 'Telemetry' },
-    { id: 'audit', icon: FileText, label: 'Audit Log' },
-  ] },
-  { title: 'System', items: [
-    { id: 'whitelist', icon: Shield, label: 'IP Whitelist' }, { id: 'config', icon: Settings2, label: 'Configuration' },
-    { id: 'security', icon: ShieldCheck, label: 'Security' },
-  ] },
-];
-
-const PAGES: Record<Page, () => JSX.Element> = {
-  dashboard: DashboardPage, users: UsersPage, payments: PaymentsPage, subscriptions: SubscriptionsPage,
-  licenses: LicensesPage, updates: UpdatesPage, devices: DevicesPage, crashes: CrashReportsPage,
-  telemetry: TelemetryPage, audit: AuditLogPage, whitelist: IpWhitelistPage, config: ConfigurationPage,
-  security: SecurityPage,
-};
-
-function AdminPanel({ onLogout: _onLogout }: { onLogout: () => void }) {
-  const [page, setPage] = useState<Page>('dashboard');
-  const ActivePage = PAGES[page] ?? DashboardPage;
-  return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar groups={NAV_GROUPS} activePage={page} onSelect={(p) => setPage(p as Page)} />
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
-      </main>
-    </div>
-  );
+function decodeRoleFromJwt(token: string | null): UserRole {
+  if (!token) return 'admin';
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]!));
+    const roles: string[] = Array.isArray(payload[
+      'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+    ]) ? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+       : [payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']].filter(Boolean);
+    if (roles.includes('superadmin')) return 'superadmin';
+    if (roles.includes('admin')) return 'admin';
+  } catch {}
+  return 'admin';
 }
 
 export default function Home() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [role, setRole] = useState<UserRole>('admin');
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
@@ -68,11 +32,14 @@ export default function Home() {
     if (saved) {
       setToken(saved);
       api.getStats().then(data => {
-        if (data) { setAuthenticated(true); startConnection(); }
-        else { setToken(null); localStorage.removeItem('aura_token'); }
+        if (data) {
+          setAuthenticated(true);
+          setRole(decodeRoleFromJwt(saved));
+          startConnection();
+        } else { setToken(null); localStorage.removeItem('aura_token'); }
         setChecking(false);
       });
-    } else { setChecking(false); }
+    } else setChecking(false);
   }, []);
 
   const handleLogout = () => {
@@ -89,6 +56,6 @@ export default function Home() {
       </div>
     </div>
   );
-  if (!authenticated) return <LoginScreen onLogin={() => { setAuthenticated(true); startConnection(); }} />;
-  return <AdminPanel onLogout={handleLogout} />;
+  if (!authenticated) return <LoginScreen onLogin={(r) => { setRole(r); setAuthenticated(true); startConnection(); }} />;
+  return <AdminPanelInner role={role} onLogout={handleLogout} />;
 }

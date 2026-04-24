@@ -7,7 +7,7 @@ public interface IAuthService
     Task<AuthResult> RegisterAsync(string email, string password, CancellationToken ct = default);
     Task<AuthResult> LoginAsync(string email, string password, CancellationToken ct = default);
     Task<AuthResult> RefreshTokenAsync(string refreshToken, CancellationToken ct = default);
-    string GenerateAccessToken(User user);
+    string GenerateAccessToken(User user, string? scope = null, TimeSpan? lifetime = null);
     string GenerateRefreshToken();
 }
 

@@ -135,7 +135,7 @@ public sealed class AuthService : IAuthService
             User: new UserDto(stored.User.Id, stored.User.Email, stored.User.Role, tier));
     }
 
-    public string GenerateAccessToken(User user)
+    public string GenerateAccessToken(User user, string? scope = null, TimeSpan? lifetime = null)
     {
         var secret = Environment.GetEnvironmentVariable("JWT_SECRET")
             ?? _config["Jwt:Secret"]
@@ -145,19 +145,31 @@ public sealed class AuthService : IAuthService
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role),
-            new Claim("sub", user.Id.ToString())
+            new Claim("sub", user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
         };
+
+        // Phase 6.11: superadmin users also get a 'admin' role claim so existing
+        // [Authorize(Roles = "admin")] guards cover them without controller rewrites.
+        // The authoritative role claim is still the first one (user.Role).
+        if (user.Role == "superadmin")
+            claims.Add(new Claim(ClaimTypes.Role, "admin"));
+
+        if (!string.IsNullOrEmpty(scope))
+            claims.Add(new Claim("scope", scope));
+
+        var expiry = DateTime.UtcNow.Add(lifetime ?? TimeSpan.FromMinutes(15));
 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"] ?? "AuraCorePro",
             audience: _config["Jwt:Audience"] ?? "AuraCorePro",
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: expiry,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
 
         return new JwtSecurityTokenHandler().WriteToken(token);

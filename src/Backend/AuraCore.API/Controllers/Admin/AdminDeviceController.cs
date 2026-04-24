@@ -73,6 +73,7 @@ public sealed class AdminDeviceController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [DestructiveAction]
     [AuditAction("DeleteDevice", "Device", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {

@@ -60,6 +60,7 @@ public sealed class AdminLicenseController : ControllerBase
     }
 
     [HttpPut("{id:guid}/revoke")]
+    [DestructiveAction]
     [AuditAction("RevokeLicense", "License", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Revoke(Guid id, CancellationToken ct)
     {
@@ -73,6 +74,7 @@ public sealed class AdminLicenseController : ControllerBase
     }
 
     [HttpPut("{id:guid}/activate")]
+    [DestructiveAction]
     [AuditAction("ActivateLicense", "License", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Activate(Guid id, [FromBody] ActivateLicenseRequest? req, CancellationToken ct)
     {

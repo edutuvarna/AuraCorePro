@@ -1,5 +1,7 @@
 using System.Net;
 using AuraCore.API.Domain.Entities;
+using AuraCore.API.Filters;
+using AuraCore.API.Helpers;
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +40,7 @@ public sealed class AdminIpWhitelistController : ControllerBase
     }
 
     [HttpPost]
+    [RequiresPermission(PermissionKeys.TabIpWhitelist)]
     [AuraCore.API.Filters.AuditAction("AddIpWhitelist", "IpWhitelist")]
     public async Task<IActionResult> Add([FromBody] AddIpWhitelistRequest req, CancellationToken ct)
     {
@@ -66,6 +69,7 @@ public sealed class AdminIpWhitelistController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [RequiresPermission(PermissionKeys.TabIpWhitelist)]
     [AuraCore.API.Filters.AuditAction("RemoveIpWhitelist", "IpWhitelist", TargetIdFromRouteKey = "id")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {

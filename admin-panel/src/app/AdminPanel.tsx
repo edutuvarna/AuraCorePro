@@ -120,6 +120,7 @@ export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail 
           onSelect={(p) => setPage(p as Page)}
           onLogout={onLogout}
           currentUserEmail={email}
+          onOpenMyPermissions={() => setPage('myPerms')}
         />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>

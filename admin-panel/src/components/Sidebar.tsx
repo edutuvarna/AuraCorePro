@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LucideIcon, LogOut } from 'lucide-react';
+import { LucideIcon, LogOut, Shield } from 'lucide-react';
 import { MobileSheet } from './MobileSheet';
 
 /**
@@ -32,6 +32,8 @@ export interface SidebarProps {
     onLogout?: () => void;
     /** Optional label shown above the logout button (e.g. user's email). */
     currentUserEmail?: string;
+    /** Open the MyPermissions page. When provided, renders a button in desktop footer + mobile more-sheet. */
+    onOpenMyPermissions?: () => void;
 }
 
 export function Sidebar({
@@ -42,6 +44,7 @@ export function Sidebar({
     miniStats = {},
     onLogout,
     currentUserEmail,
+    onOpenMyPermissions,
 }: SidebarProps) {
     const [sheetOpen, setSheetOpen] = useState(false);
     const allItems: NavItem[] = groups.flatMap((g) => g.items);
@@ -85,20 +88,31 @@ export function Sidebar({
                         })}
                     </div>
                 ))}
-                {onLogout && (
+                {(onLogout || onOpenMyPermissions) && (
                     <div className="mt-auto pt-3 border-t border-white/[0.05]">
                         {currentUserEmail && (
                             <div className="px-2.5 pb-2 text-[10px] font-mono text-white/35 truncate" title={currentUserEmail}>
                                 {currentUserEmail}
                             </div>
                         )}
-                        <button
-                            onClick={onLogout}
-                            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-mono text-left text-white/55 hover:bg-red-500/[0.08] hover:text-red-400 border border-transparent hover:border-red-500/20 transition-colors"
-                        >
-                            <LogOut className="w-3.5 h-3.5 opacity-80" />
-                            <span>Sign out</span>
-                        </button>
+                        {onOpenMyPermissions && (
+                            <button
+                                onClick={onOpenMyPermissions}
+                                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-mono text-left text-white/55 hover:bg-white/[0.05] hover:text-white/90 border border-transparent transition-colors"
+                            >
+                                <Shield className="w-3.5 h-3.5 opacity-80" />
+                                <span>My Permissions</span>
+                            </button>
+                        )}
+                        {onLogout && (
+                            <button
+                                onClick={onLogout}
+                                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-mono text-left text-white/55 hover:bg-red-500/[0.08] hover:text-red-400 border border-transparent hover:border-red-500/20 transition-colors"
+                            >
+                                <LogOut className="w-3.5 h-3.5 opacity-80" />
+                                <span>Sign out</span>
+                            </button>
+                        )}
                     </div>
                 )}
             </aside>
@@ -167,6 +181,17 @@ export function Sidebar({
                             </button>
                         );
                     })}
+                    {onOpenMyPermissions && (
+                        <button
+                            onClick={() => { onOpenMyPermissions(); setSheetOpen(false); }}
+                            className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.03] flex flex-col gap-1.5 min-h-[70px] text-left col-span-2"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-5 h-5 rounded text-white/60" />
+                                <span className="text-xs font-mono flex-1 text-white/85">My Permissions</span>
+                            </div>
+                        </button>
+                    )}
                     {onLogout && (
                         <button
                             onClick={() => { onLogout(); setSheetOpen(false); }}

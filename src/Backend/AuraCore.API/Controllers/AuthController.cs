@@ -34,6 +34,15 @@ public sealed class AuthController : ControllerBase
     private static bool CaptchaTolerant =>
         string.Equals(Environment.GetEnvironmentVariable("TURNSTILE_TOLERANT_MODE"), "true", StringComparison.OrdinalIgnoreCase);
 
+    // Phase 6.14 — mobile-client CAPTCHA bypass. The RN companion app can't render
+    // a Turnstile widget without WebView + bridge code that's disproportionate to
+    // MVP scope. Threat model: sideload-only distribution to ~5 admins, 2FA
+    // mandatory, IP rate-limiter unchanged. APK-decompile attack vector (extracting
+    // the secret) is acceptable given the small target population; upgrade path
+    // is real WebView Turnstile or Play Integrity in 6.15+.
+    private static string? MobileClientSecret =>
+        Environment.GetEnvironmentVariable("MOBILE_CLIENT_SECRET");
+
     // Phase 6.12.W5.T7 — precomputed dummy hash for BCrypt timing-attack
     // defense. Work factor MUST match production hashing (verified via the
     // T7 work-factor determination step: no HashPassword call site passes a
@@ -752,6 +761,20 @@ public sealed class AuthController : ControllerBase
     private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct, string? continuationToken = null, string? continuationEmail = null)
     {
         if (!CaptchaEnabled) return null;
+
+        // Phase 6.14 mobile-client bypass. If MOBILE_CLIENT_SECRET is configured AND
+        // the request carries a matching X-Auracore-Mobile-Client header, skip
+        // Turnstile. Threat model + tradeoffs documented above on the
+        // MobileClientSecret property.
+        var mobileSecret = MobileClientSecret;
+        if (!string.IsNullOrEmpty(mobileSecret))
+        {
+            var clientHeader = HttpContext.Request.Headers["X-Auracore-Mobile-Client"].ToString();
+            if (!string.IsNullOrEmpty(clientHeader) && clientHeader == mobileSecret)
+            {
+                return null;
+            }
+        }
 
         // Phase 6.12 polish: 2FA continuation bypass. The first submit (password
         // step) already passed Turnstile; the continuation token (5-min TTL,

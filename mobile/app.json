@@ -18,7 +18,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#08080c"
       },
-      "permissions": ["NOTIFICATIONS"]
+      "permissions": [
+        "NOTIFICATIONS",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -28,6 +32,14 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "77a51287-96ab-4641-8514-38aeabf05f5a"
+      },
+      "mobileClientSecret": "492a54a35f704065cabad30d9906feabea0c6c633e028cef150719a81b5b3f0b"
+    },
+    "owner": "ozgurdeniz"
   }
 }

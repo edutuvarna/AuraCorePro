@@ -5,6 +5,16 @@ const API = (Constants.expoConfig?.extra as any)?.apiUrl
   ?? process.env.EXPO_PUBLIC_API_URL
   ?? 'https://api.auracore.pro';
 
+// Phase 6.14: mobile-client CAPTCHA bypass. Backend's auth endpoints (login,
+// register, redeem-invitation, forgot-password) require Cloudflare Turnstile
+// in strict mode. RN can't render Turnstile without WebView + bridge, so we
+// send a shared secret in this header and the backend's CheckCaptchaAsync
+// short-circuits when MOBILE_CLIENT_SECRET env var matches. See
+// app.json extra.mobileClientSecret + /etc/auracore-api.env on origin.
+const MOBILE_CLIENT_SECRET = (Constants.expoConfig?.extra as any)?.mobileClientSecret
+  ?? process.env.EXPO_PUBLIC_MOBILE_CLIENT_SECRET
+  ?? '';
+
 async function request(path: string, init: RequestInit = {}) {
   const token = await getJwt();
   const headers: Record<string, string> = {
@@ -12,6 +22,7 @@ async function request(path: string, init: RequestInit = {}) {
     ...((init.headers as Record<string, string>) ?? {}),
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (MOBILE_CLIENT_SECRET) headers['X-Auracore-Mobile-Client'] = MOBILE_CLIENT_SECRET;
   const res = await fetch(`${API}${path}`, { ...init, headers });
   return res;
 }

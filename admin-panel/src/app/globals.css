@@ -8,6 +8,12 @@
   color-scheme: dark;
 }
 
+/* Reinforce on form controls — some Chrome+Windows builds ignore the :root
+   hint for native <select> popups unless it's also set on the element. */
+select, option, input, textarea {
+  color-scheme: dark;
+}
+
 @layer base {
   body {
     @apply bg-surface-900 text-white font-body antialiased;

@@ -32,6 +32,12 @@ export function RedeemInvitationPage() {
     setLoading(false);
     if (r.ok && r.data?.accessToken) {
       localStorage.setItem('aura_token', r.data.accessToken);
+      // Phase 6.13.6 followup: redemption mints a fresh admin without a
+      // TotpSecret. The redirect below skips LoginScreen, so the
+      // requiresTwoFactorSetup signal the login endpoint emits never fires
+      // for this user. Stash a flag here so page.tsx can apply the
+      // 2fa-setup-only scope on mount instead of dropping us on dashboard.
+      sessionStorage.setItem('aura_post_redeem_force_2fa', '1');
       setDone(true);
       setTimeout(() => window.location.assign('/'), 1500);
     } else setError(r.data?.error ?? 'Invitation invalid or expired');

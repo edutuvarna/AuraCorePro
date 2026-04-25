@@ -38,6 +38,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // Phase 6.13.6 followup: if we just came from RedeemInvitationPage,
+    // honor the post-redeem 2FA-setup scope before the auth check resolves.
+    // This is read once and cleared so that subsequent loads of the same
+    // session land on dashboard normally.
+    if (typeof window !== 'undefined' && sessionStorage.getItem('aura_post_redeem_force_2fa') === '1') {
+      sessionStorage.removeItem('aura_post_redeem_force_2fa');
+      setPostLoginView('enable2fa');
+      setPostLoginScope('2fa-setup-only');
+    }
     const saved = typeof window !== 'undefined' ? localStorage.getItem('aura_token') : null;
     if (saved) {
       setToken(saved);

@@ -5,6 +5,7 @@ import { Layers } from 'lucide-react';
 import { api, setToken } from '@/lib/api';
 import { startConnection, stopConnection } from '@/lib/signalr';
 import { LoginScreen } from '@/components/LoginScreen';
+import { RedeemInvitationPage } from '@/views/RedeemInvitationPage';
 import { AdminPanelInner, type Page } from './AdminPanel';
 import type { UserRole } from '@/lib/types';
 
@@ -28,6 +29,13 @@ export default function Home() {
   const [checking, setChecking] = useState(true);
   const [postLoginView, setPostLoginView] = useState<Page | null>(null);
   const [postLoginScope, setPostLoginScope] = useState<'normal' | '2fa-setup-only' | 'change-password'>('normal');
+  const [redeemInvite, setRedeemInvite] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/invite')) {
+      setRedeemInvite(true);
+    }
+  }, []);
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('aura_token') : null;
@@ -58,6 +66,12 @@ export default function Home() {
       </div>
     </div>
   );
+  // Phase 6.13.6 — invitation deep-link. Mount RedeemInvitationPage before
+  // LoginScreen so an unauthenticated visitor with the invite hash lands on
+  // the password-set form. RedeemInvitationPage parses its own hash params
+  // and assigns location='/' on success, which clears the hash and triggers
+  // the normal authenticated render path.
+  if (redeemInvite && !authenticated) return <RedeemInvitationPage />;
   if (!authenticated) return <LoginScreen onLogin={(r, scope) => {
     setRole(r); setAuthenticated(true); startConnection();
     if (scope === '2fa-setup-only') { setPostLoginView('enable2fa'); setPostLoginScope('2fa-setup-only'); }

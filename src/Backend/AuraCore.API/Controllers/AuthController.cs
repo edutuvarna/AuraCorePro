@@ -25,6 +25,15 @@ public sealed class AuthController : ControllerBase
     private readonly IHubContext<AdminHub> _hub;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
+    // Phase 6.12.W5.T7 — precomputed dummy hash for BCrypt timing-attack
+    // defense. Work factor MUST match production hashing (verified via the
+    // T7 work-factor determination step: no HashPassword call site passes a
+    // workFactor argument, so BCrypt.Net-Next uses its default of 11). Static
+    // so the BCrypt.HashPassword cost is paid once at app startup, not per
+    // login attempt.
+    private static readonly string _dummyHashWf11 =
+        BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
+
     public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub)
     {
         _auth = auth;
@@ -332,9 +341,15 @@ public sealed class AuthController : ControllerBase
             await _db.SaveChangesAsync(ct);
         }
 
+        // Phase 6.12.W5.T7 — always run BCrypt.Verify against either the real
+        // user's hash or the dummy hash so the response time does not depend
+        // on email existence. Work factor matches new-registration path (11).
+        var hashToVerify = user?.PasswordHash ?? _dummyHashWf11;
+        var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, hashToVerify);
+
         if (user is null
             || user.Role != "superadmin"
-            || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            || !passwordValid)
         {
             await LogAttempt(false, user?.Id);
             return Unauthorized(new { error = "Invalid credentials" });

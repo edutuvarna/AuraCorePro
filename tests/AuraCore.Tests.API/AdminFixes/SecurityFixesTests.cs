@@ -1,5 +1,12 @@
+using System.Security.Claims;
+using AuraCore.API.Controllers.Admin;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -12,6 +19,26 @@ public class SecurityFixesTests
         var options = new DbContextOptionsBuilder<AuraCoreDbContext>()
             .UseInMemoryDatabase($"sec-{Guid.NewGuid()}").Options;
         return new AuraCoreDbContext(options);
+    }
+
+    // ASP.NET Core's ControllerBase.User is HttpContext?.User. Without an
+    // HttpContext, any code that touches User.FindFirst(...) will NRE. The
+    // production filter pipeline guarantees User is set, but unit tests have
+    // to wire it up themselves. This helper attaches a minimal ClaimsPrincipal
+    // (caller "sub" claim only) so the controller's self-delete guard can run.
+    private static AdminUserController BuildController(AuraCoreDbContext db, Guid? callerId = null)
+    {
+        var claims = callerId.HasValue
+            ? new[] { new Claim("sub", callerId.Value.ToString()) }
+            : Array.Empty<Claim>();
+        var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"));
+        return new AdminUserController(db)
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = principal },
+            },
+        };
     }
 
     [Fact]
@@ -139,6 +166,100 @@ public class SecurityFixesTests
         };
         var signature = headers["Stripe-Signature"].ToString();
         Assert.True(string.IsNullOrEmpty(signature));
+    }
+
+    [Fact]
+    public async Task DeleteUser_rejects_admin_target_with_BadRequest()
+    {
+        // Phase 6.13 hotfix: a regular admin holding ActionUsersDelete must not be
+        // able to delete a peer admin via the regular users endpoint. Admin
+        // lifecycle belongs in the superadmin-only AdminManagementController.
+        var db = BuildDb();
+        var adminId = Guid.NewGuid();
+        db.Users.Add(new User { Id = adminId, Email = "peer-admin@test.local", PasswordHash = "x", Role = "admin" });
+        await db.SaveChangesAsync();
+
+        var controller = BuildController(db, callerId: Guid.NewGuid());
+        var result = await controller.DeleteUser(adminId, CancellationToken.None);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+        // The target row must still exist — guard fires before any RemoveRange.
+        Assert.NotNull(await db.Users.FindAsync(adminId));
+    }
+
+    [Fact]
+    public async Task DeleteUser_rejects_superadmin_target_with_BadRequest()
+    {
+        // Same guard applied to superadmin targets — the original report.
+        var db = BuildDb();
+        var superId = Guid.NewGuid();
+        db.Users.Add(new User { Id = superId, Email = "owner@test.local", PasswordHash = "x", Role = "superadmin" });
+        await db.SaveChangesAsync();
+
+        var controller = BuildController(db, callerId: Guid.NewGuid());
+        var result = await controller.DeleteUser(superId, CancellationToken.None);
+
+        Assert.IsType<BadRequestObjectResult>(result);
+        Assert.NotNull(await db.Users.FindAsync(superId));
+    }
+
+    [Fact]
+    public async Task DeleteUser_still_allows_regular_user_target()
+    {
+        // Regression: regular users (Role="user" or null/empty default) MUST still
+        // be deletable through this endpoint — that's its primary purpose.
+        var db = BuildDb();
+        var userId = Guid.NewGuid();
+        db.Users.Add(new User { Id = userId, Email = "regular@test.local", PasswordHash = "x", Role = "user" });
+        await db.SaveChangesAsync();
+
+        var controller = BuildController(db, callerId: Guid.NewGuid());
+        var result = await controller.DeleteUser(userId, CancellationToken.None);
+
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Null(await db.Users.FindAsync(userId));
+    }
+
+    [Fact]
+    public async Task ResetPassword_silently_noops_on_admin_target()
+    {
+        // Phase 6.13 hotfix: ResetPassword cannot be used as an account-takeover
+        // vector against admin/superadmin accounts. The response stays opaque
+        // (matches the email-enumeration protection above) but the password
+        // hash is left untouched.
+        var db = BuildDb();
+        var adminId = Guid.NewGuid();
+        const string originalHash = "ORIGINAL_BCRYPT_HASH_PLACEHOLDER";
+        db.Users.Add(new User { Id = adminId, Email = "peer@test.local", PasswordHash = originalHash, Role = "admin" });
+        await db.SaveChangesAsync();
+
+        var controller = BuildController(db);
+        var result = await controller.ResetPassword(
+            new ResetPasswordRequest { Email = "peer@test.local", NewPassword = "AttackerNewPw123!" },
+            CancellationToken.None);
+
+        Assert.IsType<OkObjectResult>(result);
+        var stored = await db.Users.FindAsync(adminId);
+        Assert.Equal(originalHash, stored!.PasswordHash);  // unchanged — silent no-op
+    }
+
+    [Fact]
+    public async Task ResetPassword_silently_noops_on_superadmin_target()
+    {
+        var db = BuildDb();
+        var superId = Guid.NewGuid();
+        const string originalHash = "ORIGINAL_BCRYPT_HASH_PLACEHOLDER";
+        db.Users.Add(new User { Id = superId, Email = "owner@test.local", PasswordHash = originalHash, Role = "superadmin" });
+        await db.SaveChangesAsync();
+
+        var controller = BuildController(db);
+        var result = await controller.ResetPassword(
+            new ResetPasswordRequest { Email = "owner@test.local", NewPassword = "AttackerNewPw123!" },
+            CancellationToken.None);
+
+        Assert.IsType<OkObjectResult>(result);
+        var stored = await db.Users.FindAsync(superId);
+        Assert.Equal(originalHash, stored!.PasswordHash);
     }
 
     [Fact]

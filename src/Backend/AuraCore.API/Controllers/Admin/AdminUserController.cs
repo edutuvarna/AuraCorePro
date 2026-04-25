@@ -85,6 +85,14 @@ public sealed class AdminUserController : ControllerBase
             return Ok(new { message = "If this email is registered, password has been reset." });
         }
 
+        // Phase 6.13 hotfix: silently no-op on admin/superadmin targets so this
+        // endpoint cannot be used as an account-takeover vector. Admin password
+        // resets must go through the superadmin-gated AdminManagementController
+        // which issues single-use invitation-style tokens. The opaque response
+        // mirrors the email-enumeration protection above.
+        if (user.Role == "admin" || user.Role == "superadmin")
+            return Ok(new { message = "If this email is registered, password has been reset." });
+
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
         user.UpdatedAt = DateTimeOffset.UtcNow;
         await _db.SaveChangesAsync(ct);
@@ -104,6 +112,14 @@ public sealed class AdminUserController : ControllerBase
         var callerId = User.FindFirst("sub")?.Value;
         if (callerId == id.ToString())
             return BadRequest(new { error = "Cannot delete your own account" });
+
+        // Phase 6.13 hotfix: prevent admin/superadmin deletion via this endpoint.
+        // Admin lifecycle (delete/promote/demote) is gated behind the
+        // superadmin-only AdminManagementController. Without this guard, any
+        // admin holding the ActionUsersDelete permission could nuke a peer
+        // admin — or the superadmin — through the regular users API.
+        if (user.Role == "admin" || user.Role == "superadmin")
+            return BadRequest(new { error = "Admin accounts must be removed via the superadmin-only AdminManagement endpoint." });
 
         // Delete related records first (foreign key constraints)
         var refreshTokens = await _db.RefreshTokens.Where(r => r.UserId == id).ToListAsync(ct);

@@ -13,6 +13,13 @@ namespace AuraCore.API.Infrastructure.Services;
 
 public sealed class AuthService : IAuthService
 {
+    // Phase 6.12.W5.T8 — precomputed dummy hash for BCrypt timing-attack
+    // defense. Work factor MUST match production hashing (BCrypt.Net default
+    // is 11; verified in T7 work-factor determination). Static so the
+    // BCrypt.HashPassword cost is paid once at app startup.
+    private static readonly string _dummyHashWf11 =
+        BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
+
     private readonly AuraCoreDbContext _db;
     private readonly IConfiguration _config;
 
@@ -60,10 +67,14 @@ public sealed class AuthService : IAuthService
     public async Task<AuthResult> LoginAsync(string email, string password, CancellationToken ct = default)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email.ToLowerInvariant().Trim(), ct);
-        if (user is null)
-            return new AuthResult(false, Error: "Invalid email or password");
 
-        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        // Phase 6.12.W5.T8 — constant-time email-existence defense. Always run
+        // BCrypt.Verify against either the real or dummy hash so response time
+        // does not depend on whether the email exists.
+        var hashToVerify = user?.PasswordHash ?? _dummyHashWf11;
+        var passwordValid = BCrypt.Net.BCrypt.Verify(password, hashToVerify);
+
+        if (user is null || !passwordValid)
             return new AuthResult(false, Error: "Invalid email or password");
 
         // Fetch active license tier

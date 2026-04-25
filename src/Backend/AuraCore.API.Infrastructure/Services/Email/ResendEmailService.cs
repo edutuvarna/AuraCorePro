@@ -81,7 +81,17 @@ public sealed class ResendEmailService : IEmailService
     {
         var props = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
         foreach (var p in props)
-            template = template.Replace("{{" + p.Name + "}}", p.GetValue(data)?.ToString() ?? "");
+        {
+            var raw = p.GetValue(data)?.ToString() ?? "";
+            // Phase 6.12.W3.T5 — HTML-encode every placeholder value.
+            // Free-text admin inputs (permission-request reason, review note)
+            // flow into HTML email templates and were previously embedded raw.
+            // No current template embeds a placeholder inside a <script> or
+            // url(...) context, so HtmlEncode (which is correct for HTML body
+            // text + most attribute values) suffices.
+            var encoded = System.Net.WebUtility.HtmlEncode(raw);
+            template = template.Replace("{{" + p.Name + "}}", encoded);
+        }
         return template;
     }
 

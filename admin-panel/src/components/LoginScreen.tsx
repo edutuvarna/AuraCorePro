@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Shield, AlertCircle, RefreshCw, Lock, Crown } from 'lucide-react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { api, setToken } from '@/lib/api';
 import type { UserRole } from '@/lib/types';
 
@@ -16,19 +17,44 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState<null | 'admin' | 'superadmin'>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Phase 6.12 polish: continuation token issued by the password-step response
+  // when 2FA is required. Forwarded on the TOTP-step submit so the backend
+  // skips Turnstile verification — single CAPTCHA per login session.
+  const [continuationToken, setContinuationToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
+
+  // Turnstile tokens are single-use + 300s TTL. After any submit attempt
+  // (success OR failure including requires2fa partial), reset the widget so
+  // the next click gets a fresh token instead of replaying the consumed one
+  // (CF returns success=false → backend sees 400 captcha_invalid).
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
 
   const submit = async (mode: 'admin' | 'superadmin') => {
     setLoading(mode); setError('');
     try {
       const { ok, data } = mode === 'admin'
-        ? await api.login(email, password, totpCode || undefined)
-        : await api.superadminLogin(email, password, totpCode || undefined);
+        ? await api.login(email, password, totpCode || undefined, turnstileToken || undefined, continuationToken || undefined)
+        : await api.superadminLogin(email, password, totpCode || undefined, turnstileToken || undefined, continuationToken || undefined);
 
-      if (data?.requires2fa && !totpCode) { setNeeds2fa(true); return; }
+      if (data?.requires2fa && !totpCode) {
+        setNeeds2fa(true);
+        // Phase 6.12 polish: store the continuation token so the next click
+        // can skip Turnstile. DO NOT call resetTurnstile() — the second submit
+        // doesn't use a fresh Turnstile token (it uses the continuation token
+        // instead), and resetting would force the user through another
+        // CAPTCHA challenge for nothing.
+        setContinuationToken(data.twoFactorContinuationToken ?? null);
+        return;
+      }
 
       if (data?.requiresTwoFactorSetup && data.accessToken) {
         setToken(data.accessToken);
         if (typeof window !== 'undefined') localStorage.setItem('aura_token', data.accessToken);
+        setContinuationToken(null);
         onLogin(data.user?.role ?? mode, '2fa-setup-only');
         return;
       }
@@ -36,6 +62,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       if (data?.requiresPasswordChange && data.accessToken) {
         setToken(data.accessToken);
         if (typeof window !== 'undefined') localStorage.setItem('aura_token', data.accessToken);
+        setContinuationToken(null);
         onLogin(data.user?.role ?? mode, 'change-password');
         return;
       }
@@ -47,12 +74,20 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         if (role !== 'admin' && role !== 'superadmin') {
           setError('Access denied. Admin role required.');
           setToken(null);
+          setContinuationToken(null);
+          resetTurnstile();
           return;
         }
+        setContinuationToken(null);
         onLogin(role);
         return;
       }
       setError(data?.error || 'Authentication failed');
+      // Failure on the TOTP step (e.g. wrong code) — the continuation was
+      // single-use and is now consumed server-side. Clear it so the next
+      // attempt falls back to Turnstile.
+      setContinuationToken(null);
+      resetTurnstile();
     } finally { setLoading(null); }
   };
 
@@ -131,12 +166,22 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               <AlertCircle className="w-4 h-4 shrink-0" />{error}
             </div>
           )}
-          <button type="submit" disabled={loading !== null}
+          <div className="flex justify-center">
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setTurnstileToken(null)}
+              onExpire={() => setTurnstileToken(null)}
+              options={{ theme: 'dark' }}
+            />
+          </div>
+          <button type="submit" disabled={loading !== null || (!turnstileToken && !continuationToken)}
             className="btn-primary w-full flex items-center justify-center gap-2">
             {loading === 'admin' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             {loading === 'admin' ? 'Authenticating...' : needs2fa ? 'Verify 2FA' : 'Sign In as Admin'}
           </button>
-          <button type="button" disabled={loading !== null}
+          <button type="button" disabled={loading !== null || (!turnstileToken && !continuationToken)}
             onClick={() => submit('superadmin')}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition
                        bg-gradient-to-r from-accent to-aura-purple text-black hover:opacity-90 disabled:opacity-50">

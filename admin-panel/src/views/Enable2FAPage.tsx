@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.auracore.pro';
 
@@ -44,11 +45,26 @@ export function Enable2FAPage() {
       <h2 className="text-xl font-display font-bold flex items-center gap-2"><ShieldCheck className="w-5 h-5" />Enable two-factor authentication</h2>
       {secret && uri ? (
         <>
-          <p className="text-sm text-white/60">Scan this URI with Google Authenticator / 1Password / Authy, or enter the secret manually.</p>
-          <div className="glass-card p-3 text-xs font-mono break-all">{uri}</div>
+          <p className="text-sm text-white/70">
+            Scan this QR code with Google Authenticator, Authy, Microsoft Authenticator, or 1Password on your phone.
+          </p>
+          <div className="flex justify-center my-4">
+            <div className="bg-white p-3 rounded-lg">
+              <QRCodeSVG value={uri} size={192} level="M" includeMargin={false} />
+            </div>
+          </div>
           <details className="text-xs">
-            <summary className="cursor-pointer text-white/60">Manual secret (click to reveal)</summary>
-            <div className="mt-2 font-mono text-sm">{secret}</div>
+            <summary className="cursor-pointer text-white/60">Can't scan? Use the URI or secret manually</summary>
+            <div className="mt-2 space-y-2">
+              <div>
+                <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">URI (some apps support paste)</div>
+                <div className="glass-card p-2 text-xs font-mono break-all">{uri}</div>
+              </div>
+              <div>
+                <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Secret key (manual entry)</div>
+                <div className="glass-card p-2 text-sm font-mono">{secret}</div>
+              </div>
+            </div>
           </details>
           <input value={code} onChange={e => setCode(e.target.value)} maxLength={6} className="input-dark w-full text-center tracking-[0.5em] text-lg" placeholder="000000" />
           {error && <div className="text-xs text-aura-red">{error}</div>}

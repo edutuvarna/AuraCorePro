@@ -23,15 +23,70 @@ public sealed class AuthController : ControllerBase
     private readonly IWhitelistService _whitelist;
     private readonly ITotpEncryption _totpEnc;
     private readonly IHubContext<AdminHub> _hub;
+    private readonly AuraCore.API.Application.Services.Security.ICaptchaVerifier _captcha;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub)
+    // Phase 6.12.W6.T10 — env-flag-driven CAPTCHA enforcement. Use static
+    // PROPERTIES (not static readonly fields) so each request re-reads the env;
+    // tests can toggle the flags via Environment.SetEnvironmentVariable at runtime.
+    private static bool CaptchaEnabled =>
+        !string.Equals(Environment.GetEnvironmentVariable("CAPTCHA_ENABLED"), "false", StringComparison.OrdinalIgnoreCase);
+    private static bool CaptchaTolerant =>
+        string.Equals(Environment.GetEnvironmentVariable("TURNSTILE_TOLERANT_MODE"), "true", StringComparison.OrdinalIgnoreCase);
+
+    // Phase 6.12.W5.T7 — precomputed dummy hash for BCrypt timing-attack
+    // defense. Work factor MUST match production hashing (verified via the
+    // T7 work-factor determination step: no HashPassword call site passes a
+    // workFactor argument, so BCrypt.Net-Next uses its default of 11). Static
+    // so the BCrypt.HashPassword cost is paid once at app startup, not per
+    // login attempt.
+    private static readonly string _dummyHashWf11 =
+        BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
+
+    // Phase 6.12 polish: 2FA continuation tokens. Issued in Login/SuperadminLogin
+    // when password OK + TOTP missing. Lets the FE skip Turnstile on the second
+    // submit (TOTP entry). Bound to email+IP, single-use, 5-minute TTL.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (string Email, string Ip, DateTimeOffset ExpiresAt)>
+        _twoFactorContinuations = new();
+
+    private const int TwoFactorContinuationMinutes = 5;
+
+    private static void PruneExpiredContinuations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        foreach (var kvp in _twoFactorContinuations)
+        {
+            if (kvp.Value.ExpiresAt < now) _twoFactorContinuations.TryRemove(kvp.Key, out _);
+        }
+    }
+
+    private static string IssueTwoFactorContinuation(string email, string ip)
+    {
+        PruneExpiredContinuations();
+        var token = Guid.NewGuid().ToString("N");
+        _twoFactorContinuations[token] = (email, ip, DateTimeOffset.UtcNow.AddMinutes(TwoFactorContinuationMinutes));
+        return token;
+    }
+
+    private static bool TryConsumeTwoFactorContinuation(string? token, string email, string ip)
+    {
+        if (string.IsNullOrEmpty(token)) return false;
+        if (!_twoFactorContinuations.TryRemove(token, out var entry)) return false;
+        if (entry.ExpiresAt < DateTimeOffset.UtcNow) return false;
+        if (!string.Equals(entry.Email, email, StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.Equals(entry.Ip, ip, StringComparison.Ordinal)) return false;
+        return true;
+    }
+
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub,
+        AuraCore.API.Application.Services.Security.ICaptchaVerifier captcha)
     {
         _auth = auth;
         _db = db;
         _whitelist = whitelist;
         _totpEnc = totpEnc;
         _hub = hub;
+        _captcha = captcha;
     }
 
     [HttpPost("register")]
@@ -62,8 +117,14 @@ public sealed class AuthController : ControllerBase
         if (email.Contains('<') || email.Contains('>') || email.Contains('"') || email.Contains('\''))
             return BadRequest(new { error = "Invalid characters in email" });
 
-        // Rate limit registration: max 3 per IP per hour
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit lookup so a
+        // missing/invalid token costs zero contention on the _regAttempts lock.
+        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        if (captchaFail is not null) return captchaFail;
+
+        // Rate limit registration: max 3 per IP per hour
         lock (_regAttempts)
         {
             // Clean old entries
@@ -138,6 +199,15 @@ public sealed class AuthController : ControllerBase
 
         var ip = GetClientIp();
 
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
+        // so a missing/invalid token costs zero DB work. Phase 6.12 polish:
+        // also accept a 2FA continuation token (issued by an earlier submit
+        // that returned requires2fa) to skip the second Turnstile challenge.
+        var captchaFail = await CheckCaptchaAsync(
+            request.TurnstileToken, ip, ct,
+            request.TwoFactorContinuationToken, email);
+        if (captchaFail is not null) return captchaFail;
+
         // ── Rate Limiting: bypass for whitelisted operational IPs (ip-whitelist.md F-3) ──
         var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
         if (!whitelisted)
@@ -203,9 +273,13 @@ public sealed class AuthController : ControllerBase
                 // Password was correct, but we haven't seen the TOTP code yet. Do not log
                 // an attempt — client must re-submit with TotpCode. The next call will log
                 // either Success=true or Success=false based on the TOTP verdict.
+                // Phase 6.12 polish: issue a 2FA continuation token so the FE can skip
+                // Turnstile on the second submit (TOTP entry).
+                var continuationToken = IssueTwoFactorContinuation(email, ip);
                 return Ok(new
                 {
                     requires2fa = true,
+                    twoFactorContinuationToken = continuationToken,
                     message = "Enter your 2FA code from Google Authenticator"
                 });
             }
@@ -280,16 +354,39 @@ public sealed class AuthController : ControllerBase
 
         var ip = GetClientIp();
 
-        // Stricter rate limit: 3 failed attempts / 60 min (vs. /login's 3 / 30).
-        // Uses the same login_attempts table; scoped to this email with a longer window.
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
+        // so a missing/invalid token costs zero DB work. Phase 6.12 polish:
+        // also accept a 2FA continuation token (issued by an earlier submit
+        // that returned requires2fa) to skip the second Turnstile challenge.
+        var captchaFail = await CheckCaptchaAsync(
+            request.TurnstileToken, ip, ct,
+            request.TwoFactorContinuationToken, email);
+        if (captchaFail is not null) return captchaFail;
+
+        // Phase 6.12.W4.T6 — tiered rate limit:
+        //   layer 1 — 3 fails per email per 60 min (catches password guessing)
+        //   layer 2 — 10 fails per IP per 60 min (catches email rotation)
+        //   layer 3 — 30 fails per IP per 24 h (catches slow-drip distributed)
+        // All three gated behind whitelisted-IP bypass.
         var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
         if (!whitelisted)
         {
-            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-60);
-            var recent = await _db.LoginAttempts.CountAsync(a =>
-                a.Email == email && !a.Success && a.CreatedAt > cutoff, ct);
-            if (recent >= 3)
-                return StatusCode(429, new { error = "Too many failed attempts. Try again in 60 minutes." });
+            var now = DateTimeOffset.UtcNow;
+
+            var emailFails = await _db.LoginAttempts.CountAsync(a =>
+                a.Email == email && !a.Success && a.CreatedAt > now.AddMinutes(-60), ct);
+            if (emailFails >= 3)
+                return StatusCode(429, new { error = "Too many failed attempts for this email. Try again in 60 minutes." });
+
+            var ipFailsShort = await _db.LoginAttempts.CountAsync(a =>
+                a.IpAddress == ip && !a.Success && a.CreatedAt > now.AddMinutes(-60), ct);
+            if (ipFailsShort >= 10)
+                return StatusCode(429, new { error = "Too many failed attempts from this IP. Try again in 60 minutes." });
+
+            var ipFailsLong = await _db.LoginAttempts.CountAsync(a =>
+                a.IpAddress == ip && !a.Success && a.CreatedAt > now.AddHours(-24), ct);
+            if (ipFailsLong >= 30)
+                return StatusCode(429, new { error = "Too many failed attempts from this IP today. Try again later." });
         }
 
         // Resolve the user without revealing whether the email exists — every
@@ -318,9 +415,15 @@ public sealed class AuthController : ControllerBase
             await _db.SaveChangesAsync(ct);
         }
 
+        // Phase 6.12.W5.T7 — always run BCrypt.Verify against either the real
+        // user's hash or the dummy hash so the response time does not depend
+        // on email existence. Work factor matches new-registration path (11).
+        var hashToVerify = user?.PasswordHash ?? _dummyHashWf11;
+        var passwordValid = BCrypt.Net.BCrypt.Verify(request.Password, hashToVerify);
+
         if (user is null
             || user.Role != "superadmin"
-            || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            || !passwordValid)
         {
             await LogAttempt(false, user?.Id);
             return Unauthorized(new { error = "Invalid credentials" });
@@ -351,9 +454,13 @@ public sealed class AuthController : ControllerBase
         {
             // Two-step: client re-submits with TotpCode. Don't log yet — the
             // next call decides success/failure based on the TOTP verdict.
+            // Phase 6.12 polish: issue a 2FA continuation token so the FE can skip
+            // Turnstile on the second submit (TOTP entry).
+            var continuationToken = IssueTwoFactorContinuation(email, ip);
             return Ok(new
             {
                 requires2fa = true,
+                twoFactorContinuationToken = continuationToken,
                 message = "Enter your 2FA code from your authenticator app"
             });
         }
@@ -627,10 +734,46 @@ public sealed class AuthController : ControllerBase
     }
 
     public sealed record EnableDto(string Code);
+
+    /// <summary>
+    /// Phase 6.12.W6.T10 — gate every covered auth endpoint with a Turnstile
+    /// verification step. Returns null on success (caller proceeds), or an
+    /// IActionResult to return immediately on failure. CAPTCHA_ENABLED=false
+    /// disables the check entirely (emergency escape hatch).
+    /// TURNSTILE_TOLERANT_MODE=true allows missing tokens through during
+    /// the rollout window between backend and frontend deploys.
+    /// </summary>
+    private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct, string? continuationToken = null, string? continuationEmail = null)
+    {
+        if (!CaptchaEnabled) return null;
+
+        // Phase 6.12 polish: 2FA continuation bypass. The first submit (password
+        // step) already passed Turnstile; the continuation token (5-min TTL,
+        // email+IP-bound, single-use) lets the second submit (TOTP step) skip
+        // Turnstile so users don't see two challenges per login session.
+        if (!string.IsNullOrEmpty(continuationToken) && !string.IsNullOrEmpty(continuationEmail)
+            && TryConsumeTwoFactorContinuation(continuationToken, continuationEmail, ip))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(token))
+        {
+            if (CaptchaTolerant) return null;
+            return BadRequest(new { error = "captcha_required" });
+        }
+        var ok = await _captcha.VerifyAsync(token, ip, ct);
+        return ok ? null : BadRequest(new { error = "captcha_invalid" });
+    }
 }
 
-public sealed record RegisterRequest(string Email, string Password);
-public sealed record LoginRequest(string Email, string Password, string? TotpCode = null);
+public sealed record RegisterRequest(string Email, string Password, string? TurnstileToken = null);
+public sealed record LoginRequest(
+    string Email,
+    string Password,
+    string? TotpCode = null,
+    string? TurnstileToken = null,
+    string? TwoFactorContinuationToken = null);
 public sealed record RefreshRequest(string RefreshToken);
 public sealed record RedeemDto(string Token, string Email, string NewPassword);
 public sealed record ChangePwDto(string? CurrentPassword, string NewPassword);

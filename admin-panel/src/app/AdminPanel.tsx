@@ -48,6 +48,7 @@ import { RoleContext } from '@/lib/roleContext';
 import { Toaster } from 'react-hot-toast';
 import { ActivityFeedProvider } from '@/lib/activityFeed';
 import { PermissionNotificationsProvider } from '@/lib/permissionNotifications';
+import { ScopeLimitedBanner } from '@/components/ScopeLimitedBanner';
 
 export type Page =
   'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security'|
@@ -85,6 +86,14 @@ export const SUPERADMIN_EXTRA_GROUPS: NavGroup[] = [
   ] },
 ];
 
+export const SETUP_2FA_GROUPS: NavGroup[] = [
+  { title: 'Setup', items: [{ id: 'enable2fa', icon: ShieldCheck, label: 'Enable 2FA' }] },
+];
+
+export const CHANGE_PW_GROUPS: NavGroup[] = [
+  { title: 'Setup', items: [{ id: 'changePw', icon: Key, label: 'Change Password' }] },
+];
+
 const PAGES: Record<Page, () => JSX.Element> = {
   dashboard: DashboardPage, users: UsersPage, payments: PaymentsPage, subscriptions: SubscriptionsPage,
   licenses: LicensesPage, updates: UpdatesPage, devices: DevicesPage, crashes: CrashReportsPage,
@@ -95,7 +104,13 @@ const PAGES: Record<Page, () => JSX.Element> = {
   myPerms: MyPermissionsPage, changePw: ChangePasswordPage, enable2fa: Enable2FAPage, redeemInvite: RedeemInvitationPage,
 };
 
-interface AdminPanelProps { onLogout: () => void; role: UserRole; initialPage?: Page; currentUserEmail?: string; }
+interface AdminPanelProps {
+  onLogout: () => void;
+  role: UserRole;
+  initialPage?: Page;
+  currentUserEmail?: string;
+  scope?: 'normal' | '2fa-setup-only' | 'change-password';
+}
 
 function decodeEmailFromJwt(): string | undefined {
   if (typeof window === 'undefined') return undefined;
@@ -109,9 +124,12 @@ function decodeEmailFromJwt(): string | undefined {
   } catch { return undefined; }
 }
 
-export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail }: AdminPanelProps) {
+export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail, scope = 'normal' }: AdminPanelProps) {
   const [page, setPage] = useState<Page>(initialPage ?? 'dashboard');
-  const groups = role === 'superadmin' ? [...ADMIN_NAV_GROUPS, ...SUPERADMIN_EXTRA_GROUPS] : ADMIN_NAV_GROUPS;
+  const groups = scope === '2fa-setup-only' ? SETUP_2FA_GROUPS
+    : scope === 'change-password' ? CHANGE_PW_GROUPS
+    : role === 'superadmin' ? [...ADMIN_NAV_GROUPS, ...SUPERADMIN_EXTRA_GROUPS]
+    : ADMIN_NAV_GROUPS;
   const ActivePage = PAGES[page] ?? DashboardPage;
   const email = currentUserEmail ?? decodeEmailFromJwt();
   return (
@@ -129,6 +147,7 @@ export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail 
               },
             }}
           />
+          {scope !== 'normal' && <ScopeLimitedBanner scope={scope} onLogout={onLogout} />}
           <div className="flex h-screen overflow-hidden">
             <Sidebar
               groups={groups}
@@ -136,10 +155,7 @@ export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail 
               onSelect={(p) => setPage(p as Page)}
               onLogout={onLogout}
               currentUserEmail={email}
-              // Superadmins inherently have every permission, so a "My Permissions"
-              // self-service page is meaningless for that role. Only expose the
-              // Sidebar entry for regular admins who actually have a scoped grant list.
-              onOpenMyPermissions={role === 'admin' ? () => setPage('myPerms') : undefined}
+              onOpenMyPermissions={scope === 'normal' && role === 'admin' ? () => setPage('myPerms') : undefined}
             />
             <main className="flex-1 overflow-y-auto">
               <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>

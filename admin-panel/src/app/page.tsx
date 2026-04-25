@@ -27,6 +27,7 @@ export default function Home() {
   const [role, setRole] = useState<UserRole>('admin');
   const [checking, setChecking] = useState(true);
   const [postLoginView, setPostLoginView] = useState<Page | null>(null);
+  const [postLoginScope, setPostLoginScope] = useState<'normal' | '2fa-setup-only' | 'change-password'>('normal');
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('aura_token') : null;
@@ -59,8 +60,9 @@ export default function Home() {
   );
   if (!authenticated) return <LoginScreen onLogin={(r, scope) => {
     setRole(r); setAuthenticated(true); startConnection();
-    if (scope === '2fa-setup-only') setPostLoginView('enable2fa');
-    else if (scope === 'change-password') setPostLoginView('changePw');
+    if (scope === '2fa-setup-only') { setPostLoginView('enable2fa'); setPostLoginScope('2fa-setup-only'); }
+    else if (scope === 'change-password') { setPostLoginView('changePw'); setPostLoginScope('change-password'); }
+    else setPostLoginScope('normal');
   }} />;
-  return <AdminPanelInner role={role} onLogout={handleLogout} initialPage={postLoginView ?? 'dashboard'} />;
+  return <AdminPanelInner role={role} onLogout={handleLogout} initialPage={postLoginView ?? 'dashboard'} scope={postLoginScope} />;
 }

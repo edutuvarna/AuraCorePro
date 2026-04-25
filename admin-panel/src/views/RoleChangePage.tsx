@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { ArrowRightLeft } from 'lucide-react';
 import { api } from '@/lib/api';
 import { CustomTemplatePicker, CustomKey } from '@/components/CustomTemplatePicker';
+import { useRole } from '@/lib/roleContext';
+import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
 
 export function RoleChangePage() {
+  const role = useRole();
+
   const [mode, setMode] = useState<'promote'|'demote'>('promote');
   const [userId, setUserId] = useState('');
   const [template, setTemplate] = useState<'Default'|'Trusted'|'ReadOnly'|'Custom'>('Default');
@@ -13,6 +17,14 @@ export function RoleChangePage() {
   const [require2fa, setRequire2fa] = useState(true);
   const [customKeys, setCustomKeys] = useState<CustomKey[]>([]);
   const [status, setStatus] = useState<string>('');
+
+  if (role !== 'superadmin') {
+    return <LockedTabPlaceholder
+      tabName="Role Change"
+      permissionKey="tab:roleChange"
+      staticMessage="This page is restricted to superadmin role. The backend will reject any role-change action regardless of UI access — the gate exists to prevent misleading 403 responses."
+    />;
+  }
 
   const run = async () => {
     setStatus('');

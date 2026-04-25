@@ -26,4 +26,14 @@ describe('LockedTabPlaceholder', () => {
     expect(screen.getByText(/Last request denied/i)).toBeTruthy();
     expect(screen.getByText(/wrong team/)).toBeTruthy();
   });
+
+  it('renders staticMessage and hides the request button when staticMessage is provided', () => {
+    render(<LockedTabPlaceholder
+      tabName="Role Change"
+      permissionKey="tab:roleChange"
+      staticMessage="This page is restricted to superadmin role."
+    />);
+    expect(screen.getByText(/restricted to superadmin role/i)).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /request permission/i })).toBeNull();
+  });
 });

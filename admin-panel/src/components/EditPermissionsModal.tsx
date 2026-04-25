@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Shield } from 'lucide-react';
 import { api } from '@/lib/api';
 import { CustomTemplatePicker, CustomKey } from '@/components/CustomTemplatePicker';
+import { Combobox } from '@/components/Combobox';
 import type { AdminAccount } from '@/lib/types';
 
 export function EditPermissionsModal({ admin, onClose, onSaved }: {
@@ -40,12 +41,17 @@ export function EditPermissionsModal({ admin, onClose, onSaved }: {
         </div>
         <div>
           <label className="text-xs text-white/50 block mb-1">New template</label>
-          <select value={template} onChange={e => setTemplate(e.target.value as any)} className="input-dark w-full">
-            <option value="Default">Default — no Tier 2 actions</option>
-            <option value="Trusted">Trusted — all Tier 2 actions</option>
-            <option value="ReadOnly">Read-Only — block all destructive actions</option>
-            <option value="Custom">Custom — pick specific permissions</option>
-          </select>
+          <Combobox
+            value={template}
+            onChange={v => setTemplate(v as any)}
+            options={[
+              { value: 'Default', label: 'Default — no Tier 2 actions' },
+              { value: 'Trusted', label: 'Trusted — all Tier 2 actions' },
+              { value: 'ReadOnly', label: 'Read-Only — block all destructive actions' },
+              { value: 'Custom', label: 'Custom — pick specific permissions' },
+            ]}
+            className="w-full"
+          />
         </div>
         {template === 'Custom' && <CustomTemplatePicker onChange={setCustomKeys} />}
         {error && <div className="text-xs text-aura-red">{error}</div>}

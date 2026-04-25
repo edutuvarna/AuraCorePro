@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ArrowRightLeft } from 'lucide-react';
 import { api } from '@/lib/api';
 import { CustomTemplatePicker, CustomKey } from '@/components/CustomTemplatePicker';
+import { Combobox } from '@/components/Combobox';
 import { useRole } from '@/lib/roleContext';
 import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
 
@@ -45,19 +46,29 @@ export function RoleChangePage() {
         <input value={userId} onChange={e => setUserId(e.target.value)} placeholder="User ID (UUID)" className="input-dark w-full" />
         {mode === 'promote' && (
           <>
-            <select value={template} onChange={e => setTemplate(e.target.value as any)} className="input-dark w-full">
-              <option value="Default">Default</option>
-              <option value="Trusted">Trusted</option>
-              <option value="ReadOnly">Read-Only</option>
-              <option value="Custom">Custom</option>
-            </select>
+            <Combobox
+              value={template}
+              onChange={v => setTemplate(v as any)}
+              options={[
+                { value: 'Default', label: 'Default' },
+                { value: 'Trusted', label: 'Trusted' },
+                { value: 'ReadOnly', label: 'Read-Only' },
+                { value: 'Custom', label: 'Custom' },
+              ]}
+              className="w-full"
+            />
             {template === 'Custom' && <CustomTemplatePicker onChange={setCustomKeys} />}
-            <select value={forcePwd} onChange={e => setForcePwd(e.target.value as any)} className="input-dark w-full">
-              <option value="on_first_login">Force change on first login</option>
-              <option value="within_7_days">Force change within 7 days</option>
-              <option value="within_30_days">Force change within 30 days</option>
-              <option value="never">Never</option>
-            </select>
+            <Combobox
+              value={forcePwd}
+              onChange={v => setForcePwd(v as any)}
+              options={[
+                { value: 'on_first_login', label: 'Force change on first login' },
+                { value: 'within_7_days', label: 'Force change within 7 days' },
+                { value: 'within_30_days', label: 'Force change within 30 days' },
+                { value: 'never', label: 'Never' },
+              ]}
+              className="w-full"
+            />
             <label className="flex gap-2 text-sm"><input type="checkbox" checked={require2fa} onChange={e => setRequire2fa(e.target.checked)} />Require 2FA</label>
           </>
         )}

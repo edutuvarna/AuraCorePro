@@ -27,6 +27,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { Combobox } from '@/components/Combobox';
 import { useRole } from '@/lib/roleContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
@@ -85,9 +86,15 @@ export function UpdatesPage() {
                         </div>
                         <div>
                             <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Channel</label>
-                            <select value={form.channel} onChange={e => setForm({ ...form, channel: e.target.value })} className="input-dark w-full">
-                                <option value="stable">Stable</option><option value="beta">Beta</option>
-                            </select>
+                            <Combobox
+                                value={form.channel}
+                                onChange={v => setForm({ ...form, channel: v })}
+                                options={[
+                                    { value: 'stable', label: 'Stable' },
+                                    { value: 'beta', label: 'Beta' },
+                                ]}
+                                className="w-full"
+                            />
                         </div>
                     </div>
                     <div className="mb-4">

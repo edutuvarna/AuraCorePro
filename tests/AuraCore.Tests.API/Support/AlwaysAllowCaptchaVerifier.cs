@@ -1,4 +1,3 @@
-#if PHASE_6_12_CAPTCHA_READY
 using AuraCore.API.Application.Services.Security;
 
 namespace AuraCore.Tests.API.Support;
@@ -14,4 +13,3 @@ public sealed class AlwaysAllowCaptchaVerifier : ICaptchaVerifier
     public Task<bool> VerifyAsync(string token, string remoteIp, CancellationToken ct = default)
         => Task.FromResult(true);
 }
-#endif

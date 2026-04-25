@@ -1,6 +1,4 @@
-#if PHASE_6_12_CAPTCHA_READY
 using AuraCore.API.Application.Services.Security;
-#endif
 using AuraCore.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -39,13 +37,10 @@ public sealed class TestWebAppFactory : WebApplicationFactory<Program>
                 .UseInMemoryDatabase(_dbName, _dbRoot)
                 .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
 
-            // Phase 6.12 — captcha substitution wired in Task 2 once
-            // ICaptchaVerifier is created. Until then, this is dead.
-            #if PHASE_6_12_CAPTCHA_READY
+            // Phase 6.12 — substitute Turnstile verifier with always-allow stub.
             var captchaDesc = services.SingleOrDefault(d => d.ServiceType == typeof(ICaptchaVerifier));
             if (captchaDesc is not null) services.Remove(captchaDesc);
             services.AddSingleton<ICaptchaVerifier, AlwaysAllowCaptchaVerifier>();
-            #endif
         });
     }
 

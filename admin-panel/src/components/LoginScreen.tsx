@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Shield, AlertCircle, RefreshCw, Lock, Crown } from 'lucide-react';
-import { Turnstile } from '@marsidev/react-turnstile';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { api, setToken } from '@/lib/api';
 import type { UserRole } from '@/lib/types';
 
@@ -18,6 +18,16 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState<null | 'admin' | 'superadmin'>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
+
+  // Turnstile tokens are single-use + 300s TTL. After any submit attempt
+  // (success OR failure including requires2fa partial), reset the widget so
+  // the next click gets a fresh token instead of replaying the consumed one
+  // (CF returns success=false → backend sees 400 captcha_invalid).
+  const resetTurnstile = () => {
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
+  };
 
   const submit = async (mode: 'admin' | 'superadmin') => {
     setLoading(mode); setError('');
@@ -26,7 +36,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         ? await api.login(email, password, totpCode || undefined, turnstileToken || undefined)
         : await api.superadminLogin(email, password, totpCode || undefined, turnstileToken || undefined);
 
-      if (data?.requires2fa && !totpCode) { setNeeds2fa(true); return; }
+      if (data?.requires2fa && !totpCode) { setNeeds2fa(true); resetTurnstile(); return; }
 
       if (data?.requiresTwoFactorSetup && data.accessToken) {
         setToken(data.accessToken);
@@ -49,12 +59,14 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         if (role !== 'admin' && role !== 'superadmin') {
           setError('Access denied. Admin role required.');
           setToken(null);
+          resetTurnstile();
           return;
         }
         onLogin(role);
         return;
       }
       setError(data?.error || 'Authentication failed');
+      resetTurnstile();
     } finally { setLoading(null); }
   };
 
@@ -135,6 +147,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           )}
           <div className="flex justify-center">
             <Turnstile
+              ref={turnstileRef}
               siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
               onSuccess={(token) => setTurnstileToken(token)}
               onError={() => setTurnstileToken(null)}

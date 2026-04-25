@@ -2,6 +2,16 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LoginScreen } from '@/components/LoginScreen';
 
+// Auto-resolve Turnstile in tests so the submit button enables.
+// The real widget makes a network call to challenges.cloudflare.com which
+// jsdom can't service; stubbing also unblocks `disabled={!turnstileToken}`.
+vi.mock('@marsidev/react-turnstile', () => ({
+  Turnstile: ({ onSuccess }: any) => {
+    onSuccess?.('stub-token');
+    return null;
+  },
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     login: vi.fn().mockResolvedValue({ ok: true, data: { accessToken: 'x', user: { role: 'admin' } } }),

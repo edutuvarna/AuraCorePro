@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Shield, AlertCircle, RefreshCw, Lock, Crown } from 'lucide-react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { api, setToken } from '@/lib/api';
 import type { UserRole } from '@/lib/types';
 
@@ -16,13 +17,14 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState<null | 'admin' | 'superadmin'>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const submit = async (mode: 'admin' | 'superadmin') => {
     setLoading(mode); setError('');
     try {
       const { ok, data } = mode === 'admin'
-        ? await api.login(email, password, totpCode || undefined)
-        : await api.superadminLogin(email, password, totpCode || undefined);
+        ? await api.login(email, password, totpCode || undefined, turnstileToken || undefined)
+        : await api.superadminLogin(email, password, totpCode || undefined, turnstileToken || undefined);
 
       if (data?.requires2fa && !totpCode) { setNeeds2fa(true); return; }
 
@@ -131,12 +133,21 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               <AlertCircle className="w-4 h-4 shrink-0" />{error}
             </div>
           )}
-          <button type="submit" disabled={loading !== null}
+          <div className="flex justify-center">
+            <Turnstile
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setTurnstileToken(null)}
+              onExpire={() => setTurnstileToken(null)}
+              options={{ theme: 'dark' }}
+            />
+          </div>
+          <button type="submit" disabled={loading !== null || !turnstileToken}
             className="btn-primary w-full flex items-center justify-center gap-2">
             {loading === 'admin' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             {loading === 'admin' ? 'Authenticating...' : needs2fa ? 'Verify 2FA' : 'Sign In as Admin'}
           </button>
-          <button type="button" disabled={loading !== null}
+          <button type="button" disabled={loading !== null || !turnstileToken}
             onClick={() => submit('superadmin')}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition
                        bg-gradient-to-r from-accent to-aura-purple text-black hover:opacity-90 disabled:opacity-50">

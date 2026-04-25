@@ -29,6 +29,9 @@ public sealed class AuraCoreDbContext : DbContext
     public DbSet<AdminInvitation> AdminInvitations => Set<AdminInvitation>();
     public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
 
+    // Phase 6.14 additions
+    public DbSet<FcmDeviceToken> FcmDeviceTokens => Set<FcmDeviceToken>();
+
     protected override void OnModelCreating(ModelBuilder m)
     {
         m.Entity<User>(e => {
@@ -275,6 +278,17 @@ public sealed class AuraCoreDbContext : DbContext
                     Value = "{\"auth.login\":{\"requests\":5,\"windowSeconds\":1800},\"auth.register\":{\"requests\":3,\"windowSeconds\":3600},\"admin.all\":{\"requests\":1000,\"windowSeconds\":3600},\"signalr.connect\":{\"requests\":10,\"windowSeconds\":60}}",
                     UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) }
             );
+        });
+
+        m.Entity<FcmDeviceToken>(b =>
+        {
+            b.ToTable("fcm_device_tokens");
+            b.HasKey(t => t.Id);
+            b.Property(t => t.Token).HasMaxLength(512).IsRequired();
+            b.Property(t => t.Platform).HasMaxLength(16).IsRequired();
+            b.Property(t => t.DeviceId).HasMaxLength(256);
+            b.HasIndex(t => t.UserId);
+            b.HasIndex(t => new { t.UserId, t.Token }).IsUnique();
         });
     }
 }

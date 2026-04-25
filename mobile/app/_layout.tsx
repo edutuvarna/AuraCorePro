@@ -6,10 +6,13 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { loadAuthFromStore, tryBiometricUnlock, AuthState } from '@/lib/auth';
 import { RoleProvider } from '@/lib/roleContext';
+import { attachForegroundListener, attachTapListener } from '@/lib/notifications';
+import { InAppNotificationBanner } from '@/components/InAppNotificationBanner';
 
 export default function RootLayout() {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [checking, setChecking] = useState(true);
+  const [banner, setBanner] = useState<{ title: string; body: string; data: Record<string, unknown> } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +27,23 @@ export default function RootLayout() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (!auth) return;
+    const fgSub = attachForegroundListener((data) => {
+      setBanner({
+        title: 'Permission request',
+        body: typeof data.body === 'string' ? data.body : 'New request',
+        data,
+      });
+    });
+    const tapSub = attachTapListener((data) => {
+      if (data.type === 'permission-request') {
+        router.push('/(app)/permissions');
+      }
+    });
+    return () => { fgSub.remove(); tapSub.remove(); };
+  }, [auth]);
+
   if (checking) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-900">
@@ -37,6 +57,16 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <RoleProvider value={auth?.role ?? 'admin'}>
         <Slot />
+        <InAppNotificationBanner
+          visible={banner !== null}
+          title={banner?.title ?? ''}
+          body={banner?.body ?? ''}
+          onDismiss={() => setBanner(null)}
+          onTap={() => {
+            if (banner?.data?.type === 'permission-request') router.push('/(app)/permissions');
+            setBanner(null);
+          }}
+        />
       </RoleProvider>
     </QueryClientProvider>
   );

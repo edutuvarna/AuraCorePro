@@ -57,6 +57,15 @@ public sealed class TurnstileVerifier : ICaptchaVerifier
             }
             var json = await resp.Content.ReadAsStringAsync(ct);
             var parsed = JsonSerializer.Deserialize<TurnstileResponse>(json, JsonOpts);
+            if (parsed?.Success != true)
+            {
+                // Debug visibility into why CF rejected — error-codes array
+                // has values like 'invalid-input-secret', 'invalid-input-response',
+                // 'timeout-or-duplicate'. Trim to first 200 chars to avoid
+                // log spam if CF ever returns a long body.
+                var truncated = json.Length > 200 ? json.Substring(0, 200) : json;
+                _logger.LogWarning("Turnstile verify success=false. Response body: {Body}", truncated);
+            }
             return parsed?.Success ?? false;
         }
         catch (BrokenCircuitException)

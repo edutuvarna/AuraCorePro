@@ -44,13 +44,18 @@ public sealed class MeController : ControllerBase
         return Ok();
     }
 
+    // Token comes via request body (not query string) so it doesn't end up
+    // in nginx access logs. Push tokens identify a user-device pair; though
+    // not auth-bearing, keeping them off URL paths matches request-hygiene
+    // best practice. ASP.NET Core supports DELETE-with-body since net5.
     [HttpDelete("fcm-token")]
-    public async Task<IActionResult> UnregisterFcmToken([FromQuery] string token, CancellationToken ct)
+    public async Task<IActionResult> UnregisterFcmToken([FromBody] FcmTokenDto dto, CancellationToken ct)
     {
         var userId = User.GetUserId();
         if (userId is null) return Unauthorized();
+        if (string.IsNullOrWhiteSpace(dto.Token)) return BadRequest(new { error = "missing_token" });
         var row = await _db.FcmDeviceTokens
-            .FirstOrDefaultAsync(t => t.UserId == userId.Value && t.Token == token, ct);
+            .FirstOrDefaultAsync(t => t.UserId == userId.Value && t.Token == dto.Token, ct);
         if (row != null)
         {
             _db.FcmDeviceTokens.Remove(row);

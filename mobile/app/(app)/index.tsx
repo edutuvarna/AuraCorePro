@@ -14,12 +14,26 @@ function formatCurrency(n: number | undefined): string {
   return `$${(n / 1000).toFixed(1)}K`;
 }
 
+// Backend `/api/admin/dashboard/stats` shape (AdminDashboardController.GetStats):
+// { totalUsers, proUsers, enterpriseUsers, freeUsers, totalRevenue, monthlyRevenue, pendingCryptoPayments }.
+interface DashboardStats {
+  totalUsers?: number;
+  proUsers?: number;
+  enterpriseUsers?: number;
+  freeUsers?: number;
+  totalRevenue?: number;
+  monthlyRevenue?: number;
+  pendingCryptoPayments?: number;
+}
+
 export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
-  const { data, refetch, isLoading } = useQuery({
+  const { data, refetch, isLoading } = useQuery<DashboardStats | null>({
     queryKey: ['dashboardStats'],
     queryFn: () => api.getStats(),
   });
+
+  const subscriptions = data ? (data.proUsers ?? 0) + (data.enterpriseUsers ?? 0) : undefined;
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -38,10 +52,10 @@ export default function Dashboard() {
           <ActivityIndicator color="#22d3ee" />
         ) : (
           <View className="gap-2">
-            <KpiCard label="Active users" value={formatNumber(data?.activeUsers)} accent="cyan" />
-            <KpiCard label="Subscriptions" value={formatNumber(data?.activeSubscriptions)} accent="purple" />
-            <KpiCard label="MRR" value={formatCurrency(data?.mrr)} accent="green" />
-            <KpiCard label="Recent payments" value={formatNumber(data?.recentPaymentsCount)} accent="amber" />
+            <KpiCard label="Total users" value={formatNumber(data?.totalUsers)} accent="cyan" />
+            <KpiCard label="Subscriptions" value={formatNumber(subscriptions)} accent="purple" />
+            <KpiCard label="Monthly revenue" value={formatCurrency(data?.monthlyRevenue)} accent="green" />
+            <KpiCard label="Pending crypto" value={formatNumber(data?.pendingCryptoPayments)} accent="amber" />
           </View>
         )}
       </View>

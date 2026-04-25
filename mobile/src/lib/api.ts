@@ -64,8 +64,10 @@ export const api = {
   },
 
   async unregisterFcmToken(token: string) {
-    const res = await request(`/api/admin/me/fcm-token?token=${encodeURIComponent(token)}`, {
+    // Body-as-DELETE (not query) so the FCM token doesn't land in nginx access logs.
+    const res = await request('/api/admin/me/fcm-token', {
       method: 'DELETE',
+      body: JSON.stringify({ token, platform: 'android' }),
     });
     return res.ok;
   },

@@ -82,7 +82,7 @@ public class FcmDeviceTokenControllerTests
         await db.SaveChangesAsync();
         var ctrl = BuildController(db, userId);
 
-        var result = await ctrl.UnregisterFcmToken("T1", CancellationToken.None);
+        var result = await ctrl.UnregisterFcmToken(new FcmTokenDto { Token = "T1" }, CancellationToken.None);
 
         Assert.IsType<NoContentResult>(result);
         Assert.Equal(0, await db.FcmDeviceTokens.CountAsync());
@@ -98,7 +98,7 @@ public class FcmDeviceTokenControllerTests
         await db.SaveChangesAsync();
         var ctrl = BuildController(db, userB);  // different user
 
-        var result = await ctrl.UnregisterFcmToken("T1", CancellationToken.None);
+        var result = await ctrl.UnregisterFcmToken(new FcmTokenDto { Token = "T1" }, CancellationToken.None);
 
         Assert.IsType<NoContentResult>(result);
         Assert.Equal(1, await db.FcmDeviceTokens.CountAsync());  // userA's row untouched

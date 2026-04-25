@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuraCore.API.Controllers.Admin;
 
@@ -20,10 +21,11 @@ public sealed class PermissionRequestsController : ControllerBase
     private readonly IEmailService _email;
     private readonly IHubContext<AdminHub> _hub;
     private readonly IFcmService _fcm;
+    private readonly ILogger<PermissionRequestsController> _log;
 
-    public PermissionRequestsController(AuraCoreDbContext db, IEmailService email, IHubContext<AdminHub> hub, IFcmService fcm)
+    public PermissionRequestsController(AuraCoreDbContext db, IEmailService email, IHubContext<AdminHub> hub, IFcmService fcm, ILogger<PermissionRequestsController> log)
     {
-        _db = db; _email = email; _hub = hub; _fcm = fcm;
+        _db = db; _email = email; _hub = hub; _fcm = fcm; _log = log;
     }
 
     [HttpGet]
@@ -80,7 +82,7 @@ public sealed class PermissionRequestsController : ControllerBase
                 ["type"] = "permission-request",
                 ["requestId"] = req.Id.ToString(),
             });
-        await PermissionRequestPushTrigger.SendToSuperadminsAsync(_db, _fcm, pushPayload, ct);
+        await PermissionRequestPushTrigger.SendToSuperadminsAsync(_db, _fcm, pushPayload, ct, _log);
 
         // Best-effort email to each superadmin
         var superadmins = await _db.Users.Where(u => u.Role == "superadmin" && u.IsActive).ToListAsync(ct);
@@ -118,7 +120,8 @@ public static class PermissionRequestPushTrigger
         AuraCoreDbContext db,
         IFcmService fcm,
         FcmPayload payload,
-        CancellationToken ct)
+        CancellationToken ct,
+        ILogger? logger = null)
     {
         var tokens = await db.FcmDeviceTokens
             .Where(t => db.Users.Where(u => u.Role == "superadmin").Select(u => u.Id).Contains(t.UserId))
@@ -127,7 +130,14 @@ public static class PermissionRequestPushTrigger
         foreach (var token in tokens)
         {
             try { await fcm.SendAsync(token, payload, ct); }
-            catch (Exception) { /* log + continue: one bad token must not block others */ }
+            catch (Exception ex)
+            {
+                // One bad token must not block others. Log so ops can detect mass-token-rotation
+                // events or service-account misconfiguration. Token prefix only — full tokens
+                // are device-identifying and not safe to dump in logs.
+                logger?.LogWarning(ex, "FCM send failed for superadmin token prefix {TokenPrefix}",
+                    token.Length >= 12 ? token[..12] : token);
+            }
         }
     }
 }

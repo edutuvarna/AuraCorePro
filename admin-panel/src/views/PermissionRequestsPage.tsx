@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Check, X, RefreshCw, Users2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { on, off } from '@/lib/signalr';
+import { Combobox } from '@/components/Combobox';
 import type { PermissionRequest } from '@/lib/types';
 
 export function PermissionRequestsPage() {
@@ -50,12 +51,16 @@ export function PermissionRequestsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold flex items-center gap-2"><Users2 className="w-6 h-6"/>Permission Requests</h1>
-        <select value={status} onChange={e => setStatus(e.target.value as any)} className="input-dark">
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="denied">Denied</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <Combobox
+          value={status}
+          onChange={v => setStatus(v as any)}
+          options={[
+            { value: 'pending', label: 'Pending' },
+            { value: 'approved', label: 'Approved' },
+            { value: 'denied', label: 'Denied' },
+            { value: 'cancelled', label: 'Cancelled' },
+          ]}
+        />
       </div>
 
       {selected.size > 0 && (

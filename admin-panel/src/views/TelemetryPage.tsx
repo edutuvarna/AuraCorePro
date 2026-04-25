@@ -27,6 +27,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { KPICard } from '@/components/KpiCard';
 import { EmptyState } from '@/components/EmptyState';
 import { DataTable, DataTableColumn } from '@/components/DataTable';
+import { Combobox } from '@/components/Combobox';
 
 // Inline (not in plan's lift list — Wave 3 / Task 16 will absorb).
 function Pagination({ page, pages, onChange }: { page: number; pages: number; onChange: (p: number) => void }) {
@@ -100,10 +101,14 @@ export function TelemetryPage() {
 
             <div className="glass-card p-5">
                 <div className="flex items-center gap-4 mb-5">
-                    <select value={eventType} onChange={e => setEventType(e.target.value)} className="input-dark">
-                        <option value="">All event types</option>
-                        {types.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
+                    <Combobox
+                        value={eventType}
+                        onChange={v => setEventType(v)}
+                        options={[
+                            { value: '', label: 'All event types' },
+                            ...types.map(t => ({ value: t, label: t })),
+                        ]}
+                    />
                 </div>
                 <DataTable<any>
                     columns={columns}

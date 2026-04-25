@@ -19,7 +19,8 @@ const SIGNALR_ENABLED = true;
 
 export function startConnection(){
 if(!SIGNALR_ENABLED)return;
-if(conn?.state===signalR.HubConnectionState.Connected)return;
+if(conn?.state===signalR.HubConnectionState.Connected
+||conn?.state===signalR.HubConnectionState.Connecting)return;
 if(!getToken())return;
 conn=new signalR.HubConnectionBuilder()
 .withUrl(API+"/hubs/admin",{accessTokenFactory:()=>getToken()||""})

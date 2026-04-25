@@ -4,8 +4,13 @@ import { useState } from 'react';
 import { ArrowRightLeft } from 'lucide-react';
 import { api } from '@/lib/api';
 import { CustomTemplatePicker, CustomKey } from '@/components/CustomTemplatePicker';
+import { Combobox } from '@/components/Combobox';
+import { useRole } from '@/lib/roleContext';
+import { LockedTabPlaceholder } from '@/components/LockedTabPlaceholder';
 
 export function RoleChangePage() {
+  const role = useRole();
+
   const [mode, setMode] = useState<'promote'|'demote'>('promote');
   const [userId, setUserId] = useState('');
   const [template, setTemplate] = useState<'Default'|'Trusted'|'ReadOnly'|'Custom'>('Default');
@@ -13,6 +18,14 @@ export function RoleChangePage() {
   const [require2fa, setRequire2fa] = useState(true);
   const [customKeys, setCustomKeys] = useState<CustomKey[]>([]);
   const [status, setStatus] = useState<string>('');
+
+  if (role !== 'superadmin') {
+    return <LockedTabPlaceholder
+      tabName="Role Change"
+      permissionKey="tab:roleChange"
+      staticMessage="This page is restricted to superadmin role. The backend will reject any role-change action regardless of UI access — the gate exists to prevent misleading 403 responses."
+    />;
+  }
 
   const run = async () => {
     setStatus('');
@@ -33,26 +46,36 @@ export function RoleChangePage() {
         <input value={userId} onChange={e => setUserId(e.target.value)} placeholder="User ID (UUID)" className="input-dark w-full" />
         {mode === 'promote' && (
           <>
-            <select value={template} onChange={e => setTemplate(e.target.value as any)} className="input-dark w-full">
-              <option value="Default">Default</option>
-              <option value="Trusted">Trusted</option>
-              <option value="ReadOnly">Read-Only</option>
-              <option value="Custom">Custom</option>
-            </select>
+            <Combobox
+              value={template}
+              onChange={v => setTemplate(v as any)}
+              options={[
+                { value: 'Default', label: 'Default' },
+                { value: 'Trusted', label: 'Trusted' },
+                { value: 'ReadOnly', label: 'Read-Only' },
+                { value: 'Custom', label: 'Custom' },
+              ]}
+              className="w-full"
+            />
             {template === 'Custom' && <CustomTemplatePicker onChange={setCustomKeys} />}
-            <select value={forcePwd} onChange={e => setForcePwd(e.target.value as any)} className="input-dark w-full">
-              <option value="on_first_login">Force change on first login</option>
-              <option value="within_7_days">Force change within 7 days</option>
-              <option value="within_30_days">Force change within 30 days</option>
-              <option value="never">Never</option>
-            </select>
+            <Combobox
+              value={forcePwd}
+              onChange={v => setForcePwd(v as any)}
+              options={[
+                { value: 'on_first_login', label: 'Force change on first login' },
+                { value: 'within_7_days', label: 'Force change within 7 days' },
+                { value: 'within_30_days', label: 'Force change within 30 days' },
+                { value: 'never', label: 'Never' },
+              ]}
+              className="w-full"
+            />
             <label className="flex gap-2 text-sm"><input type="checkbox" checked={require2fa} onChange={e => setRequire2fa(e.target.checked)} />Require 2FA</label>
           </>
         )}
         <button onClick={run} className="btn-primary w-full" disabled={!userId}>Apply</button>
         {status && <div className="text-xs text-white/60">{status}</div>}
       </div>
-      <p className="text-xs text-white/40">Bulk operations + audit preview deferred to Phase 6.12.</p>
+      <p className="text-xs text-white/40">Bulk operations + audit preview deferred to Phase 6.14.</p>
     </div>
   );
 }

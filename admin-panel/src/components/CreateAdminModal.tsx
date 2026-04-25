@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import { api } from '@/lib/api';
 import { CustomTemplatePicker, CustomKey } from '@/components/CustomTemplatePicker';
+import { Combobox } from '@/components/Combobox';
 
 export function CreateAdminModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [email, setEmail] = useState('');
@@ -56,21 +57,31 @@ export function CreateAdminModal({ onClose, onCreated }: { onClose: () => void; 
         )}
         <div>
           <label className="text-xs text-white/50 block mb-1">Force password change</label>
-          <select value={forcePasswordChange} onChange={e => setForce(e.target.value as 'on_first_login'|'within_7_days'|'within_30_days'|'never')} className="input-dark w-full">
-            <option value="on_first_login">On first login</option>
-            <option value="within_7_days">Within 7 days</option>
-            <option value="within_30_days">Within 30 days</option>
-            <option value="never">Never</option>
-          </select>
+          <Combobox
+            value={forcePasswordChange}
+            onChange={v => setForce(v as 'on_first_login'|'within_7_days'|'within_30_days'|'never')}
+            options={[
+              { value: 'on_first_login', label: 'On first login' },
+              { value: 'within_7_days', label: 'Within 7 days' },
+              { value: 'within_30_days', label: 'Within 30 days' },
+              { value: 'never', label: 'Never' },
+            ]}
+            className="w-full"
+          />
         </div>
         <div>
           <label className="text-xs text-white/50 block mb-1">Permission template</label>
-          <select value={template} onChange={e => setTemplate(e.target.value as 'Default'|'Trusted'|'ReadOnly'|'Custom')} className="input-dark w-full">
-            <option value="Default">Default — no Tier 2 actions</option>
-            <option value="Trusted">Trusted — all Tier 2 actions</option>
-            <option value="ReadOnly">Read-Only — no destructive actions</option>
-            <option value="Custom">Custom — per-permission config</option>
-          </select>
+          <Combobox
+            value={template}
+            onChange={v => setTemplate(v as 'Default'|'Trusted'|'ReadOnly'|'Custom')}
+            options={[
+              { value: 'Default', label: 'Default — no Tier 2 actions' },
+              { value: 'Trusted', label: 'Trusted — all Tier 2 actions' },
+              { value: 'ReadOnly', label: 'Read-Only — no destructive actions' },
+              { value: 'Custom', label: 'Custom — per-permission config' },
+            ]}
+            className="w-full"
+          />
         </div>
         {template === 'Custom' && <CustomTemplatePicker onChange={setCustomKeys} />}
         <label className="flex items-center gap-2 text-sm">

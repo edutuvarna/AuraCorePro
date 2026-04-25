@@ -20,6 +20,7 @@ import { api } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { PermissionGate } from '@/components/PermissionGate';
 import { PermissionRequestDialog } from '@/components/PermissionRequestDialog';
+import { Combobox } from '@/components/Combobox';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useRole } from '@/lib/roleContext';
 
@@ -58,10 +59,15 @@ export function SubscriptionsPage() {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Tier</label>
-                            <select value={tier} onChange={e => setTier(e.target.value)} className="input-dark w-full">
-                                <option value="pro">Pro</option>
-                                <option value="enterprise">Enterprise</option>
-                            </select>
+                            <Combobox
+                                value={tier}
+                                onChange={v => setTier(v)}
+                                options={[
+                                    { value: 'pro', label: 'Pro' },
+                                    { value: 'enterprise', label: 'Enterprise' },
+                                ]}
+                                className="w-full"
+                            />
                         </div>
                         <div>
                             <label className="block text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Days</label>

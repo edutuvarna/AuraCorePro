@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
+using Polly;
+using Polly.CircuitBreaker;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,32 @@ builder.Services.AddScoped<AuraCore.API.Application.Services.Audit.IAuditLogServ
                           AuraCore.API.Infrastructure.Services.Audit.AuditLogService>();
 builder.Services.AddScoped<AuraCore.API.Application.Services.Security.IWhitelistService,
                           AuraCore.API.Infrastructure.Services.Security.WhitelistService>();
+
+// Phase 6.12.W2.T4 — Cloudflare Turnstile CAPTCHA verifier with Polly
+// circuit breaker (5 consecutive fails in 60s sampling window → 60s break).
+// HttpClient timeout is 5s; verifier returns true (fail-open) when the
+// breaker is open so a CF outage does not take down the auth path.
+builder.Services.AddHttpClient<
+    AuraCore.API.Application.Services.Security.ICaptchaVerifier,
+    AuraCore.API.Infrastructure.Services.Security.TurnstileVerifier>(client =>
+{
+    client.BaseAddress = new Uri("https://challenges.cloudflare.com/");
+    client.Timeout = TimeSpan.FromSeconds(5);
+})
+.AddResilienceHandler("captcha-verify", pipeline =>
+{
+    pipeline.AddCircuitBreaker(new Polly.CircuitBreaker.CircuitBreakerStrategyOptions<HttpResponseMessage>
+    {
+        FailureRatio = 1.0,
+        MinimumThroughput = 5,
+        SamplingDuration = TimeSpan.FromMinutes(1),
+        BreakDuration = TimeSpan.FromSeconds(60),
+        ShouldHandle = new Polly.PredicateBuilder<HttpResponseMessage>()
+            .Handle<HttpRequestException>()
+            .Handle<TaskCanceledException>()
+            .HandleResult(r => (int)r.StatusCode >= 500),
+    });
+});
 
 // Phase 6.11 startup services
 builder.Services.AddScoped<AuraCore.API.Services.SuperadminBootstrapService>();

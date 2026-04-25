@@ -16,10 +16,12 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const submit = async () => {
+  const submit = async (mode: 'admin' | 'superadmin') => {
     setError(''); setLoading(true);
     try {
-      const { ok, data } = await api.login(email, password, totpCode || undefined);
+      const { ok, data } = mode === 'admin'
+        ? await api.login(email, password, totpCode || undefined)
+        : await api.superadminLogin(email, password, totpCode || undefined);
       if (data?.requires2fa && !totpCode) { setNeeds2fa(true); return; }
       if (ok && data?.accessToken && data?.refreshToken) {
         await persistLoginSuccess(data.accessToken, data.refreshToken);
@@ -78,13 +80,22 @@ export default function LoginScreen() {
           <Text className="text-red-400 text-xs">{error}</Text>
         ) : null}
         <Pressable
-          onPress={submit}
+          onPress={() => submit('admin')}
           disabled={loading || !email || !password}
           className="bg-accent rounded-md py-3 items-center"
         >
           {loading
             ? <ActivityIndicator color="#0a0a0f" />
-            : <Text className="text-surface-900 font-semibold">{needs2fa ? 'Verify 2FA' : 'Sign In'}</Text>}
+            : <Text className="text-surface-900 font-semibold">{needs2fa ? 'Verify 2FA' : 'Sign In as Admin'}</Text>}
+        </Pressable>
+        <Pressable
+          onPress={() => submit('superadmin')}
+          disabled={loading || !email || !password}
+          className="bg-gradient-to-r rounded-md py-3 items-center border border-accent-secondary/40 bg-accent-secondary/[0.08]"
+        >
+          {loading
+            ? <ActivityIndicator color="#a78bfa" />
+            : <Text className="text-accent-secondary font-semibold">{needs2fa ? 'Verify 2FA (Superadmin)' : 'Sign In as Superadmin'}</Text>}
         </Pressable>
       </View>
     </View>

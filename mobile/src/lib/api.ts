@@ -40,6 +40,16 @@ export const api = {
     return { ok: res.ok, status: res.status, data: await safeJson(res) };
   },
 
+  async superadminLogin(email: string, password: string, totpCode?: string) {
+    // Stricter endpoint: 3 fails / 60 min IP-rate-limit, mandatory 2FA, audit-logs
+    // to audit_log on every attempt. Same DTO shape as /api/auth/login.
+    const res = await request('/api/auth/superadmin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, totpCode }),
+    });
+    return { ok: res.ok, status: res.status, data: await safeJson(res) };
+  },
+
   async getStats() {
     const res = await request('/api/admin/dashboard/stats');
     return res.ok ? await safeJson(res) : null;

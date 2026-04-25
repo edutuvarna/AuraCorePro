@@ -112,9 +112,11 @@ Files:
 Pattern (apply to both call sites):
 
 ```csharp
-// One-time at class init — module-static field.
+// One-time at class init — module-static field. Work factor MUST match the
+// production hashing work factor or the timing defense leaks via the work-
+// factor delta itself. See note below for how to determine prod's value.
 private static readonly string _dummyHash =
-    BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 12);
+    BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
 
 // Inside the method:
 var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
@@ -128,7 +130,13 @@ if (user is null || !passwordValid /* || other-condition for SuperadminLogin */)
 }
 ```
 
-The `_dummyHash` work factor must match the production hashing work factor (`12` is the BCrypt.Net default). If `IAuthService.LoginAsync` already implements this pattern (verify during implementation), 6.12.C for the regular login is a no-op.
+**Work-factor determination (implementation plan must do this):**
+1. Inspect `IAuthService.LoginAsync` (or wherever `BCrypt.HashPassword` is called for new registrations) to see whether a `workFactor` parameter is passed. BCrypt.Net-Next default is `11` if no parameter is supplied.
+2. Spot-check a production user's `PasswordHash` column — work factor is encoded in the hash string itself (`$2a$11$...` ⇒ work factor 11; `$2b$10$...` ⇒ work factor 10).
+3. If the prod hashes use mixed work factors (some legacy users hashed at `10`, newer at `11`), pick the median, or pick the **same value used for new registrations going forward** — this is the consistent target for the timing curve.
+4. Spec the resolved work factor in the implementation plan as a constant; do not leave it as an open value.
+
+If `IAuthService.LoginAsync` already implements this pattern (verify during implementation), 6.12.C for the regular login is a no-op.
 
 #### 4. `ICaptchaVerifier` interface + `TurnstileVerifier` implementation
 
@@ -267,7 +275,7 @@ Backend test count grows from 183 → ~198-200 (+15-17 tests).
 | `CaptchaEnforcementTests.cs` | 5 | All four endpoints: missing-token 400, invalid-token 400, valid-token proceeds; substituted-mock infrastructure |
 | `CaptchaCircuitBreakerTests.cs` | 3 | Opens after 5 consecutive failures, re-probes and recovers after 60 s, bypass mode logs warning |
 
-Existing test fixtures that currently use `IClassFixture<WebApplicationFactory<Program>>` and hit auth endpoints (`SuperadminLoginEndpointTests`, `TwoFactorEnforcementTests`, `LoginSuspendedAccountTests`, `AdminInvitationFlowTests`, etc.) need either a shared `TestWebAppFactory` base helper or per-fixture `s.AddScoped<ICaptchaVerifier, AlwaysAllowCaptchaVerifier>()` registration so existing tests continue passing without producing real Turnstile traffic.
+Existing test fixtures that currently use `IClassFixture<WebApplicationFactory<Program>>` and hit auth endpoints (`SuperadminLoginEndpointTests`, `TwoFactorEnforcementTests`, `LoginSuspendedAccountTests`, `AdminInvitationFlowTests`, etc.) must register a stub `ICaptchaVerifier` that returns `true` by default. Recommended approach: a shared `TestWebAppFactory` base helper (extracted into `tests/AuraCore.Tests.API/Support/TestWebAppFactory.cs`) that all auth-touching test classes derive from, with the `ICaptchaVerifier` substitution + `ManyServiceProvidersCreatedWarning` suppression done once. Avoids per-fixture duplication and the existing-fixture migration is a single search-and-replace pass per test class.
 
 ### Frontend tests
 

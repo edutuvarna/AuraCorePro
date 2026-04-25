@@ -30,7 +30,7 @@ export function LockedTabPlaceholder({
         <div className="space-y-2">
           <h2 className="text-xl font-display font-bold">{tabName} is locked</h2>
           <p className="text-sm text-white/60 leading-relaxed">
-            {staticMessage ?? (
+            {staticMessage || (
               <>This page has been disabled by the superadmin by default. You need permission
               from the superadmin to be able to use the {tabName} tab.</>
             )}

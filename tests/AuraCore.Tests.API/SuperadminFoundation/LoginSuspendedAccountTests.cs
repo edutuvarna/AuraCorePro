@@ -1,12 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using AuraCore.API.Domain.Entities;
-using AuraCore.API.Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
+using AuraCore.Tests.API.Support;
 using Xunit;
 
 namespace AuraCore.Tests.API.SuperadminFoundation;
@@ -18,42 +13,16 @@ namespace AuraCore.Tests.API.SuperadminFoundation;
 /// gated this at line ~315; the regular endpoint was missing the check, so an
 /// admin suspended via the Admin Management tab could still authenticate.
 /// </summary>
-public class LoginSuspendedAccountTests : IClassFixture<WebApplicationFactory<Program>>
+public class LoginSuspendedAccountTests : IClassFixture<TestWebAppFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly TestWebAppFactory _factory;
 
-    public LoginSuspendedAccountTests(WebApplicationFactory<Program> factory)
-    {
-        Environment.SetEnvironmentVariable("JWT_SECRET", "test-secret-at-least-32-characters-long!!");
-        var dbName = $"susp-{Guid.NewGuid()}";
-        var dbRoot = new InMemoryDatabaseRoot();
-        _factory = factory.WithWebHostBuilder(b => b.ConfigureServices(s =>
-        {
-            var dbDesc = s.Single(d => d.ServiceType == typeof(DbContextOptions<AuraCoreDbContext>));
-            s.Remove(dbDesc);
-            s.AddDbContext<AuraCoreDbContext>(o => o
-                .UseInMemoryDatabase(dbName, dbRoot)
-                // Suppress ManyServiceProvidersCreatedWarning — each xUnit test class
-                // that uses IClassFixture<WebApplicationFactory<Program>> + a per-ctor
-                // WithWebHostBuilder contributes one more IServiceProvider to EF's
-                // cache, and the suite now has enough such classes to trip the >20
-                // threshold. Irrelevant to prod behavior.
-                .ConfigureWarnings(w => w.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)));
-        }));
-    }
-
-    private async Task Seed(Action<AuraCoreDbContext> act)
-    {
-        using var scope = _factory.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
-        act(db);
-        await db.SaveChangesAsync();
-    }
+    public LoginSuspendedAccountTests(TestWebAppFactory factory) => _factory = factory;
 
     [Fact]
     public async Task Returns_401_account_suspended_when_IsActive_is_false()
     {
-        await Seed(db => db.Users.Add(new User
+        await _factory.SeedAsync(db => db.Users.Add(new User
         {
             Id = Guid.NewGuid(),
             Email = "suspended@x.com",
@@ -75,7 +44,7 @@ public class LoginSuspendedAccountTests : IClassFixture<WebApplicationFactory<Pr
     [Fact]
     public async Task Active_account_with_same_credentials_still_logs_in()
     {
-        await Seed(db => db.Users.Add(new User
+        await _factory.SeedAsync(db => db.Users.Add(new User
         {
             Id = Guid.NewGuid(),
             Email = "active@x.com",

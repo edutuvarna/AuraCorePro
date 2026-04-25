@@ -60,7 +60,7 @@ export function Sidebar({
     return (
         <>
             {/* Desktop sidebar */}
-            <aside className="w-[200px] flex-shrink-0 border-r border-white/[0.05] bg-white/[0.02] backdrop-blur-xl p-4 hidden md:flex md:flex-col gap-1 h-screen overflow-y-auto">
+            <aside className="w-[200px] flex-shrink-0 border-r border-white/[0.05] bg-white/[0.02] backdrop-blur-xl p-4 hidden md:flex md:flex-col gap-1 h-full overflow-y-auto">
                 <div className="flex items-center gap-2 mb-4 px-2 font-mono text-sm">
                     <div className="w-5 h-5 rounded-md bg-gradient-to-br from-cyan-500 to-purple-500 shadow-[0_0_12px_rgba(6,182,212,0.5)]" />
                     <span>auracore.admin</span>

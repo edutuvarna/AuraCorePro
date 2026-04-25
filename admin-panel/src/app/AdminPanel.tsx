@@ -147,19 +147,21 @@ export function AdminPanelInner({ onLogout, role, initialPage, currentUserEmail,
               },
             }}
           />
-          {scope !== 'normal' && <ScopeLimitedBanner scope={scope} onLogout={onLogout} />}
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar
-              groups={groups}
-              activePage={page}
-              onSelect={(p) => setPage(p as Page)}
-              onLogout={onLogout}
-              currentUserEmail={email}
-              onOpenMyPermissions={scope === 'normal' && role === 'admin' ? () => setPage('myPerms') : undefined}
-            />
-            <main className="flex-1 overflow-y-auto">
-              <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
-            </main>
+          <div className="flex flex-col h-screen overflow-hidden">
+            {scope !== 'normal' && <ScopeLimitedBanner scope={scope} onLogout={onLogout} />}
+            <div className="flex flex-1 overflow-hidden min-h-0">
+              <Sidebar
+                groups={groups}
+                activePage={page}
+                onSelect={(p) => setPage(p as Page)}
+                onLogout={onLogout}
+                currentUserEmail={email}
+                onOpenMyPermissions={scope === 'normal' && role === 'admin' ? () => setPage('myPerms') : undefined}
+              />
+              <main className="flex-1 overflow-y-auto">
+                <div className="max-w-[1400px] mx-auto p-6 lg:p-8 pb-20 md:pb-0"><ActivePage /></div>
+              </main>
+            </div>
           </div>
         </PermissionNotificationsProvider>
       </ActivityFeedProvider>

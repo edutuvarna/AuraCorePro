@@ -575,7 +575,13 @@ public sealed class AuthController : ControllerBase
         _db.RefreshTokens.Add(new RefreshToken { UserId = user.Id, Token = refresh, ExpiresAt = DateTimeOffset.UtcNow.AddDays(30) });
         await _db.SaveChangesAsync(ct);
 
-        return Ok(new { accessToken = access, refreshToken = refresh, user = new { user.Id, user.Email, user.Role } });
+        return Ok(new
+        {
+            accessToken = access,
+            refreshToken = refresh,
+            user = new { user.Id, user.Email, user.Role },
+            requiresTwoFactorSetup = string.IsNullOrEmpty(user.TotpSecret),
+        });
     }
 
     // Phase 6.11.W4.T27: in-session password change. Current-password check is

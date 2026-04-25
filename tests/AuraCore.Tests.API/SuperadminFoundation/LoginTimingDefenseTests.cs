@@ -68,7 +68,7 @@ public class LoginTimingDefenseTests : IClassFixture<TestWebAppFactory>
             $"Timing delta ({delta} ms) leaked email existence. existing={existing} nonexistent={nonexistent}");
     }
 
-    [Fact(Skip = "T8 applies the same dummy-hash defense to IAuthService.LoginAsync. Until then this test fails by design.")]
+    [Fact]
     public async Task Login_response_time_does_not_leak_user_existence()
     {
         await _f.SeedAsync(db => db.Users.Add(new User

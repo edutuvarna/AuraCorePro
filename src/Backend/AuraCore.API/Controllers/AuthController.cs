@@ -43,6 +43,41 @@ public sealed class AuthController : ControllerBase
     private static readonly string _dummyHashWf11 =
         BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
 
+    // Phase 6.12 polish: 2FA continuation tokens. Issued in Login/SuperadminLogin
+    // when password OK + TOTP missing. Lets the FE skip Turnstile on the second
+    // submit (TOTP entry). Bound to email+IP, single-use, 5-minute TTL.
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (string Email, string Ip, DateTimeOffset ExpiresAt)>
+        _twoFactorContinuations = new();
+
+    private const int TwoFactorContinuationMinutes = 5;
+
+    private static void PruneExpiredContinuations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        foreach (var kvp in _twoFactorContinuations)
+        {
+            if (kvp.Value.ExpiresAt < now) _twoFactorContinuations.TryRemove(kvp.Key, out _);
+        }
+    }
+
+    private static string IssueTwoFactorContinuation(string email, string ip)
+    {
+        PruneExpiredContinuations();
+        var token = Guid.NewGuid().ToString("N");
+        _twoFactorContinuations[token] = (email, ip, DateTimeOffset.UtcNow.AddMinutes(TwoFactorContinuationMinutes));
+        return token;
+    }
+
+    private static bool TryConsumeTwoFactorContinuation(string? token, string email, string ip)
+    {
+        if (string.IsNullOrEmpty(token)) return false;
+        if (!_twoFactorContinuations.TryRemove(token, out var entry)) return false;
+        if (entry.ExpiresAt < DateTimeOffset.UtcNow) return false;
+        if (!string.Equals(entry.Email, email, StringComparison.OrdinalIgnoreCase)) return false;
+        if (!string.Equals(entry.Ip, ip, StringComparison.Ordinal)) return false;
+        return true;
+    }
+
     public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub,
         AuraCore.API.Application.Services.Security.ICaptchaVerifier captcha)
     {
@@ -165,8 +200,12 @@ public sealed class AuthController : ControllerBase
         var ip = GetClientIp();
 
         // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
-        // so a missing/invalid token costs zero DB work.
-        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        // so a missing/invalid token costs zero DB work. Phase 6.12 polish:
+        // also accept a 2FA continuation token (issued by an earlier submit
+        // that returned requires2fa) to skip the second Turnstile challenge.
+        var captchaFail = await CheckCaptchaAsync(
+            request.TurnstileToken, ip, ct,
+            request.TwoFactorContinuationToken, email);
         if (captchaFail is not null) return captchaFail;
 
         // ── Rate Limiting: bypass for whitelisted operational IPs (ip-whitelist.md F-3) ──
@@ -234,9 +273,13 @@ public sealed class AuthController : ControllerBase
                 // Password was correct, but we haven't seen the TOTP code yet. Do not log
                 // an attempt — client must re-submit with TotpCode. The next call will log
                 // either Success=true or Success=false based on the TOTP verdict.
+                // Phase 6.12 polish: issue a 2FA continuation token so the FE can skip
+                // Turnstile on the second submit (TOTP entry).
+                var continuationToken = IssueTwoFactorContinuation(email, ip);
                 return Ok(new
                 {
                     requires2fa = true,
+                    twoFactorContinuationToken = continuationToken,
                     message = "Enter your 2FA code from Google Authenticator"
                 });
             }
@@ -312,8 +355,12 @@ public sealed class AuthController : ControllerBase
         var ip = GetClientIp();
 
         // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
-        // so a missing/invalid token costs zero DB work.
-        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        // so a missing/invalid token costs zero DB work. Phase 6.12 polish:
+        // also accept a 2FA continuation token (issued by an earlier submit
+        // that returned requires2fa) to skip the second Turnstile challenge.
+        var captchaFail = await CheckCaptchaAsync(
+            request.TurnstileToken, ip, ct,
+            request.TwoFactorContinuationToken, email);
         if (captchaFail is not null) return captchaFail;
 
         // Phase 6.12.W4.T6 — tiered rate limit:
@@ -407,9 +454,13 @@ public sealed class AuthController : ControllerBase
         {
             // Two-step: client re-submits with TotpCode. Don't log yet — the
             // next call decides success/failure based on the TOTP verdict.
+            // Phase 6.12 polish: issue a 2FA continuation token so the FE can skip
+            // Turnstile on the second submit (TOTP entry).
+            var continuationToken = IssueTwoFactorContinuation(email, ip);
             return Ok(new
             {
                 requires2fa = true,
+                twoFactorContinuationToken = continuationToken,
                 message = "Enter your 2FA code from your authenticator app"
             });
         }
@@ -692,9 +743,20 @@ public sealed class AuthController : ControllerBase
     /// TURNSTILE_TOLERANT_MODE=true allows missing tokens through during
     /// the rollout window between backend and frontend deploys.
     /// </summary>
-    private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct)
+    private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct, string? continuationToken = null, string? continuationEmail = null)
     {
         if (!CaptchaEnabled) return null;
+
+        // Phase 6.12 polish: 2FA continuation bypass. The first submit (password
+        // step) already passed Turnstile; the continuation token (5-min TTL,
+        // email+IP-bound, single-use) lets the second submit (TOTP step) skip
+        // Turnstile so users don't see two challenges per login session.
+        if (!string.IsNullOrEmpty(continuationToken) && !string.IsNullOrEmpty(continuationEmail)
+            && TryConsumeTwoFactorContinuation(continuationToken, continuationEmail, ip))
+        {
+            return null;
+        }
+
         if (string.IsNullOrEmpty(token))
         {
             if (CaptchaTolerant) return null;
@@ -706,7 +768,12 @@ public sealed class AuthController : ControllerBase
 }
 
 public sealed record RegisterRequest(string Email, string Password, string? TurnstileToken = null);
-public sealed record LoginRequest(string Email, string Password, string? TotpCode = null, string? TurnstileToken = null);
+public sealed record LoginRequest(
+    string Email,
+    string Password,
+    string? TotpCode = null,
+    string? TurnstileToken = null,
+    string? TwoFactorContinuationToken = null);
 public sealed record RefreshRequest(string RefreshToken);
 public sealed record RedeemDto(string Token, string Email, string NewPassword);
 public sealed record ChangePwDto(string? CurrentPassword, string NewPassword);

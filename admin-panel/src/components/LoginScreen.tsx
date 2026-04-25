@@ -18,6 +18,10 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState<null | 'admin' | 'superadmin'>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Phase 6.12 polish: continuation token issued by the password-step response
+  // when 2FA is required. Forwarded on the TOTP-step submit so the backend
+  // skips Turnstile verification — single CAPTCHA per login session.
+  const [continuationToken, setContinuationToken] = useState<string | null>(null);
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   // Turnstile tokens are single-use + 300s TTL. After any submit attempt
@@ -33,14 +37,24 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     setLoading(mode); setError('');
     try {
       const { ok, data } = mode === 'admin'
-        ? await api.login(email, password, totpCode || undefined, turnstileToken || undefined)
-        : await api.superadminLogin(email, password, totpCode || undefined, turnstileToken || undefined);
+        ? await api.login(email, password, totpCode || undefined, turnstileToken || undefined, continuationToken || undefined)
+        : await api.superadminLogin(email, password, totpCode || undefined, turnstileToken || undefined, continuationToken || undefined);
 
-      if (data?.requires2fa && !totpCode) { setNeeds2fa(true); resetTurnstile(); return; }
+      if (data?.requires2fa && !totpCode) {
+        setNeeds2fa(true);
+        // Phase 6.12 polish: store the continuation token so the next click
+        // can skip Turnstile. DO NOT call resetTurnstile() — the second submit
+        // doesn't use a fresh Turnstile token (it uses the continuation token
+        // instead), and resetting would force the user through another
+        // CAPTCHA challenge for nothing.
+        setContinuationToken(data.twoFactorContinuationToken ?? null);
+        return;
+      }
 
       if (data?.requiresTwoFactorSetup && data.accessToken) {
         setToken(data.accessToken);
         if (typeof window !== 'undefined') localStorage.setItem('aura_token', data.accessToken);
+        setContinuationToken(null);
         onLogin(data.user?.role ?? mode, '2fa-setup-only');
         return;
       }
@@ -48,6 +62,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       if (data?.requiresPasswordChange && data.accessToken) {
         setToken(data.accessToken);
         if (typeof window !== 'undefined') localStorage.setItem('aura_token', data.accessToken);
+        setContinuationToken(null);
         onLogin(data.user?.role ?? mode, 'change-password');
         return;
       }
@@ -59,13 +74,19 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         if (role !== 'admin' && role !== 'superadmin') {
           setError('Access denied. Admin role required.');
           setToken(null);
+          setContinuationToken(null);
           resetTurnstile();
           return;
         }
+        setContinuationToken(null);
         onLogin(role);
         return;
       }
       setError(data?.error || 'Authentication failed');
+      // Failure on the TOTP step (e.g. wrong code) — the continuation was
+      // single-use and is now consumed server-side. Clear it so the next
+      // attempt falls back to Turnstile.
+      setContinuationToken(null);
       resetTurnstile();
     } finally { setLoading(null); }
   };
@@ -155,12 +176,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               options={{ theme: 'dark' }}
             />
           </div>
-          <button type="submit" disabled={loading !== null || !turnstileToken}
+          <button type="submit" disabled={loading !== null || (!turnstileToken && !continuationToken)}
             className="btn-primary w-full flex items-center justify-center gap-2">
             {loading === 'admin' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             {loading === 'admin' ? 'Authenticating...' : needs2fa ? 'Verify 2FA' : 'Sign In as Admin'}
           </button>
-          <button type="button" disabled={loading !== null || !turnstileToken}
+          <button type="button" disabled={loading !== null || (!turnstileToken && !continuationToken)}
             onClick={() => submit('superadmin')}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition
                        bg-gradient-to-r from-accent to-aura-purple text-black hover:opacity-90 disabled:opacity-50">

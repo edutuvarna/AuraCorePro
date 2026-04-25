@@ -37,10 +37,10 @@ async function request(path: string, options: RequestInit = {}) {
 
 export const api = {
   // Auth
-  async login(email: string, password: string, totpCode?: string, turnstileToken?: string) {
+  async login(email: string, password: string, totpCode?: string, turnstileToken?: string, twoFactorContinuationToken?: string) {
     try {
       const res = await request('/api/auth/login', {
-        method: 'POST', body: JSON.stringify({ email, password, totpCode, turnstileToken })
+        method: 'POST', body: JSON.stringify({ email, password, totpCode, turnstileToken, twoFactorContinuationToken })
       });
       const data = await res.json();
       if (res.ok && data.accessToken) {
@@ -397,10 +397,10 @@ export const api = {
 
   // ── Phase 6.11 ───────────────────────────────────────
 
-  async superadminLogin(email: string, password: string, totpCode?: string, turnstileToken?: string) {
+  async superadminLogin(email: string, password: string, totpCode?: string, turnstileToken?: string, twoFactorContinuationToken?: string) {
     const res = await request('/api/auth/superadmin/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password, totpCode, turnstileToken }),
+      body: JSON.stringify({ email, password, totpCode, turnstileToken, twoFactorContinuationToken }),
     });
     const data = await res.json();
     if (res.ok && data.accessToken) {

@@ -22,7 +22,7 @@ public class TwoFactorEnforcementTests : IClassFixture<TestWebAppFactory>
             });
         });
         var c = _f.CreateClient();
-        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "a@x.com", password = "GoodPass12" });
+        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "a@x.com", password = "GoodPass12", turnstileToken = "stub" });
         var body = await r.Content.ReadAsStringAsync();
         Assert.DoesNotContain("requiresTwoFactorSetup", body);
     }
@@ -38,7 +38,7 @@ public class TwoFactorEnforcementTests : IClassFixture<TestWebAppFactory>
             });
         });
         var c = _f.CreateClient();
-        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "b@x.com", password = "GoodPass12" });
+        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "b@x.com", password = "GoodPass12", turnstileToken = "stub" });
         var body = await r.Content.ReadAsStringAsync();
         Assert.Contains("requiresTwoFactorSetup", body);
     }
@@ -55,7 +55,7 @@ public class TwoFactorEnforcementTests : IClassFixture<TestWebAppFactory>
             db.SystemSettings.Add(new SystemSetting { Key = "require_2fa_for_all_admins", Value = "true" });
         });
         var c = _f.CreateClient();
-        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "c@x.com", password = "GoodPass12" });
+        var r = await c.PostAsJsonAsync("/api/auth/login", new { email = "c@x.com", password = "GoodPass12", turnstileToken = "stub" });
         var body = await r.Content.ReadAsStringAsync();
         Assert.Contains("requiresTwoFactorSetup", body);
     }

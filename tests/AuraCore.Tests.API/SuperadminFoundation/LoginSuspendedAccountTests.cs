@@ -34,7 +34,7 @@ public class LoginSuspendedAccountTests : IClassFixture<TestWebAppFactory>
 
         var c = _factory.CreateClient();
         var r = await c.PostAsJsonAsync("/api/auth/login",
-            new { email = "suspended@x.com", password = "GoodPass12" });
+            new { email = "suspended@x.com", password = "GoodPass12", turnstileToken = "stub" });
         var body = await r.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.Unauthorized, r.StatusCode);
@@ -56,7 +56,7 @@ public class LoginSuspendedAccountTests : IClassFixture<TestWebAppFactory>
 
         var c = _factory.CreateClient();
         var r = await c.PostAsJsonAsync("/api/auth/login",
-            new { email = "active@x.com", password = "GoodPass12" });
+            new { email = "active@x.com", password = "GoodPass12", turnstileToken = "stub" });
         var body = await r.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, r.StatusCode);

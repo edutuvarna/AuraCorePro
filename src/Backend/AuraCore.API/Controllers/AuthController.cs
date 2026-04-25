@@ -23,7 +23,16 @@ public sealed class AuthController : ControllerBase
     private readonly IWhitelistService _whitelist;
     private readonly ITotpEncryption _totpEnc;
     private readonly IHubContext<AdminHub> _hub;
+    private readonly AuraCore.API.Application.Services.Security.ICaptchaVerifier _captcha;
     private static readonly Dictionary<string, (int Count, DateTime ResetAt)> _regAttempts = new();
+
+    // Phase 6.12.W6.T10 — env-flag-driven CAPTCHA enforcement. Use static
+    // PROPERTIES (not static readonly fields) so each request re-reads the env;
+    // tests can toggle the flags via Environment.SetEnvironmentVariable at runtime.
+    private static bool CaptchaEnabled =>
+        !string.Equals(Environment.GetEnvironmentVariable("CAPTCHA_ENABLED"), "false", StringComparison.OrdinalIgnoreCase);
+    private static bool CaptchaTolerant =>
+        string.Equals(Environment.GetEnvironmentVariable("TURNSTILE_TOLERANT_MODE"), "true", StringComparison.OrdinalIgnoreCase);
 
     // Phase 6.12.W5.T7 — precomputed dummy hash for BCrypt timing-attack
     // defense. Work factor MUST match production hashing (verified via the
@@ -34,13 +43,15 @@ public sealed class AuthController : ControllerBase
     private static readonly string _dummyHashWf11 =
         BCrypt.Net.BCrypt.HashPassword("dummy-password-never-matches-anything", workFactor: 11);
 
-    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub)
+    public AuthController(IAuthService auth, AuraCoreDbContext db, IWhitelistService whitelist, ITotpEncryption totpEnc, IHubContext<AdminHub> hub,
+        AuraCore.API.Application.Services.Security.ICaptchaVerifier captcha)
     {
         _auth = auth;
         _db = db;
         _whitelist = whitelist;
         _totpEnc = totpEnc;
         _hub = hub;
+        _captcha = captcha;
     }
 
     [HttpPost("register")]
@@ -71,8 +82,14 @@ public sealed class AuthController : ControllerBase
         if (email.Contains('<') || email.Contains('>') || email.Contains('"') || email.Contains('\''))
             return BadRequest(new { error = "Invalid characters in email" });
 
-        // Rate limit registration: max 3 per IP per hour
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit lookup so a
+        // missing/invalid token costs zero contention on the _regAttempts lock.
+        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        if (captchaFail is not null) return captchaFail;
+
+        // Rate limit registration: max 3 per IP per hour
         lock (_regAttempts)
         {
             // Clean old entries
@@ -146,6 +163,11 @@ public sealed class AuthController : ControllerBase
             return BadRequest(new { error = "Invalid email format" });
 
         var ip = GetClientIp();
+
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
+        // so a missing/invalid token costs zero DB work.
+        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        if (captchaFail is not null) return captchaFail;
 
         // ── Rate Limiting: bypass for whitelisted operational IPs (ip-whitelist.md F-3) ──
         var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
@@ -288,6 +310,11 @@ public sealed class AuthController : ControllerBase
             return BadRequest(new { error = "Invalid email format" });
 
         var ip = GetClientIp();
+
+        // Phase 6.12.W6.T10 — CAPTCHA gate. Runs BEFORE rate-limit DB lookup
+        // so a missing/invalid token costs zero DB work.
+        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        if (captchaFail is not null) return captchaFail;
 
         // Phase 6.12.W4.T6 — tiered rate limit:
         //   layer 1 — 3 fails per email per 60 min (catches password guessing)
@@ -656,6 +683,26 @@ public sealed class AuthController : ControllerBase
     }
 
     public sealed record EnableDto(string Code);
+
+    /// <summary>
+    /// Phase 6.12.W6.T10 — gate every covered auth endpoint with a Turnstile
+    /// verification step. Returns null on success (caller proceeds), or an
+    /// IActionResult to return immediately on failure. CAPTCHA_ENABLED=false
+    /// disables the check entirely (emergency escape hatch).
+    /// TURNSTILE_TOLERANT_MODE=true allows missing tokens through during
+    /// the rollout window between backend and frontend deploys.
+    /// </summary>
+    private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct)
+    {
+        if (!CaptchaEnabled) return null;
+        if (string.IsNullOrEmpty(token))
+        {
+            if (CaptchaTolerant) return null;
+            return BadRequest(new { error = "captcha_required" });
+        }
+        var ok = await _captcha.VerifyAsync(token, ip, ct);
+        return ok ? null : BadRequest(new { error = "captcha_invalid" });
+    }
 }
 
 public sealed record RegisterRequest(string Email, string Password, string? TurnstileToken = null);

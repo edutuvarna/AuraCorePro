@@ -38,7 +38,7 @@ public class LoginRateLimitTieredTests
         var probeEmail = $"probe-{Guid.NewGuid():N}@x.com";
         var c = f.CreateClient();
         await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = probeEmail, password = "wrong-pass-12", totpCode = "000000" });
+            new { email = probeEmail, password = "wrong-pass-12", totpCode = "000000", turnstileToken = "stub" });
 
         using var scope = f.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AuraCoreDbContext>();
@@ -53,7 +53,7 @@ public class LoginRateLimitTieredTests
     {
         var c = f.CreateClient();
         var r = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email, password = "wrong-pass-12", totpCode = "000000" });
+            new { email, password = "wrong-pass-12", totpCode = "000000", turnstileToken = "stub" });
         return r.StatusCode;
     }
 
@@ -125,7 +125,7 @@ public class LoginRateLimitTieredTests
         // user does not exist). The key assertion is "not 429".
         var c = f.CreateClient();
         var r = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = "ghost@x.com", password = "wrong", totpCode = "000000" });
+            new { email = "ghost@x.com", password = "wrong", totpCode = "000000", turnstileToken = "stub" });
         Assert.NotEqual(HttpStatusCode.TooManyRequests, r.StatusCode);
     }
 }

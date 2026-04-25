@@ -59,9 +59,9 @@ public class LoginTimingDefenseTests : IClassFixture<TestWebAppFactory>
         }));
 
         var existing = await AverageMsAsync("/api/auth/superadmin/login",
-            new { email = "exists@x.com", password = "WrongPass99", totpCode = "000000" });
+            new { email = "exists@x.com", password = "WrongPass99", totpCode = "000000", turnstileToken = "stub" });
         var nonexistent = await AverageMsAsync("/api/auth/superadmin/login",
-            new { email = "ghost@x.com", password = "WrongPass99", totpCode = "000000" });
+            new { email = "ghost@x.com", password = "WrongPass99", totpCode = "000000", turnstileToken = "stub" });
 
         var delta = Math.Abs(existing - nonexistent);
         Assert.True(delta < ThresholdMs,
@@ -81,9 +81,9 @@ public class LoginTimingDefenseTests : IClassFixture<TestWebAppFactory>
         }));
 
         var existing = await AverageMsAsync("/api/auth/login",
-            new { email = "exists2@x.com", password = "WrongPass99" });
+            new { email = "exists2@x.com", password = "WrongPass99", turnstileToken = "stub" });
         var nonexistent = await AverageMsAsync("/api/auth/login",
-            new { email = "ghost2@x.com", password = "WrongPass99" });
+            new { email = "ghost2@x.com", password = "WrongPass99", turnstileToken = "stub" });
 
         var delta = Math.Abs(existing - nonexistent);
         Assert.True(delta < ThresholdMs,

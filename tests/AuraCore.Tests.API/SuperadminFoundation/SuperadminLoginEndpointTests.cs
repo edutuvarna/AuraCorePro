@@ -29,7 +29,7 @@ public class SuperadminLoginEndpointTests : IClassFixture<TestWebAppFactory>
     {
         var c = Client();
         var res = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = "none@x.com", password = "whatever12", totpCode = "123456" });
+            new { email = "none@x.com", password = "whatever12", totpCode = "123456", turnstileToken = "stub" });
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, res.StatusCode);
     }
 
@@ -45,7 +45,7 @@ public class SuperadminLoginEndpointTests : IClassFixture<TestWebAppFactory>
 
         var c = Client();
         var res = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = "plain@x.com", password = "GoodPass12" });
+            new { email = "plain@x.com", password = "GoodPass12", turnstileToken = "stub" });
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, res.StatusCode);
     }
 
@@ -56,7 +56,7 @@ public class SuperadminLoginEndpointTests : IClassFixture<TestWebAppFactory>
         // Password correct + no TOTP code supplied → requires2fa: true (same contract as /login).
         var c = Client();
         var res = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = "boss@x.com", password = "GoodPass12" });
+            new { email = "boss@x.com", password = "GoodPass12", turnstileToken = "stub" });
         Assert.Equal(System.Net.HttpStatusCode.OK, res.StatusCode);
         var body = await res.Content.ReadAsStringAsync();
         Assert.Contains("requires2fa", body);
@@ -75,7 +75,7 @@ public class SuperadminLoginEndpointTests : IClassFixture<TestWebAppFactory>
 
         var c = Client();
         var res = await c.PostAsJsonAsync("/api/auth/superadmin/login",
-            new { email = "fresh@x.com", password = "GoodPass12" });
+            new { email = "fresh@x.com", password = "GoodPass12", turnstileToken = "stub" });
         Assert.Equal(System.Net.HttpStatusCode.OK, res.StatusCode);
         var body = await res.Content.ReadAsStringAsync();
         Assert.Contains("requiresTwoFactorSetup", body);

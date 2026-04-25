@@ -149,5 +149,5 @@ public sealed class PasswordResetController : ControllerBase
 
 }
 
-public sealed record ForgotPasswordRequest(string Email);
+public sealed record ForgotPasswordRequest(string Email, string? TurnstileToken = null);
 public sealed record ResetPasswordRequest(string Email, string Code, string NewPassword);

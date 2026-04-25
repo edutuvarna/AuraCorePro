@@ -658,8 +658,8 @@ public sealed class AuthController : ControllerBase
     public sealed record EnableDto(string Code);
 }
 
-public sealed record RegisterRequest(string Email, string Password);
-public sealed record LoginRequest(string Email, string Password, string? TotpCode = null);
+public sealed record RegisterRequest(string Email, string Password, string? TurnstileToken = null);
+public sealed record LoginRequest(string Email, string Password, string? TotpCode = null, string? TurnstileToken = null);
 public sealed record RefreshRequest(string RefreshToken);
 public sealed record RedeemDto(string Token, string Email, string NewPassword);
 public sealed record ChangePwDto(string? CurrentPassword, string NewPassword);

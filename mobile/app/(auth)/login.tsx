@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { api } from '@/lib/api';
-import { persistLoginSuccess } from '@/lib/auth';
+import { persistLoginSuccess, decodeRoleFromJwt } from '@/lib/auth';
 import { registerForPush } from '@/lib/notifications';
+import { useAuth } from '@/lib/authContext';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { setAuth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
@@ -22,6 +24,12 @@ export default function LoginScreen() {
       if (ok && data?.accessToken && data?.refreshToken) {
         await persistLoginSuccess(data.accessToken, data.refreshToken);
         try { await registerForPush(); } catch (e: any) { /* push optional */ }
+        // Update auth context BEFORE navigating so (app) tree sees a valid session.
+        setAuth({
+          authenticated: true,
+          role: decodeRoleFromJwt(data.accessToken),
+          jwt: data.accessToken,
+        });
         router.replace('/(app)');
         return;
       }

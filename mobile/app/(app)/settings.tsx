@@ -2,10 +2,12 @@ import { View, Text, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { logout } from '@/lib/auth';
 import { useRole } from '@/lib/roleContext';
+import { useAuth } from '@/lib/authContext';
 
 export default function Settings() {
   const router = useRouter();
   const role = useRole();
+  const { setAuth } = useAuth();
 
   const onLogout = async () => {
     Alert.alert('Sign out?', 'You will need to log in again.', [
@@ -15,6 +17,7 @@ export default function Settings() {
         style: 'destructive',
         onPress: async () => {
           await logout();
+          setAuth(null); // Clear auth context so (app) tree won't re-enter on remount.
           router.replace('/(auth)/login');
         },
       },

@@ -280,16 +280,30 @@ public sealed class AuthController : ControllerBase
 
         var ip = GetClientIp();
 
-        // Stricter rate limit: 3 failed attempts / 60 min (vs. /login's 3 / 30).
-        // Uses the same login_attempts table; scoped to this email with a longer window.
+        // Phase 6.12.W4.T6 — tiered rate limit:
+        //   layer 1 — 3 fails per email per 60 min (catches password guessing)
+        //   layer 2 — 10 fails per IP per 60 min (catches email rotation)
+        //   layer 3 — 30 fails per IP per 24 h (catches slow-drip distributed)
+        // All three gated behind whitelisted-IP bypass.
         var whitelisted = await _whitelist.IsWhitelistedAsync(ip, ct);
         if (!whitelisted)
         {
-            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-60);
-            var recent = await _db.LoginAttempts.CountAsync(a =>
-                a.Email == email && !a.Success && a.CreatedAt > cutoff, ct);
-            if (recent >= 3)
-                return StatusCode(429, new { error = "Too many failed attempts. Try again in 60 minutes." });
+            var now = DateTimeOffset.UtcNow;
+
+            var emailFails = await _db.LoginAttempts.CountAsync(a =>
+                a.Email == email && !a.Success && a.CreatedAt > now.AddMinutes(-60), ct);
+            if (emailFails >= 3)
+                return StatusCode(429, new { error = "Too many failed attempts for this email. Try again in 60 minutes." });
+
+            var ipFailsShort = await _db.LoginAttempts.CountAsync(a =>
+                a.IpAddress == ip && !a.Success && a.CreatedAt > now.AddMinutes(-60), ct);
+            if (ipFailsShort >= 10)
+                return StatusCode(429, new { error = "Too many failed attempts from this IP. Try again in 60 minutes." });
+
+            var ipFailsLong = await _db.LoginAttempts.CountAsync(a =>
+                a.IpAddress == ip && !a.Success && a.CreatedAt > now.AddHours(-24), ct);
+            if (ipFailsLong >= 30)
+                return StatusCode(429, new { error = "Too many failed attempts from this IP today. Try again later." });
         }
 
         // Resolve the user without revealing whether the email exists — every

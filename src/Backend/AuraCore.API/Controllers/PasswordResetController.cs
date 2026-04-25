@@ -13,14 +13,27 @@ public sealed class PasswordResetController : ControllerBase
 {
     private readonly AuraCoreDbContext _db;
     private readonly AuraCore.API.Application.Services.Email.IEmailService _email;
+    private readonly AuraCore.API.Application.Services.Security.ICaptchaVerifier _captcha;
 
     private static readonly ConcurrentDictionary<string, (int Count, DateTime ResetAt)> _forgotAttempts = new();
     private static readonly ConcurrentDictionary<string, (int Count, DateTime ResetAt)> _resetAttempts = new();
 
-    public PasswordResetController(AuraCoreDbContext db, AuraCore.API.Application.Services.Email.IEmailService email)
+    // Phase 6.12.W6.T11 — env-flag-driven CAPTCHA enforcement. Use static
+    // PROPERTIES (not static readonly fields) so each request re-reads the env;
+    // tests can toggle the flags via Environment.SetEnvironmentVariable at runtime.
+    private static bool CaptchaEnabled =>
+        !string.Equals(Environment.GetEnvironmentVariable("CAPTCHA_ENABLED"), "false", StringComparison.OrdinalIgnoreCase);
+    private static bool CaptchaTolerant =>
+        string.Equals(Environment.GetEnvironmentVariable("TURNSTILE_TOLERANT_MODE"), "true", StringComparison.OrdinalIgnoreCase);
+
+    public PasswordResetController(
+        AuraCoreDbContext db,
+        AuraCore.API.Application.Services.Email.IEmailService email,
+        AuraCore.API.Application.Services.Security.ICaptchaVerifier captcha)
     {
         _db = db;
         _email = email;
+        _captcha = captcha;
     }
 
     [HttpPost("forgot")]
@@ -41,6 +54,13 @@ public sealed class PasswordResetController : ControllerBase
 
         // Rate limit: 3 requests/hour per IP
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        // Phase 6.12.W6.T11 — CAPTCHA gate. Runs after empty-input + email-format
+        // validation (those return the generic okResponse to avoid email
+        // enumeration) but before rate-limit + DB writes + email send.
+        var captchaFail = await CheckCaptchaAsync(request.TurnstileToken, ip, ct);
+        if (captchaFail is not null) return captchaFail;
+
         if (!CheckRateLimit(_forgotAttempts, ip, 3))
             return StatusCode(429, new { error = "Too many requests. Try again later." });
 
@@ -147,6 +167,24 @@ public sealed class PasswordResetController : ControllerBase
         return entry.Count <= maxAttempts;
     }
 
+    /// <summary>
+    /// Phase 6.12.W6.T11 — CAPTCHA gate helper. Mirrors AuthController.CheckCaptchaAsync.
+    /// Returns null on success (caller continues), or an IActionResult to return
+    /// immediately on failure. CAPTCHA_ENABLED=false disables the check entirely
+    /// (emergency escape hatch). TURNSTILE_TOLERANT_MODE=true allows missing tokens
+    /// through during the rollout window between backend and frontend deploys.
+    /// </summary>
+    private async Task<IActionResult?> CheckCaptchaAsync(string? token, string ip, CancellationToken ct)
+    {
+        if (!CaptchaEnabled) return null;
+        if (string.IsNullOrEmpty(token))
+        {
+            if (CaptchaTolerant) return null;
+            return BadRequest(new { error = "captcha_required" });
+        }
+        var ok = await _captcha.VerifyAsync(token, ip, ct);
+        return ok ? null : BadRequest(new { error = "captcha_invalid" });
+    }
 }
 
 public sealed record ForgotPasswordRequest(string Email, string? TurnstileToken = null);

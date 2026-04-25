@@ -99,4 +99,20 @@ public class CaptchaEnforcementTests : IClassFixture<TestWebAppFactory>
             new { email = "valid@x.com", password = "GoodPass12", turnstileToken = "any-token-stub-allows" });
         Assert.Equal(HttpStatusCode.OK, r.StatusCode);
     }
+
+    [Fact]
+    public async Task ForgotPassword_returns_400_when_token_missing()
+    {
+        Environment.SetEnvironmentVariable("TURNSTILE_TOLERANT_MODE", "false");
+        Environment.SetEnvironmentVariable("CAPTCHA_ENABLED", "true");
+        var c = _f.CreateClient();
+        // Note: actual route is /api/auth/password/forgot (per existing
+        // [Route("api/auth/password")] + [HttpPost("forgot")]). The plan
+        // T11 step 4 referenced a hypothetical /api/auth/forgot-password
+        // route, but the live endpoint (used by the landing page) is the
+        // path below — not changing the route avoids breaking consumers.
+        var r = await c.PostAsJsonAsync("/api/auth/password/forgot", new { email = "x@y.com" });
+        Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);
+        Assert.Contains("captcha_required", await r.Content.ReadAsStringAsync());
+    }
 }

@@ -75,7 +75,7 @@ export function RoleChangePage() {
         <button onClick={run} className="btn-primary w-full" disabled={!userId}>Apply</button>
         {status && <div className="text-xs text-white/60">{status}</div>}
       </div>
-      <p className="text-xs text-white/40">Bulk operations + audit preview deferred to Phase 6.14.</p>
+      <p className="text-xs text-white/40">Bulk operations + audit preview deferred to Phase 6.15.</p>
     </div>
   );
 }

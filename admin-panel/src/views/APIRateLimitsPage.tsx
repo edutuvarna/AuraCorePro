@@ -68,7 +68,7 @@ export function APIRateLimitsPage() {
           </div>
         </div>
       )}
-      <p className="text-xs text-white/40">Edits persist to system_settings['rate_limit_policies'] and invalidate the 5-min cache. Hot-reload of the ASP.NET Core RateLimiter pipeline is queued for Phase 6.14.</p>
+      <p className="text-xs text-white/40">Edits persist to system_settings['rate_limit_policies'] and invalidate the 5-min cache. Hot-reload of the ASP.NET Core RateLimiter pipeline is queued for Phase 6.15.</p>
     </div>
   );
 }

@@ -91,6 +91,12 @@ builder.Services.AddHttpClient("resend", client =>
 builder.Services.AddScoped<AuraCore.API.Application.Services.Email.IEmailService,
                            AuraCore.API.Infrastructure.Services.Email.ResendEmailService>();
 
+// Phase 6.14: FCM HTTP v1 push notifications. Typed HttpClient registers
+// IFcmService -> FcmService and injects HttpClient. Service is a no-op when
+// FCM_SERVICE_ACCOUNT_JSON / FCM_PROJECT_ID env vars are not configured.
+builder.Services.AddHttpClient<AuraCore.API.Application.Services.Push.IFcmService,
+                               AuraCore.API.Infrastructure.Services.Push.FcmService>();
+
 // DataProtection with persistent keyring. Keys directory must be app-user-owned, chmod 600.
 // On prod (Linux) default to /var/www/auracore-api/.dataprotection-keys; allow override via env var.
 // On local dev the path won't exist — fall back to a temp dir so the app still boots.

@@ -37,6 +37,18 @@ public sealed class GrubManagerModule : IOptimizationModule
     /// <summary>Parsed settings from the last successful scan.</summary>
     public GrubSettings? LastSettings { get; private set; }
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("update-grub", ct))
+            return ModuleAvailability.ToolNotInstalled("update-grub",
+                "sudo apt install grub-pc OR sudo dnf install grub2-tools");
+
+        return ModuleAvailability.Available;
+    }
+
     // ── ScanAsync ────────────────────────────────────────────────
 
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)

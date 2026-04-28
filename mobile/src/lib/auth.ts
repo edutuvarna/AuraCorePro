@@ -1,6 +1,9 @@
 import * as LocalAuthentication from 'expo-local-authentication';
-import { setJwt, setRefreshToken, setLastActiveAt, clearAuth, getJwt, isInactiveBeyondLimit } from './secureStore';
-import { api } from './api';
+import {
+  setJwt, setRefreshToken, setLastActiveAt, clearAuth, getJwt, getRefreshToken,
+  isInactiveBeyondLimit,
+  setCachedJwt, setCachedRefreshToken,
+} from './secureStore';
 import { unregisterPush } from './notifications';
 
 export type Role = 'admin' | 'superadmin';
@@ -14,8 +17,8 @@ export interface AuthState {
 export const INACTIVITY_LIMIT_DAYS = 30;
 
 export function decodeRoleFromJwt(token: string | null): Role {
-  if (!token) return 'admin';
   try {
+    if (!token) return 'admin';
     const parts = token.split('.');
     if (parts.length < 2) return 'admin';
     const payload = JSON.parse(atob(parts[1]));
@@ -39,6 +42,12 @@ export async function tryBiometricUnlock(): Promise<boolean> {
   return res.success;
 }
 
+/**
+ * Side-effect-free read: returns AuthState if a JWT exists and the user
+ * hasn't been inactive past the limit. Does NOT touch biometric — that's
+ * AuthProvider's job (single-gate). After this returns truthy, AuthProvider
+ * runs the biometric prompt, then calls hydrateCacheFromStore.
+ */
 export async function loadAuthFromStore(): Promise<AuthState | null> {
   if (await isInactiveBeyondLimit(INACTIVITY_LIMIT_DAYS)) {
     await clearAuth();
@@ -49,13 +58,29 @@ export async function loadAuthFromStore(): Promise<AuthState | null> {
   return { authenticated: true, role: decodeRoleFromJwt(jwt), jwt };
 }
 
+/**
+ * Phase 6.15.1: called by AuthProvider after a successful biometric unlock.
+ * Pulls JWT + refresh from SecureStore into the in-memory cache so the
+ * `request()` path never touches SecureStore again this session.
+ */
+export async function hydrateCacheFromStore(): Promise<void> {
+  const [jwt, refresh] = await Promise.all([getJwt(), getRefreshToken()]);
+  setCachedJwt(jwt);
+  setCachedRefreshToken(refresh);
+}
+
 export async function persistLoginSuccess(accessToken: string, refreshToken: string) {
   await setJwt(accessToken);
   await setRefreshToken(refreshToken);
   await setLastActiveAt(Date.now());
+  // Phase 6.15.1: populate cache immediately so the next request() reads the
+  // new token without round-tripping SecureStore.
+  setCachedJwt(accessToken);
+  setCachedRefreshToken(refreshToken);
 }
 
 export async function logout() {
+  // unregister push BEFORE clearing — needs the JWT for the backend call.
   try { await unregisterPush(); } catch {}
-  await clearAuth();
+  await clearAuth();  // clearAuth() also wipes the in-memory cache via clearAuthCache().
 }

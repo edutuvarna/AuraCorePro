@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using AuraCore.API.Domain.Entities;
 using AuraCore.API.Infrastructure.Data;
+using AuraCore.API.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,7 @@ public sealed class PasswordResetController : ControllerBase
         _captcha = captcha;
     }
 
+    [RateLimited("auth.register")]
     [HttpPost("forgot")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken ct)
     {

@@ -6,6 +6,12 @@
     <ProjectReference Include="../AuraCore.API.Application/AuraCore.API.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Phase 6.15.3: RateLimiterMiddleware needs HttpContext + IApplicationBuilder.
+         FrameworkReference is the standard way for class libraries to opt into
+         ASP.NET Core types without redistributing them. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.404" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="8.0.14" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />

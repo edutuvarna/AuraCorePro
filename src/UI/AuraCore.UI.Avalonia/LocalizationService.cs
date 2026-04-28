@@ -2508,6 +2508,17 @@ public static class LocalizationService
         ["UpdateBanner_Ready"]             = "Update downloaded. Run installer now?",
         ["UpdateBanner_Mandatory_Title"]   = "Required update",
         ["UpdateBanner_Mandatory_Message"] = "Version {0} is a mandatory update. AuraCore Pro will now install the new version.",
+
+        // ── Phase 6.16: UnavailableModuleView ──
+        ["unavailable.title.WrongPlatform"]      = "Not available on this platform",
+        ["unavailable.title.HelperNotRunning"]   = "Privilege helper required",
+        ["unavailable.title.ToolNotInstalled"]   = "Required tool missing",
+        ["unavailable.title.FeatureDisabled"]    = "Feature disabled",
+        ["unavailable.title.BackendUnreachable"] = "Service unreachable",
+        ["unavailable.tryAgain"]                 = "Try Again",
+        ["unavailable.copy"]                     = "Copy command",
+        ["unavailable.copied"]                   = "Copied",
+        ["unavailable.remediation"]              = "Remediation",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4945,6 +4956,17 @@ public static class LocalizationService
         ["UpdateBanner_Ready"]             = "Güncelleme indirildi. Kurulum şimdi başlatılsın mı?",
         ["UpdateBanner_Mandatory_Title"]   = "Zorunlu güncelleme",
         ["UpdateBanner_Mandatory_Message"] = "Sürüm {0} zorunlu bir güncellemedir. AuraCore Pro yeni sürümü şimdi kuracak.",
+
+        // ── Phase 6.16: UnavailableModuleView ──
+        ["unavailable.title.WrongPlatform"]      = "Bu platformda kullanılamıyor",
+        ["unavailable.title.HelperNotRunning"]   = "Yetki yardımcısı gerekli",
+        ["unavailable.title.ToolNotInstalled"]   = "Gerekli araç eksik",
+        ["unavailable.title.FeatureDisabled"]    = "Özellik devre dışı",
+        ["unavailable.title.BackendUnreachable"] = "Servise erişilemiyor",
+        ["unavailable.tryAgain"]                 = "Tekrar Dene",
+        ["unavailable.copy"]                     = "Komutu kopyala",
+        ["unavailable.copied"]                   = "Kopyalandı",
+        ["unavailable.remediation"]              = "Çözüm",
     };
 
     private static void Save()

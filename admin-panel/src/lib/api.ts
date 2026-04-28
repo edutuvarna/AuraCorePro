@@ -557,6 +557,24 @@ export const api = {
     return { ok: res.ok, data: res.ok ? await res.json() : await safeJson(res) };
   },
 
+  async getAuditRetentionPolicy() {
+    const res = await request('/api/superadmin/audit-retention/policy');
+    return res.ok ? await res.json() : null;
+  },
+
+  async setAuditRetentionPolicy(retentionDays: number) {
+    const res = await request('/api/superadmin/audit-retention/policy', {
+      method: 'POST',
+      body: JSON.stringify({ retentionDays }),
+    });
+    return { ok: res.ok, data: res.ok ? await res.json() : await safeJson(res) };
+  },
+
+  async runAuditRetentionNow() {
+    const res = await request('/api/superadmin/audit-retention/run-now', { method: 'POST' });
+    return { ok: res.ok, data: res.ok ? await res.json() : await safeJson(res) };
+  },
+
   async changePassword(currentPassword: string, newPassword: string) {
     const res = await request('/api/auth/change-password', {
       method: 'POST', body: JSON.stringify({ currentPassword, newPassword }),

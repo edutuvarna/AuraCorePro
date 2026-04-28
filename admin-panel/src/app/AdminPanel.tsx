@@ -14,7 +14,7 @@ import { useState } from 'react';
 import {
   LayoutDashboard, Users, CreditCard, Shield, Crown, Zap, ShieldCheck, Monitor,
   BarChart2, Settings2, Key, Bug, FileText,
-  Inbox, UserCog, ArrowRightLeft, Lock, Gauge, Mail,
+  Inbox, UserCog, ArrowRightLeft, Lock, Gauge, Mail, Clock,
 } from 'lucide-react';
 import { Sidebar, NavGroup } from '@/components/Sidebar';
 
@@ -38,6 +38,7 @@ import { InvitationsPage } from '@/views/InvitationsPage';
 import { RoleChangePage } from '@/views/RoleChangePage';
 import { SecurityPolicyPage } from '@/views/SecurityPolicyPage';
 import { APIRateLimitsPage } from '@/views/APIRateLimitsPage';
+import { AuditRetentionPage } from '@/views/AuditRetentionPage';
 import { MyPermissionsPage } from '@/views/MyPermissionsPage';
 import { ChangePasswordPage } from '@/views/ChangePasswordPage';
 import { Enable2FAPage } from '@/views/Enable2FAPage';
@@ -53,7 +54,7 @@ import { ScopeLimitedBanner } from '@/components/ScopeLimitedBanner';
 export type Page =
   'dashboard'|'users'|'payments'|'subscriptions'|'licenses'|'updates'|'devices'|'crashes'|'telemetry'|'audit'|'whitelist'|'config'|'security'|
   // superadmin-only
-  'permReq'|'adminActionLog'|'adminMgmt'|'invitations'|'roleChange'|'securityPolicy'|'rateLimits'|
+  'permReq'|'adminActionLog'|'adminMgmt'|'invitations'|'roleChange'|'securityPolicy'|'rateLimits'|'auditRetention'|
   // cross-role
   'myPerms'|'changePw'|'enable2fa'|'redeemInvite';
 
@@ -83,6 +84,7 @@ export const SUPERADMIN_EXTRA_GROUPS: NavGroup[] = [
     { id: 'roleChange', icon: ArrowRightLeft, label: 'Role Change' },
     { id: 'securityPolicy', icon: Lock, label: 'Security Policy' },
     { id: 'rateLimits', icon: Gauge, label: 'API Rate Limits' },
+    { id: 'auditRetention', icon: Clock, label: 'Audit Retention' },
   ] },
 ];
 
@@ -101,6 +103,7 @@ const PAGES: Record<Page, () => JSX.Element> = {
   security: SecurityPage,
   permReq: PermissionRequestsPage, adminActionLog: AdminActionLogPage, adminMgmt: AdminManagementPage,
   invitations: InvitationsPage, roleChange: RoleChangePage, securityPolicy: SecurityPolicyPage, rateLimits: APIRateLimitsPage,
+  auditRetention: AuditRetentionPage,
   myPerms: MyPermissionsPage, changePw: ChangePasswordPage, enable2fa: Enable2FAPage, redeemInvite: RedeemInvitationPage,
 };
 

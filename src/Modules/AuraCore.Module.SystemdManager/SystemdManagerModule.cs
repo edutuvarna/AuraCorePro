@@ -18,6 +18,18 @@ public sealed class SystemdManagerModule : IOptimizationModule
 
     public SystemdReport? LastReport { get; private set; }
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("systemctl", ct))
+            return ModuleAvailability.ToolNotInstalled("systemctl",
+                "Switch to a systemd-based Linux distribution.");
+
+        return ModuleAvailability.Available;
+    }
+
     // Known services often safe to disable/mask (user must opt-in)
     private static readonly Dictionary<string, string> KnownBloatware = new()
     {

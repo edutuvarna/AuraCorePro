@@ -25,6 +25,18 @@ public sealed class CronManagerModule : IOptimizationModule
         "@reboot", "@yearly", "@annually", "@monthly", "@weekly", "@daily", "@hourly", "@midnight"
     };
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("crontab", ct))
+            return ModuleAvailability.ToolNotInstalled("crontab",
+                "sudo apt install cron");
+
+        return ModuleAvailability.Available;
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!OperatingSystem.IsLinux())

@@ -479,6 +479,12 @@ public sealed partial class MainWindow : Window
         // ── Windows-only modules ──
         if (OperatingSystem.IsWindows())
         {
+            // Phase 6.16.F: lambda factories below construct Windows-only views. The outer
+            // IsWindows() guard makes them safe at runtime, but the analyzer can't trace the
+            // guard through the lambda boundary. Pragma-suppress here keeps the registration
+            // table compact; the constructed View classes carry [SupportedOSPlatform("windows")]
+            // so any non-lambda call site is still gated by the analyzer.
+#pragma warning disable CA1416
             _moduleNavigator.RegisterView("startup-optimizer",   () => new Pages.StartupOptimizerView());
             _moduleNavigator.RegisterView("storage-compression", () => new Pages.GenericModuleView()); // placeholder per pre-Phase-6.16 status
             _moduleNavigator.RegisterView("registry-cleaner",    () => new Pages.RegistryOptimizerView());
@@ -495,6 +501,7 @@ public sealed partial class MainWindow : Window
             _moduleNavigator.RegisterView("context-menu",        () => CreateTweakListView("context-menu"));
             _moduleNavigator.RegisterView("taskbar-tweaks",      () => CreateTweakListView("taskbar-tweaks"));
             _moduleNavigator.RegisterView("explorer-tweaks",     () => CreateTweakListView("explorer-tweaks"));
+#pragma warning restore CA1416
         }
 
         // ── Linux-only modules ──
@@ -647,6 +654,9 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    // Phase 6.16.F: TweakListView is Windows-only. Only invoked from the IsWindows() block
+    // in RegisterModuleViews (~line 480-498). Annotation makes the contract explicit.
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private UserControl CreateTweakListView(string moduleId)
     {
         return _moduleMap.TryGetValue(moduleId, out var module)

@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
+// Phase 6.16.F: this view binds to ContextMenu/TaskbarTweaks/ExplorerTweaks modules,
+// all Windows-only. Registered only inside the IsWindows() block in MainWindow.
+[SupportedOSPlatform("windows")]
 public partial class TweakListView : UserControl
 {
     private readonly IOptimizationModule _module;

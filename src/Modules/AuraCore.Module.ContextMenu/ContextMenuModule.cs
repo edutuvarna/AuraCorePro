@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using AuraCore.Application;
@@ -8,6 +9,10 @@ using AuraCore.Module.ContextMenu.Models;
 
 namespace AuraCore.Module.ContextMenu;
 
+// Phase 6.16.F: Windows-only module — uses Microsoft.Win32.Registry which throws
+// PlatformNotSupportedException on Linux/macOS. Runtime IsWindows() guards remain
+// as defense-in-depth; class attribute makes the contract explicit to CA1416.
+[SupportedOSPlatform("windows")]
 public sealed class ContextMenuModule : IOptimizationModule
 {
     public string Id => "context-menu";
@@ -178,6 +183,9 @@ public sealed class ContextMenuModule : IOptimizationModule
     }
 }
 
+// Phase 6.16.F: DI registration extension marked Windows-only because it instantiates
+// ContextMenuModule. Callers must guard with OperatingSystem.IsWindows() before calling.
+[SupportedOSPlatform("windows")]
 public static class ContextMenuRegistration
 {
     public static IServiceCollection AddContextMenuModule(this IServiceCollection services)

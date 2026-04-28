@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,15 +25,17 @@ public sealed class ServiceManagerEngine
             return Task.FromResult<IReadOnlyList<ServiceEntry>>(Array.Empty<ServiceEntry>());
 
         var list = ServiceController.GetServices()
-            .Select(sc => new ServiceEntry(
-                sc.ServiceName,
-                sc.DisplayName,
-                sc.Status.ToString(),
-                sc.StartType.ToString()))
+            .Select(ProjectEntry)
             .OrderBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
         return Task.FromResult<IReadOnlyList<ServiceEntry>>(list);
     }
+
+    // Phase 6.16.F: explicit-platform helper extracted from LINQ Select so CA1416
+    // analyzer can see ServiceController members are touched on a Windows-annotated method.
+    [SupportedOSPlatform("windows")]
+    private static ServiceEntry ProjectEntry(ServiceController sc)
+        => new(sc.ServiceName, sc.DisplayName, sc.Status.ToString(), sc.StartType.ToString());
 
     public Task<ServiceOperationOutcome> StartAsync(string name, CancellationToken ct = default)
         => DispatchAsync("service.start", new[] { name }, ct);

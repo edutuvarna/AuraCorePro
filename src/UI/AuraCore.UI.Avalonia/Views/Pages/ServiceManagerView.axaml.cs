@@ -36,6 +36,14 @@ public partial class ServiceManagerView : UserControl
         {
             var rawData = await Task.Run(() =>
             {
+                // Phase 6.16 Linux platform guard — defense in depth inside the Task.Run delegate.
+                // RunScan's method-entry guard at the top already short-circuits on non-Windows,
+                // but ServiceController.GetServices() is documented as Windows-only and throws
+                // PlatformNotSupportedException on Linux/macOS. Inner guard keeps this lambda safe
+                // to call from any future code path that bypasses the outer check.
+                if (!OperatingSystem.IsWindows())
+                    return new List<(string Name, string Svc, string Start, string Stat)>();
+
                 var services = ServiceController.GetServices();
                 return services.Select(s =>
                 {

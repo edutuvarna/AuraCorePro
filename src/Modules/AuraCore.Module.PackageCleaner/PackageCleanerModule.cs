@@ -22,6 +22,19 @@ public sealed class PackageCleanerModule : IOptimizationModule
     // Priority order for package manager detection
     private static readonly string[] SupportedPMs = { "apt", "dnf", "pacman", "zypper" };
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        foreach (var tool in SupportedPMs)
+            if (await ProcessRunner.CommandExistsAsync(tool, ct))
+                return ModuleAvailability.Available;
+
+        return ModuleAvailability.ToolNotInstalled("apt/dnf/pacman/zypper",
+            "Install a supported package manager (apt, dnf, pacman, or zypper).");
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!OperatingSystem.IsLinux())

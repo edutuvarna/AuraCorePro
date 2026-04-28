@@ -140,9 +140,9 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         var items = new List<SidebarModuleVM>
         {
             Module("junk-cleaner",      "nav.junkCleaner"),
-            Module("disk-cleanup",      "nav.diskCleanup"),
-            Module("privacy-cleaner",   "nav.privacyCleaner"),
-            Module("registry-cleaner",  "nav.registry",    "windows"),
+            Module("disk-cleanup",      "nav.diskCleanup",   "windows"),
+            Module("privacy-cleaner",   "nav.privacyCleaner","windows"),
+            Module("registry-cleaner",  "nav.registry",      "windows"),
             Module("bloatware-removal", "nav.bloatware",   "windows"),
         };
 

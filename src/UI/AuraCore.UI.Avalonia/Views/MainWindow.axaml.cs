@@ -426,8 +426,14 @@ public sealed partial class MainWindow : Window
     {
         if (_moduleNavigator is null)
         {
-            // Design-time / DI-unavailable fallback — render dashboard.
-            ContentArea.Content = new Pages.DashboardView();
+            // DI failed during ctor — surface the diagnostic instead of silently
+            // falling back to Dashboard for every click (the audit pattern that
+            // Phase 6.16 was meant to FIX, not perpetuate).
+            ContentArea.Content = new UnavailableModuleView(
+                moduleId,
+                AuraCore.Application.Interfaces.Modules.ModuleAvailability.FeatureDisabled(
+                    "Module navigator not initialized — DI bootstrap failed at MainWindow ctor."),
+                onTryAgain: null);
             return;
         }
         try
@@ -441,10 +447,18 @@ public sealed partial class MainWindow : Window
                 });
             ContentArea.Content = view;
         }
-        catch
+        catch (Exception ex)
         {
-            // Defensive — never let dispatch failure crash the shell.
-            ContentArea.Content = new Pages.DashboardView();
+            // Defensive — surface the failure instead of masking it as Dashboard.
+            ContentArea.Content = new UnavailableModuleView(
+                moduleId,
+                AuraCore.Application.Interfaces.Modules.ModuleAvailability.FeatureDisabled(
+                    $"Dispatch failed: {ex.GetType().Name}: {ex.Message}"),
+                onTryAgain: () =>
+                {
+                    SetActiveContent(moduleId);
+                    return Task.CompletedTask;
+                });
         }
     }
 

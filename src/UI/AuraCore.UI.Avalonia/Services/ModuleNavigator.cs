@@ -49,43 +49,41 @@ public sealed class ModuleNavigator : IModuleNavigator
             ? null
             : () => onRetryRequested(moduleId);
 
-        // 1) Module not registered on this platform → UnavailableModuleView with WrongPlatform(All).
-        if (!_moduleMap.TryGetValue(moduleId, out var module))
+        bool hasFactory = _viewFactories.TryGetValue(moduleId, out var factory);
+        bool hasModule  = _moduleMap.TryGetValue(moduleId, out var module);
+
+        // 1) No factory registered → no shell-level rendering possible. Show diagnostic.
+        // Virtual ids (dashboard/settings/ai-features) DO have factories even though they
+        // are not IOptimizationModule services — they fall through to step 3.
+        if (!hasFactory)
         {
             return new UnavailableModuleView(
-                moduleId,
+                module?.DisplayName ?? moduleId,
                 ModuleAvailability.WrongPlatform(SupportedPlatform.All),
                 onTryAgain);
         }
 
-        // 2) Module exists — run availability check.
-        var availability = await module.CheckRuntimeAvailabilityAsync(ct).ConfigureAwait(true);
-        if (!availability.IsAvailable)
+        // 2) Module-backed factory → run availability check first; render UnavailableModuleView on failure.
+        if (hasModule)
         {
-            return new UnavailableModuleView(
-                module.DisplayName,
-                availability,
-                onTryAgain);
-        }
-
-        // 3) Available — invoke registered view factory if present.
-        if (_viewFactories.TryGetValue(moduleId, out var factory))
-        {
-            try { return factory(); }
-            catch (Exception ex)
+            var availability = await module!.CheckRuntimeAvailabilityAsync(ct).ConfigureAwait(true);
+            if (!availability.IsAvailable)
             {
-                // Defensive: factory threw — show diagnostic instead of crashing the shell.
                 return new UnavailableModuleView(
                     module.DisplayName,
-                    ModuleAvailability.FeatureDisabled($"View factory threw: {ex.GetType().Name}"),
+                    availability,
                     onTryAgain);
             }
         }
 
-        // 4) No factory registered (programmer error — should be flagged).
-        return new UnavailableModuleView(
-            module.DisplayName,
-            ModuleAvailability.FeatureDisabled("View factory not registered for this module."),
-            onTryAgain);
+        // 3) Invoke the factory. Wrap in try/catch — a factory throw must not crash the shell.
+        try { return factory!(); }
+        catch (Exception ex)
+        {
+            return new UnavailableModuleView(
+                module?.DisplayName ?? moduleId,
+                ModuleAvailability.FeatureDisabled($"View factory threw: {ex.GetType().Name}: {ex.Message}"),
+                onTryAgain);
+        }
     }
 }

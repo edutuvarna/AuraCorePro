@@ -25,7 +25,7 @@ public sealed class SymlinkManagerModule : IOptimizationModule
     public string DisplayName => "Symlink Manager";
     public OptimizationCategory Category => OptimizationCategory.ShellCustomization;
     public RiskLevel Risk => RiskLevel.Medium;
-    public SupportedPlatform Platform => SupportedPlatform.Linux;
+    public SupportedPlatform Platform => SupportedPlatform.All;
 
     public SymlinkReport? LastReport { get; private set; }
 

@@ -1,23 +1,24 @@
-using Avalonia.Controls;
+using global::Avalonia.Controls;
 
 namespace AuraCore.UI.Avalonia.Services;
 
-/// <summary>
-/// Phase 6.16: UI-layer module dispatcher with availability gating.
-/// Replaces the hardcoded MainWindow.SetActiveContent switch.
-/// Distinct from Application-layer INavigationService (event-based deep-link bus).
-/// </summary>
 public interface IModuleNavigator
 {
-    /// <summary>Register a view factory for a module id (called once at app startup, per platform).</summary>
     void RegisterView(string moduleId, Func<UserControl> factory);
 
     /// <summary>
-    /// Resolve a module id to its rendered UserControl. Internally:
-    ///   1) Looks up the IOptimizationModule by id.
-    ///   2) Calls module.CheckRuntimeAvailabilityAsync().
-    ///   3) On Available -> invokes the registered view factory.
-    ///   4) Otherwise -> returns a configured UnavailableModuleView with retry callback.
+    /// Resolve a module id to its rendered UserControl.
     /// </summary>
-    Task<UserControl> ResolveAsync(string moduleId, CancellationToken ct = default);
+    /// <param name="moduleId">Module id to resolve.</param>
+    /// <param name="onRetryRequested">
+    /// Optional callback invoked when the user clicks "Try Again" on an
+    /// UnavailableModuleView. The shell typically passes its own re-render
+    /// helper so the navigator can re-resolve the same id and the shell
+    /// swaps the rendered control. May be null (Try-Again button hidden).
+    /// </param>
+    /// <param name="ct">Cancellation token.</param>
+    Task<UserControl> ResolveAsync(
+        string moduleId,
+        Func<string, Task>? onRetryRequested = null,
+        CancellationToken ct = default);
 }

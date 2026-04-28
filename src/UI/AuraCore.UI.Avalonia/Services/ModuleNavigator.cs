@@ -38,16 +38,24 @@ public sealed class ModuleNavigator : IModuleNavigator
         _viewFactories[moduleId] = factory;
     }
 
-    public async Task<UserControl> ResolveAsync(string moduleId, CancellationToken ct = default)
+    public async Task<UserControl> ResolveAsync(
+        string moduleId,
+        Func<string, Task>? onRetryRequested = null,
+        CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(moduleId);
+
+        Func<Task>? onTryAgain = onRetryRequested is null
+            ? null
+            : () => onRetryRequested(moduleId);
 
         // 1) Module not registered on this platform → UnavailableModuleView with WrongPlatform(All).
         if (!_moduleMap.TryGetValue(moduleId, out var module))
         {
             return new UnavailableModuleView(
                 moduleId,
-                ModuleAvailability.WrongPlatform(SupportedPlatform.All));
+                ModuleAvailability.WrongPlatform(SupportedPlatform.All),
+                onTryAgain);
         }
 
         // 2) Module exists — run availability check.
@@ -57,14 +65,7 @@ public sealed class ModuleNavigator : IModuleNavigator
             return new UnavailableModuleView(
                 module.DisplayName,
                 availability,
-                onTryAgain: async () =>
-                {
-                    // Best-effort: caller (MainWindow) will re-fetch via ResolveAsync.
-                    // The Try-Again button calls back; we re-resolve and the caller
-                    // swaps the visual. Implemented as a no-op task here because
-                    // visual swap is the shell's responsibility — Wave A scope.
-                    await Task.CompletedTask;
-                });
+                onTryAgain);
         }
 
         // 3) Available — invoke registered view factory if present.
@@ -76,13 +77,15 @@ public sealed class ModuleNavigator : IModuleNavigator
                 // Defensive: factory threw — show diagnostic instead of crashing the shell.
                 return new UnavailableModuleView(
                     module.DisplayName,
-                    ModuleAvailability.FeatureDisabled($"View factory threw: {ex.GetType().Name}"));
+                    ModuleAvailability.FeatureDisabled($"View factory threw: {ex.GetType().Name}"),
+                    onTryAgain);
             }
         }
 
         // 4) No factory registered (programmer error — should be flagged).
         return new UnavailableModuleView(
             module.DisplayName,
-            ModuleAvailability.FeatureDisabled("View factory not registered for this module."));
+            ModuleAvailability.FeatureDisabled("View factory not registered for this module."),
+            onTryAgain);
     }
 }

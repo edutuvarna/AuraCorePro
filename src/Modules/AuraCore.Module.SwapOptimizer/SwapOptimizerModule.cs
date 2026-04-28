@@ -21,6 +21,18 @@ public sealed class SwapOptimizerModule : IOptimizationModule
 
     private const long GB = 1024L * 1024 * 1024;
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("swapon", ct))
+            return ModuleAvailability.ToolNotInstalled("swapon",
+                "Install the util-linux package (provides swapon).");
+
+        return ModuleAvailability.Available;
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!OperatingSystem.IsLinux())

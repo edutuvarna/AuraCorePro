@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <!-- Phase 6.16.F: enforce CA1416 platform-compatibility analyzer as build error -->
+    <MSBuildWarningsAsErrors>CA1416</MSBuildWarningsAsErrors>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AuraCore.Module.KernelCleaner</RootNamespace>

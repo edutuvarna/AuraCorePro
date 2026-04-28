@@ -23,6 +23,30 @@ public interface IOptimizationModule
     /// </summary>
     bool IsAdvanced => false;
 
+    /// <summary>
+    /// Phase 6.16: fast sync platform check derived from Platform enum.
+    /// Used by SidebarViewModel.VisibleCategories() — no async overhead during sidebar render.
+    /// </summary>
+    bool IsPlatformSupported => Platform switch
+    {
+        SupportedPlatform.Windows => OperatingSystem.IsWindows(),
+        SupportedPlatform.Linux   => OperatingSystem.IsLinux(),
+        SupportedPlatform.MacOS   => OperatingSystem.IsMacOS(),
+        SupportedPlatform.All     => true,
+        _                         => true,
+    };
+
+    /// <summary>
+    /// Phase 6.16: slow async runtime check. Returns rich result.
+    /// Used by NavigationService BEFORE rendering view to surface
+    /// helper-not-running, tool-not-installed, etc. as a graceful UnavailableModuleView.
+    /// Default: Available on all supported platforms; modules opt in by overriding.
+    /// </summary>
+    Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+        => Task.FromResult(IsPlatformSupported
+            ? ModuleAvailability.Available
+            : ModuleAvailability.WrongPlatform(Platform));
+
     Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default);
     Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan,

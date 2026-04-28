@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -11,6 +12,9 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public record RegIssueItem(string Desc, string KeyPath, string Category, string Risk, ISolidColorBrush RiskFg, ISolidColorBrush RiskBg);
 
+// Phase 6.16.F: this view is registered only inside the IsWindows() block in MainWindow,
+// so it's safe to mark Windows-only and let CA1416 propagate.
+[SupportedOSPlatform("windows")]
 public partial class RegistryOptimizerView : UserControl
 {
     private readonly RegistryOptimizerModule? _module;

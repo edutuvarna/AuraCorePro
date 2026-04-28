@@ -20,6 +20,18 @@ public sealed class JournalCleanerModule : IOptimizationModule
 
     public JournalReport? LastReport { get; private set; }
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("journalctl", ct))
+            return ModuleAvailability.ToolNotInstalled("journalctl",
+                "Switch to a systemd-based Linux distribution.");
+
+        return ModuleAvailability.Available;
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!OperatingSystem.IsLinux())

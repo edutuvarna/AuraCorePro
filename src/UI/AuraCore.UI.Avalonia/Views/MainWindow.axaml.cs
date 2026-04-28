@@ -27,6 +27,9 @@ public sealed partial class MainWindow : Window
     private readonly Dictionary<string, IOptimizationModule> _moduleMap = new();
     private readonly AuraCore.UI.Avalonia.ViewModels.SidebarViewModel _sidebarVm;
 
+    // Phase 6.16: module navigator (view factory registry + availability gating)
+    private readonly global::AuraCore.UI.Avalonia.Services.IModuleNavigator? _moduleNavigator;
+
     // Phase 5.2.0 Task 11: privilege helper availability banner
     private readonly IHelperAvailabilityService? _helperAvailability;
 
@@ -63,6 +66,19 @@ public sealed partial class MainWindow : Window
                 _moduleMap[m.Id] = m;
         }
         catch { /* DI not available during design time */ }
+
+        // Phase 6.16: resolve the module navigator from DI and register every
+        // moduleId → view-factory binding the MainWindow shell knows about.
+        try
+        {
+            _moduleNavigator = App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Services.IModuleNavigator>();
+            RegisterAllModuleViews();
+        }
+        catch
+        {
+            // Design-time / test fallback — without the navigator, SetActiveContent
+            // falls back to the legacy DashboardView.
+        }
 
         // Phase 5.2.0 Task 11: resolve helper availability service and wire banner visibility
         try
@@ -406,66 +422,109 @@ public sealed partial class MainWindow : Window
         RebuildSidebar();
     }
 
-    private void SetActiveContent(string moduleId)
+    private async void SetActiveContent(string moduleId)
     {
-        ContentArea.Content = moduleId switch
+        if (_moduleNavigator is null)
         {
-            "dashboard" => new Pages.DashboardView(),
-            "ai-features" => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView>(),
-            _ => CreateModuleView(moduleId),
-        };
+            // Design-time / DI-unavailable fallback — render dashboard.
+            ContentArea.Content = new Pages.DashboardView();
+            return;
+        }
+        try
+        {
+            var view = await _moduleNavigator.ResolveAsync(
+                moduleId,
+                onRetryRequested: id =>
+                {
+                    SetActiveContent(id);
+                    return Task.CompletedTask;
+                });
+            ContentArea.Content = view;
+        }
+        catch
+        {
+            // Defensive — never let dispatch failure crash the shell.
+            ContentArea.Content = new Pages.DashboardView();
+        }
     }
 
-    private UserControl CreateModuleView(string moduleId)
+    private void RegisterAllModuleViews()
     {
-        return moduleId switch
+        if (_moduleNavigator is null) return;
+
+        // ── Always-on (Dashboard + Settings + AI Features) ──
+        _moduleNavigator.RegisterView("dashboard",       () => new Pages.DashboardView());
+        _moduleNavigator.RegisterView("settings",        () => new Pages.SettingsView());
+        _moduleNavigator.RegisterView("ai-features",
+            () => App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Views.Pages.AIFeaturesView>());
+
+        // ── Cross-platform modules ──
+        _moduleNavigator.RegisterView("ram-optimizer",         () => new Pages.RamOptimizerView());
+        _moduleNavigator.RegisterView("network-optimizer",     () => new Pages.NetworkOptimizerView());
+        _moduleNavigator.RegisterView("battery-optimizer",     () => new Pages.BatteryOptimizerView());
+        _moduleNavigator.RegisterView("junk-cleaner",          () => CreateCategoryCleanView("junk-cleaner"));
+        _moduleNavigator.RegisterView("disk-cleanup",          () => CreateCategoryCleanView("disk-cleanup"));
+        _moduleNavigator.RegisterView("privacy-cleaner",       () => CreateCategoryCleanView("privacy-cleaner"));
+        _moduleNavigator.RegisterView("file-shredder",         () => new Pages.FileShredderView());
+        _moduleNavigator.RegisterView("hosts-editor",          () => new Pages.HostsEditorView());
+        _moduleNavigator.RegisterView("space-analyzer",        () => new Pages.SpaceAnalyzerView());
+        _moduleNavigator.RegisterView("system-health",         () => new Pages.SystemHealthView());
+        _moduleNavigator.RegisterView("environment-variables", () => new Pages.EnvironmentVariablesView());
+        _moduleNavigator.RegisterView("symlink-manager",       () => new Pages.SymlinkManagerView());
+        _moduleNavigator.RegisterView("process-monitor",       () => new Pages.ProcessMonitorView());
+        _moduleNavigator.RegisterView("wake-on-lan",           () => new Pages.WakeOnLanView());
+        _moduleNavigator.RegisterView("admin-panel",           () => new Pages.AdminPanelView());
+        _moduleNavigator.RegisterView("disk-health",           () => new Pages.DiskHealthView());
+
+        // ── Windows-only modules ──
+        if (OperatingSystem.IsWindows())
         {
-            "ram-optimizer" => new Pages.RamOptimizerView(),
-            "startup-optimizer" => new Pages.StartupOptimizerView(),
-            "network-optimizer" => new Pages.NetworkOptimizerView(),
-            "battery-optimizer" => new Pages.BatteryOptimizerView(),
-            "junk-cleaner" => CreateCategoryCleanView("junk-cleaner"),
-            "disk-cleanup" => CreateCategoryCleanView("disk-cleanup"),
-            "privacy-cleaner" => CreateCategoryCleanView("privacy-cleaner"),
-            "registry-cleaner" => new Pages.RegistryOptimizerView(),
-            "bloatware-removal" => new Pages.BloatwareRemovalView(),
-            "app-installer" => new Pages.AppInstallerView(),
-            "gaming-mode" => new Pages.GamingModeView(),
-            "defender-manager" => new Pages.DefenderManagerView(),
-            "firewall-rules" => new Pages.FirewallRulesView(),
-            "file-shredder" => new Pages.FileShredderView(),
-            "hosts-editor" => new Pages.HostsEditorView(),
-            "driver-updater" => new Pages.DriverUpdaterView(),
-            "service-manager" => new Pages.ServiceManagerView(),
-            "iso-builder" => new Pages.IsoBuilderView(),
-            "disk-health" => new Pages.DiskHealthView(),
-            "space-analyzer" => new Pages.SpaceAnalyzerView(),
-            "registry-deep" => new Pages.RegistryOptimizerView(),
-            "environment-variables" => new Pages.EnvironmentVariablesView(),
-            "symlink-manager" => new Pages.SymlinkManagerView(),
-            "process-monitor" => new Pages.ProcessMonitorView(),
-            // Phase 5.1.10: font-manager soft-hidden; falls through to Dashboard default.
-            "context-menu" => CreateTweakListView("context-menu"),
-            "taskbar-tweaks" => CreateTweakListView("taskbar-tweaks"),
-            "explorer-tweaks" => CreateTweakListView("explorer-tweaks"),
-            "autorun-manager" => new Pages.AutorunManagerView(),
-            "wake-on-lan" => new Pages.WakeOnLanView(),
-            "system-health" => new Pages.SystemHealthView(),
-            "admin-panel" => new Pages.AdminPanelView(),
-            "storage-compression" => new Pages.GenericModuleView(), // placeholder — feature dev deferred
-            "journal-cleaner" => CreateJournalCleanerView(),
-            "snap-flatpak-cleaner" => CreateSnapFlatpakCleanerView(),
-            "docker-cleaner" => CreateDockerCleanerView(),
-            "kernel-cleaner" => CreateKernelCleanerView(),
-            "linux-app-installer" => CreateLinuxAppInstallerView(),
-            "grub-manager" => CreateGrubManagerView(),
-            "dns-flusher" => CreateDnsFlusherView(),
-            "purgeable-space-manager" => CreatePurgeableSpaceView(),
-            "spotlight-manager" => CreateSpotlightManagerView(),
-            "xcode-cleaner" => CreateXcodeCleanerView(),
-            "mac-app-installer" => CreateMacAppInstallerView(),
-            _ => new Pages.DashboardView(),
-        };
+            // Phase 6.16.F: lambda factories below construct Windows-only views. The outer
+            // IsWindows() guard makes them safe at runtime, but the analyzer can't trace the
+            // guard through the lambda boundary. Pragma-suppress here keeps the registration
+            // table compact; the constructed View classes carry [SupportedOSPlatform("windows")]
+            // so any non-lambda call site is still gated by the analyzer.
+#pragma warning disable CA1416
+            _moduleNavigator.RegisterView("startup-optimizer",   () => new Pages.StartupOptimizerView());
+            _moduleNavigator.RegisterView("storage-compression", () => new Pages.GenericModuleView()); // placeholder per pre-Phase-6.16 status
+            _moduleNavigator.RegisterView("registry-cleaner",    () => new Pages.RegistryOptimizerView());
+            _moduleNavigator.RegisterView("registry-deep",       () => new Pages.RegistryOptimizerView());
+            _moduleNavigator.RegisterView("bloatware-removal",   () => new Pages.BloatwareRemovalView());
+            _moduleNavigator.RegisterView("gaming-mode",         () => new Pages.GamingModeView());
+            _moduleNavigator.RegisterView("defender-manager",    () => new Pages.DefenderManagerView());
+            _moduleNavigator.RegisterView("firewall-rules",      () => new Pages.FirewallRulesView());
+            _moduleNavigator.RegisterView("app-installer",       () => new Pages.AppInstallerView());
+            _moduleNavigator.RegisterView("driver-updater",      () => new Pages.DriverUpdaterView());
+            _moduleNavigator.RegisterView("service-manager",     () => new Pages.ServiceManagerView());
+            _moduleNavigator.RegisterView("iso-builder",         () => new Pages.IsoBuilderView());
+            _moduleNavigator.RegisterView("autorun-manager",     () => new Pages.AutorunManagerView());
+            _moduleNavigator.RegisterView("context-menu",        () => CreateTweakListView("context-menu"));
+            _moduleNavigator.RegisterView("taskbar-tweaks",      () => CreateTweakListView("taskbar-tweaks"));
+            _moduleNavigator.RegisterView("explorer-tweaks",     () => CreateTweakListView("explorer-tweaks"));
+#pragma warning restore CA1416
+        }
+
+        // ── Linux-only modules ──
+        if (OperatingSystem.IsLinux())
+        {
+            _moduleNavigator.RegisterView("journal-cleaner",      CreateJournalCleanerView);
+            _moduleNavigator.RegisterView("snap-flatpak-cleaner", CreateSnapFlatpakCleanerView);
+            _moduleNavigator.RegisterView("docker-cleaner",       CreateDockerCleanerView);
+            _moduleNavigator.RegisterView("kernel-cleaner",       CreateKernelCleanerView);
+            _moduleNavigator.RegisterView("linux-app-installer",  CreateLinuxAppInstallerView);
+            _moduleNavigator.RegisterView("grub-manager",         CreateGrubManagerView);
+        }
+
+        // ── macOS-only modules ──
+        if (OperatingSystem.IsMacOS())
+        {
+            _moduleNavigator.RegisterView("docker-cleaner",          CreateDockerCleanerView); // shared with Linux per App.axaml.cs
+            _moduleNavigator.RegisterView("dns-flusher",             CreateDnsFlusherView);
+            _moduleNavigator.RegisterView("purgeable-space-manager", CreatePurgeableSpaceView);
+            _moduleNavigator.RegisterView("spotlight-manager",       CreateSpotlightManagerView);
+            _moduleNavigator.RegisterView("xcode-cleaner",           CreateXcodeCleanerView);
+            _moduleNavigator.RegisterView("mac-app-installer",       CreateMacAppInstallerView);
+        }
     }
 
     private UserControl CreateCategoryCleanView(string moduleId)
@@ -595,6 +654,9 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    // Phase 6.16.F: TweakListView is Windows-only. Only invoked from the IsWindows() block
+    // in RegisterModuleViews (~line 480-498). Annotation makes the contract explicit.
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private UserControl CreateTweakListView(string moduleId)
     {
         return _moduleMap.TryGetValue(moduleId, out var module)

@@ -120,10 +120,10 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
         var items = new List<SidebarModuleVM>
         {
             Module("ram-optimizer",       "nav.ramOptimizer"),
-            Module("startup-optimizer",   "nav.startupOptimizer"),
-            Module("network-optimizer",   "nav.network"),
-            Module("battery-optimizer",   "nav.batteryOptimizer"),
-            Module("storage-compression", "nav.storage", "windows"),
+            Module("startup-optimizer",   "nav.startupOptimizer", "windows"),
+            Module("network-optimizer",   "nav.network",          "windows"),
+            Module("battery-optimizer",   "nav.batteryOptimizer", "windows"),
+            Module("storage-compression", "nav.storage",          "windows"),
         };
 
         if (OperatingSystem.IsLinux())
@@ -224,7 +224,7 @@ public sealed class SidebarViewModel : INotifyPropertyChanged
             Module("context-menu",           "nav.contextMenu",           "windows"),
             Module("taskbar-tweaks",         "nav.taskbar",               "windows"),
             Module("explorer-tweaks",        "nav.explorer",              "windows"),
-            Module("autorun-manager",        "nav.autorunManager"),
+            Module("autorun-manager",        "nav.autorunManager",        "windows"),
             Module("wake-on-lan",            "nav.wakeOnLan"),
             Module("admin-panel",            "nav.adminPanel"),
         };

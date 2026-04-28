@@ -5,27 +5,29 @@ using System.Threading.Tasks;
 namespace AuraCore.UI.Avalonia.ViewModels.Dashboard;
 
 /// <summary>
-/// Factory for the Windows Quick Action tile collection shown on the Dashboard.
-/// The three Func delegates are injected by DashboardViewModel so this class
+/// Factory for the Dashboard Quick Action tile collection.
+/// The Func delegates are injected by DashboardViewModel so this class
 /// remains decoupled from specific module types and easy to test.
 /// </summary>
 public static class QuickActionPresets
 {
     /// <summary>
-    /// Returns the standard Windows Quick Action tiles in display order.
+    /// Returns the Quick Action tiles in display order, filtered by current platform.
+    /// On non-Windows, the "Remove Windows bloat" tile is excluded (the underlying
+    /// BloatwareRemoval module is Windows-only).
     /// </summary>
-    public static IReadOnlyList<QuickActionTileVM> Windows(
+    public static IReadOnlyList<QuickActionTileVM> Default(
         Func<Task> quickCleanup,
         Func<Task> optimizeRam,
         Func<Task> removeBloat)
     {
-        return new[]
+        var tiles = new List<QuickActionTileVM>
         {
             new QuickActionTileVM(
                 id: "quick-cleanup",
                 label: LocalizationService.Get("quickaction.quickcleanup.label"),
                 subLabel: LocalizationService.Get("quickaction.quickcleanup.sublabel"),
-                iconGlyph: "\U0001F9F9",   // 🧹 broom
+                iconGlyph: "\U0001F9F9",
                 accentToken: "AccentTealBrush",
                 execute: quickCleanup),
 
@@ -33,17 +35,22 @@ public static class QuickActionPresets
                 id: "optimize-ram",
                 label: LocalizationService.Get("quickaction.optimizeram.label"),
                 subLabel: LocalizationService.Get("quickaction.optimizeram.sublabel"),
-                iconGlyph: "\u26A1",       // ⚡ lightning
+                iconGlyph: "⚡",
                 accentToken: "AccentPurpleBrush",
                 execute: optimizeRam),
+        };
 
-            new QuickActionTileVM(
+        if (OperatingSystem.IsWindows())
+        {
+            tiles.Add(new QuickActionTileVM(
                 id: "remove-bloat",
                 label: LocalizationService.Get("quickaction.removebloat.label"),
                 subLabel: LocalizationService.Get("quickaction.removebloat.sublabel"),
-                iconGlyph: "\U0001F5D1",   // 🗑 wastebasket
+                iconGlyph: "\U0001F5D1",
                 accentToken: "AccentAmberBrush",
-                execute: removeBloat),
-        };
+                execute: removeBloat));
+        }
+
+        return tiles;
     }
 }

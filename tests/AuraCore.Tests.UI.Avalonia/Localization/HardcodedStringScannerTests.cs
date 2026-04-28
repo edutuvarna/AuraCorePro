@@ -140,6 +140,62 @@ public class HardcodedStringScannerTests
         return false;
     }
 
+    [Fact]
+    public void Localization_Values_Should_Not_Contain_Platform_Names_In_Generic_Keys()
+    {
+        // Assemble the EN dict via reflection on the static LocalizationService.
+        // Banned terms in non-platform-keyed values are user-visible Windows-centric
+        // strings that would leak to Linux/macOS users.
+        var enField = typeof(global::AuraCore.UI.Avalonia.LocalizationService)
+            .GetField("EN", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.NotNull(enField);
+        var en = (Dictionary<string, string>)enField!.GetValue(null)!;
+
+        // Words to flag in values where the key is NOT platform-suffixed.
+        // Skip "Windows" alone (too common — used in legit Windows-only contexts);
+        // flag the more egregious phrases.
+        var bannedPhrases = new[]
+        {
+            "Windows 10",
+            "Windows 11",
+            "Windows hosts",
+            "Windows Optimization SaaS",
+            "Windows optimization toolkit",
+            "Customize Your Windows",
+        };
+
+        // Keys allowed to mention Windows because they're platform-scoped.
+        bool IsAllowedKey(string key)
+            => key.EndsWith(".windows") || key.EndsWith(".linux") || key.EndsWith(".macos")
+            || key.Contains(".subtitleWindows") || key.Contains(".subtitleLinux") || key.Contains(".subtitleMacOS")
+            || key.StartsWith("def.")  // Windows Defender — module-scoped
+            || key.StartsWith("svc.")  // Windows Service Manager — module-scoped
+            || key.StartsWith("autorun.") || key.StartsWith("registry.") || key.StartsWith("ctxmenu.")
+            || key.StartsWith("storage.") || key.StartsWith("driver.") || key.StartsWith("iso.")
+            || key.StartsWith("firewall.") || key.StartsWith("appinstall.") || key.StartsWith("bloatware.")
+            || key.StartsWith("startup.") || key.StartsWith("gaming.") || key.StartsWith("taskbar.")
+            || key.StartsWith("explorer.")
+            || key == "quickaction.removebloat.label"  // Windows-only tile by design (Phase 6.16.E)
+            || key == "quickaction.removebloat.sublabel";
+
+        var offenders = new List<string>();
+        foreach (var (key, value) in en)
+        {
+            if (IsAllowedKey(key)) continue;
+            foreach (var phrase in bannedPhrases)
+            {
+                if (value.Contains(phrase, StringComparison.OrdinalIgnoreCase))
+                {
+                    offenders.Add($"  + key='{key}' value contains '{phrase}': \"{value}\"");
+                }
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "Localization keys with banned platform-name leakage:" + Environment.NewLine +
+            string.Join(Environment.NewLine, offenders));
+    }
+
     private static string? FindViewsRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

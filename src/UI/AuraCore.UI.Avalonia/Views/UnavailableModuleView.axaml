@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AuraCore.UI.Avalonia.Views.UnavailableModuleView">
+  <Grid RowDefinitions="Auto,*">
+    <!-- Page header: module name -->
+    <Border Grid.Row="0" Padding="32,24,32,16" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource BorderSubtleBrush}">
+      <TextBlock x:Name="ModuleNameText"
+                 FontSize="22"
+                 Foreground="{DynamicResource TextPrimaryBrush}" />
+    </Border>
+    <!-- Body: diagnostic card -->
+    <ScrollViewer Grid.Row="1" Padding="32,24,32,32">
+      <Border Padding="32" MaxWidth="640" HorizontalAlignment="Stretch"
+              CornerRadius="8"
+              Background="{DynamicResource BgCardBrush}"
+              BorderBrush="{DynamicResource BorderSubtleBrush}"
+              BorderThickness="1">
+        <StackPanel Spacing="16">
+          <!-- Title -->
+          <TextBlock x:Name="CategoryTitleText"
+                     FontSize="18" FontWeight="SemiBold"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
+
+          <!-- Reason -->
+          <TextBlock x:Name="ReasonText"
+                     FontSize="14"
+                     TextWrapping="Wrap"
+                     Foreground="{DynamicResource TextSecondaryBrush}" />
+
+          <!-- Remediation command (only shown if non-null) -->
+          <Border x:Name="RemediationPanel"
+                  Padding="16,12" CornerRadius="6"
+                  Background="{DynamicResource BgSurfaceBrush}">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+              <TextBlock Grid.Row="0" Grid.Column="0"
+                         x:Name="RemediationLabel"
+                         FontSize="11" FontWeight="SemiBold"
+                         Foreground="{DynamicResource TextMutedBrush}"
+                         Margin="0,0,0,4" />
+              <SelectableTextBlock Grid.Row="1" Grid.Column="0"
+                         x:Name="RemediationText"
+                         FontFamily="Consolas,Menlo,Monospace"
+                         FontSize="13"
+                         Foreground="{DynamicResource TextPrimaryBrush}"
+                         TextWrapping="Wrap" />
+              <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                      x:Name="CopyButton"
+                      Click="OnCopyClick"
+                      VerticalAlignment="Top" />
+            </Grid>
+          </Border>
+
+          <!-- Try Again button -->
+          <Button x:Name="TryAgainButton"
+                  HorizontalAlignment="Left"
+                  Click="OnTryAgainClick" />
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -59,7 +59,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         }
         // Initialize tiles with no-op stubs so bindings are never null.
         // DashboardView.Loaded calls InitQuickActions() with real delegates.
-        QuickActions = QuickActionPresets.Windows(
+        QuickActions = QuickActionPresets.Default(
             quickCleanup: () => Task.CompletedTask,
             optimizeRam:  () => Task.CompletedTask,
             removeBloat:  () => Task.CompletedTask);
@@ -75,7 +75,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         _executeOptimizeRam  = optimizeRam;
         _executeRemoveBloat  = removeBloat;
         Func<Task> noOp = () => Task.CompletedTask;
-        QuickActions = QuickActionPresets.Windows(
+        QuickActions = QuickActionPresets.Default(
             quickCleanup: () => (_executeQuickCleanup ?? noOp)(),
             optimizeRam:  () => (_executeOptimizeRam  ?? noOp)(),
             removeBloat:  () => (_executeRemoveBloat  ?? noOp)());

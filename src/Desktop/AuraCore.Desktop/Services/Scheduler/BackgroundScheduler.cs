@@ -146,6 +146,17 @@ public sealed class BackgroundScheduler : IDisposable
 
     private static TimeSpan GetIdleTime()
     {
+        // Phase 6.16 Linux platform guard — GetLastInputInfo is a user32.dll P/Invoke that throws
+        // EntryPointNotFoundException on non-Windows. AuraCore.Desktop currently targets
+        // net8.0-windows10.0.19041.0 so this never triggers in the WinUI app, but the guard makes
+        // the helper safe to lift cross-platform if BackgroundScheduler ever moves to Avalonia.
+        // CheckSchedules runs on a 60-second timer in production — a per-tick crash would be
+        // catastrophic, hence the early-return rather than try/catch.
+        // No automated test: GetIdleTime is private and Tests.Unit cannot reference the WinUI csproj.
+        // Manual verification path: build + run the Avalonia equivalent on Linux once BackgroundScheduler
+        // is lifted (Phase 6.16 Wave C consideration).
+        if (!OperatingSystem.IsWindows()) return TimeSpan.Zero;
+
         var info = new LASTINPUTINFO { cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf<LASTINPUTINFO>() };
         if (GetLastInputInfo(ref info))
         {

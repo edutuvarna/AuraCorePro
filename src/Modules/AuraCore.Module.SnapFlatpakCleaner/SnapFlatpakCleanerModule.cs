@@ -33,6 +33,19 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     public bool LastSnapAvailable { get; private set; }
     public bool LastFlatpakAvailable { get; private set; }
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        foreach (var tool in new[] { "snap", "flatpak" })
+            if (await ProcessRunner.CommandExistsAsync(tool, ct))
+                return ModuleAvailability.Available;
+
+        return ModuleAvailability.ToolNotInstalled("snap/flatpak",
+            "Install snap (sudo apt install snapd) or flatpak (sudo apt install flatpak).");
+    }
+
     /// <summary>
     /// Validates snap package names and flatpak application IDs.
     /// Allows alphanumeric characters, dashes, dots, and underscores.

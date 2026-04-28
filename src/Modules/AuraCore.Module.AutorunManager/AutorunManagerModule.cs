@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using AuraCore.Application;
@@ -7,6 +8,10 @@ using AuraCore.Module.AutorunManager.Models;
 
 namespace AuraCore.Module.AutorunManager;
 
+// Phase 6.16.F: Windows-only module — uses Microsoft.Win32.Registry which throws
+// PlatformNotSupportedException on Linux/macOS. Runtime IsWindows() guards remain
+// as defense-in-depth; class attribute makes the contract explicit to CA1416.
+[SupportedOSPlatform("windows")]
 public sealed class AutorunManagerModule : IOptimizationModule
 {
     public string Id          => "autorun-manager";
@@ -18,6 +23,10 @@ public sealed class AutorunManagerModule : IOptimizationModule
 
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Microsoft.Win32.Registry throws PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new ScanResult(Id, true, 0, 0);
+
         var entries = new List<AutorunEntry>();
         await Task.Run(() =>
         {
@@ -52,6 +61,10 @@ public sealed class AutorunManagerModule : IOptimizationModule
     public async Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan, IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Registry writes throw PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new OptimizationResult(Id, "", true, 0, 0, TimeSpan.Zero);
+
         int done = 0;
         var start = DateTime.UtcNow;
         var ids = plan.SelectedItemIds ?? new List<string>();
@@ -259,6 +272,9 @@ public sealed class AutorunManagerModule : IOptimizationModule
     }
 }
 
+// Phase 6.16.F: DI registration extension marked Windows-only because it instantiates
+// AutorunManagerModule. Callers must guard with OperatingSystem.IsWindows() before calling.
+[SupportedOSPlatform("windows")]
 public static class AutorunManagerRegistration
 {
     public static IServiceCollection AddAutorunManagerModule(this IServiceCollection services)

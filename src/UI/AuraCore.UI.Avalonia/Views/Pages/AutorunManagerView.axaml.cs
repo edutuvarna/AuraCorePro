@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
@@ -16,6 +17,9 @@ public record AutorunDisplayItem(
     bool IsEnabled, string ToggleTag, string DeleteTag,
     string DeleteLabel);
 
+// Phase 6.16.F: this view is registered only inside the IsWindows() block in MainWindow,
+// so it's safe to mark Windows-only and let CA1416 propagate.
+[SupportedOSPlatform("windows")]
 public partial class AutorunManagerView : UserControl
 {
     private readonly AutorunManagerModule? _module;

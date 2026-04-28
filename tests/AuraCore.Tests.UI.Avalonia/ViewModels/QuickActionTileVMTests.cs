@@ -71,35 +71,48 @@ public class QuickActionTileVMTests
     }
 
     [Fact]
-    public void QuickActionPresets_Windows_returns_three_tiles()
+    public void QuickActionPresets_Default_returns_correct_tiles_for_platform()
     {
-        var tiles = QuickActionPresets.Windows(
+        var tiles = QuickActionPresets.Default(
             quickCleanup: () => Task.CompletedTask,
             optimizeRam:  () => Task.CompletedTask,
             removeBloat:  () => Task.CompletedTask);
 
-        Assert.Equal(3, tiles.Count);
+        int expected = System.OperatingSystem.IsWindows() ? 3 : 2;
+        Assert.Equal(expected, tiles.Count);
     }
 
     [Fact]
-    public void QuickActionPresets_Windows_ids_are_distinct()
+    public void QuickActionPresets_Default_ids_are_distinct()
     {
-        var tiles = QuickActionPresets.Windows(
+        var tiles = QuickActionPresets.Default(
             quickCleanup: () => Task.CompletedTask,
             optimizeRam:  () => Task.CompletedTask,
             removeBloat:  () => Task.CompletedTask);
 
         var ids = new System.Collections.Generic.HashSet<string>();
         foreach (var t in tiles) ids.Add(t.Id);
-        Assert.Equal(3, ids.Count);
+        int expected = System.OperatingSystem.IsWindows() ? 3 : 2;
+        Assert.Equal(expected, ids.Count);
     }
 
     [Fact]
-    public void DashboardViewModel_QuickActions_initialized_with_three_tiles()
+    public void Default_OnNonWindows_ExcludesRemoveBloatTile()
     {
-        // Default ctor must produce a non-empty QuickActions list
+        if (System.OperatingSystem.IsWindows()) return;
+        var tiles = QuickActionPresets.Default(
+            quickCleanup: () => Task.CompletedTask,
+            optimizeRam:  () => Task.CompletedTask,
+            removeBloat:  () => Task.CompletedTask);
+        Assert.DoesNotContain(tiles, t => t.Id == "remove-bloat");
+    }
+
+    [Fact]
+    public void DashboardViewModel_QuickActions_initialized_for_platform()
+    {
         var vm = new AuraCore.UI.Avalonia.ViewModels.DashboardViewModel();
-        Assert.Equal(3, vm.QuickActions.Count);
+        int expected = System.OperatingSystem.IsWindows() ? 3 : 2;
+        Assert.Equal(expected, vm.QuickActions.Count);
     }
 
     [Fact]
@@ -113,8 +126,9 @@ public class QuickActionTileVMTests
             optimizeRam:  () => Task.CompletedTask,
             removeBloat:  () => Task.CompletedTask);
 
-        // Still 3 tiles after re-init
-        Assert.Equal(3, vm.QuickActions.Count);
+        // Same tile count after re-init (platform-filtered)
+        int expected = System.OperatingSystem.IsWindows() ? 3 : 2;
+        Assert.Equal(expected, vm.QuickActions.Count);
         // The first tile's command should invoke our delegate
         vm.QuickActions[0].Command.Execute(null);
         // replacedCalled will be true once the async command fires

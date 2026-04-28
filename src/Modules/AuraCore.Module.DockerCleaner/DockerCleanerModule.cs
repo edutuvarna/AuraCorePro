@@ -21,6 +21,18 @@ public sealed class DockerCleanerModule : IOptimizationModule
 
     public DockerReport? LastReport { get; private set; }
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux | SupportedPlatform.MacOS);
+
+        if (!await ProcessRunner.CommandExistsAsync("docker", ct))
+            return ModuleAvailability.ToolNotInstalled("docker",
+                "https://docs.docker.com/engine/install/");
+
+        return ModuleAvailability.Available;
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!IsSupportedPlatform())

@@ -20,6 +20,18 @@ public sealed class KernelCleanerModule : IOptimizationModule
     public KernelReport? LastReport { get; private set; }
     private const int DefaultKeepCount = 2;  // Keep current + 1 previous
 
+    public async Task<ModuleAvailability> CheckRuntimeAvailabilityAsync(CancellationToken ct = default)
+    {
+        if (!OperatingSystem.IsLinux())
+            return ModuleAvailability.WrongPlatform(SupportedPlatform.Linux);
+
+        if (!await ProcessRunner.CommandExistsAsync("apt-get", ct))
+            return ModuleAvailability.ToolNotInstalled("apt-get",
+                "Currently supports apt-based distributions only (Debian, Ubuntu).");
+
+        return ModuleAvailability.Available;
+    }
+
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
         if (!OperatingSystem.IsLinux())

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using AuraCore.Application;
@@ -8,6 +9,10 @@ using AuraCore.Module.RegistryOptimizer.Models;
 
 namespace AuraCore.Module.RegistryOptimizer;
 
+// Phase 6.16.F: Windows-only module — uses Microsoft.Win32.Registry which throws
+// PlatformNotSupportedException on Linux/macOS. Runtime IsWindows() guards remain
+// as defense-in-depth; class attribute makes the contract explicit to CA1416.
+[SupportedOSPlatform("windows")]
 public sealed class RegistryOptimizerModule : IOptimizationModule
 {
     public string Id => "registry-optimizer";
@@ -19,6 +24,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
 
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Microsoft.Win32.Registry throws PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new ScanResult(Id, true, 0, 0);
+
         var issues = new List<RegistryIssue>();
 
         await Task.Run(() =>
@@ -38,6 +47,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
     public async Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan, IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Registry writes throw PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new OptimizationResult(Id, "", true, 0, 0, TimeSpan.Zero);
+
         if (plan.SelectedItemIds.Count == 0 || LastReport is null)
             return new OptimizationResult(Id, "", false, 0, 0, TimeSpan.Zero);
 
@@ -438,6 +451,9 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
     }
 }
 
+// Phase 6.16.F: DI registration extension marked Windows-only because it instantiates
+// RegistryOptimizerModule. Callers must guard with OperatingSystem.IsWindows() before calling.
+[SupportedOSPlatform("windows")]
 public static class RegistryOptimizerRegistration
 {
     public static IServiceCollection AddRegistryOptimizerModule(

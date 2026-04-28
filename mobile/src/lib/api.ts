@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { getJwt } from './secureStore';
+import { getCachedJwt } from './secureStore';
 
 const API = (Constants.expoConfig?.extra as any)?.apiUrl
   ?? process.env.EXPO_PUBLIC_API_URL
@@ -15,8 +15,11 @@ const MOBILE_CLIENT_SECRET = (Constants.expoConfig?.extra as any)?.mobileClientS
   ?? process.env.EXPO_PUBLIC_MOBILE_CLIENT_SECRET
   ?? '';
 
+// Phase 6.15.1: synchronous cache read replaces the previous `await getJwt()`.
+// AuthProvider populates the cache after the single biometric unlock; login/
+// refresh paths populate it via persistLoginSuccess and tryRefreshToken.
 async function request(path: string, init: RequestInit = {}) {
-  const token = await getJwt();
+  const token = getCachedJwt();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...((init.headers as Record<string, string>) ?? {}),

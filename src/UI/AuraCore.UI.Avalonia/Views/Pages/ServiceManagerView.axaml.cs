@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,23 +35,19 @@ public partial class ServiceManagerView : UserControl
         ScanLabel.Text = LocalizationService._("common.scanning");
         try
         {
-            var rawData = await Task.Run(() =>
+            var rawData = await Task.Run([SupportedOSPlatform("windows")] () =>
             {
                 // Phase 6.16 Linux platform guard — defense in depth inside the Task.Run delegate.
                 // RunScan's method-entry guard at the top already short-circuits on non-Windows,
                 // but ServiceController.GetServices() is documented as Windows-only and throws
                 // PlatformNotSupportedException on Linux/macOS. Inner guard keeps this lambda safe
                 // to call from any future code path that bypasses the outer check.
+                // Phase 6.16.F: lambda attribute makes platform contract explicit to CA1416 analyzer.
                 if (!OperatingSystem.IsWindows())
                     return new List<(string Name, string Svc, string Start, string Stat)>();
 
                 var services = ServiceController.GetServices();
-                return services.Select(s =>
-                {
-                    string startType;
-                    try { startType = s.StartType.ToString(); } catch { startType = "Unknown"; }
-                    return (Name: s.DisplayName, Svc: s.ServiceName, Start: startType, Stat: s.Status.ToString());
-                }).OrderBy(s => s.Name).ToList();
+                return services.Select(ProjectService).OrderBy(s => s.Name).ToList();
             });
             _allItems = rawData.Select(s =>
             {
@@ -67,6 +64,16 @@ public partial class ServiceManagerView : UserControl
         }
         catch (System.Exception ex) { SubText.Text = $"{LocalizationService._("common.errorPrefix")}{ex.Message}"; }
         finally { ScanLabel.Text = LocalizationService._("common.scan"); }
+    }
+
+    // Phase 6.16.F: explicit-platform helper extracted from RunScan's Select lambda so CA1416
+    // analyzer can see ServiceController members are touched on a Windows-annotated method.
+    [SupportedOSPlatform("windows")]
+    private static (string Name, string Svc, string Start, string Stat) ProjectService(ServiceController s)
+    {
+        string startType;
+        try { startType = s.StartType.ToString(); } catch { startType = "Unknown"; }
+        return (Name: s.DisplayName, Svc: s.ServiceName, Start: startType, Stat: s.Status.ToString());
     }
 
     private void ApplyFilter()

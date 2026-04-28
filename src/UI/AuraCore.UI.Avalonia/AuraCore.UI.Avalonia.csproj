@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>AuraCore.Pro</AssemblyName>
     <RootNamespace>AuraCore.UI.Avalonia</RootNamespace>
+    <!-- Phase 6.16.F: enforce CA1416 platform-compatibility analyzer as build error -->
+    <MSBuildWarningsAsErrors>CA1416</MSBuildWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

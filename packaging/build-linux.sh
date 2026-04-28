@@ -3,12 +3,12 @@
 # AuraCore Pro — Linux .deb + tarball builder
 # Run on a Linux machine with .NET 8 SDK installed
 # Usage: bash build-linux.sh [version]
-# Example: bash build-linux.sh 1.7.0
+# Example: bash build-linux.sh 1.8.0
 # =============================================================================
 
 set -e
 
-VERSION="${1:-1.7.0}"
+VERSION="${1:-1.8.0}"
 APP_NAME="auracorepro"
 DISPLAY_NAME="AuraCore Pro"
 ARCH="amd64"

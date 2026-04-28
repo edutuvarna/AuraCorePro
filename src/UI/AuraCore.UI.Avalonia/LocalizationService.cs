@@ -2023,7 +2023,7 @@ public static class LocalizationService
 
         // ── Batch 6: Firewall Rules ──
         ["firewall.title"]              = "Firewall Rules",
-        ["firewall.subtitle"]           = "Manage Windows Firewall inbound and outbound rules",
+        ["firewall.subtitle"]           = "Manage system firewall inbound and outbound rules",
         ["firewall.action.scan"]        = "Scan Rules",
         ["firewall.searchWatermark"]    = "Search rules...",
         ["firewall.hint"]               = "Click Scan to load firewall rules (requires admin)",
@@ -4482,7 +4482,7 @@ public static class LocalizationService
 
         // ── Batch 6: Güvenlik Duvarı Kuralları ──
         ["firewall.title"]              = "Güvenlik Duvarı Kuralları",
-        ["firewall.subtitle"]           = "Windows Güvenlik Duvarı gelen ve giden kurallarını yönetin",
+        ["firewall.subtitle"]           = "Sistem güvenlik duvarı gelen ve giden kurallarını yönetin",
         ["firewall.action.scan"]        = "Kuralları Tara",
         ["firewall.searchWatermark"]    = "Kural ara...",
         ["firewall.hint"]               = "Güvenlik duvarı kurallarını yüklemek için Tara'ya tıklayın (yönetici gerektirir)",

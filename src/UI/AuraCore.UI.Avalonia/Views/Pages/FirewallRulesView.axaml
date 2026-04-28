@@ -8,7 +8,7 @@
       <!-- Header -->
       <controls:ModuleHeader x:Name="ModuleHdr"
                              Title=""
-                             Subtitle="Manage Windows Firewall inbound and outbound rules">
+                             Subtitle="">
         <controls:ModuleHeader.Actions>
           <StackPanel Orientation="Horizontal" Spacing="8">
             <Button x:Name="ScanBtn" Classes="action-btn" Click="Scan_Click"

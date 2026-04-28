@@ -3,13 +3,13 @@
 # AuraCore Pro — macOS .app bundle builder (UNSIGNED)
 # Can run on macOS (native) or Linux/Windows (cross-compile structure only)
 # Usage: bash build-macos.sh [version] [arch]
-# Example: bash build-macos.sh 1.7.0 arm64
-#          bash build-macos.sh 1.7.0 x64
+# Example: bash build-macos.sh 1.8.0 arm64
+#          bash build-macos.sh 1.8.0 x64
 # =============================================================================
 
 set -e
 
-VERSION="${1:-1.7.0}"
+VERSION="${1:-1.8.0}"
 ARCH="${2:-arm64}"  # arm64 (Apple Silicon) or x64 (Intel)
 RID="osx-${ARCH}"
 APP_NAME="AuraCore Pro"
@@ -60,7 +60,7 @@ chmod +x "$APP_BUNDLE/Contents/MacOS/AuraCore.Pro"
 cp "$SCRIPT_DIR/Info.plist" "$APP_BUNDLE/Contents/"
 # Update version in Info.plist
 if command -v sed &> /dev/null; then
-    sed -i.bak "s|<string>1.7.0</string>|<string>${VERSION}</string>|g" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
+    sed -i.bak "s|<string>1.8.0</string>|<string>${VERSION}</string>|g" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || true
     rm -f "$APP_BUNDLE/Contents/Info.plist.bak"
 fi
 

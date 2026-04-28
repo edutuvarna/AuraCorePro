@@ -4,12 +4,75 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [1.8.0] — 2026-04-04
+## [1.8.0] — 2026-04-28
+
+Major desktop release covering Phase 5.5 finishing items and Phase 6.1–6.6 (deep-link routing, pixel-regression infra, light/dark/system theme, full Turkish localization, release pipeline integration), plus the Session 23 ML training + LLM integration work that was originally drafted for v1.8.0 in April. Ships Windows + Linux self-contained binaries (1.2 GB each, includes ML/LLM models). macOS notarization is still blocked on hardware and remains in Phase 6 carry-forward.
+
+### Phase 6.6 — Release pipeline desktop integration (April 19–22, 2026)
+- `UpdateDownloader` background service with Polly retry + SHA256 verification against `app_updates.SignatureHash`
+- Active update banner (non-mandatory) and full-screen modal (mandatory) — Alt+F4 / Esc / Win key all hardened so a mandatory update cannot be bypassed
+- Per-platform update channel: desktop sends `?platform=windows` or `?platform=linux` to `/api/updates/check`
+- Empty-hash fail-fast guard: client refuses to apply an update whose `SignatureHash` is empty (security regression prevention)
+- Banner event-handler unsubscribe on dismiss (no leak), update notification breadcrumb wired through `UpdateInfo`
+- `AuraCorePro-Setup.exe` and `auracorepro_<ver>_amd64.deb` distribution paths verified via 100 KB dummy-installer smoke test (Phase 6.6.E)
+
+### Phase 6.4 — Full Turkish localization sweep (April 18–22, 2026)
+- All 67 XAML view files localized (EN + TR), zero hardcoded UI strings remaining
+- ~560+ new translation key pairs added to `LocalizationService` (dual EN/TR `Dictionary<string, string>` with `LanguageChanged` event)
+- Localized: LoginWindow, MainWindow, SettingsView, DashboardView, AIFeaturesView, all AI sections, 7 Controls + 5 Dialogs, 7 core module views (×4 batches), Defender / DiskHealth / DnsBenchmark / DnsFlusher / DriverUpdater / EnvVars / FileShredder, Admin / AppInstaller / Autorun / Battery / Bloatware / CategoryClean / DefaultsOptimizer, ServiceManager / SpaceAnalyzer / StartupOptimizer / SwapOptimizer / SymlinkManager / SystemHealth / TweakList, Upgrade / WakeOnLan + 5 Linux modules, final 9 Linux + macOS modules
+- Code-behind hardcoded-string scanner (companion to XAML scanner) catches Turkish literals slipping through C# `.cs` files
+- XAML hardcoded-string regression scanner (`HardcodedStringScannerTests`) gates all new view files; grandfather list emptied
+- 3 hardcoded TR strings caught and migrated mid-session in `InsightsSection` code-behind
+
+### Phase 6.3 — Light / Dark / System theme switcher (April 18, 2026)
+- `ThemeService` 3-state refactor: `AppTheme { Dark, Light, System }` with `EffectiveVariant` resolution
+- System mode reads `PlatformSettings.GetColorValues().ThemeVariant` (falls back to Dark on unknown / Linux)
+- Theme persistence at `%LOCALAPPDATA%/AuraCorePro/theme.pref`
+- New `<ResourceDictionary x:Key="Light">` sibling in `AuraCoreThemeV2.axaml` — 27 parity tokens (off-white backgrounds, pure white cards, inverted text, Tailwind-600 semantic colors, dimmed glow shadows)
+- Settings UI: 3-option RadioButton group (`ThemeSystemRb`/`ThemeLightRb`/`ThemeDarkRb`) replaces old 2-state button
+- Cold-start flash avoided: `ThemeService.Initialize()` owns the variant before `MainWindow.Show()` (removed hardcoded `App.axaml RequestedThemeVariant="Dark"`)
+- Light gallery pixel-regression goldens added (4 total: 2 Dark + 2 Light per gallery view)
+
+### Phase 6.2 — Pixel regression infrastructure (April 18, 2026)
+- `Verify.Xunit 28.1.0` + `Verify.ImageSharp 4.0.0` wired to Avalonia.Headless + Skia (`UseSkia()` + `UseHeadlessDrawing=false`) for deterministic view snapshots
+- `PixelRegressionHarness.RenderViewAsync<TView>(w, h)` → captures rendered frame as PNG bytes
+- `PixelVerify.Verify(png)` routes goldens to `tests/.../goldens/` via `.UseDirectory("../goldens")`
+- Test-only `DesignSystemGallery` UserControl (typography ramp + accent/semantic swatches + StatusChip / AccentBadge variants + corner-radii scale + tinted status surfaces); 2 sizes × 2 themes = 4 goldens
+- Caught a real regression first run: 10 semantic tint tokens had hex alpha byte in trailing position instead of Avalonia's leading `#AARRGGBB` — fixed in companion commit
+- `.gitignore` rule for `*.received.{png,txt}`; `goldens/README.md` documents accept workflow (Verify.Tool CLI / manual rename / `VERIFY_AutoVerify`)
+
+### Phase 6.1 — Deep-link URL routing (April 18, 2026)
+- `auracorepro://module/<id>?...` URL scheme with idempotent HKCU auto-install via `UrlSchemeRegistrar`
+- `UrlSchemeHandler.Parse` with **46-case security test suite** covering injection, escaping, malformed schemes
+- `ModuleIdsRegistry` as single source of truth for deep-link module IDs (no string drift)
+- Per-user single-instance lock via `InstanceMutex` (no global lock — multi-user systems supported)
+- `UrlGatewayServer` Named Pipe with current-user ACL — second-launch routes URL to running instance
+- `UrlGatewayClient` send-and-exit path
+- `Win32Interop.FocusWindowByTitle` via P/Invoke (raises window when URL arrives)
+- `MainWindow` dispatches pending launch URL via `INavigationService` after RootView is ready
+
+### Phase 5.5.x — UX finishing items (April 12–18, 2026)
+- **Space Analyzer**: tree-expansion drill-down with lazy children loading (no blocking on large filesystems)
+- **System Health**: intro card + localization
+- **Disk Health**: real SMART data wired into `DiskHealthSummaryCard`; sidebar entry removed (now Dashboard widget); WMI worst-temp wiring in `DiskHealthScanner`
+- **Symlink Manager**: find-vs-create UI split + create action
+- **QuickAction tile collection** + Bloatware preset
+- **ServiceManager** new `AuraCore.Module.ServiceManager` + row context menu
+- **Defender Manager**: 7 write actions wired via `IShellCommandService`
+- **Driver Updater**: scan + export via `IShellCommandService`
+- **Driver/Defender/Service Ops** implementations with action-validator + timeout
+- `ActionWhitelist.Windows` with 13 whitelisted action ids
+- Named Pipe server: full whitelist + ACL + dispatcher implementation
+- **AI Chat**: wired `IAuraCoreLLM.ReloadAsync` into `ChatSection` UI (debt-A1)
+- **First-run UAC install prompt** for Windows privileged helper (debt-A2)
+- **Cleaner consolidation** decision + subtitle disambiguation
+- **GrubManager** 3 deferred sudo hits migrated via 3 new grub sub-actions (debt-B5)
+- DI bootstrap in test harness un-skipped 6 pilot-view render tests (debt-B2)
 
 ### Session 23 (April 4, 2026) — ML Training Pipeline + LLM Integration
 
 #### ML Training Pipeline (ml-training/ directory)
-- Real data collection: 1000 telemetry samples from LocalMetricDb (SQLite)
+- Real data collection: 1000 telemetry samples from `LocalMetricDb` (SQLite)
 - Synthetic data augmentation: 10,000 samples with realistic distributions
 - Parameter optimization: grid search across 3 ML.NET models (threshold/sensitivity tuning, false positive reduction)
 - ONNX autoencoder: PyTorch custom anomaly detection model (F1=0.876, 78KB), exported to ONNX format
@@ -21,9 +84,9 @@ All notable changes to this project will be documented in this file.
 - LLM dataset: 964 bilingual examples (EN/TR) covering AuraCore modules and system optimization
 
 #### C# AI Integration
-- OnnxAnomalyDetector: ONNX Runtime inference integrated into ML.NET pipeline
-- LlmInferenceEngine: LLamaSharp 0.26.0 for local LLM inference (CPU + GPU support)
-- AIConfigProvider: model path resolution and configuration management
+- `OnnxAnomalyDetector`: ONNX Runtime inference integrated into ML.NET pipeline
+- `LlmInferenceEngine`: LLamaSharp 0.26.0 for local LLM inference (CPU + GPU support)
+- `AIConfigProvider`: model path resolution and configuration management
 - AI Chat UI: conversational interface with chat history persistence
 - Settings model selector: 7 models listed with real RAM usage measurements
 
@@ -31,12 +94,20 @@ All notable changes to this project will be documented in this file.
 - 8 Linux/macOS platform module bug fixes across multiple modules
 - Platform-specific guards and fallbacks improved
 
-#### Testing
-- 44 C# unit tests passing
+### Testing
+- **2212 desktop tests passing** (Unit 9 + Integration 15 + Module 158 + Platform 397 + Simulation 1 + UI.Avalonia 1632)
+- Full backend suite: 233 passing (separate API project; not bundled in desktop release)
+- 7 pre-existing CA1416 warnings (`ServiceController` + `RegistryKey` reachable on non-Windows code paths) — carry-forward to a future platform-guard sweep, no functional impact
 
-#### Known Issues
-- LLM dataset accuracy needs improvement (hallucination on module details)
-- Next session: enrich dataset with real module UI data + re-fine-tune
+### Known Issues / Carry-forward
+- LLM dataset accuracy needs improvement (hallucination on module details) — Phase 6.16+ retraining
+- macOS distribution still blocked on Apple Developer notarization hardware (Phase 6 roadmap Item 6 unchanged)
+- 7 CA1416 platform-API warnings on non-Windows builds (cosmetic; APIs throw at runtime if reached, but currently guarded by view-level platform checks)
+
+### Distribution
+- **Windows**: `AuraCorePro-1.8.0-win-x64.zip` (~488 MB compressed, 1.2 GB extracted) — extract anywhere, run `AuraCore.Pro.exe`
+- **Linux**: `AuraCorePro-1.8.0-linux-x64.zip` or `auracorepro_1.8.0_amd64.deb` — `.zip` extracts + `chmod +x AuraCore.Pro && ./AuraCore.Pro`; `.deb` installs to `/usr/lib/auracorepro/` with `auracorepro` launcher in `PATH`
+- **macOS**: not shipped this release (notarization blocker)
 
 ---
 

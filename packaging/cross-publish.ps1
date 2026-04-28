@@ -1,10 +1,10 @@
 # =============================================================================
 # AuraCore Pro — Cross-Platform Publisher (runs on Windows)
 # Publishes self-contained binaries for Windows, Linux, macOS
-# Usage: .\cross-publish.ps1 [-Version "1.7.0"] [-Platforms "all"]
+# Usage: .\cross-publish.ps1 [-Version "1.8.0"] [-Platforms "all"]
 # =============================================================================
 param(
-    [string]$Version = "1.7.0",
+    [string]$Version = "1.8.0",
     [string]$Platforms = "all"  # all, win, linux, macos
 )
 

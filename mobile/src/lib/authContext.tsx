@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   loadAuthFromStore, tryBiometricUnlock, hydrateCacheFromStore, AuthState,
+  setOnAuthFailure,
 } from './auth';
 import { clearAuth } from './secureStore';
 
@@ -32,6 +33,17 @@ const AuthContext = createContext<AuthCtx>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [checking, setChecking] = useState(true);
+
+  // Phase 6.15.2: register the auth-failure callback BEFORE the load effect
+  // fires any requests. When tryRefreshToken returns false, api.ts calls
+  // fireAuthFailure() → this handler nulls auth and the Index dispatcher's
+  // <Redirect /> sends the user back to /(auth)/login. We avoid calling
+  // router.replace directly to dodge a race with AuthContext's own routing.
+  useEffect(() => {
+    setOnAuthFailure(() => {
+      setAuth(null);
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;

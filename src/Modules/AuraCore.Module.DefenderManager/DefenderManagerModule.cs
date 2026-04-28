@@ -37,6 +37,10 @@ public sealed class DefenderManagerModule : IOptimizationModule
     /// <summary>Scan = Gather Defender status</summary>
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Defender is Windows-only; WindowsPrincipal access throws PNS on Linux.
+        if (!OperatingSystem.IsWindows())
+            return new ScanResult(Id, true, 0, 0);
+
         LastStatus = await GetDefenderStatusAsync(ct);
         LastThreats = await GetThreatHistoryAsync(ct);
         LastExclusions = await GetExclusionsAsync(ct);
@@ -60,6 +64,10 @@ public sealed class DefenderManagerModule : IOptimizationModule
     public async Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan, IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Defender is Windows-only; powershell.exe + Update-MpSignature unavailable on Linux.
+        if (!OperatingSystem.IsWindows())
+            return new OptimizationResult(Id, "", true, 0, 0, TimeSpan.Zero);
+
         var start = DateTime.UtcNow;
         progress?.Report(new TaskProgress(Id, 10, "Updating virus definitions..."));
 
@@ -358,10 +366,16 @@ public sealed class DefenderManagerModule : IOptimizationModule
         var status = new DefenderStatus();
         try
         {
-            var isAdmin = new System.Security.Principal.WindowsPrincipal(
-                System.Security.Principal.WindowsIdentity.GetCurrent())
-                .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
-            status.IsAdmin = isAdmin;
+            // Phase 6.16 Linux platform guard — WindowsPrincipal/WindowsIdentity throws PNS on non-Windows.
+            // Defense in depth: ScanAsync already early-returns on Linux, but this helper may be called
+            // from other paths; isAdmin is left at its default (false) on non-Windows.
+            if (OperatingSystem.IsWindows())
+            {
+                var isAdmin = new System.Security.Principal.WindowsPrincipal(
+                    System.Security.Principal.WindowsIdentity.GetCurrent())
+                    .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+                status.IsAdmin = isAdmin;
+            }
 
             var output = await RunPowerShellOutputAsync(
                 "Get-MpComputerStatus | Select-Object " +

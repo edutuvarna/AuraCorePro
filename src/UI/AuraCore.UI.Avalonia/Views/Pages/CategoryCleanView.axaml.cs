@@ -16,25 +16,22 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public partial class CategoryCleanView : UserControl
 {
-    private readonly IOptimizationModule? _module;
+    private readonly IOptimizationModule _module;
     private readonly List<CatInfo> _cats = new();
     private readonly List<CheckBox> _catCheckBoxes = new();
 
     // Per-file checkbox tracking (junk-cleaner only)
     private readonly Dictionary<string, List<FileCheckEntry>> _fileChecksByCategory = new();
 
-    private bool IsJunkCleaner => _module?.Id == "junk-cleaner";
+    private bool IsJunkCleaner => _module.Id == "junk-cleaner";
 
     private record CatInfo(string Name, string Desc, string Risk, int Files, long Bytes, string SizeText, bool NeedAdmin);
     private record FileCheckEntry(CheckBox CheckBox, string FullPath, long SizeBytes);
 
-    public CategoryCleanView() : this(null) { }
-
-    public CategoryCleanView(IOptimizationModule? module)
+    public CategoryCleanView(IOptimizationModule module)
     {
         InitializeComponent();
-        _module = module;
-        if (module is null) return;
+        _module = module ?? throw new ArgumentNullException(nameof(module));
         PageTitle.Text = module.DisplayName;
         PageSubtitle.Text = module.Id switch
         {

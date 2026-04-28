@@ -33,6 +33,13 @@ public partial class StartupOptimizerView : UserControl
             // Collect raw data on background thread (no UI objects)
             var rawData = await Task.Run(() =>
             {
+                // Phase 6.16 Linux platform guard — defense in depth inside the Task.Run delegate.
+                // The method-entry guard at top of RunScan() already short-circuits on non-Windows,
+                // but Registry.CurrentUser/LocalMachine throw PlatformNotSupportedException on
+                // non-Windows so we re-check here in case this lambda is ever invoked elsewhere.
+                if (!OperatingSystem.IsWindows())
+                    return new List<(string Name, string Cmd, string Hive, string Impact, bool Enabled)>();
+
                 var list = new List<(string Name, string Cmd, string Hive, string Impact, bool Enabled)>();
                 ScanReg(list, Registry.CurrentUser, "HKCU");
                 ScanReg(list, Registry.LocalMachine, "HKLM");

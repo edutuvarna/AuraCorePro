@@ -13,6 +13,40 @@ using Polly.CircuitBreaker;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Phase 6.15.6 — Sentry observability. DSN comes from Sentry:Dsn config (in
+// production this is set via Sentry__Dsn env var in /etc/auracore-api.env so
+// it never enters source). When DSN is empty (dev / unit tests) the SDK
+// gracefully no-ops. PII scrubbing strips email + IP from User context and
+// filters Authorization + Cookie request headers — audit_log already records
+// who-did-what, Sentry doesn't need to duplicate that surface.
+builder.WebHost.UseSentry(o =>
+{
+    o.Dsn = builder.Configuration["Sentry:Dsn"] ?? string.Empty;
+    o.Environment = builder.Environment.EnvironmentName;
+    var version = typeof(Program).Assembly.GetName().Version?.ToString();
+    if (!string.IsNullOrEmpty(version)) o.Release = version;
+    o.TracesSampleRate = 0.1;
+    o.SendDefaultPii = false;
+    o.MaxBreadcrumbs = 50;
+    o.Debug = builder.Environment.IsDevelopment();
+    o.SetBeforeSend((sentryEvent, _) =>
+    {
+        if (sentryEvent.User is not null)
+        {
+            sentryEvent.User.Email = null;
+            sentryEvent.User.IpAddress = null;
+        }
+        var headers = sentryEvent.Request?.Headers;
+        if (headers is not null)
+        {
+            if (headers.ContainsKey("Authorization")) headers["Authorization"] = "[Filtered]";
+            if (headers.ContainsKey("Cookie")) headers["Cookie"] = "[Filtered]";
+            if (headers.ContainsKey("X-Auracore-Mobile-Client")) headers["X-Auracore-Mobile-Client"] = "[Filtered]";
+        }
+        return sentryEvent;
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 builder.Services.AddSignalR();

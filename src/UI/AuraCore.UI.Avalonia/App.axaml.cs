@@ -50,6 +50,12 @@ public partial class App : global::Avalonia.Application
         // ── Phase 5.4: Navigation service (Dashboard Smart Optimize deep-link) ──
         sc.AddSingleton<INavigationService, NavigationService>();
 
+        // ── Phase 6.16: Module navigator (view factory registry + availability gating) ──
+        // Distinct from the event-based INavigationService above; this is a UI-layer
+        // dispatcher that swaps the hardcoded MainWindow.SetActiveContent switch.
+        sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.IModuleNavigator,
+                        global::AuraCore.UI.Avalonia.Services.ModuleNavigator>();
+
         // ── Cross-platform modules (Windows + Linux + macOS) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);
         AuraCore.Module.SystemHealth.SystemHealthRegistration.AddSystemHealthModule(sc);

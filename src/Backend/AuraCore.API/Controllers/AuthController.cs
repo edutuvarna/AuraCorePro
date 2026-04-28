@@ -4,6 +4,7 @@ using AuraCore.API.Domain.Entities;
 using AuraCore.API.Helpers;
 using AuraCore.API.Hubs;
 using AuraCore.API.Infrastructure.Data;
+using AuraCore.API.Infrastructure.RateLimiting;
 using AuraCore.API.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -98,6 +99,7 @@ public sealed class AuthController : ControllerBase
         _captcha = captcha;
     }
 
+    [RateLimited("auth.register")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken ct)
     {
@@ -195,6 +197,7 @@ public sealed class AuthController : ControllerBase
         });
     }
 
+    [RateLimited("auth.login")]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
@@ -350,6 +353,7 @@ public sealed class AuthController : ControllerBase
     // /enable-2fa. role='superadmin' is enforced; admins trying this endpoint
     // are rejected with the same 'Invalid credentials' the enumeration attacker
     // would get for a nonexistent email.
+    [RateLimited("auth.login")]
     [HttpPost("superadmin/login")]
     public async Task<IActionResult> SuperadminLogin([FromBody] LoginRequest request, CancellationToken ct)
     {
@@ -552,6 +556,7 @@ public sealed class AuthController : ControllerBase
     // emailed to the invitee; here we SHA256-hash it to match the row stored
     // in admin_invitations. No authentication — anyone holding the raw token
     // (which is single-use and 24-hour capped) proves ownership of the mailbox.
+    [RateLimited("auth.register")]
     [HttpPost("redeem-invitation")]
     public async Task<IActionResult> RedeemInvitation([FromBody] RedeemDto dto, CancellationToken ct)
     {

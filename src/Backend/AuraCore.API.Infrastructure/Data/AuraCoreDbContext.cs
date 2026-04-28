@@ -207,6 +207,7 @@ public sealed class AuraCoreDbContext : DbContext
             e.HasIndex(a => new { a.ActorId, a.CreatedAt }).HasDatabaseName("idx_audit_actor_created");
             e.HasIndex(a => new { a.Action, a.CreatedAt }).HasDatabaseName("idx_audit_action_created");
             e.HasIndex(a => new { a.TargetType, a.TargetId }).HasDatabaseName("idx_audit_target");
+            e.HasIndex(a => a.CreatedAt).HasDatabaseName("idx_audit_created");
             e.HasOne(a => a.Actor).WithMany().HasForeignKey(a => a.ActorId).OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -276,7 +277,10 @@ public sealed class AuraCoreDbContext : DbContext
                 new SystemSetting { Key = "require_2fa_for_all_admins", Value = "false", UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) },
                 new SystemSetting { Key = "rate_limit_policies",
                     Value = "{\"auth.login\":{\"requests\":5,\"windowSeconds\":1800},\"auth.register\":{\"requests\":3,\"windowSeconds\":3600},\"admin.all\":{\"requests\":1000,\"windowSeconds\":3600},\"signalr.connect\":{\"requests\":10,\"windowSeconds\":60}}",
-                    UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) }
+                    UpdatedAt = new DateTimeOffset(2026, 4, 23, 0, 0, 0, TimeSpan.Zero) },
+                new SystemSetting { Key = "audit_retention.retentionDays", Value = "365", UpdatedAt = new DateTimeOffset(2026, 4, 28, 0, 0, 0, TimeSpan.Zero) },
+                new SystemSetting { Key = "audit_retention.lastRunAt", Value = "", UpdatedAt = new DateTimeOffset(2026, 4, 28, 0, 0, 0, TimeSpan.Zero) },
+                new SystemSetting { Key = "audit_retention.lastRunDeletedRows", Value = "0", UpdatedAt = new DateTimeOffset(2026, 4, 28, 0, 0, 0, TimeSpan.Zero) }
             );
         });
 

@@ -1,5 +1,6 @@
 using AuraCore.API.Application.Services.Security;
 using AuraCore.API.Infrastructure.Data;
+using AuraCore.API.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,16 @@ public sealed class TestWebAppFactory : WebApplicationFactory<Program>
             var captchaDesc = services.SingleOrDefault(d => d.ServiceType == typeof(ICaptchaVerifier));
             if (captchaDesc is not null) services.Remove(captchaDesc);
             services.AddSingleton<ICaptchaVerifier, AlwaysAllowCaptchaVerifier>();
+
+            // Phase 6.15.3 — replace the production token-bucket limiter with an
+            // always-allow stub so timing/auth tests that fire many requests from
+            // a single test client (127.0.0.1) don't trip the auth.login budget
+            // and skew BCrypt timing comparisons. Per-policy rate-limit behavior
+            // is covered by the dedicated CustomRateLimiterTests +
+            // RateLimiterMiddlewareTests pair.
+            var rlDesc = services.SingleOrDefault(d => d.ServiceType == typeof(IAuraCoreRateLimiter));
+            if (rlDesc is not null) services.Remove(rlDesc);
+            services.AddSingleton<IAuraCoreRateLimiter, AlwaysAllowRateLimiter>();
         });
     }
 

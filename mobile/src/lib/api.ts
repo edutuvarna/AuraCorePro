@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
-import { getJwt } from './secureStore';
+import { getCachedJwt } from './secureStore';
+import { tryRefreshToken, fireAuthFailure } from './auth';
 
 const API = (Constants.expoConfig?.extra as any)?.apiUrl
   ?? process.env.EXPO_PUBLIC_API_URL
@@ -15,8 +16,25 @@ const MOBILE_CLIENT_SECRET = (Constants.expoConfig?.extra as any)?.mobileClientS
   ?? process.env.EXPO_PUBLIC_MOBILE_CLIENT_SECRET
   ?? '';
 
-async function request(path: string, init: RequestInit = {}) {
-  const token = await getJwt();
+// Phase 6.15.2: single-flight refresh. Concurrent 401s during the refresh
+// window share the same in-flight promise so the refresh-token isn't burned
+// multiple times.
+let inFlightRefresh: Promise<boolean> | null = null;
+
+async function ensureRefresh(): Promise<boolean> {
+  if (inFlightRefresh) return inFlightRefresh;
+  inFlightRefresh = (async () => {
+    try { return await tryRefreshToken(); }
+    finally { inFlightRefresh = null; }
+  })();
+  return inFlightRefresh;
+}
+
+// Phase 6.15.1: synchronous cache read replaces the previous `await getJwt()`.
+// AuthProvider populates the cache after the single biometric unlock; login/
+// refresh paths populate it via persistLoginSuccess and tryRefreshToken.
+async function request(path: string, init: RequestInit = {}, isRetry = false): Promise<Response> {
+  const token = getCachedJwt();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...((init.headers as Record<string, string>) ?? {}),
@@ -24,6 +42,18 @@ async function request(path: string, init: RequestInit = {}) {
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (MOBILE_CLIENT_SECRET) headers['X-Auracore-Mobile-Client'] = MOBILE_CLIENT_SECRET;
   const res = await fetch(`${API}${path}`, { ...init, headers });
+
+  // Phase 6.15.2: lazy refresh on 401. Skip /api/auth/* paths (login itself
+  // returning 401 means bad creds, not stale token). Skip retries to avoid
+  // infinite loops when refresh succeeds but the retried request also 401s.
+  if (res.status === 401 && !isRetry && !path.startsWith('/api/auth/')) {
+    const refreshed = await ensureRefresh();
+    if (refreshed) {
+      return request(path, init, true);
+    }
+    // Refresh failed → trigger logout via AuthProvider's registered callback.
+    fireAuthFailure();
+  }
   return res;
 }
 

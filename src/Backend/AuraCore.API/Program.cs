@@ -1,6 +1,7 @@
 using System.Text;
 using AuraCore.API.Infrastructure;
 using AuraCore.API.Infrastructure.Data;
+using AuraCore.API.Infrastructure.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -78,6 +79,12 @@ builder.Services.AddScoped<AuraCore.API.Services.GrandfatherMigrationService>();
 // Phase 6.11 T37: runtime-editable rate-limit policies
 builder.Services.AddScoped<AuraCore.API.Application.Services.RateLimiting.IRateLimitConfigService,
                           AuraCore.API.Infrastructure.Services.RateLimiting.RateLimitConfigService>();
+
+// Phase 6.15.3: token-bucket rate limiter (singleton — buckets persist across
+// requests). Resolves IRateLimitConfigService per-call via root provider scope
+// so operator UI edits take effect on the next request.
+builder.Services.AddSingleton<AuraCore.API.Infrastructure.RateLimiting.IAuraCoreRateLimiter,
+                              AuraCore.API.Infrastructure.RateLimiting.AuraCoreRateLimiter>();
 
 // Phase 6.11: transactional email via Resend HTTPS API
 builder.Services.AddHttpClient("resend", client =>
@@ -224,6 +231,8 @@ builder.Services.AddSingleton<AuraCore.API.Application.Services.Telemetry.ITelem
 // T2.24: login_attempts retention sweep — purges rows older than 90 days once per 24h
 builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Audit.AuditLogPurgeService>();
 builder.Services.AddHostedService<AuraCore.API.HostedServices.RetentionJob>();
+// Phase 6.15.5: audit_log retention sweep — configurable retention window (default 365 days)
+builder.Services.AddHostedService<AuraCore.API.Infrastructure.Services.Background.AuditLogCleanupService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -361,6 +370,18 @@ if (!app.Environment.IsDevelopment() && !app.Environment.IsProduction())
 }
 
 app.UseCors();
+
+// Phase 6.15.3: explicit UseRouting so endpoint metadata (matched [RateLimited]
+// attribute) is populated before our limiter middleware reads it. Without this
+// the auto-inserted UseRouting runs at MapControllers time, which is after our
+// custom middlewares — so endpoint?.Metadata would be null.
+app.UseRouting();
+
+// Phase 6.15.3: rate-limit gate for endpoints decorated with [RateLimited(...)].
+// Runs after routing (so we have the matched endpoint) and before auth so an
+// IP being throttled doesn't exercise the JWT validation path.
+app.UseAuraCoreRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

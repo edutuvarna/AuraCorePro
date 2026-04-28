@@ -1,5 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { loadAuthFromStore, tryBiometricUnlock, AuthState } from './auth';
+import {
+  loadAuthFromStore, tryBiometricUnlock, hydrateCacheFromStore, AuthState,
+  setOnAuthFailure,
+} from './auth';
+import { clearAuth } from './secureStore';
 
 interface AuthCtx {
   auth: AuthState | null;
@@ -14,17 +18,32 @@ const AuthContext = createContext<AuthCtx>({
 });
 
 /**
- * Centralizes auth-state loading + biometric unlock so RootLayout doesn't have
- * to call router.replace from a useEffect (which races with Expo Router's
- * navigation-tree initialization, leaving the splash spinner visible forever).
+ * Phase 6.15.1: Single-gate biometric.
  *
- * Pattern: AuthProvider runs the auth check on mount. The root index route
- * (mobile/app/index.tsx) reads useAuth() and renders <Redirect> based on the
- * decision. The redirect is declarative — no router.replace timing surprises.
+ * Flow on cold start:
+ *   1. loadAuthFromStore — side-effect-free SecureStore read, no biometric
+ *   2. If no JWT or stale → checking=false, Index renders <Redirect href="/(auth)/login" />
+ *   3. If JWT present → tryBiometricUnlock (THE single biometric prompt)
+ *   4. On success → hydrateCacheFromStore + setAuth → Index renders /(app)
+ *   5. On 3-fail/cancel → clearAuth (also clears cache) + checking=false → /(auth)/login
+ *
+ * Subsequent api.request() calls use getCachedJwt() — no SecureStore touch,
+ * no biometric prompt. Tab switching, refreshes, pull-to-refresh = 0 prompts.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [checking, setChecking] = useState(true);
+
+  // Phase 6.15.2: register the auth-failure callback BEFORE the load effect
+  // fires any requests. When tryRefreshToken returns false, api.ts calls
+  // fireAuthFailure() → this handler nulls auth and the Index dispatcher's
+  // <Redirect /> sends the user back to /(auth)/login. We avoid calling
+  // router.replace directly to dodge a race with AuthContext's own routing.
+  useEffect(() => {
+    setOnAuthFailure(() => {
+      setAuth(null);
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,13 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const ok = await tryBiometricUnlock();
         if (cancelled) return;
         if (!ok) {
+          await clearAuth();  // also clears in-memory cache
           setChecking(false);
           return;
         }
+        await hydrateCacheFromStore();
+        if (cancelled) return;
         setAuth(cached);
         setChecking(false);
       } catch (e) {
-        // Auth load failures land on LoginScreen, not stuck-spinner.
         console.warn('Auth load failed:', e);
         if (!cancelled) setChecking(false);
       }

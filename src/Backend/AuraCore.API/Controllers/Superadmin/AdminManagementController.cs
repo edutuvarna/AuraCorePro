@@ -312,6 +312,117 @@ public sealed class AdminManagementController : ControllerBase
         return Ok(new { id, role = u.Role });
     }
 
+    [HttpPost("admins/bulk-promote")]
+    [AuditAction("BulkPromoteUsers", "User")]
+    public async Task<IActionResult> BulkPromote([FromBody] BulkPromoteDto dto, CancellationToken ct)
+    {
+        if (dto?.UserIds == null || dto.UserIds.Length == 0)
+            return BadRequest(new { error = "no_users_selected" });
+        if (!PermissionTemplates.IsValidTemplate(dto.Template) || dto.Template == PermissionTemplates.Custom)
+            return BadRequest(new { error = "invalid_template_for_bulk" });
+
+        var users = await _db.Users.Where(u => dto.UserIds.Contains(u.Id)).ToListAsync(ct);
+        if (users.Count != dto.UserIds.Length)
+            return BadRequest(new { error = "one_or_more_user_ids_not_found" });
+        if (users.Any(u => u.Role != "user"))
+            return BadRequest(new { error = "some_users_not_in_user_role" });
+
+        // Tolerate missing claims for direct controller-instantiation tests; in
+        // production [Authorize(Roles="superadmin")] guarantees a ClaimsPrincipal.
+        var superId = HttpContext?.User?.GetUserId();
+
+        // Match the ApplyTemplate transaction-gating pattern: gate the tx on a relational
+        // provider (production Postgres). InMemory (tests) returns false here so we
+        // perform a best-effort SaveChanges without a transaction.
+        await using var tx = _db.Database.IsRelational()
+            ? await _db.Database.BeginTransactionAsync(ct)
+            : null;
+        try
+        {
+            var keys = PermissionTemplates.GetPermissionsForTemplate(dto.Template);
+            var deadline = ForceChangeDeadline(dto.ForcePasswordChange);
+            foreach (var u in users)
+            {
+                u.Role = "admin";
+                u.CreatedVia = "admin_bulk_promote";
+                u.CreatedByUserId = superId;
+                u.IsReadonly = PermissionTemplates.RequiresIsReadonlyFlag(dto.Template);
+                u.Require2fa = dto.Require2fa;
+                u.ForcePasswordChange = dto.ForcePasswordChange != "never";
+                u.ForcePasswordChangeBy = deadline;
+
+                foreach (var key in keys)
+                {
+                    _db.PermissionGrants.Add(new PermissionGrant
+                    {
+                        AdminUserId = u.Id,
+                        PermissionKey = key,
+                        GrantedBy = superId ?? Guid.Empty,
+                    });
+                }
+            }
+            await _db.SaveChangesAsync(ct);
+            if (tx is not null) await tx.CommitAsync(ct);
+
+            return Ok(new
+            {
+                succeeded = users.Count,
+                failed = 0,
+                promoted = users.Select(u => new { u.Id, u.Email, template = dto.Template }),
+            });
+        }
+        catch (Exception ex)
+        {
+            if (tx is not null) await tx.RollbackAsync(ct);
+            return StatusCode(500, new { error = "bulk_promote_failed", detail = ex.Message });
+        }
+    }
+
+    [HttpPost("admins/bulk-demote")]
+    [AuditAction("BulkDemoteAdmins", "User")]
+    public async Task<IActionResult> BulkDemote([FromBody] BulkDemoteDto dto, CancellationToken ct)
+    {
+        if (dto?.AdminIds == null || dto.AdminIds.Length == 0)
+            return BadRequest(new { error = "no_admins_selected" });
+
+        var admins = await _db.Users
+            .Where(u => dto.AdminIds.Contains(u.Id) && u.Role == "admin")
+            .ToListAsync(ct);
+        if (admins.Count != dto.AdminIds.Length)
+            return BadRequest(new { error = "some_ids_not_active_admins" });
+
+        await using var tx = _db.Database.IsRelational()
+            ? await _db.Database.BeginTransactionAsync(ct)
+            : null;
+        try
+        {
+            var ids = admins.Select(a => a.Id).ToHashSet();
+            foreach (var u in admins)
+            {
+                u.Role = "user";
+                u.IsReadonly = false;
+            }
+            var grants = await _db.PermissionGrants
+                .Where(g => ids.Contains(g.AdminUserId) && g.RevokedAt == null)
+                .ToListAsync(ct);
+            var now = DateTimeOffset.UtcNow;
+            foreach (var g in grants)
+            {
+                g.RevokedAt = now;
+                g.RevokeReason = "bulk_demoted";
+            }
+            await _db.SaveChangesAsync(ct);
+            if (tx is not null) await tx.CommitAsync(ct);
+
+            return Ok(new { succeeded = admins.Count, failed = 0 });
+        }
+        catch (Exception ex)
+        {
+            if (tx is not null) await tx.RollbackAsync(ct);
+            return StatusCode(500, new { error = "bulk_demote_failed", detail = ex.Message });
+        }
+    }
+
     [HttpPut("admins/{id:guid}/require-2fa")]
     public async Task<IActionResult> SetRequire2fa(Guid id, [FromBody] SetRequire2faDto dto, CancellationToken ct)
     {
@@ -411,4 +522,8 @@ public sealed class AdminManagementController : ControllerBase
     public sealed record CustomKey(string PermissionKey, DateTimeOffset? ExpiresAt);
 
     public sealed record SetRequire2faDto(bool Require2fa);
+
+    public sealed record BulkPromoteDto(Guid[] UserIds, string Template, string ForcePasswordChange, bool Require2fa);
+
+    public sealed record BulkDemoteDto(Guid[] AdminIds);
 }

@@ -59,7 +59,7 @@ public static class LocalizationService
     {
         // ── Login Window ──
         ["login.title"] = "Aura Core Pro",
-        ["login.subtitle"] = "AI Powered Windows Intelligence",
+        ["login.subtitle"] = "AI-Powered System Intelligence",
         ["login.signIn"] = "Sign In",
         ["login.createAccount"] = "Create Account",
         ["login.email"] = "Email",
@@ -95,7 +95,7 @@ public static class LocalizationService
         ["set.uiFrameworkLabel"] = "UI Framework",
         ["set.uiFrameworkValue"] = "Avalonia 11.2",
         ["set.aiModelNote"] = "AI models are managed in AI Features \u2192 Chat. Open Chat to download or switch models.",
-        ["set.websiteLink"] = "auracore.pro - Windows Optimization SaaS",
+        ["set.websiteLink"] = "auracore.pro - Cross-platform System Optimization",
         ["set.freeTier"] = "Free",
         // ── Main Window / Navigation ──
         ["nav.dashboard"] = "Dashboard",
@@ -391,8 +391,8 @@ public static class LocalizationService
         ["settings.chooseLang"] = "Choose your preferred language",
         ["settings.about"] = "About Aura Core Pro",
         ["settings.version"] = "Version 1.8.0",
-        ["settings.tagline"] = "AI Powered Windows Intelligence",
-        ["settings.description"] = "Aura Core Pro is a comprehensive Windows optimization suite featuring 27+ modules for system health analysis, cleanup, performance tuning, privacy, and customization.",
+        ["settings.tagline"] = "AI-Powered System Intelligence",
+        ["settings.description"] = "Aura Core Pro is a comprehensive cross-platform optimization suite featuring 27+ modules for system health analysis, cleanup, performance tuning, privacy, and customization.",
         ["settings.logOutTitle"] = "Log out?",
         ["settings.logOutMsg"] = "You will need to sign in again to use online features.",
         ["settings.loggedOut"] = "Logged out",
@@ -498,7 +498,7 @@ public static class LocalizationService
         ["svc.found"] = "Found {0} services - {1} running",
         // -- Disk Cleanup Pro --
         ["dc.title"] = "Disk Cleanup Pro",
-        ["dc.subtitle"] = "Windows deep clean — system caches + duplicates + empty folders",
+        ["dc.subtitle"] = "Deep clean — system caches, duplicates, empty folders",
         ["dc.adminWarningTitle"] = "Some categories require admin privileges",
         ["dc.adminWarningMsg"] = "Run AuraCore Pro as administrator for full cleanup capabilities.",
         ["dc.scanBtn"] = "Deep Scan",
@@ -971,7 +971,7 @@ public static class LocalizationService
         ["proc.subtitle"] = "Real-time view of all running processes with CPU, RAM and control",
         // ── Hosts Editor ──
         ["hosts.title"] = "Hosts File Editor",
-        ["hosts.subtitle"] = "Edit the Windows hosts file — block domains, set custom DNS mappings",
+        ["hosts.subtitle"] = "Edit the system hosts file — block domains, set custom DNS mappings",
         ["hosts.loaded"] = "Loaded {0} entries — {1} active",
         ["hosts.unsaved"] = "Unsaved changes — click Save to apply",
         ["hosts.saved"] = "Hosts file saved successfully.",
@@ -990,7 +990,7 @@ public static class LocalizationService
 
         // ── Onboarding ──
         ["onb.welcomeTitle"] = "Welcome to AuraCore Pro",
-        ["onb.welcomeDesc"] = "Your all-in-one Windows optimization toolkit powered by intelligent analysis. 20+ specialized modules work together to keep your system fast, clean, and customized.",
+        ["onb.welcomeDesc"] = "Your all-in-one cross-platform optimization toolkit powered by intelligent analysis. 20+ specialized modules work together to keep your system fast, clean, and customized.",
         ["onb.welcomeDetail"] = "Let's take a quick tour of what you can do.",
         ["onb.dashboardTitle"] = "Live Dashboard",
         ["onb.dashboardDesc"] = "Your dashboard shows real-time CPU, RAM, and disk usage with a health score. Quick action buttons let you scan for junk, optimize RAM, or run a health check in one click.",
@@ -1001,9 +1001,9 @@ public static class LocalizationService
         ["onb.gamingTitle"] = "Gaming Mode",
         ["onb.gamingDesc"] = "One click to maximize gaming performance: switches to high-performance power plan, silences notifications, suspends background apps, and boosts process priority.",
         ["onb.gamingDetail"] = "Create per-game profiles for customized optimization.",
-        ["onb.customizeTitle"] = "Customize Your Windows",
+        ["onb.customizeTitle"] = "Customize Your System",
         ["onb.customizeDesc"] = "Restore the classic right-click menu, hide taskbar clutter like Widgets and Copilot, show file extensions in Explorer, and more. App Installer manages 127+ apps through WinGet.",
-        ["onb.customizeDetail"] = "All tweaks work on both Windows 10 and Windows 11.",
+        ["onb.customizeDetail"] = "Modules adapt to your platform — Windows tweaks on Windows, systemd controls on Linux, defaults editing on macOS.",
         ["onb.smartTitle"] = "Smart & Automated",
         ["onb.smartDesc"] = "AI Recommendations analyzes your system and suggests improvements. Auto-Scheduling runs modules in the background when your PC is idle.",
         ["onb.smartDetail"] = "Choose your theme and language in Settings.",
@@ -2380,7 +2380,7 @@ public static class LocalizationService
         ["symlink.scanDirBtn"]          = "Scan Directory",
         ["symlink.scanPathWatermark"]   = "Directory to scan (e.g. C:\\Users)",
         ["symlink.scanHint"]            = "Enter a directory and click Scan",
-        ["symlink.adminWarning"]        = "Creating symbolic links requires administrator privileges on Windows.",
+        ["symlink.adminWarning"]        = "On Windows, creating symbolic links requires administrator privileges. On Linux/macOS, requires write access to the target directory.",
         ["symlink.creatingLink"]        = "Creating link...",
         ["symlink.pathRequired"]        = "Both link path and target path are required.",
         ["symlink.validDirRequired"]    = "Please enter a valid directory path.",
@@ -2528,7 +2528,7 @@ public static class LocalizationService
     {
         // ── Giriş Ekranı ──
         ["login.title"] = "Aura Core Pro",
-        ["login.subtitle"] = "Yapay Zekâ Destekli Windows Optimizasyonu",
+        ["login.subtitle"] = "Yapay Zekâ Destekli Sistem Optimizasyonu",
         ["login.signIn"] = "Giriş Yap",
         ["login.createAccount"] = "Hesap Oluştur",
         ["login.email"] = "E-posta",
@@ -2564,7 +2564,7 @@ public static class LocalizationService
         ["set.uiFrameworkLabel"] = "Arayüz Çerçevesi",
         ["set.uiFrameworkValue"] = "Avalonia 11.2",
         ["set.aiModelNote"] = "Yapay zekâ modelleri Yapay Zekâ Özellikleri \u2192 Sohbet bölümünde yönetilir. Model indirmek veya değiştirmek için Sohbet'i açın.",
-        ["set.websiteLink"] = "auracore.pro - Windows Optimizasyon Yazılımı",
+        ["set.websiteLink"] = "auracore.pro - Çoklu Platform Sistem Optimizasyonu",
         ["set.freeTier"] = "Ücretsiz",
         // ── Ana Pencere / Navigasyon ──
         ["nav.dashboard"] = "Kontrol Paneli",
@@ -2859,8 +2859,8 @@ public static class LocalizationService
         ["settings.chooseLang"] = "Tercih ettiğiniz dili seçin",
         ["settings.about"] = "Aura Core Pro Hakkında",
         ["settings.version"] = "Sürüm 1.8.0",
-        ["settings.tagline"] = "Yapay Zekâ Destekli Windows Optimizasyonu",
-        ["settings.description"] = "Aura Core Pro, sistem sağlığı analizi, temizlik, performans ayarı, gizlilik ve kişiselleştirme için 27'den fazla modül içeren kapsamlı bir Windows optimizasyon paketidir.",
+        ["settings.tagline"] = "Yapay Zekâ Destekli Sistem Optimizasyonu",
+        ["settings.description"] = "Aura Core Pro, sistem sağlığı analizi, temizlik, performans ayarı, gizlilik ve kişiselleştirme için 27'den fazla modül içeren kapsamlı, çoklu platform bir optimizasyon paketidir.",
         ["settings.logOutTitle"] = "Çıkış yapılsın mı?",
         ["settings.logOutMsg"] = "Çevrimiçi özellikleri kullanmak için tekrar giriş yapmanız gerekecektir.",
         ["settings.loggedOut"] = "Çıkış yapıldı",
@@ -2950,7 +2950,7 @@ public static class LocalizationService
         ["pdf.startupPrograms"] = "Başlangıç Programları ({0})",
         // -- Disk Cleanup Pro --
         ["dc.title"] = "Disk Temizleme Pro",
-        ["dc.subtitle"] = "Windows derin temizlik — sistem önbelleği + kopya dosya + boş klasör",
+        ["dc.subtitle"] = "Derin temizlik — sistem önbelleği, kopya dosya, boş klasör",
         ["dc.adminWarningTitle"] = "Bazı kategoriler yönetici yetkisi gerektirir",
         ["dc.adminWarningMsg"] = "Tam temizlik için AuraCore Pro'yu yönetici olarak çalıştırın.",
         ["dc.scanBtn"] = "Kapsamlı Tarama",
@@ -3430,7 +3430,7 @@ public static class LocalizationService
         ["proc.subtitle"] = "CPU, RAM ve kontrol özellikleriyle çalışan tüm işlemlerin gerçek zamanlı görünümü",
         // ── Hosts Düzenleyici ──
         ["hosts.title"] = "Hosts Dosyası Düzenleyici",
-        ["hosts.subtitle"] = "Windows hosts dosyasını düzenleyin — alan adlarını engelleyin, özel DNS eşlemeleri yapın",
+        ["hosts.subtitle"] = "Sistem hosts dosyasını düzenleyin — alan adlarını engelleyin, özel DNS eşlemeleri yapın",
         ["hosts.loaded"] = "{0} kayıt yüklendi — {1} aktif",
         ["hosts.unsaved"] = "Kaydedilmemiş değişiklikler — uygulamak için Kaydet'e tıklayın",
         ["hosts.saved"] = "Hosts dosyası başarıyla kaydedildi.",
@@ -3449,7 +3449,7 @@ public static class LocalizationService
 
         // ── Onboarding ──
         ["onb.welcomeTitle"] = "AuraCore Pro'ya Hosgeldiniz",
-        ["onb.welcomeDesc"] = "Yapay zeka destekli hepsi bir arada Windows optimizasyon araciniz. 20+ uzman modul sisteminizi hizli, temiz ve ozellestirilmis tutar.",
+        ["onb.welcomeDesc"] = "Yapay zeka destekli hepsi bir arada çoklu platform optimizasyon araciniz. 20+ uzman modul sisteminizi hizli, temiz ve ozellestirilmis tutar.",
         ["onb.welcomeDetail"] = "Neler yapabileceginize hizli bir tur atalim.",
         ["onb.dashboardTitle"] = "Canli Kontrol Paneli",
         ["onb.dashboardDesc"] = "Kontrol paneliniz gercek zamanli CPU, RAM ve disk kullanimini saglik puaniyla gosterir. Hizli eylem butonlariyla tek tikla tarama ve optimizasyon yapabilirsiniz.",
@@ -3460,9 +3460,9 @@ public static class LocalizationService
         ["onb.gamingTitle"] = "Oyun Modu",
         ["onb.gamingDesc"] = "Tek tikla maksimum oyun performansi: yuksek performans guc plani, sessiz bildirimler, arka plan uygulamalarini durdurma ve islem onceligi artirma.",
         ["onb.gamingDetail"] = "Oyun basina ozel profiller olusturun.",
-        ["onb.customizeTitle"] = "Windows'unuzu Ozellestirin",
+        ["onb.customizeTitle"] = "Sisteminizi Ozellestirin",
         ["onb.customizeDesc"] = "Klasik sag tik menusunu geri getirin, gorev cubugu karisikligini gizleyin, dosya uzantilarini gosterin ve daha fazlasi. Uygulama Yukleyici WinGet ile 127+ uygulama yonetir.",
-        ["onb.customizeDetail"] = "Tum ayarlar Windows 10 ve 11'de calisir.",
+        ["onb.customizeDetail"] = "Modüller platforma uyum sağlar — Windows'ta Windows ayarları, Linux'ta systemd, macOS'ta defaults düzenleme.",
         ["onb.smartTitle"] = "Akilli ve Otomatik",
         ["onb.smartDesc"] = "Yapay Zeka Onerileri sisteminizi analiz eder ve iyilestirmeler onerir. Otomatik Zamanlama bilgisayariniz bosta iken modulleri calistirir.",
         ["onb.smartDetail"] = "Ayarlar'dan tema ve dil secebilirsiniz.",
@@ -4839,7 +4839,7 @@ public static class LocalizationService
         ["symlink.scanDirBtn"]          = "Dizini Tara",
         ["symlink.scanPathWatermark"]   = "Taranacak dizin (örn. C:\\Users)",
         ["symlink.scanHint"]            = "Bir dizin girin ve Tara'ya tıklayın",
-        ["symlink.adminWarning"]        = "Windows'ta sembolik bağlantı oluşturmak yönetici ayrıcalıkları gerektirir.",
+        ["symlink.adminWarning"]        = "Windows'ta sembolik bağlantı oluşturmak yönetici ayrıcalıkları gerektirir. Linux/macOS'ta hedef dizine yazma erişimi gerekir.",
         ["symlink.creatingLink"]        = "Bağlantı oluşturuluyor...",
         ["symlink.pathRequired"]        = "Bağlantı yolu ve hedef yol zorunludur.",
         ["symlink.validDirRequired"]    = "Lütfen geçerli bir dizin yolu girin.",

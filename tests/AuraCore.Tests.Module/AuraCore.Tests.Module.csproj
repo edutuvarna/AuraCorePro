@@ -42,5 +42,6 @@
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.DefenderManager\AuraCore.Module.DefenderManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.ServiceManager\AuraCore.Module.ServiceManager.csproj" />
     <ProjectReference Include="..\..\src\Modules\AuraCore.Module.AutorunManager\AuraCore.Module.AutorunManager.csproj" />
+    <ProjectReference Include="..\..\src\Modules\AuraCore.Module.RegistryOptimizer\AuraCore.Module.RegistryOptimizer.csproj" />
   </ItemGroup>
 </Project>

@@ -19,6 +19,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
 
     public async Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Microsoft.Win32.Registry throws PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new ScanResult(Id, true, 0, 0);
+
         var issues = new List<RegistryIssue>();
 
         await Task.Run(() =>
@@ -38,6 +42,10 @@ public sealed class RegistryOptimizerModule : IOptimizationModule
     public async Task<OptimizationResult> OptimizeAsync(
         OptimizationPlan plan, IProgress<TaskProgress>? progress = null, CancellationToken ct = default)
     {
+        // Phase 6.16 Linux platform guard — Registry writes throw PlatformNotSupportedException on non-Windows.
+        if (!OperatingSystem.IsWindows())
+            return new OptimizationResult(Id, "", true, 0, 0, TimeSpan.Zero);
+
         if (plan.SelectedItemIds.Count == 0 || LastReport is null)
             return new OptimizationResult(Id, "", false, 0, 0, TimeSpan.Zero);
 

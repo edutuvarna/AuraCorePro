@@ -52,14 +52,16 @@ public sealed class ModuleNavigator : IModuleNavigator
         bool hasFactory = _viewFactories.TryGetValue(moduleId, out var factory);
         bool hasModule  = _moduleMap.TryGetValue(moduleId, out var module);
 
-        // 1) No factory registered → no shell-level rendering possible. Show diagnostic.
-        // Virtual ids (dashboard/settings/ai-features) DO have factories even though they
-        // are not IOptimizationModule services — they fall through to step 3.
+        // 1) No factory registered → module unknown to this shell on this platform.
+        // Use FeatureDisabled (not WrongPlatform) — "Wrong platform" with target=All is
+        // logically nonsensical ("This module supports All only" — supports everything
+        // but unavailable here). FeatureDisabled with a clear reason is honest.
         if (!hasFactory)
         {
             return new UnavailableModuleView(
                 module?.DisplayName ?? moduleId,
-                ModuleAvailability.WrongPlatform(SupportedPlatform.All),
+                ModuleAvailability.FeatureDisabled(
+                    $"No view registered for module id '{moduleId}' on this platform."),
                 onTryAgain);
         }
 

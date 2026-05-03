@@ -29,6 +29,9 @@ public sealed partial class MainWindow : Window
 
     // Phase 6.16: module navigator (view factory registry + availability gating)
     private readonly global::AuraCore.UI.Avalonia.Services.IModuleNavigator? _moduleNavigator;
+    // Phase 6.16 hotfix: capture the navigator-init exception so SetActiveContent
+    // can surface it instead of falling back to a misleading DashboardView.
+    private readonly string? _navigatorInitError;
 
     // Phase 5.2.0 Task 11: privilege helper availability banner
     private readonly IHelperAvailabilityService? _helperAvailability;
@@ -74,10 +77,16 @@ public sealed partial class MainWindow : Window
             _moduleNavigator = App.Services.GetRequiredService<global::AuraCore.UI.Avalonia.Services.IModuleNavigator>();
             RegisterAllModuleViews();
         }
-        catch
+        catch (Exception navInitEx)
         {
-            // Design-time / test fallback — without the navigator, SetActiveContent
-            // falls back to the legacy DashboardView.
+            // Phase 6.16 hotfix — capture the actual exception so SetActiveContent
+            // can surface it via UnavailableModuleView instead of silently falling
+            // back to DashboardView (the audit pattern Phase 6.16 was meant to FIX).
+            var inner = navInitEx.InnerException is not null
+                ? $" → inner: {navInitEx.InnerException.GetType().Name}: {navInitEx.InnerException.Message}"
+                : string.Empty;
+            _navigatorInitError = $"{navInitEx.GetType().Name}: {navInitEx.Message}{inner}";
+            try { System.Console.Error.WriteLine($"[MainWindow] IModuleNavigator init failed: {navInitEx}"); } catch { }
         }
 
         // Phase 5.2.0 Task 11: resolve helper availability service and wire banner visibility
@@ -429,10 +438,11 @@ public sealed partial class MainWindow : Window
             // DI failed during ctor — surface the diagnostic instead of silently
             // falling back to Dashboard for every click (the audit pattern that
             // Phase 6.16 was meant to FIX, not perpetuate).
+            var detail = _navigatorInitError ?? "(no exception captured — App.Services may have been null)";
             ContentArea.Content = new UnavailableModuleView(
                 moduleId,
                 AuraCore.Application.Interfaces.Modules.ModuleAvailability.FeatureDisabled(
-                    "Module navigator not initialized — DI bootstrap failed at MainWindow ctor."),
+                    "Module navigator init failed: " + detail),
                 onTryAgain: null);
             return;
         }
@@ -521,6 +531,14 @@ public sealed partial class MainWindow : Window
         // ── Linux-only modules ──
         if (OperatingSystem.IsLinux())
         {
+            // Phase 6.16 hotfix: these 4 were the original "click goes to dashboard"
+            // bug per the audit. They were never in the old CreateModuleView switch;
+            // adding them here makes them reachable via the navigator.
+            _moduleNavigator.RegisterView("systemd-manager",      () => new Pages.SystemdManagerView());
+            _moduleNavigator.RegisterView("swap-optimizer",       () => new Pages.SwapOptimizerView());
+            _moduleNavigator.RegisterView("package-cleaner",      () => new Pages.PackageCleanerView());
+            _moduleNavigator.RegisterView("cron-manager",         () => new Pages.CronManagerView());
+
             _moduleNavigator.RegisterView("journal-cleaner",      CreateJournalCleanerView);
             _moduleNavigator.RegisterView("snap-flatpak-cleaner", CreateSnapFlatpakCleanerView);
             _moduleNavigator.RegisterView("docker-cleaner",       CreateDockerCleanerView);

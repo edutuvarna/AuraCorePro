@@ -36,6 +36,16 @@ public partial class App : global::Avalonia.Application
     {
         var sc = new ServiceCollection();
 
+        // ── Phase 6.16 hotfix: register the standard logging stack BEFORE any
+        // service registrations. LinuxShellCommandService (registered by
+        // sc.AddPrivilegeIpc() below) takes ILogger<LinuxShellCommandService>
+        // via ctor; without this line, DI cannot resolve it and the eager
+        // IEnumerable<IOptimizationModule> enumeration in ModuleNavigator's
+        // ctor cascades into InvalidOperationException ("Unable to resolve
+        // service for type 'Microsoft.Extensions.Logging.ILogger`1'").
+        // AddLogging() registers a no-op default; future phases can wire real
+        // log providers (Serilog, file appender, etc.) without code changes here.
+        sc.AddLogging();
 
         // ── Phase 5.2.1: Privilege IPC + helper availability ──
         // IShellCommandService is required by the three migrated Linux modules

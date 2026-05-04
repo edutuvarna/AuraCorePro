@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -15,6 +16,7 @@ namespace AuraCore.Module.GrubManager;
 /// Always ensure a backup exists before making changes.
 /// Risk: HIGH | Platform: Linux-only | Advanced: yes (power-users only)
 /// </summary>
+[SupportedOSPlatform("linux")]
 public sealed class GrubManagerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -409,6 +411,7 @@ public sealed record GrubSettings(
 /// <summary>
 /// DI registration for the GrubManager module.
 /// </summary>
+[SupportedOSPlatform("linux")]
 public static class GrubManagerRegistration
 {
     public static IServiceCollection AddGrubManagerModule(this IServiceCollection services)

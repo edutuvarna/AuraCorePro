@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -9,6 +10,7 @@ using AuraCore.Module.SwapOptimizer.Models;
 
 namespace AuraCore.Module.SwapOptimizer;
 
+[SupportedOSPlatform("linux")]
 public sealed class SwapOptimizerModule : IOptimizationModule
 {
     public string Id => "swap-optimizer";
@@ -231,6 +233,7 @@ public sealed class SwapOptimizerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class SwapOptimizerRegistration
 {
     public static IServiceCollection AddSwapOptimizerModule(this IServiceCollection services)

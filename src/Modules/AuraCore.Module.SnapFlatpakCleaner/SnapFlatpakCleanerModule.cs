@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -9,6 +10,7 @@ using AuraCore.Domain.Enums;
 
 namespace AuraCore.Module.SnapFlatpakCleaner;
 
+[SupportedOSPlatform("linux")]
 public sealed class SnapFlatpakCleanerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -318,6 +320,7 @@ public sealed class SnapFlatpakCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class SnapFlatpakCleanerRegistration
 {
     public static IServiceCollection AddSnapFlatpakCleanerModule(this IServiceCollection services)

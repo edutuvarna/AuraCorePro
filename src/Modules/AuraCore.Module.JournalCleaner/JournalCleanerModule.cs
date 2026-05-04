@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -10,6 +11,7 @@ using AuraCore.Module.JournalCleaner.Models;
 
 namespace AuraCore.Module.JournalCleaner;
 
+[SupportedOSPlatform("linux")]
 public sealed class JournalCleanerModule : IOptimizationModule
 {
     public string Id => "journal-cleaner";
@@ -181,6 +183,7 @@ public sealed class JournalCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class JournalCleanerRegistration
 {
     public static IServiceCollection AddJournalCleanerModule(this IServiceCollection services)

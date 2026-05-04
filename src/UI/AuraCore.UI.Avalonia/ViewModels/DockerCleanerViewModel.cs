@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -28,6 +29,8 @@ public interface IDockerCleanerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed class DockerCleanerEngineAdapter : IDockerCleanerEngine
 {
     private readonly DockerCleanerModule _module;
@@ -91,6 +94,8 @@ public sealed class DockerCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     public DockerCleanerViewModel(DockerCleanerModule module)
         : this(new DockerCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

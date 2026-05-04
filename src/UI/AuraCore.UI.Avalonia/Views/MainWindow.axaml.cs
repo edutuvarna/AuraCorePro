@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Versioning;
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
@@ -565,6 +566,7 @@ public sealed partial class MainWindow : Window
         return new Pages.CategoryCleanView(module);
     }
 
+    [SupportedOSPlatform("linux")]
     private UserControl CreateJournalCleanerView()
     {
         var v = new Pages.JournalCleanerView();
@@ -576,6 +578,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("linux")]
     private UserControl CreateSnapFlatpakCleanerView()
     {
         var v = new Pages.SnapFlatpakCleanerView();
@@ -587,6 +590,8 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("linux")]
+    [SupportedOSPlatform("macos")]
     private UserControl CreateDockerCleanerView()
     {
         var v = new Pages.DockerCleanerView();
@@ -598,6 +603,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("linux")]
     private UserControl CreateKernelCleanerView()
     {
         var v = new Pages.KernelCleanerView();
@@ -609,6 +615,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("linux")]
     private UserControl CreateLinuxAppInstallerView()
     {
         var v = new Pages.LinuxAppInstallerView();
@@ -620,6 +627,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("linux")]
     private UserControl CreateGrubManagerView()
     {
         var v = new Pages.GrubManagerView();

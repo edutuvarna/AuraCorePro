@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -9,6 +10,7 @@ using AuraCore.Module.LinuxAppInstaller.Models;
 
 namespace AuraCore.Module.LinuxAppInstaller;
 
+[SupportedOSPlatform("linux")]
 public sealed class LinuxAppInstallerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -267,6 +269,7 @@ public sealed class LinuxAppInstallerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class LinuxAppInstallerRegistration
 {
     public static IServiceCollection AddLinuxAppInstallerModule(this IServiceCollection services)

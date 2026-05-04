@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using AuraCore.Module.SnapFlatpakCleaner;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
+[SupportedOSPlatform("linux")]
 public partial class SnapFlatpakCleanerView : UserControl
 {
     public SnapFlatpakCleanerView()

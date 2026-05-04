@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -29,6 +30,7 @@ public interface ISnapFlatpakCleanerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class SnapFlatpakCleanerEngineAdapter : ISnapFlatpakCleanerEngine
 {
     private readonly SnapFlatpakCleanerModule _module;
@@ -88,6 +90,7 @@ public sealed class SnapFlatpakCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
     public SnapFlatpakCleanerViewModel(SnapFlatpakCleanerModule module)
         : this(new SnapFlatpakCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

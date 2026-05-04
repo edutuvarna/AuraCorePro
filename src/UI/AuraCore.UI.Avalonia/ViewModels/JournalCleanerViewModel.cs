@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -26,6 +27,7 @@ public interface IJournalCleanerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class JournalCleanerEngineAdapter : IJournalCleanerEngine
 {
     private readonly JournalCleanerModule _module;
@@ -68,6 +70,7 @@ public sealed class JournalCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
     public JournalCleanerViewModel(JournalCleanerModule module)
         : this(new JournalCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

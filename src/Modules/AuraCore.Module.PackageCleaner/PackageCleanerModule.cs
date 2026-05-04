@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -9,6 +10,7 @@ using AuraCore.Module.PackageCleaner.Models;
 
 namespace AuraCore.Module.PackageCleaner;
 
+[SupportedOSPlatform("linux")]
 public sealed class PackageCleanerModule : IOptimizationModule
 {
     public string Id => "package-cleaner";
@@ -214,6 +216,7 @@ public sealed class PackageCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class PackageCleanerRegistration
 {
     public static IServiceCollection AddPackageCleanerModule(this IServiceCollection services)

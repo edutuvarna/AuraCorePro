@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -30,6 +31,7 @@ public interface ILinuxAppInstallerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class LinuxAppInstallerEngineAdapter : ILinuxAppInstallerEngine
 {
     private readonly LinuxAppInstallerModule _module;
@@ -277,6 +279,7 @@ public sealed class LinuxAppInstallerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
     public LinuxAppInstallerViewModel(LinuxAppInstallerModule module)
         : this(new LinuxAppInstallerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

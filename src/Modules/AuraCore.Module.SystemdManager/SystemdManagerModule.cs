@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -8,6 +9,7 @@ using AuraCore.Module.SystemdManager.Models;
 
 namespace AuraCore.Module.SystemdManager;
 
+[SupportedOSPlatform("linux")]
 public sealed class SystemdManagerModule : IOptimizationModule
 {
     public string Id => "systemd-manager";
@@ -189,6 +191,7 @@ public sealed class SystemdManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class SystemdManagerRegistration
 {
     public static IServiceCollection AddSystemdManagerModule(this IServiceCollection services)

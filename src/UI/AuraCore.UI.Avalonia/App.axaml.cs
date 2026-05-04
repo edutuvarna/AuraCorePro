@@ -117,6 +117,11 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.PackageCleaner.PackageCleanerRegistration.AddPackageCleanerModule(sc);
             AuraCore.Module.SwapOptimizer.SwapOptimizerRegistration.AddSwapOptimizerModule(sc);
             AuraCore.Module.CronManager.CronManagerRegistration.AddCronManagerModule(sc);
+            // Phase 6.17.C: Linux modules are [SupportedOSPlatform("linux")]; the lambda
+            // factories below escape the IsLinux() guard, so pragma-suppress CA1416 here.
+            // Runtime guard: the entire block is gated by IsLinux(), so the lambdas are
+            // only invoked on Linux when DI resolves the module.
+#pragma warning disable CA1416
             // Journal Cleaner (Phase 4.3.1): register concrete first so the VM can inject
             // JournalCleanerModule directly, then alias it to IOptimizationModule so the
             // engine-wide multi-binding (_moduleMap in MainWindow) also sees it.
@@ -149,6 +154,7 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.GrubManager.GrubManagerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.GrubManager.GrubManagerModule>());
+#pragma warning restore CA1416
         }
 
         // ── macOS-only modules (Faz 3) ──
@@ -202,10 +208,16 @@ public partial class App : global::Avalonia.Application
         // ── Linux + macOS shared modules ──
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
+            // Phase 6.17.C: DockerCleanerModule carries both [SupportedOSPlatform("linux")]
+            // and [SupportedOSPlatform("macos")]. The IsLinux()||IsMacOS() guard above
+            // satisfies that runtime, but the lambda factory escapes the guard for static
+            // analysis purposes — pragma-suppress CA1416 in this narrow block.
+#pragma warning disable CA1416
             // Docker Cleaner (Phase 4.3.3): concrete first for VM injection, alias to IOptimizationModule.
             sc.AddSingleton<AuraCore.Module.DockerCleaner.DockerCleanerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.DockerCleaner.DockerCleanerModule>());
+#pragma warning restore CA1416
         }
 
         // ── AI Analyzer Engine ──

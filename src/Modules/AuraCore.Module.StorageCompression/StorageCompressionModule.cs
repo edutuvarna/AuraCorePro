@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -7,6 +8,7 @@ using AuraCore.Module.StorageCompression.Models;
 
 namespace AuraCore.Module.StorageCompression;
 
+[SupportedOSPlatform("windows")]
 public sealed class StorageCompressionModule : IOptimizationModule
 {
     public string Id => "storage-compression";
@@ -321,6 +323,7 @@ public sealed class StorageCompressionModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("windows")]
 public static class StorageCompressionRegistration
 {
     public static IServiceCollection AddStorageCompressionModule(

@@ -412,17 +412,17 @@ public sealed partial class MainWindow : Window
 
         if (module?.IsLocked == true)
         {
-            try
-            {
-                var tierService = App.Services.GetRequiredService<AuraCore.UI.Avalonia.Services.AI.ITierService>();
-                var required = tierService.GetRequiredTier(moduleKey);
-                var dialog = new Views.Dialogs.TierUpgradePlaceholderDialog(moduleKey, required);
-                await dialog.ShowDialog(this);
-            }
-            catch
-            {
-                // Silently swallow if DI not available (design time / tests)
-            }
+            // Phase 6.16: locked module click now routes to the actual upgrade
+            // flow (UpgradeView → PaymentView → Stripe checkout) instead of the
+            // dead-end TierUpgradePlaceholderDialog. The placeholder dialog is
+            // kept for the Linux helper-missing case (different concern).
+            var moduleName = LocalizationService._(module.LocalizationKey);
+            ContentArea.Content = new Pages.UpgradeView(moduleKey, moduleName);
+            // Mark the module visually active in the sidebar so the user has
+            // context about what they tried to open.
+            _sidebarVm.NavigateTo(moduleKey);
+            RebuildSidebar();
+            await Task.CompletedTask;
             return;
         }
 

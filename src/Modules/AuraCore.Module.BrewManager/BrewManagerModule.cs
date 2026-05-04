@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -10,6 +11,7 @@ using AuraCore.Module.BrewManager.Models;
 
 namespace AuraCore.Module.BrewManager;
 
+[SupportedOSPlatform("macos")]
 public sealed class BrewManagerModule : IOptimizationModule
 {
     public string Id => "brew-manager";
@@ -256,6 +258,7 @@ public sealed class BrewManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class BrewManagerRegistration
 {
     public static IServiceCollection AddBrewManagerModule(this IServiceCollection services)

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -8,6 +9,7 @@ using AuraCore.Module.DefaultsOptimizer.Models;
 
 namespace AuraCore.Module.DefaultsOptimizer;
 
+[SupportedOSPlatform("macos")]
 public sealed class DefaultsOptimizerModule : IOptimizationModule
 {
     public string Id => "defaults-optimizer";
@@ -183,6 +185,7 @@ public sealed class DefaultsOptimizerModule : IOptimizationModule
         !string.IsNullOrWhiteSpace(s) && s.All(c => char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_');
 }
 
+[SupportedOSPlatform("macos")]
 public static class DefaultsOptimizerRegistration
 {
     public static IServiceCollection AddDefaultsOptimizerModule(this IServiceCollection services)

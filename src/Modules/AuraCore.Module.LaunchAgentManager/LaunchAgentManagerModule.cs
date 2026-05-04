@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -8,6 +9,7 @@ using AuraCore.Module.LaunchAgentManager.Models;
 
 namespace AuraCore.Module.LaunchAgentManager;
 
+[SupportedOSPlatform("macos")]
 public sealed class LaunchAgentManagerModule : IOptimizationModule
 {
     public string Id => "launch-agent-manager";
@@ -283,6 +285,7 @@ public sealed class LaunchAgentManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class LaunchAgentManagerRegistration
 {
     public static IServiceCollection AddLaunchAgentManagerModule(this IServiceCollection services)

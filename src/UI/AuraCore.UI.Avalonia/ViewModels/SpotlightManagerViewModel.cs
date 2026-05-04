@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -29,6 +30,7 @@ public interface ISpotlightEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("macos")]
 public sealed class SpotlightEngineAdapter : ISpotlightEngine
 {
     private readonly SpotlightManagerModule _module;
@@ -183,6 +185,7 @@ public sealed class SpotlightManagerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("macos")]
     public SpotlightManagerViewModel(SpotlightManagerModule module)
         : this(new SpotlightEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

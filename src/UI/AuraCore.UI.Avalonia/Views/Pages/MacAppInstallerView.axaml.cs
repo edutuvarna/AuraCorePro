@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using AuraCore.Module.MacAppInstaller;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
+[SupportedOSPlatform("macos")]
 public partial class MacAppInstallerView : UserControl
 {
     public MacAppInstallerView()

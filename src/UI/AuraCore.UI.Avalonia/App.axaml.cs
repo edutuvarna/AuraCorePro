@@ -164,6 +164,11 @@ public partial class App : global::Avalonia.Application
             AuraCore.Module.LaunchAgentManager.LaunchAgentManagerRegistration.AddLaunchAgentManagerModule(sc);
             AuraCore.Module.BrewManager.BrewManagerRegistration.AddBrewManagerModule(sc);
             AuraCore.Module.TimeMachineManager.TimeMachineManagerRegistration.AddTimeMachineManagerModule(sc);
+            // Phase 6.17.D: macOS modules are [SupportedOSPlatform("macos")]; the lambda
+            // factories below escape the IsMacOS() guard, so pragma-suppress CA1416 here.
+            // Runtime guard: the entire block is gated by IsMacOS(), so the lambdas are
+            // only invoked on macOS when DI resolves the module.
+#pragma warning disable CA1416
             // Xcode Cleaner (Phase 4.4.4): replaces the old single-line
             // AddXcodeCleanerModule registration — same concrete +
             // IOptimizationModule alias pattern as 4.3.1-4.4.3 so the VM can
@@ -203,6 +208,7 @@ public partial class App : global::Avalonia.Application
             sc.AddSingleton<AuraCore.Module.MacAppInstaller.MacAppInstallerModule>();
             sc.AddSingleton<AuraCore.Application.Interfaces.Modules.IOptimizationModule>(
                 sp => sp.GetRequiredService<AuraCore.Module.MacAppInstaller.MacAppInstallerModule>());
+#pragma warning restore CA1416
         }
 
         // ── Linux + macOS shared modules ──

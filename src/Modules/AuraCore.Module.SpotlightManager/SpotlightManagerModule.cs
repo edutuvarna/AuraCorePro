@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -10,6 +11,7 @@ using AuraCore.Module.SpotlightManager.Models;
 
 namespace AuraCore.Module.SpotlightManager;
 
+[SupportedOSPlatform("macos")]
 public sealed class SpotlightManagerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -228,6 +230,7 @@ public sealed class SpotlightManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class SpotlightManagerRegistration
 {
     public static IServiceCollection AddSpotlightManagerModule(this IServiceCollection services)

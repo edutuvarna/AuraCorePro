@@ -639,6 +639,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("macos")]
     private UserControl CreateDnsFlusherView()
     {
         var v = new Pages.DnsFlusherView();
@@ -650,6 +651,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("macos")]
     private UserControl CreatePurgeableSpaceView()
     {
         var v = new Pages.PurgeableSpaceManagerView();
@@ -661,6 +663,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("macos")]
     private UserControl CreateSpotlightManagerView()
     {
         var v = new Pages.SpotlightManagerView();
@@ -672,6 +675,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("macos")]
     private UserControl CreateXcodeCleanerView()
     {
         var v = new Pages.XcodeCleanerView();
@@ -683,6 +687,7 @@ public sealed partial class MainWindow : Window
         return v;
     }
 
+    [SupportedOSPlatform("macos")]
     private UserControl CreateMacAppInstallerView()
     {
         var v = new Pages.MacAppInstallerView();

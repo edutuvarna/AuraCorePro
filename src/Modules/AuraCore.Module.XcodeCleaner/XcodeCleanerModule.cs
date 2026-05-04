@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -9,6 +10,7 @@ using AuraCore.Module.XcodeCleaner.Models;
 
 namespace AuraCore.Module.XcodeCleaner;
 
+[SupportedOSPlatform("macos")]
 public sealed class XcodeCleanerModule : IOptimizationModule
 {
     public string Id => "xcode-cleaner";
@@ -239,6 +241,7 @@ public sealed class XcodeCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class XcodeCleanerRegistration
 {
     public static IServiceCollection AddXcodeCleanerModule(this IServiceCollection services)

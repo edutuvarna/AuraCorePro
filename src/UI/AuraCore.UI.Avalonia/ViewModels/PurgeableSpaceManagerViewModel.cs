@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -27,6 +28,7 @@ public interface IPurgeableSpaceManagerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("macos")]
 public sealed class PurgeableSpaceManagerEngineAdapter : IPurgeableSpaceManagerEngine
 {
     private readonly PurgeableSpaceManagerModule _module;
@@ -79,6 +81,7 @@ public sealed class PurgeableSpaceManagerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("macos")]
     public PurgeableSpaceManagerViewModel(PurgeableSpaceManagerModule module)
         : this(new PurgeableSpaceManagerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

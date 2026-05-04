@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -10,6 +11,7 @@ using AuraCore.Module.DnsFlusher.Models;
 
 namespace AuraCore.Module.DnsFlusher;
 
+[SupportedOSPlatform("macos")]
 public sealed class DnsFlusherModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -161,6 +163,7 @@ public sealed class DnsFlusherModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class DnsFlusherRegistration
 {
     public static IServiceCollection AddDnsFlusherModule(this IServiceCollection services)

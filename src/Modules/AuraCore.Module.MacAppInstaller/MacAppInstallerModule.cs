@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -8,6 +9,7 @@ using AuraCore.Module.MacAppInstaller.Models;
 
 namespace AuraCore.Module.MacAppInstaller;
 
+[SupportedOSPlatform("macos")]
 public sealed class MacAppInstallerModule : IOptimizationModule
 {
     public string Id => "mac-app-installer";
@@ -188,6 +190,7 @@ public sealed class MacAppInstallerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class MacAppInstallerRegistration
 {
     public static IServiceCollection AddMacAppInstallerModule(this IServiceCollection services)

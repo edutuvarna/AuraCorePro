@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -29,6 +30,7 @@ public interface IMacAppInstallerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("macos")]
 public sealed class MacAppInstallerEngineAdapter : IMacAppInstallerEngine
 {
     private readonly MacAppInstallerModule _module;
@@ -282,6 +284,7 @@ public sealed class MacAppInstallerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("macos")]
     public MacAppInstallerViewModel(MacAppInstallerModule module)
         : this(new MacAppInstallerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

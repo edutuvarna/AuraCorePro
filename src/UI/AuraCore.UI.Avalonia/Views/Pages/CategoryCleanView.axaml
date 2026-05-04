@@ -136,6 +136,13 @@
         </Button>
       </Grid>
 
+      <!-- Phase 6.17 Wave F post-action banner (junk-cleaner only) -->
+      <TextBlock x:Name="PostActionBanner"
+                 IsVisible="False"
+                 Margin="0,12,0,0"
+                 TextWrapping="Wrap"
+                 FontSize="13"/>
+
     </StackPanel>
   </ScrollViewer>
 </UserControl>

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
+using AuraCore.Application;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -135,4 +136,37 @@ public partial class SystemdManagerView : UserControl
         ScanBtn.Content = L("systemdManager.action.scan");
         SubText.Text    = L("systemdManager.subtext.initial");
     }
+
+    /// <summary>
+    /// Phase 6.17 Wave F — surfaces an OperationResult into the post-action banner.
+    /// Service-state actions invoked from this view (per-row enable/disable/mask buttons,
+    /// when wired up) call this after RunOperationAsync returns.
+    /// </summary>
+    internal void ApplyPostActionBanner(OperationResult opResult)
+    {
+        PostActionBanner.IsVisible = true;
+        PostActionBanner.Foreground = opResult.Status switch
+        {
+            OperationStatus.Success => new SolidColorBrush(Color.Parse("#10B981")),
+            OperationStatus.Skipped => new SolidColorBrush(Color.Parse("#F59E0B")),
+            OperationStatus.Failed  => new SolidColorBrush(Color.Parse("#EF4444")),
+            _                       => new SolidColorBrush(Color.Parse("#9CA3AF")),
+        };
+        PostActionBanner.Text = opResult.Status switch
+        {
+            OperationStatus.Success => string.Format(LocalizationService._("op.result.success"),
+                                          FormatBytes(opResult.BytesFreed), opResult.ItemsAffected, opResult.Duration.TotalSeconds),
+            OperationStatus.Skipped => string.Format(LocalizationService._("op.result.skipped"), opResult.Reason ?? string.Empty),
+            OperationStatus.Failed  => string.Format(LocalizationService._("op.result.failed"), opResult.Reason ?? string.Empty),
+            _                       => string.Empty,
+        };
+    }
+
+    private static string FormatBytes(long b) => b switch
+    {
+        < 1024 => $"{b} B",
+        < 1024 * 1024 => $"{b / 1024.0:F1} KB",
+        < 1024L * 1024 * 1024 => $"{b / (1024.0 * 1024):F1} MB",
+        _ => $"{b / (1024.0 * 1024 * 1024):F2} GB"
+    };
 }

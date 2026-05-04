@@ -66,6 +66,10 @@ public partial class App : global::Avalonia.Application
         sc.AddSingleton<global::AuraCore.UI.Avalonia.Services.IModuleNavigator,
                         global::AuraCore.UI.Avalonia.Services.ModuleNavigator>();
 
+        // ── Phase 6.17.E: privileged action guard (pre-flight helper check) ──
+        sc.AddSingleton<global::AuraCore.Application.Interfaces.Platform.IPrivilegedActionGuard,
+                        global::AuraCore.UI.Avalonia.Services.PrivilegedActionGuard>();
+
         // ── Cross-platform modules (Windows + Linux + macOS) ──
         AuraCore.Module.HostsEditor.HostsEditorRegistration.AddHostsEditorModule(sc);
         AuraCore.Module.SystemHealth.SystemHealthRegistration.AddSystemHealthModule(sc);

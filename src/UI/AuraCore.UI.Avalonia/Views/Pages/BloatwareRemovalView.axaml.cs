@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using global::Avalonia;
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
@@ -16,6 +17,7 @@ public record BloatDisplayItem(string Name, string Publisher, string Category, s
     string RiskText, ISolidColorBrush RiskFg, ISolidColorBrush RiskBg, bool CanRemove, string PkgName,
     string PackageFamilyName);
 
+[SupportedOSPlatform("windows")]
 public partial class BloatwareRemovalView : UserControl
 {
     private readonly BloatwareRemovalModule? _module;

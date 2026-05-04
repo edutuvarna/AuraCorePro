@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.JournalCleaner.Models;
@@ -12,7 +13,7 @@ using AuraCore.Module.JournalCleaner.Models;
 namespace AuraCore.Module.JournalCleaner;
 
 [SupportedOSPlatform("linux")]
-public sealed class JournalCleanerModule : IOptimizationModule
+public sealed class JournalCleanerModule : IOptimizationModule, IOperationModule
 {
     public string Id => "journal-cleaner";
     public string DisplayName => "Journal Cleaner";
@@ -123,6 +124,50 @@ public sealed class JournalCleanerModule : IOptimizationModule
         {
             Debug.WriteLine($"[{Id}] Optimize error: {ex.Message}");
             return new OptimizationResult(Id, operationId, false, processed, freed, DateTime.UtcNow - start);
+        }
+    }
+
+    /// <summary>
+    /// Phase 6.17 Wave F: rich-result wrapper with privilege guard for journalctl vacuum operations.
+    /// Linux-only — Windows/macOS short-circuit with Failed result.
+    /// </summary>
+    public async Task<OperationResult> RunOperationAsync(
+        OptimizationPlan plan,
+        IPrivilegedActionGuard guard,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        if (!OperatingSystem.IsLinux())
+        {
+            sw.Stop();
+            return OperationResult.Failed("Journal Cleaner is Linux-only.", sw.Elapsed);
+        }
+
+        if (!await guard.TryGuardAsync(
+                actionDescription: "Vacuum systemd journal logs",
+                remediationCommandOverride: null,
+                ct: ct))
+        {
+            sw.Stop();
+            return OperationResult.Skipped(
+                "Privilege helper required",
+                "sudo bash /opt/auracorepro/install-privhelper.sh");
+        }
+
+        try
+        {
+            var legacy = await OptimizeAsync(plan, progress, ct);
+            sw.Stop();
+            if (!legacy.Success)
+                return OperationResult.Failed("Journal vacuum did not complete successfully", sw.Elapsed);
+            return OperationResult.Success(legacy.BytesFreed, legacy.ItemsProcessed, sw.Elapsed);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            return OperationResult.Failed($"{ex.GetType().Name}: {ex.Message}", sw.Elapsed);
         }
     }
 

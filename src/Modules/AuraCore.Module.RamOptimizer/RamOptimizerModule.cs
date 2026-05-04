@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.RamOptimizer.Models;
 
@@ -16,7 +17,7 @@ public sealed class RamOptimizerConfig
     public List<string> Blacklist { get; set; } = new(); // always optimize first
 }
 
-public sealed class RamOptimizerModule : IOptimizationModule
+public sealed class RamOptimizerModule : IOptimizationModule, IOperationModule
 {
     public string Id => "ram-optimizer";
     public string DisplayName => "RAM Optimizer";
@@ -240,6 +241,52 @@ public sealed class RamOptimizerModule : IOptimizationModule
             File.WriteAllText(ConfigPath, json);
         }
         catch { }
+    }
+
+    /// <summary>
+    /// Phase 6.17 Wave F: rich-result wrapper with privilege guard for Linux drop_caches.
+    /// Windows path uses EmptyWorkingSet which does not need the helper.
+    /// </summary>
+    public async Task<OperationResult> RunOperationAsync(
+        OptimizationPlan plan,
+        IPrivilegedActionGuard guard,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        if (OperatingSystem.IsLinux())
+        {
+            if (!await guard.TryGuardAsync(
+                    actionDescription: "Flush RAM caches (drop_caches sysctl)",
+                    remediationCommandOverride: null,
+                    ct: ct))
+            {
+                sw.Stop();
+                return OperationResult.Skipped(
+                    "Privilege helper required",
+                    "sudo bash /opt/auracorepro/install-privhelper.sh");
+            }
+        }
+
+        try
+        {
+            var legacy = await OptimizeAsync(plan, progress, ct);
+            sw.Stop();
+            if (!legacy.Success)
+            {
+                var reason = OperatingSystem.IsLinux()
+                    ? "drop_caches operation failed"
+                    : "EmptyWorkingSet returned non-success";
+                return OperationResult.Failed(reason, sw.Elapsed);
+            }
+            return OperationResult.Success(legacy.BytesFreed, legacy.ItemsProcessed, sw.Elapsed);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            return OperationResult.Failed($"{ex.GetType().Name}: {ex.Message}", sw.Elapsed);
+        }
     }
 
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default)

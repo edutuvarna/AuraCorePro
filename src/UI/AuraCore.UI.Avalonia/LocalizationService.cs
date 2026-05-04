@@ -2526,6 +2526,11 @@ public static class LocalizationService
         ["privhelper.dialog.docs"]     = "Open documentation",
         ["privhelper.dialog.tryAgain"] = "I've installed it",
         ["privhelper.dialog.closeBtn"] = "Close",
+
+        // ── Phase 6.17 Wave F: Operation post-action banner ──
+        ["op.result.success"] = "Operation succeeded — freed {0}, {1} items, {2:F1}s.",
+        ["op.result.skipped"] = "Skipped: {0}",
+        ["op.result.failed"]  = "Failed: {0}",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4981,6 +4986,11 @@ public static class LocalizationService
         ["privhelper.dialog.docs"]     = "Dokümantasyonu aç",
         ["privhelper.dialog.tryAgain"] = "Kurdum",
         ["privhelper.dialog.closeBtn"] = "Kapat",
+
+        // ── Phase 6.17 Wave F: Operation post-action banner ──
+        ["op.result.success"] = "Tamamlandı — {0} alan, {1} öğe, {2:F1}s.",
+        ["op.result.skipped"] = "Atlandı: {0}",
+        ["op.result.failed"]  = "Başarısız: {0}",
     };
 
     private static void Save()

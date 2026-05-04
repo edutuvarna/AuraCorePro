@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -8,6 +9,7 @@ using AuraCore.Module.AppInstaller.Models;
 
 namespace AuraCore.Module.AppInstaller;
 
+[SupportedOSPlatform("windows")]
 public sealed class AppInstallerModule : IOptimizationModule
 {
     public string Id => "app-installer";
@@ -327,6 +329,7 @@ public sealed class AppInstallerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("windows")]
 public static class AppInstallerRegistration
 {
     public static IServiceCollection AddAppInstallerModule(

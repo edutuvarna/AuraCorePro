@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using global::Avalonia;
 using global::Avalonia.Controls;
@@ -14,6 +15,7 @@ using AuraCore.Application.Interfaces.Modules;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
+[SupportedOSPlatform("windows")]
 public partial class AppInstallerView : UserControl
 {
     private record AppInfo(string Name, string Id, string Version, string Available, string Source);

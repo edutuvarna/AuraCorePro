@@ -4,6 +4,7 @@ using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.DefenderManager.Models;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 namespace AuraCore.Module.DefenderManager;
 
@@ -12,6 +13,7 @@ namespace AuraCore.Module.DefenderManager;
 /// Uses PowerShell cmdlets (Get-MpComputerStatus, Get-MpThreat, etc.)
 /// Includes: Scheduled Scan management, Quarantine management.
 /// </summary>
+[SupportedOSPlatform("windows")]
 public sealed class DefenderManagerModule : IOptimizationModule
 {
     private readonly AuraCore.Application.Interfaces.Platform.IShellCommandService? _shellCommandService;
@@ -680,6 +682,7 @@ public sealed class DefenderManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("windows")]
 public static class DefenderManagerRegistration
 {
     public static IServiceCollection AddDefenderManagerModule(this IServiceCollection services)

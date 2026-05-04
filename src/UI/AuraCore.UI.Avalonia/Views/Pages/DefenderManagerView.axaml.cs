@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using global::Avalonia;
@@ -18,6 +19,7 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 public record ThreatDisplayItem(string Name, string Path, string Severity, string Status,
     ISolidColorBrush SevFg, ISolidColorBrush SevBg);
 
+[SupportedOSPlatform("windows")]
 public partial class DefenderManagerView : UserControl
 {
     private readonly DefenderManagerModule? _module;

@@ -16,7 +16,12 @@ public class SymlinkManagerTests
         Assert.False(string.IsNullOrWhiteSpace(m.DisplayName));
         Assert.Equal(OptimizationCategory.ShellCustomization, m.Category);
         Assert.Equal(RiskLevel.Medium, m.Risk);
-        Assert.Equal(SupportedPlatform.Linux, m.Platform);
+        // Phase 6.16 hotfix (ace19bb): Platform changed from Linux to All because
+        // SymlinkManager is registered cross-platform in App.axaml.cs (and Windows
+        // has mklink + macOS has ln, conceptually cross-platform). ScanAsync's own
+        // OperatingSystem.IsLinux() guard still gates the actual implementation
+        // until Windows/macOS support lands in a future phase.
+        Assert.Equal(SupportedPlatform.All, m.Platform);
         IOptimizationModule iface = m;
         Assert.False(iface.IsAdvanced);
     }

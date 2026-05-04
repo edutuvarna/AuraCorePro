@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.SwapOptimizer.Models;
@@ -11,7 +12,7 @@ using AuraCore.Module.SwapOptimizer.Models;
 namespace AuraCore.Module.SwapOptimizer;
 
 [SupportedOSPlatform("linux")]
-public sealed class SwapOptimizerModule : IOptimizationModule
+public sealed class SwapOptimizerModule : IOptimizationModule, IOperationModule
 {
     public string Id => "swap-optimizer";
     public string DisplayName => "Swap Optimizer";
@@ -131,6 +132,51 @@ public sealed class SwapOptimizerModule : IOptimizationModule
         {
             Debug.WriteLine($"[{Id}] Optimize error: {ex.Message}");
             return new OptimizationResult(Id, operationId, false, processed, 0, DateTime.UtcNow - start);
+        }
+    }
+
+    /// <summary>
+    /// Phase 6.17 Wave F: rich-result wrapper with privilege guard for swap configuration changes.
+    /// Linux-only — Windows/macOS short-circuit with Failed result.
+    /// </summary>
+    public async Task<OperationResult> RunOperationAsync(
+        OptimizationPlan plan,
+        IPrivilegedActionGuard guard,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        if (!OperatingSystem.IsLinux())
+        {
+            sw.Stop();
+            return OperationResult.Failed("Swap Optimizer is Linux-only.", sw.Elapsed);
+        }
+
+        if (!await guard.TryGuardAsync(
+                actionDescription: "Modify swap configuration (swapon/swapoff/swappiness)",
+                remediationCommandOverride: null,
+                ct: ct))
+        {
+            sw.Stop();
+            return OperationResult.Skipped(
+                "Privilege helper required",
+                "sudo bash /opt/auracorepro/install-privhelper.sh");
+        }
+
+        try
+        {
+            var legacy = await OptimizeAsync(plan, progress, ct);
+            sw.Stop();
+            if (!legacy.Success)
+                return OperationResult.Failed("Swap configuration change failed", sw.Elapsed);
+            // Swap config doesn't free bytes — pass 0.
+            return OperationResult.Success(0, legacy.ItemsProcessed, sw.Elapsed);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            return OperationResult.Failed($"{ex.GetType().Name}: {ex.Message}", sw.Elapsed);
         }
     }
 

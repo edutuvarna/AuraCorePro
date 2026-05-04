@@ -91,3 +91,24 @@ If FAIL: file an issue against the responsible Wave (B / C / D / E / F) and re-c
 ## Sign-off
 
 Operator: _________________________  Date: _________
+
+---
+
+## Phase 6.17 verification (added 2026-05-04)
+
+**Build:** `phase-6-17-debt-closure` HEAD `4f2bb9f83c9e10457d4abe437130779793a0e0e3`
+**Status:** Operator smoke pending (run when ready — see `docs/superpowers/phase-6-17-banner-verify.md` for banner matrix)
+
+| Module (post-6.17 adoption) | Post-action banner shows? | Helper-missing path correct? | Notes |
+|---|---|---|---|
+| RAM Optimizer    | <yes/no> | <yes/no> | |
+| Junk Cleaner     | <yes/no> | <yes/no> | |
+| Systemd Manager  | <yes/no> | <yes/no> | |
+| Swap Optimizer   | <yes/no> | <yes/no> | |
+| Package Cleaner  | <yes/no> | <yes/no> | |
+| Journal Cleaner  | <yes/no> | <yes/no> | |
+
+System Health no longer shows -2147483648%: <yes/no>
+PrivilegeHelperMissingBanner visible at startup (helper not installed): <yes/no>
+
+Sign-off: __________________  Date: ____________

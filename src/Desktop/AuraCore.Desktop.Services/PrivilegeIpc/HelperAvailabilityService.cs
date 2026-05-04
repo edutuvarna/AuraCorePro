@@ -6,8 +6,42 @@ namespace AuraCore.Desktop.Services.PrivilegeIpc;
 
 public sealed class HelperAvailabilityService : IHelperAvailabilityService
 {
+    // Phase 6.17.G: file-existence sentinel that install-privhelper.sh writes
+    // when the daemon is successfully installed. A real D-Bus presence probe is
+    // Phase 6.18 (requires Tmds.DBus session-bus query); for now, the install
+    // script's success-marker is the source of truth.
+    private const string InstallMarkerPath = "/opt/auracorepro/install-privhelper.sh.installed";
+
     private bool _isMissing;
     private bool _isBannerVisible;
+
+    public HelperAvailabilityService()
+    {
+        // Phase 6.17.G: probe helper presence at startup so the banner can
+        // light up immediately on launch (Linux/macOS only; Windows uses UAC
+        // and never needs the banner). Background fire-and-forget; banner
+        // surfaces as soon as the probe completes (~milliseconds for a file
+        // existence check).
+        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        {
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    if (!File.Exists(InstallMarkerPath))
+                        ReportMissing();
+                    else
+                        ReportAvailable();
+                }
+                catch
+                {
+                    // Defensive: if the probe itself throws, leave defaults
+                    // (banner stays hidden); next failed privileged op will
+                    // call ReportMissing() to surface it.
+                }
+            });
+        }
+    }
 
     public bool IsMissing
     {

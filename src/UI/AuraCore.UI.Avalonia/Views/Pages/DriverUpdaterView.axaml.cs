@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using global::Avalonia.Controls;
@@ -16,6 +17,7 @@ namespace AuraCore.UI.Avalonia.Views.Pages;
 public record DriverDisplayItem(string Name, string Class, string Mfr, string Version, string Date,
     string Status, ISolidColorBrush StatusFg, ISolidColorBrush StatusBg);
 
+[SupportedOSPlatform("windows")]
 public partial class DriverUpdaterView : UserControl
 {
     private readonly DriverUpdaterModule? _module;

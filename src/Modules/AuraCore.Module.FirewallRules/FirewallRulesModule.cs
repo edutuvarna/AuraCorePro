@@ -2,9 +2,11 @@ using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
 
 namespace AuraCore.Module.FirewallRules;
 
+[SupportedOSPlatform("windows")]
 public class FirewallRulesModule : IOptimizationModule
 {
     public string Id => "firewall-rules";
@@ -35,6 +37,7 @@ public class FirewallRulesModule : IOptimizationModule
         => Task.CompletedTask;
 }
 
+[SupportedOSPlatform("windows")]
 public static class FirewallRulesRegistration
 {
     public static void AddFirewallRulesModule(IServiceCollection sc)

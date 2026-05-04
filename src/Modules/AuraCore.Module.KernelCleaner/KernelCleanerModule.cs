@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -9,6 +10,7 @@ using AuraCore.Module.KernelCleaner.Models;
 
 namespace AuraCore.Module.KernelCleaner;
 
+[SupportedOSPlatform("linux")]
 public sealed class KernelCleanerModule : IOptimizationModule
 {
     public string Id => "kernel-cleaner";
@@ -296,6 +298,7 @@ public sealed class KernelCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class KernelCleanerRegistration
 {
     public static IServiceCollection AddKernelCleanerModule(this IServiceCollection services)

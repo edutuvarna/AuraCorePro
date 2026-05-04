@@ -196,7 +196,13 @@ public partial class DashboardView : UserControl
             var modules = services.GetServices<IOptimizationModule>().ToList();
             var junkModule    = modules.OfType<JunkCleanerModule>().FirstOrDefault();
             var ramModule     = modules.OfType<RamOptimizerModule>().FirstOrDefault();
+            // Phase 6.17.B: BloatwareRemovalModule is Windows-only; null-check at use site
+            // is the runtime guard. Pragma-suppress the lambda body because the analyzer
+            // can't trace the IsWindows()-implicit guard (module not registered on non-Windows
+            // means OfType returns nothing, so bloatModule is null) through the closure.
+#pragma warning disable CA1416
             var bloatModule   = modules.OfType<BloatwareRemovalModule>().FirstOrDefault();
+#pragma warning restore CA1416
 
             _vm.InitQuickActions(
                 quickCleanup: async () =>
@@ -226,8 +232,10 @@ public partial class DashboardView : UserControl
                 removeBloat: async () =>
                 {
                     if (bloatModule is null) return;
+#pragma warning disable CA1416
                     try { await bloatModule.RemoveDefaultPresetAsync(); }
                     catch { }
+#pragma warning restore CA1416
                 });
         }
         catch { /* DI unavailable — tiles remain with no-op stubs */ }

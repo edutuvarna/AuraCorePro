@@ -176,13 +176,46 @@ public partial class RamOptimizerView : UserControl
             var plan = new OptimizationPlan(_module.Id, new[] { "all" });
             var progress = new Progress<TaskProgress>(p =>
                 Dispatcher.UIThread.Post(() => StatusText.Text = p.StatusText));
-            var result = await _module.OptimizeAsync(plan, progress);
-            StatusText.Text = $"Freed memory from {result.ItemsProcessed} processes in {result.Duration.TotalSeconds:F1}s";
+
+            // Phase 6.17 Wave F — use IOperationModule.RunOperationAsync with privilege guard.
+            var guard = App.Services.GetRequiredService<global::AuraCore.Application.Interfaces.Platform.IPrivilegedActionGuard>();
+            var opResult = await ((global::AuraCore.Application.Interfaces.Modules.IOperationModule)_module)
+                .RunOperationAsync(plan, guard, progress, ct: default);
+
+            ApplyPostActionBanner(opResult);
             await RunScan();
         }
         catch (System.Exception ex) { StatusText.Text = ex.Message; }
         finally { OptLabel.Text = LocalizationService._("common.optimize"); OptBtn.IsEnabled = true; }
     }
+
+    private void ApplyPostActionBanner(OperationResult opResult)
+    {
+        PostActionBanner.IsVisible = true;
+        PostActionBanner.Foreground = opResult.Status switch
+        {
+            OperationStatus.Success => new SolidColorBrush(Color.Parse("#10B981")),
+            OperationStatus.Skipped => new SolidColorBrush(Color.Parse("#F59E0B")),
+            OperationStatus.Failed  => new SolidColorBrush(Color.Parse("#EF4444")),
+            _                       => new SolidColorBrush(Color.Parse("#9CA3AF")),
+        };
+        PostActionBanner.Text = opResult.Status switch
+        {
+            OperationStatus.Success => string.Format(LocalizationService._("op.result.success"),
+                                          FormatBytes(opResult.BytesFreed), opResult.ItemsAffected, opResult.Duration.TotalSeconds),
+            OperationStatus.Skipped => string.Format(LocalizationService._("op.result.skipped"), opResult.Reason ?? string.Empty),
+            OperationStatus.Failed  => string.Format(LocalizationService._("op.result.failed"), opResult.Reason ?? string.Empty),
+            _                       => string.Empty,
+        };
+    }
+
+    private static string FormatBytes(long b) => b switch
+    {
+        < 1024 => $"{b} B",
+        < 1024 * 1024 => $"{b / 1024.0:F1} KB",
+        < 1024L * 1024 * 1024 => $"{b / (1024.0 * 1024):F1} MB",
+        _ => $"{b / (1024.0 * 1024 * 1024):F2} GB"
+    };
 
     private async void Boost_Click(object? sender, RoutedEventArgs e)
     {

@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## v1.8.1 — Phase 6.17 (2026-05-04)
+
+### Fixed
+- System Health storage drives no longer show `-2147483648%` on Linux virtual filesystems. Virtual filesystems (`tmpfs`, `proc`, `sysfs`, `devpts`, `securityfs`, `cgroup`, etc.) are filtered from the user-facing list; remaining drives have a zero-capacity guard plus `Math.Clamp(0, 100)` defense-in-depth on the percent calculation.
+- Privileged operations (RAM Optimizer, Junk Cleaner, Systemd Manager, Swap Optimizer, Package Cleaner, Journal Cleaner) now surface a clear "Privilege helper required" diagnostic with copyable install command instead of silently no-oping when the privilege helper isn't installed.
+- `PrivilegeHelperMissingBanner` now appears at app startup on Linux when the helper isn't installed (was only surfacing after a privileged op had already failed).
+
+### Changed
+- `[SupportedOSPlatform("windows")]` attribute now applied to all 7 previously-deferred Windows-only module classes (DefenderManager, FirewallRules, AppInstaller, DriverUpdater, GamingMode, StorageCompression, BloatwareRemoval) plus their View pages and DI registration extensions. CA1416 analyzer clean across the entire Release build.
+- `[SupportedOSPlatform("linux")]` applied to all 10 Linux-only module classes (Systemd / Swap / Package / Journal / SnapFlatpak / Kernel / LinuxAppInstaller / Cron / Grub / Docker[+macos]).
+- `[SupportedOSPlatform("macos")]` applied to all 9 macOS-only module classes — the build-hygiene prerequisite for the eventual macOS notarized release.
+- 6 modules now expose an `IOperationModule.RunOperationAsync` returning `OperationResult` with explicit `Success / Skipped / Failed` status + reason + remediation. The legacy `OptimizeAsync` shape is preserved for the other 40+ modules; opt-in migration to Phase 6.18+.
+- New `PrivilegeHelperRequiredDialog` modal mirrors the existing `UnavailableModuleView` UX (title + reason + copyable remediation + Try Again + Close + 5 EN+TR loc keys).
+- Post-action banner on each adopting module View shows green/amber/red feedback for Success/Skipped/Failed (3 EN+TR loc keys: `op.result.success`, `op.result.skipped`, `op.result.failed`).
+
+### Carry-forward to Phase 6.18+
+- Real privileged-ops smoke (deploy `install-privhelper.sh` and verify RAM Optimizer actually drops caches, Package Cleaner actually removes orphans, etc.)
+- Migrate the other 40+ modules to `IOperationModule.RunOperationAsync` incrementally
+- Replace file-existence sentinel for helper presence with real D-Bus presence probe (Tmds.DBus session-bus query) + NameOwnerChanged auto-refresh
+- macOS implementation of the privilege-helper analog (XPC service + signed entitlements) — gated on Mac hardware
+- App-level `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` beyond CA1416 (nullability, etc.)
+- System Health stale-data warning — distinguish "drive momentarily not ready" from "drive doesn't exist"
+- Centralize the `FormatBytes` helper that's currently duplicated across 6 module Views from Wave F adoption
+
+---
+
 ## [1.8.0] — 2026-04-28
 
 Major desktop release covering Phase 5.5 finishing items and Phase 6.1–6.6 (deep-link routing, pixel-regression infra, light/dark/system theme, full Turkish localization, release pipeline integration), plus the Session 23 ML training + LLM integration work that was originally drafted for v1.8.0 in April. Ships Windows + Linux self-contained binaries (1.2 GB each, includes ML/LLM models). macOS notarization is still blocked on hardware and remains in Phase 6 carry-forward.

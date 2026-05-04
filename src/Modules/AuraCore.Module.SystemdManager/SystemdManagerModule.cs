@@ -1,14 +1,17 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Application.Shared;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.SystemdManager.Models;
 
 namespace AuraCore.Module.SystemdManager;
 
-public sealed class SystemdManagerModule : IOptimizationModule
+[SupportedOSPlatform("linux")]
+public sealed class SystemdManagerModule : IOptimizationModule, IOperationModule
 {
     public string Id => "systemd-manager";
     public string DisplayName => "Systemd Manager";
@@ -137,6 +140,51 @@ public sealed class SystemdManagerModule : IOptimizationModule
         }
     }
 
+    /// <summary>
+    /// Phase 6.17 Wave F: rich-result wrapper with privilege guard for systemctl service-state changes.
+    /// Linux-only — Windows/macOS short-circuit with Failed result.
+    /// </summary>
+    public async Task<OperationResult> RunOperationAsync(
+        OptimizationPlan plan,
+        IPrivilegedActionGuard guard,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        if (!OperatingSystem.IsLinux())
+        {
+            sw.Stop();
+            return OperationResult.Failed("Systemd Manager is Linux-only.", sw.Elapsed);
+        }
+
+        if (!await guard.TryGuardAsync(
+                actionDescription: "Modify systemd service state (enable/disable/mask)",
+                remediationCommandOverride: null,
+                ct: ct))
+        {
+            sw.Stop();
+            return OperationResult.Skipped(
+                "Privilege helper required",
+                "sudo bash /opt/auracorepro/install-privhelper.sh");
+        }
+
+        try
+        {
+            var legacy = await OptimizeAsync(plan, progress, ct);
+            sw.Stop();
+            if (!legacy.Success)
+                return OperationResult.Failed("Service state change failed", sw.Elapsed);
+            // Service ops don't free bytes — pass 0.
+            return OperationResult.Success(0, legacy.ItemsProcessed, sw.Elapsed);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            return OperationResult.Failed($"{ex.GetType().Name}: {ex.Message}", sw.Elapsed);
+        }
+    }
+
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default) => Task.FromResult(false);
     public Task RollbackAsync(string operationId, CancellationToken ct = default) => Task.CompletedTask;
 
@@ -189,6 +237,7 @@ public sealed class SystemdManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class SystemdManagerRegistration
 {
     public static IServiceCollection AddSystemdManagerModule(this IServiceCollection services)

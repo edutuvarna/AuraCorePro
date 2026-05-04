@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -29,6 +30,7 @@ public interface IGrubManagerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class GrubManagerEngineAdapter : IGrubManagerEngine
 {
     private readonly GrubManagerModule _module;
@@ -96,6 +98,7 @@ public sealed class GrubManagerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
     public GrubManagerViewModel(GrubManagerModule module)
         : this(new GrubManagerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

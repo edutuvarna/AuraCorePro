@@ -2519,6 +2519,18 @@ public static class LocalizationService
         ["unavailable.copy"]                     = "Copy command",
         ["unavailable.copied"]                   = "Copied",
         ["unavailable.remediation"]              = "Remediation",
+
+        // ── Phase 6.17: Privilege Helper Required dialog ──
+        ["privhelper.dialog.title"]    = "Privilege helper required",
+        ["privhelper.dialog.reason"]   = "The privilege helper is required to apply system-level changes. Install it once and we'll use it for all privileged actions.",
+        ["privhelper.dialog.docs"]     = "Open documentation",
+        ["privhelper.dialog.tryAgain"] = "I've installed it",
+        ["privhelper.dialog.closeBtn"] = "Close",
+
+        // ── Phase 6.17 Wave F: Operation post-action banner ──
+        ["op.result.success"] = "Operation succeeded — freed {0}, {1} items, {2:F1}s.",
+        ["op.result.skipped"] = "Skipped: {0}",
+        ["op.result.failed"]  = "Failed: {0}",
     };
 
     // ═══════════════════════════════════════════════════════
@@ -4967,6 +4979,18 @@ public static class LocalizationService
         ["unavailable.copy"]                     = "Komutu kopyala",
         ["unavailable.copied"]                   = "Kopyalandı",
         ["unavailable.remediation"]              = "Çözüm",
+
+        // ── Phase 6.17: Privilege Helper Required dialog ──
+        ["privhelper.dialog.title"]    = "Yetki yardımcısı gerekli",
+        ["privhelper.dialog.reason"]   = "Sistem düzeyinde değişiklikleri uygulamak için yetki yardımcısı gerekli. Bir kez kurun, tüm yetkili işlemler için kullanacağız.",
+        ["privhelper.dialog.docs"]     = "Dokümantasyonu aç",
+        ["privhelper.dialog.tryAgain"] = "Kurdum",
+        ["privhelper.dialog.closeBtn"] = "Kapat",
+
+        // ── Phase 6.17 Wave F: Operation post-action banner ──
+        ["op.result.success"] = "Tamamlandı — {0} alan, {1} öğe, {2:F1}s.",
+        ["op.result.skipped"] = "Atlandı: {0}",
+        ["op.result.failed"]  = "Başarısız: {0}",
     };
 
     private static void Save()

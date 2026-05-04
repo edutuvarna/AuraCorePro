@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -7,6 +8,7 @@ using AuraCore.Module.BloatwareRemoval.Models;
 
 namespace AuraCore.Module.BloatwareRemoval;
 
+[SupportedOSPlatform("windows")]
 public sealed class BloatwareRemovalModule : IOptimizationModule
 {
     public string Id => "bloatware-removal";
@@ -279,6 +281,7 @@ public sealed class BloatwareRemovalModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("windows")]
 public static class BloatwareRemovalRegistration
 {
     public static IServiceCollection AddBloatwareRemovalModule(

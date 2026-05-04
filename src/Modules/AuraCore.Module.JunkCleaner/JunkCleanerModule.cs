@@ -1,12 +1,14 @@
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.JunkCleaner.Models;
 
 namespace AuraCore.Module.JunkCleaner;
 
-public sealed class JunkCleanerModule : IOptimizationModule
+public sealed class JunkCleanerModule : IOptimizationModule, IOperationModule
 {
     public string Id => "junk-cleaner";
     public string DisplayName => "AI Junk Cleaner";
@@ -203,6 +205,47 @@ public sealed class JunkCleanerModule : IOptimizationModule
         }, ct);
 
         return new OptimizationResult(Id, Guid.NewGuid().ToString(), true, deleted, freedBytes, DateTime.UtcNow - start);
+    }
+
+    /// <summary>
+    /// Phase 6.17 Wave F: rich-result wrapper with privilege guard for Linux package-cache cleanup.
+    /// Windows path doesn't need helper for tmp folder cleanup.
+    /// </summary>
+    public async Task<OperationResult> RunOperationAsync(
+        OptimizationPlan plan,
+        IPrivilegedActionGuard guard,
+        IProgress<TaskProgress>? progress = null,
+        CancellationToken ct = default)
+    {
+        var sw = Stopwatch.StartNew();
+
+        if (OperatingSystem.IsLinux())
+        {
+            if (!await guard.TryGuardAsync(
+                    actionDescription: "Delete cached package files and temporary data",
+                    remediationCommandOverride: null,
+                    ct: ct))
+            {
+                sw.Stop();
+                return OperationResult.Skipped(
+                    "Privilege helper required",
+                    "sudo bash /opt/auracorepro/install-privhelper.sh");
+            }
+        }
+
+        try
+        {
+            var legacy = await OptimizeAsync(plan, progress, ct);
+            sw.Stop();
+            if (!legacy.Success)
+                return OperationResult.Failed("Junk cleanup did not complete successfully", sw.Elapsed);
+            return OperationResult.Success(legacy.BytesFreed, legacy.ItemsProcessed, sw.Elapsed);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            return OperationResult.Failed($"{ex.GetType().Name}: {ex.Message}", sw.Elapsed);
+        }
     }
 
     public Task<bool> CanRollbackAsync(string operationId, CancellationToken ct = default)

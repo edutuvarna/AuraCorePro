@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -9,6 +10,7 @@ using AuraCore.Module.CronManager.Models;
 
 namespace AuraCore.Module.CronManager;
 
+[SupportedOSPlatform("linux")]
 public sealed class CronManagerModule : IOptimizationModule
 {
     public string Id => "cron-manager";
@@ -346,6 +348,7 @@ public sealed class CronManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
 public static class CronManagerRegistration
 {
     public static IServiceCollection AddCronManagerModule(this IServiceCollection services)

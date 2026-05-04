@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -11,6 +12,7 @@ using AuraCore.Module.PurgeableSpaceManager.Models;
 
 namespace AuraCore.Module.PurgeableSpaceManager;
 
+[SupportedOSPlatform("macos")]
 public sealed class PurgeableSpaceManagerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -232,6 +234,7 @@ public sealed class PurgeableSpaceManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class PurgeableSpaceManagerRegistration
 {
     public static IServiceCollection AddPurgeableSpaceManagerModule(this IServiceCollection services)

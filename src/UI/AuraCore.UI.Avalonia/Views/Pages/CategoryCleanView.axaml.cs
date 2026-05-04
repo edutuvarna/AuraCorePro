@@ -623,30 +623,62 @@ public partial class CategoryCleanView : UserControl
                     StatusText.Text = $"{p.Percentage:F0}% - {p.StatusText}");
             });
 
-            var result = await _module.OptimizeAsync(plan, progress);
-
-            StatusText.Text = result.Success
-                ? $"Cleaned {result.ItemsProcessed} items. Freed {FormatBytes(result.BytesFreed)} in {result.Duration.TotalSeconds:F1}s"
-                : LocalizationService._("catClean.cleanFailed");
-
-            // Log to history (junk-cleaner only)
-            if (IsJunkCleaner && result.Success)
+            // Phase 6.17 Wave F — junk-cleaner adopts IOperationModule with privilege guard.
+            // Disk-cleanup and privacy-cleaner keep their legacy OptimizeAsync paths.
+            if (IsJunkCleaner && _module is global::AuraCore.Application.Interfaces.Modules.IOperationModule opModule)
             {
-                JunkCleanerService.AddHistoryEntry(new CleanHistoryEntry
+                var guard = App.Services.GetRequiredService<global::AuraCore.Application.Interfaces.Platform.IPrivilegedActionGuard>();
+                var opResult = await opModule.RunOperationAsync(plan, guard, progress, ct: default);
+
+                ApplyPostActionBanner(opResult);
+
+                // Log to history on success
+                if (opResult.Status == OperationStatus.Success)
                 {
-                    Timestamp = DateTimeOffset.Now,
-                    ModuleId = _module.Id,
-                    ItemsCleaned = result.ItemsProcessed,
-                    BytesFreed = result.BytesFreed,
-                    Categories = selectedCats
-                });
-                LoadHistoryPanel();
+                    JunkCleanerService.AddHistoryEntry(new CleanHistoryEntry
+                    {
+                        Timestamp = DateTimeOffset.Now,
+                        ModuleId = _module.Id,
+                        ItemsCleaned = opResult.ItemsAffected,
+                        BytesFreed = opResult.BytesFreed,
+                        Categories = selectedCats
+                    });
+                    LoadHistoryPanel();
+                }
+            }
+            else
+            {
+                var result = await _module.OptimizeAsync(plan, progress);
+
+                StatusText.Text = result.Success
+                    ? $"Cleaned {result.ItemsProcessed} items. Freed {FormatBytes(result.BytesFreed)} in {result.Duration.TotalSeconds:F1}s"
+                    : LocalizationService._("catClean.cleanFailed");
             }
 
             await RunScan(); // refresh
         }
         catch (Exception ex) { StatusText.Text = $"Error: {ex.Message}"; }
         finally { CleanLabel.Text = LocalizationService._("catClean.cleanSelected"); }
+    }
+
+    private void ApplyPostActionBanner(OperationResult opResult)
+    {
+        PostActionBanner.IsVisible = true;
+        PostActionBanner.Foreground = opResult.Status switch
+        {
+            OperationStatus.Success => new SolidColorBrush(Color.Parse("#10B981")),
+            OperationStatus.Skipped => new SolidColorBrush(Color.Parse("#F59E0B")),
+            OperationStatus.Failed  => new SolidColorBrush(Color.Parse("#EF4444")),
+            _                       => new SolidColorBrush(Color.Parse("#9CA3AF")),
+        };
+        PostActionBanner.Text = opResult.Status switch
+        {
+            OperationStatus.Success => string.Format(LocalizationService._("op.result.success"),
+                                          FormatBytes(opResult.BytesFreed), opResult.ItemsAffected, opResult.Duration.TotalSeconds),
+            OperationStatus.Skipped => string.Format(LocalizationService._("op.result.skipped"), opResult.Reason ?? string.Empty),
+            OperationStatus.Failed  => string.Format(LocalizationService._("op.result.failed"), opResult.Reason ?? string.Empty),
+            _                       => string.Empty,
+        };
     }
 
     private static string FormatBytes(long b) => b switch

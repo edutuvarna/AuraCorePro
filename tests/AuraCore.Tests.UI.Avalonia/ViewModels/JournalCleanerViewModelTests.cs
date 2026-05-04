@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using AuraCore.Application;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.JournalCleaner.Models;
 using AuraCore.UI.Avalonia.ViewModels;
@@ -243,6 +244,23 @@ public class JournalCleanerViewModelTests
             progress?.Report(new TaskProgress(Id, 100, "complete"));
             var operationId = Guid.NewGuid().ToString("N")[..8];
             return new OptimizationResult(Id, operationId, OptimizeSuccess, 1, BytesFreedOnOptimize, TimeSpan.Zero);
+        }
+
+        // Phase 6.17 Wave F — IOperationModule extension; the VM unit tests in this file
+        // exercise the legacy path (no guard wired); this is a stub for the interface contract.
+        public async Task<OperationResult> RunOperationAsync(
+            OptimizationPlan plan,
+            IPrivilegedActionGuard guard,
+            IProgress<TaskProgress>? progress,
+            CancellationToken ct)
+        {
+            LastOptimizePlan = plan;
+            progress?.Report(new TaskProgress(Id, 0, "starting"));
+            await Task.Yield();
+            progress?.Report(new TaskProgress(Id, 100, "complete"));
+            return OptimizeSuccess
+                ? OperationResult.Success(BytesFreedOnOptimize, 1, TimeSpan.Zero)
+                : OperationResult.Failed(BlockedReason ?? "fake failure", TimeSpan.Zero);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ using AuraCore.Module.DockerCleaner.Models;
 
 namespace AuraCore.Module.DockerCleaner;
 
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public sealed class DockerCleanerModule : IOptimizationModule
 {
     public string Id => "docker-cleaner";
@@ -265,6 +268,8 @@ public sealed class DockerCleanerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public static class DockerCleanerRegistration
 {
     public static IServiceCollection AddDockerCleanerModule(this IServiceCollection services)

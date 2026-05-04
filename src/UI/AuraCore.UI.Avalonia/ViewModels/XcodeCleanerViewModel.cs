@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -29,6 +30,7 @@ public interface IXcodeCleanerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("macos")]
 public sealed class XcodeCleanerEngineAdapter : IXcodeCleanerEngine
 {
     private readonly XcodeCleanerModule _module;
@@ -158,6 +160,7 @@ public sealed class XcodeCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("macos")]
     public XcodeCleanerViewModel(XcodeCleanerModule module)
         : this(new XcodeCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

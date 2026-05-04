@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
 using AuraCore.Application.Interfaces.Modules;
@@ -8,6 +9,7 @@ using AuraCore.Module.GamingMode.Models;
 
 namespace AuraCore.Module.GamingMode;
 
+[SupportedOSPlatform("windows")]
 public sealed class GamingModeModule : IOptimizationModule
 {
     public string Id => "gaming-mode";
@@ -684,6 +686,7 @@ public sealed class GamingModeModule : IOptimizationModule
     [DllImport("psapi.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool EmptyWorkingSet(IntPtr hProcess);
 }
 
+[SupportedOSPlatform("windows")]
 public static class GamingModeRegistration
 {
     public static IServiceCollection AddGamingModeModule(

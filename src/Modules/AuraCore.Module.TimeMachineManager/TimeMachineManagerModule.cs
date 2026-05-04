@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using AuraCore.Application;
@@ -11,6 +12,7 @@ using AuraCore.Module.TimeMachineManager.Models;
 
 namespace AuraCore.Module.TimeMachineManager;
 
+[SupportedOSPlatform("macos")]
 public sealed class TimeMachineManagerModule : IOptimizationModule
 {
     private readonly IShellCommandService _shell;
@@ -222,6 +224,7 @@ public sealed class TimeMachineManagerModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("macos")]
 public static class TimeMachineManagerRegistration
 {
     public static IServiceCollection AddTimeMachineManagerModule(this IServiceCollection services)

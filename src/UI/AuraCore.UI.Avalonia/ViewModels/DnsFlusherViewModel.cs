@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -27,6 +28,7 @@ public interface IDnsFlusherEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("macos")]
 public sealed class DnsFlusherEngineAdapter : IDnsFlusherEngine
 {
     private readonly DnsFlusherModule _module;
@@ -88,6 +90,7 @@ public sealed class DnsFlusherViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("macos")]
     public DnsFlusherViewModel(DnsFlusherModule module)
         : this(new DnsFlusherEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

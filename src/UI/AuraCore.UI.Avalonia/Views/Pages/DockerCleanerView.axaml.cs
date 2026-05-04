@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using AuraCore.Module.DockerCleaner;
 using AuraCore.UI.Avalonia.ViewModels;
 using global::Avalonia.Controls;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
+[SupportedOSPlatform("linux")]
+[SupportedOSPlatform("macos")]
 public partial class DockerCleanerView : UserControl
 {
     public DockerCleanerView()

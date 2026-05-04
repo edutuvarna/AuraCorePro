@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using global::Avalonia.Media;
 using AuraCore.Application;
+using AuraCore.Application.Interfaces.Platform;
 using AuraCore.Module.JournalCleaner;
 using AuraCore.Module.JournalCleaner.Models;
 
@@ -23,9 +26,13 @@ public interface IJournalCleanerEngine
     JournalReport? LastReport { get; }
     Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default);
     Task<OptimizationResult> OptimizeAsync(OptimizationPlan plan, IProgress<TaskProgress>? progress, CancellationToken ct);
+
+    /// <summary>Phase 6.17 Wave F — rich-result vacuum operation with privilege guard.</summary>
+    Task<OperationResult> RunOperationAsync(OptimizationPlan plan, IPrivilegedActionGuard guard, IProgress<TaskProgress>? progress, CancellationToken ct);
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class JournalCleanerEngineAdapter : IJournalCleanerEngine
 {
     private readonly JournalCleanerModule _module;
@@ -35,6 +42,8 @@ public sealed class JournalCleanerEngineAdapter : IJournalCleanerEngine
     public Task<ScanResult> ScanAsync(ScanOptions options, CancellationToken ct = default) => _module.ScanAsync(options, ct);
     public Task<OptimizationResult> OptimizeAsync(OptimizationPlan plan, IProgress<TaskProgress>? progress, CancellationToken ct) =>
         _module.OptimizeAsync(plan, progress, ct);
+    public Task<OperationResult> RunOperationAsync(OptimizationPlan plan, IPrivilegedActionGuard guard, IProgress<TaskProgress>? progress, CancellationToken ct) =>
+        _module.RunOperationAsync(plan, guard, progress, ct);
 }
 
 /// <summary>
@@ -46,11 +55,13 @@ public sealed class JournalCleanerEngineAdapter : IJournalCleanerEngine
 public sealed class JournalCleanerViewModel : INotifyPropertyChanged
 {
     private readonly IJournalCleanerEngine _engine;
+    private readonly IPrivilegedActionGuard? _guard;
     private CancellationTokenSource? _cts;
 
-    public JournalCleanerViewModel(IJournalCleanerEngine engine)
+    public JournalCleanerViewModel(IJournalCleanerEngine engine, IPrivilegedActionGuard? guard = null)
     {
         _engine = engine ?? throw new ArgumentNullException(nameof(engine));
+        _guard = guard;
 
         ScanCommand = new AsyncDelegateCommand(
             execute: _ => ScanAsync(),
@@ -68,8 +79,9 @@ public sealed class JournalCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
-    public JournalCleanerViewModel(JournalCleanerModule module)
-        : this(new JournalCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
+    [SupportedOSPlatform("linux")]
+    public JournalCleanerViewModel(JournalCleanerModule module, IPrivilegedActionGuard? guard = null)
+        : this(new JournalCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))), guard)
     {
     }
 
@@ -164,6 +176,43 @@ public sealed class JournalCleanerViewModel : INotifyPropertyChanged
 
     public bool HasError => !string.IsNullOrEmpty(_errorMessage);
 
+    // ── Phase 6.17 Wave F: post-action banner (VM-bound) ──
+    private OperationResult? _lastOperationResult;
+    public OperationResult? LastOperationResult
+    {
+        get => _lastOperationResult;
+        private set
+        {
+            if (ReferenceEquals(_lastOperationResult, value)) return;
+            _lastOperationResult = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowPostActionBanner));
+            OnPropertyChanged(nameof(PostActionBannerText));
+            OnPropertyChanged(nameof(PostActionBannerForeground));
+        }
+    }
+
+    public bool ShowPostActionBanner => _lastOperationResult is not null;
+
+    public string PostActionBannerText => _lastOperationResult is null ? string.Empty : _lastOperationResult.Status switch
+    {
+        OperationStatus.Success => string.Format(LocalizationService._("op.result.success"),
+            FormatSize(_lastOperationResult.BytesFreed), _lastOperationResult.ItemsAffected, _lastOperationResult.Duration.TotalSeconds),
+        OperationStatus.Skipped => string.Format(LocalizationService._("op.result.skipped"), _lastOperationResult.Reason ?? string.Empty),
+        OperationStatus.Failed  => string.Format(LocalizationService._("op.result.failed"), _lastOperationResult.Reason ?? string.Empty),
+        _                       => string.Empty,
+    };
+
+    public IBrush PostActionBannerForeground => _lastOperationResult is null
+        ? new SolidColorBrush(Color.Parse("#9CA3AF"))
+        : _lastOperationResult.Status switch
+        {
+            OperationStatus.Success => new SolidColorBrush(Color.Parse("#10B981")),
+            OperationStatus.Skipped => new SolidColorBrush(Color.Parse("#F59E0B")),
+            OperationStatus.Failed  => new SolidColorBrush(Color.Parse("#EF4444")),
+            _                       => new SolidColorBrush(Color.Parse("#9CA3AF")),
+        };
+
     public ICommand ScanCommand { get; }
     public ICommand VacuumCommand { get; }
     public ICommand CancelCommand { get; }
@@ -231,6 +280,32 @@ public sealed class JournalCleanerViewModel : INotifyPropertyChanged
             var plan = new OptimizationPlan(_engine.Id, new List<string> { itemId });
             var progress = new Progress<TaskProgress>(p => ProgressPercent = p.Percentage);
 
+            // Phase 6.17 Wave F — when guard is wired, route via RunOperationAsync to surface banner.
+            if (_guard is not null)
+            {
+                var opResult = await _engine.RunOperationAsync(plan, _guard, progress, _cts.Token);
+                LastOperationResult = opResult;
+
+                if (opResult.Status != OperationStatus.Success)
+                {
+                    StatusText = string.Format(
+                        LocalizationService._("journalCleaner.status.error"),
+                        opResult.Reason ?? "vacuum failed");
+                    ErrorMessage = opResult.Reason;
+                    return;
+                }
+
+                // Re-scan to refresh stats after vacuum
+                var rescan = await _engine.ScanAsync(new ScanOptions(), _cts.Token);
+                if (rescan.Success) Report = _engine.LastReport;
+
+                StatusText = string.Format(
+                    LocalizationService._("journalCleaner.status.done"),
+                    FormatSize(opResult.BytesFreed));
+                return;
+            }
+
+            // Legacy path (no guard wired — used in unit tests)
             var result = await _engine.OptimizeAsync(plan, progress, _cts.Token);
 
             if (!result.Success)
@@ -243,8 +318,8 @@ public sealed class JournalCleanerViewModel : INotifyPropertyChanged
             }
 
             // Re-scan to refresh stats after vacuum
-            var rescan = await _engine.ScanAsync(new ScanOptions(), _cts.Token);
-            if (rescan.Success) Report = _engine.LastReport;
+            var rescan2 = await _engine.ScanAsync(new ScanOptions(), _cts.Token);
+            if (rescan2.Success) Report = _engine.LastReport;
 
             StatusText = string.Format(
                 LocalizationService._("journalCleaner.status.done"),

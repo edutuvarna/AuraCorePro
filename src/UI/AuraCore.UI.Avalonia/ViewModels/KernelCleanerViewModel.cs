@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -32,6 +33,7 @@ public interface IKernelCleanerEngine
 }
 
 /// <summary>Default production adapter over the sealed concrete module.</summary>
+[SupportedOSPlatform("linux")]
 public sealed class KernelCleanerEngineAdapter : IKernelCleanerEngine
 {
     private readonly KernelCleanerModule _module;
@@ -153,6 +155,7 @@ public sealed class KernelCleanerViewModel : INotifyPropertyChanged
     }
 
     /// <summary>Convenience ctor for DI — wraps the concrete module in the default adapter.</summary>
+    [SupportedOSPlatform("linux")]
     public KernelCleanerViewModel(KernelCleanerModule module)
         : this(new KernelCleanerEngineAdapter(module ?? throw new ArgumentNullException(nameof(module))))
     {

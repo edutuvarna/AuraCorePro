@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AuraCore.UI.Avalonia.Views.Dialogs.PrivilegeHelperRequiredDialog"
+        Width="600" Height="380"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+  <Grid Margin="32" RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+    <TextBlock Grid.Row="0" x:Name="TitleText"
+               FontSize="20" FontWeight="SemiBold"
+               Foreground="{DynamicResource TextPrimaryBrush}"
+               Margin="0,0,0,12" />
+
+    <TextBlock Grid.Row="1" x:Name="ActionDescText"
+               FontSize="14"
+               TextWrapping="Wrap"
+               Foreground="{DynamicResource TextSecondaryBrush}"
+               Margin="0,0,0,8" />
+
+    <StackPanel Grid.Row="2" Spacing="12">
+      <TextBlock x:Name="ReasonText"
+                 FontSize="13"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource TextSecondaryBrush}" />
+
+      <Border Padding="16,12" CornerRadius="6"
+              Background="{DynamicResource BgSurfaceBrush}">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+          <SelectableTextBlock Grid.Column="0"
+                     x:Name="RemediationText"
+                     FontFamily="Consolas,Menlo,Monospace"
+                     FontSize="13"
+                     Foreground="{DynamicResource TextPrimaryBrush}"
+                     TextWrapping="Wrap" />
+          <Button Grid.Column="1" x:Name="CopyButton"
+                  VerticalAlignment="Top" Margin="12,0,0,0"
+                  Click="OnCopyClick" />
+        </Grid>
+      </Border>
+    </StackPanel>
+
+    <Button Grid.Row="3" x:Name="DocsButton"
+            HorizontalAlignment="Left" Margin="0,16,0,12"
+            Click="OnDocsClick" />
+
+    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button x:Name="TryAgainButton" Click="OnTryAgainClick" />
+      <Button x:Name="CloseButton" Click="OnCloseClick" />
+    </StackPanel>
+  </Grid>
+</Window>

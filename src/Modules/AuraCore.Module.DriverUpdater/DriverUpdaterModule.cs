@@ -4,6 +4,7 @@ using AuraCore.Application.Interfaces.Modules;
 using AuraCore.Domain.Enums;
 using AuraCore.Module.DriverUpdater.Models;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Text.Json;
 
 namespace AuraCore.Module.DriverUpdater;
@@ -13,6 +14,7 @@ namespace AuraCore.Module.DriverUpdater;
 /// Uses WMI (Win32_PnPSignedDriver) for reliable driver enumeration.
 /// Supports: driver scan, age analysis, problem detection, backup, Windows Update check.
 /// </summary>
+[SupportedOSPlatform("windows")]
 public sealed class DriverUpdaterModule : IOptimizationModule
 {
     private readonly AuraCore.Application.Interfaces.Platform.IShellCommandService? _shellCommandService;
@@ -394,6 +396,7 @@ public sealed class DriverUpdaterModule : IOptimizationModule
     }
 }
 
+[SupportedOSPlatform("windows")]
 public static class DriverUpdaterRegistration
 {
     public static IServiceCollection AddDriverUpdaterModule(this IServiceCollection services)

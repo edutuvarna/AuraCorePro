@@ -1,6 +1,7 @@
 using global::Avalonia.Controls;
 using global::Avalonia.Interactivity;
 using global::Avalonia.Media;
+using AuraCore.Application;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
@@ -138,4 +139,36 @@ public partial class PackageCleanerView : UserControl
         SubText.Text    = L("packageCleaner.subtext.initial");
         PrivilegeWarning.Text = L("packageCleaner.warning.privilege");
     }
+
+    /// <summary>
+    /// Phase 6.17 Wave F — surfaces an OperationResult into the post-action banner.
+    /// Wired to clean/autoremove actions when invoked.
+    /// </summary>
+    internal void ApplyPostActionBanner(OperationResult opResult)
+    {
+        PostActionBanner.IsVisible = true;
+        PostActionBanner.Foreground = opResult.Status switch
+        {
+            OperationStatus.Success => new SolidColorBrush(Color.Parse("#10B981")),
+            OperationStatus.Skipped => new SolidColorBrush(Color.Parse("#F59E0B")),
+            OperationStatus.Failed  => new SolidColorBrush(Color.Parse("#EF4444")),
+            _                       => new SolidColorBrush(Color.Parse("#9CA3AF")),
+        };
+        PostActionBanner.Text = opResult.Status switch
+        {
+            OperationStatus.Success => string.Format(LocalizationService._("op.result.success"),
+                                          FormatBytesNew(opResult.BytesFreed), opResult.ItemsAffected, opResult.Duration.TotalSeconds),
+            OperationStatus.Skipped => string.Format(LocalizationService._("op.result.skipped"), opResult.Reason ?? string.Empty),
+            OperationStatus.Failed  => string.Format(LocalizationService._("op.result.failed"), opResult.Reason ?? string.Empty),
+            _                       => string.Empty,
+        };
+    }
+
+    private static string FormatBytesNew(long b) => b switch
+    {
+        < 1024 => $"{b} B",
+        < 1024 * 1024 => $"{b / 1024.0:F1} KB",
+        < 1024L * 1024 * 1024 => $"{b / (1024.0 * 1024):F1} MB",
+        _ => $"{b / (1024.0 * 1024 * 1024):F2} GB"
+    };
 }

@@ -224,9 +224,20 @@ public sealed class SystemHealthModule : IOptimizationModule
         {
             try
             {
+                // Phase 6.17.A: skip virtual filesystems — they're not user-facing
+                // storage and reporting 0-byte capacity caused the -2147483648%
+                // display bug ((int)((1 - 0/0) * 100) = (int)NaN = int.MinValue).
+                if (IsVirtualFilesystem(d)) continue;
+
                 var totalGb = d.TotalSize / (1024.0 * 1024 * 1024);
-                var freeGb = d.AvailableFreeSpace / (1024.0 * 1024 * 1024);
-                var usedPct = (int)((1.0 - freeGb / totalGb) * 100);
+
+                // Phase 6.17.A: zero-capacity guard — even after the virtual-fs
+                // filter, some ready drives can momentarily report TotalSize=0
+                // (slow USB enumeration, ramdisks). Don't divide by zero.
+                if (totalGb <= 0) continue;
+
+                var freeGb  = d.AvailableFreeSpace / (1024.0 * 1024 * 1024);
+                var usedPct = (int)Math.Clamp((1.0 - freeGb / totalGb) * 100, 0, 100);
                 drives.Add(new DriveReport(d.Name, d.VolumeLabel, d.DriveFormat, totalGb, freeGb, usedPct));
             }
             catch { }
@@ -503,6 +514,22 @@ public sealed class SystemHealthModule : IOptimizationModule
             }
         }
         return startups;
+    }
+
+    /// <summary>
+    /// Phase 6.17.A: virtual filesystems on Linux/macOS report 0-byte capacity
+    /// and would underflow the percent calculation. Drop the well-known
+    /// virtual ones; treat everything else (ext4, btrfs, xfs, ntfs, apfs,
+    /// hfsplus, exfat, fat32, ...) as real storage.
+    /// </summary>
+    private static bool IsVirtualFilesystem(DriveInfo d)
+    {
+        var fmt = d.DriveFormat?.ToLowerInvariant() ?? string.Empty;
+        return fmt is "tmpfs" or "devtmpfs" or "proc" or "sysfs" or "devpts"
+                    or "securityfs" or "cgroup" or "cgroup2" or "pstore"
+                    or "bpf" or "tracefs" or "debugfs" or "configfs"
+                    or "fusectl" or "binfmt_misc" or "autofs" or "mqueue"
+                    or "hugetlbfs" or "rpc_pipefs" or "nsfs";
     }
 
     [StructLayout(LayoutKind.Sequential)]

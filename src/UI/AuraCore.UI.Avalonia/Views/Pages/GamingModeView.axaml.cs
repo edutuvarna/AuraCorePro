@@ -10,11 +10,13 @@ using AuraCore.Module.GamingMode;
 using AuraCore.Module.GamingMode.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 namespace AuraCore.UI.Avalonia.Views.Pages;
 
 public record BgProcessItem(string Name, string MemText, string Category, bool Suggest, int Pid);
 
+[SupportedOSPlatform("windows")]
 public partial class GamingModeView : UserControl
 {
     private readonly GamingModeModule? _module;

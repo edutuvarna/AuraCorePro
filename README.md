@@ -1,12 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="AuraCore Pro Logo" width="100" height="100" />
-</p>
-
-<h1 align="center">AuraCore Pro</h1>
-
-<p align="center">
-  <strong>High-Performance System Optimization Suite & Local-First AI Guardian</strong><br>
-  Built with .NET 8 and Avalonia UI for Windows, Linux, and macOS.
+  <img src="assets/social-preview.png" alt="AuraCore Pro" width="100%" />
 </p>
 
 <p align="center">

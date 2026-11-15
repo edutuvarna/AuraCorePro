@@ -3,82 +3,66 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.8.0-blue.svg?style=flat-square" alt="Version 1.8.0" />
-  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-informational.svg?style=flat-square" alt="Platform Support" />
-  <img src="https://img.shields.io/badge/framework-.NET%208%20%2F%20Avalonia-purple.svg?style=flat-square" alt=".NET 8 / Avalonia" />
-  <img src="https://img.shields.io/badge/ai-100%25%20Local%20%26%20Offline-success.svg?style=flat-square" alt="Local AI" />
-  <img src="https://img.shields.io/badge/license-Proprietary-lightgrey.svg?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/latest-v1.8.1-blue.svg?style=flat-square" alt="Latest release v1.8.1" />
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-informational.svg?style=flat-square" alt="Windows and Linux" />
+  <img src="https://img.shields.io/badge/built%20with-.NET%208%20%2F%20Avalonia-purple.svg?style=flat-square" alt=".NET 8 / Avalonia" />
+  <img src="https://img.shields.io/badge/license-Proprietary-lightgrey.svg?style=flat-square" alt="Proprietary license" />
 </p>
 
 ---
 
-## Overview
+## What is AuraCore Pro?
 
-**AuraCore Pro** is an all-in-one desktop utility engineered for real, measurable system performance, advanced privacy protection, and continuous system monitoring.
+AuraCore Pro is a desktop system optimization suite for Windows and Linux. It brings cleaning, performance tuning, privacy tools and system monitoring together in one app, plus AI features that run locally on your machine.
 
-Unlike traditional utilities that rely on simulated counters or superficial tweaks, AuraCore Pro adheres to a strict **Zero Placebo Policy**: every action executes genuine OS operations through secure privileged interfaces, backed by pre-modification snapshots and one-click rollback capabilities.
-
----
-
-## Key Highlights
-
-### 🛡️ Grounded AI Guardian (100% Offline)
-- **Real-Time Memory Leak Detection**: Integrated ML.NET IID Change Point models continuously evaluate process working sets over time to identify memory leaks before they exhaust system resources.
-- **Process & Network Security Inspector**: Correlates active outbound TCP connections per process with digital Authenticode signatures. Automatically flags unsigned or suspicious executables executing from temporary directories.
-- **Fact-Based AI Insights**: Context-aware diagnostics cite verified OS telemetry, providing actionable recommendations without hallucination.
-- **Complete Privacy**: All intelligence runs locally on your CPU/GPU — no telemetry or system metrics are ever sent to external cloud servers.
-
-### ⚡ 48 Production Optimization Modules
-- **Deep Disk & Junk Cleaning**: Cleans temporary files, crash dumps, system caches, browser residues (Chrome, Edge, Firefox), and securely routes duplicate files to the Recycle Bin.
-- **Intelligent Driver Management**: Verifies drivers against the authentic Windows Update Agent (WUA) catalog, excludes standard Microsoft in-box drivers from false positives, and creates complete pre-update backups via `pnputil /export-driver`.
-- **Gaming Performance Mode**: Automatically detects over 68+ popular game titles to adjust process thread priorities, configure network QoS policies, and pause background Windows updates during gameplay.
-- **Precision Startup & Services**: Tune startup applications, scheduled tasks, and Windows/systemd services with immediate impact analysis.
-- **Shell & Privacy Tools**: Multi-pass secure file shredding, DNS benchmarking and automatic switching, hosts file editor with full IPv6 support, and Windows Defender controls.
-
-### 🔄 Safe Rollback Architecture
-Every critical modification — from registry tweaks and hosts entries to power schemes and driver updates — creates an automatic pre-action backup, allowing you to restore your system state at any time.
-
-### 🌐 Multi-Language Support
-AuraCore Pro is fully localized across **5 languages**:
-- 🇬🇧 English
-- 🇹🇷 Türkçe
-- 🇩🇪 Deutsch
-- 🇪🇸 Español
-- 🇫🇷 Français
+This repository hosts releases, release notes and the issue tracker. The source code is private.
 
 ---
 
-## Download & Installation
+## Features
 
-### Windows 10 / 11 (64-bit)
-1. Download the latest **`AuraCorePro-Setup-1.8.0.exe`** from [GitHub Releases](https://github.com/edutuvarna/AuraCorePro/releases/latest).
-2. Run the self-contained installer — no external .NET runtime installation required.
-3. Launch AuraCore Pro from your desktop or start menu.
+### Cleaning & storage
+Junk Cleaner, Disk Cleanup Pro, Privacy Cleaner, Storage Compression, Space Analyzer, File Shredder, and on Linux: Package, Journal, Kernel, Snap & Flatpak, and Docker cleaners.
 
-### Linux & macOS
-- Linux packages (`.deb` / `.tar.gz`) and macOS packages are available under [Releases](https://github.com/edutuvarna/AuraCorePro/releases).
+### Performance
+RAM Optimizer, Gaming Mode (auto-detects 68+ games), Startup Optimizer, Service Manager, Network Optimizer, DNS Benchmark, and on Linux: Swap Optimizer and Systemd Manager.
+
+### Security & system tools
+Defender Manager, Firewall Rules, Hosts Editor, Driver Updater, Registry Optimizer, Battery Optimizer, System Health, Disk Health (SMART), Process Monitor, Network Monitor and ISO Builder.
+
+### AI (runs on your device)
+- **AI Insights**: health score, CPU/RAM anomaly alerts, disk-full forecast and memory-leak detection.
+- **AI Recommendations**: suggestions based on your live system data.
+- **AI Chat** *(experimental)*: ask questions about your system using a local language model.
+
+AI analysis happens on your computer. Sharing anonymous usage data is optional and asks for your consent first.
+
+### Undo support
+Many modules back up what they change before they change it, so you can roll back.
+
+### Languages
+English, Türkçe, Deutsch, Español, Français *(German, Spanish and French arrive in the next release)*.
 
 ---
 
-## System Requirements
+## Download
 
-| Specification | Windows | Linux | macOS |
-| :--- | :--- | :--- | :--- |
-| **Operating System** | Windows 10 / 11 (64-bit) | Ubuntu 22.04+, Fedora 38+, Debian 12+ | macOS 12 Monterey or later |
-| **Processor** | 64-bit Intel / AMD | 64-bit x86_64 | Apple Silicon (M1+) or Intel x64 |
-| **Memory** | 4 GB RAM (8 GB recommended) | 4 GB RAM | 4 GB RAM |
-| **Storage** | 500 MB free disk space | 500 MB free disk space | 500 MB free disk space |
+Installers will be published on the [Releases](https://github.com/edutuvarna/AuraCorePro/releases) page.
+
+- **Windows**: Windows 10 or 11, 64-bit.
+- **Linux**: 64-bit (x86_64). Some modules need the AuraCore privilege helper.
+- **macOS**: not available yet.
 
 ---
 
-## Feedback & Community
+## Feedback
 
-- **Bug Reports**: If you experience an issue, please open a [Bug Report](https://github.com/edutuvarna/AuraCorePro/issues/new?template=bug_report.md).
-- **Feature Requests**: Have an idea for a new module or optimization? Submit a [Feature Request](https://github.com/edutuvarna/AuraCorePro/issues/new?template=feature_request.md).
-- **Release History**: See [CHANGELOG.md](CHANGELOG.md) for detailed notes on every release.
+- Found a bug? [Open a bug report](https://github.com/edutuvarna/AuraCorePro/issues/new?template=bug_report.md).
+- Have an idea? [Request a feature](https://github.com/edutuvarna/AuraCorePro/issues/new?template=feature_request.md).
+- What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## License
 
-AuraCore Pro is proprietary software. All rights reserved. See [LICENSE.md](LICENSE.md) for full licensing details.
+AuraCore Pro is proprietary software. All rights reserved. See [LICENSE.md](LICENSE.md).
